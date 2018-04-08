@@ -1,0 +1,343 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class BhdeliveryController extends BasicController {
+
+
+    public function addview1Action(){
+
+    }
+    public function addview2Action(){
+
+    }
+    public function addview3Action(){
+
+    }
+    public function addview4Action(){
+
+    }
+    public function addview5Action(){
+
+    }
+    /*
+     * 获取广告计划列表
+     */
+     public function getCampAction(){
+         $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+         $Bhdelivery = Helper::M('Bhdelivery');
+         $result = $Bhdelivery->getcamp($comp_id);
+         Helper::outJson($result);
+      }
+
+      /*
+       *添加计划
+       */
+      public function addCampAction(){
+          $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+          $bh_campaign_name = Helper::clean($this->getRequest()->getPost('bh_campaign_name'));//广告计划名称
+          $startDate = Helper::clean($this->getRequest()->getPost('startDate'));//开始时间
+          $endDate = Helper::clean($this->getRequest()->getPost('endDate'));//结束时间
+          $budgetSwitch = Helper::clean($this->getRequest()->getPost('budgetSwitch'));//日预算状态
+          $budget = Helper::clean($this->getRequest()->getPost('budget'));//日预算
+          $totalBudgetSwitch = Helper::clean($this->getRequest()->getPost('totalBudgetSwitch'));//总预算状态
+          $totalBudget = Helper::clean($this->getRequest()->getPost('totalBudget'));//总预算
+          $data['comp_id'] = $comp_id;
+          $data['bh_campaign_name'] = $bh_campaign_name;
+          $data['startDate'] = $startDate;
+          $data['endDate'] = $endDate;
+          $data['budgetSwitch'] = $budgetSwitch;
+          $data['budget'] = $budget*100;
+          $data['totalBudgetSwitch'] = $totalBudgetSwitch;
+          $data['totalBudget'] = $totalBudget*100;
+          $data['comp_pid'] = $this->uinfo['comp_id'];//代理商id
+          $data['add_staff_id'] = $this->uinfo['staff_id'];
+          $data['add_time'] = time();
+          $Bhdelivery = Helper::M('Bhdelivery');
+          $result = $Bhdelivery->addcamp($data);
+          Helper::outJson($result);
+      }
+
+    /*
+   * 获取人群包列表
+   */
+    public function getCrowdlistAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->getCrowdlist($comp_pid);
+        if($result){
+            foreach($result as $key=>$val){
+                $Markete = Helper::M('Market');
+                $crowd_info = $Markete->getCrowdinfo($val['crowd_id'], $comp_pid);;
+                if($crowd_info){
+                    $result[$key]['cover_users'] = $crowd_info[0]['cover_users'];
+                }else{
+                    $result[$key]['cover_users'] = '';
+                }
+            }
+        }
+        $arr = array('api_code' => 1, 'msg' => 'success',);
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+    /*
+     * 获取媒体列表
+     */
+    public function getAdxsAction(){
+
+        $where  = "";
+        $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+        if($osType_o==1){
+            if($where){
+                $where = $where." AND osType_o=1";
+            }else{
+                $where = "osType_o=1";
+            }
+        }
+        $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+        if($osType_i==1){
+            if($where){
+                $where = $where." AND osType_i=1";
+            }else{
+                $where = "osType_i=1";
+            }
+        }
+        $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+        if($behavior_type_t==1){
+            if($where){
+                $where = $where." AND behavior_type_t=1";
+            }else{
+                $where = "behavior_type_t=1";
+            }
+        }
+        $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+        if($behavior_type_x==1){
+            if($where){
+                $where = $where." AND behavior_type_x=1";
+            }else{
+                $where = "behavior_type_x=1";
+            }
+        }
+        $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+        if($action_type_h==1){
+            if($where){
+                $where = $where." AND action_type_h=1";
+            }else{
+                $where = "action_type_h=1";
+            }
+        }
+       // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+        //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+        $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+        if($action_type_k==1){
+            if($where){
+                $where = $where." AND action_type_k=1";
+            }else{
+                $where = "action_type_k=1";
+            }
+        }
+        $source_type_q = Helper::clean($this->getRequest()->getPost('source_type_q'));//来源支持-全网智能优化 0 不支持 1支持
+        if($source_type_q==1){
+            if($where){
+                $where = $where." AND source_type_q=1";
+            }else{
+                $where = "source_type_q=1";
+            }
+        }
+        $source_type_z = Helper::clean($this->getRequest()->getPost('source_type_z'));//来源支持-指定应用 0 不支持 1支持
+        if($source_type_z==1){
+            if($where){
+                $where = $where." AND source_type_z=1";
+            }else{
+                $where = "source_type_z=1";
+            }
+        }
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $size_info = $Bhdelivery->getAdxs($where);
+        $adx_list = array();
+        if($size_info){
+                foreach($size_info as $key=>$val){
+                          if(in_array($val['adx_Id'],$adx_list)){
+                              $adx_list[] = $val['adx_Id'];
+                          }
+                }
+        }
+        if($adx_list){
+            //获取媒体列表
+          $adxInfo =   $Bhdelivery->getAdxlist($adx_list);
+        }else{
+            $adxInfo = '';
+        }
+        Helper::outJson($adxInfo);
+
+    }
+    /*
+     * 获取全网智能优化对应的媒体对应的规格
+     */
+    public function  getSourcetypeqAction(){
+
+        $where  = "";
+        $adx_id = Helper::clean($this->getRequest()->getPost('adx_id'));//媒体列表
+        if($adx_id){
+            if($where){
+                $where = $where." AND $adx_id=".$adx_id;
+            }else{
+                $where = "$adx_id=".$adx_id;;
+            }
+        }
+        $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+        if($osType_o==1){
+            if($where){
+                $where = $where." AND osType_o=1";
+            }else{
+                $where = "osType_o=1";
+            }
+        }
+        $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+        if($osType_i==1){
+            if($where){
+                $where = $where." AND osType_i=1";
+            }else{
+                $where = "osType_i=1";
+            }
+        }
+        $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+        if($behavior_type_t==1){
+            if($where){
+                $where = $where." AND behavior_type_t=1";
+            }else{
+                $where = "behavior_type_t=1";
+            }
+        }
+        $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+        if($behavior_type_x==1){
+            if($where){
+                $where = $where." AND behavior_type_x=1";
+            }else{
+                $where = "behavior_type_x=1";
+            }
+        }
+        $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+        if($action_type_h==1){
+            if($where){
+                $where = $where." AND action_type_h=1";
+            }else{
+                $where = "action_type_h=1";
+            }
+        }
+        // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+        //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+        $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+        if($action_type_k==1){
+            if($where){
+                $where = $where." AND action_type_k=1";
+            }else{
+                $where = "action_type_k=1";
+            }
+        }
+        $source_type_q = 1;//来源支持-全网智能优化 0 不支持 1支持
+        if($source_type_q==1){
+            if($where){
+                $where = $where." AND source_type_q=1";
+            }else{
+                $where = "source_type_q=1";
+            }
+        }
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $size_info = $Bhdelivery->getAdxs($where);
+        Helper::outJson($size_info);
+     }
+    /*
+     * 获取对应媒体对应的app列表
+     */
+    public function getAppAction(){
+
+        $adx_Id = Helper::clean($this->getRequest()->getPost('adx_Id'));//媒体列表
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $applist = $Bhdelivery->getApp($adx_Id);
+        Helper::outJson($applist);
+    }
+    /*
+     *获取app对应的规格列表
+     */
+    public function getAppSizeAction(){
+
+        $where = "";
+        $ap_id = Helper::clean($this->getRequest()->getPost('ap_id'));//app对应id
+        if($ap_id){
+            if($where){
+                $where = $where." AND ap_id=".$ap_id;
+            }else{
+                $where = "ap_id=".$ap_id;;
+            }
+        }
+        $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+        if($osType_o==1){
+            if($where){
+                $where = $where." AND osType_o=1";
+            }else{
+                $where = "osType_o=1";
+            }
+        }
+        $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+        if($osType_i==1){
+            if($where){
+                $where = $where." AND osType_i=1";
+            }else{
+                $where = "osType_i=1";
+            }
+        }
+        $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+        if($behavior_type_t==1){
+            if($where){
+                $where = $where." AND behavior_type_t=1";
+            }else{
+                $where = "behavior_type_t=1";
+            }
+        }
+        $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+        if($behavior_type_x==1){
+            if($where){
+                $where = $where." AND behavior_type_x=1";
+            }else{
+                $where = "behavior_type_x=1";
+            }
+        }
+        $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+        if($action_type_h==1){
+            if($where){
+                $where = $where." AND action_type_h=1";
+            }else{
+                $where = "action_type_h=1";
+            }
+        }
+        // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+        //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+        $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+        if($action_type_k==1){
+            if($where){
+                $where = $where." AND action_type_k=1";
+            }else{
+                $where = "action_type_k=1";
+            }
+        }
+        $source_type_z = 1;//来源支持-全网智能优化 0 不支持 1支持
+        if($source_type_z==1){
+            if($where){
+                $where = $where." AND source_type_q=1";
+            }else{
+                $where = "source_type_q=1";
+            }
+        }
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->getAppSize($where);
+        Helper::outJson($result);
+    }
+
+}

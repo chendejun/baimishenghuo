@@ -1,0 +1,90 @@
+<?php
+
+/**
+ *
+ */
+class Scenes extends Model
+{
+
+    /**
+     * [getAgentAdvertiser 得到代理商广告主]
+     * @param  [int] $comp_id [代理商id]
+     * @return [type]          [description]
+     */
+    public function getAgentAdvertiser($comp_id)
+    {
+        $field = 'a.comp_id,
+        a.comp_name,
+        ifnull(b.scene_id,0) as scene_id,
+        (case when c.state = 2 then c.re_record_id else 0 end) as is_payment
+        ';
+        $sql = ' select '.$field.' from dsp_company as a
+        left join dsp_scenes as b on a.comp_id = b.comp_id
+        left join dsp_advertiser_recharge_record as c on c.comp_id = a.comp_id
+        where comp_type = 1 and a.comp_pid = '.$comp_id;
+        $rel = $this->db->dsp->query($sql);
+
+        return  $rel;
+    }
+
+    /**
+     * [getAdvertiserInfo 得到广告主信息]
+     * @param  [type] $where [description]
+     * @return [type]        [description]
+     */
+    public function getAdvertiserInfo($where)
+    {
+        $rel = $this->db->dsp->table('dsp_company')->where($where)->find();
+
+        return $rel;
+    }
+
+    /**
+     * [getAdvertiserMac 得到广告主设备]
+     * @param  [type] $comp_id [广告主id]
+     * @return [type]          [description]
+     */
+    public function getAdvertiserMac($comp_id)
+    {
+        $where = ' comp_id = '.$comp_id;
+        $field = ' mac_id,mac_addr,mac_set';
+        $rel = $this->db->dsp->table('dsp_mac_list')->field($field)->where($where)->select();
+        return $rel;
+    }
+
+    /**
+     * [getAdvertiserScene 得到广告主场景]
+     * @param  [type] $comp_id [广告主id]
+     * @return [type]          [description]
+     */
+    public function getAdvertiserScene($comp_id)
+    {
+        $rel = $this->db->dsp->table('dsp_scenes')->where('comp_id='.$comp_id)->find();
+        return $rel;
+    }
+
+    /**
+     * [getServerAvailableAmount 得到服务商可用金额]
+     * @param  [int] $comp_id [服务商id]
+     * @return [type]          [description]
+     */
+    public function getServerAvailableAmount($comp_id)
+    {
+        $rel = $this->db->account->table('dsp_account')->where('comp_id='.$comp_id.' and account_type = 1')->find();
+        return $rel;
+    }
+
+    /**
+     * [getMobilePhone 得到服务商手机号码]
+     * @param  [type] $comp_id [服务商id]
+     * @return [type]          [description]
+     */
+    public function getMobilePhone($comp_id)
+    {
+        $where = 'comp_id='.$comp_id.' and comp_type = 2';
+        $rel = $this->getAdvertiserInfo($where);
+        return $rel['mobile_phone'];
+    }
+
+
+}

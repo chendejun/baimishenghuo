@@ -1,0 +1,83 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class BhcreativeController extends BasicController {
+
+    /*
+     * 获取媒体列表
+     */
+  public function getAdSlotDataAction(){
+
+      $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+      $data['dealType'] = 1;
+      $data['creativeType'] = 1;//创意类型
+      $data['mediaType'] = 1;//媒体类型
+      $data['osType'] = 2;//系统类型
+      $data['trafficType'] = 1;
+      $data['platformType'] = 2;
+      $data['behaviorType'] = 1;
+      $bh = new BhDspApi();
+      $result = $bh->getAdSlotData($account_id,$data);
+      $result = '{"code":0,"msg":"ok","message":"成功","reason":"","datas":{"bid":"20239500","click":"350","cost":"57255600.0","size":{"300x150":18461,"1280x720":6948,"450x225":4671,"692x191":4092,"1080x1920":1372,"720x1280":1130,"640x100":892,"640x360":731,"480x800":567,"2048x1536":503,"640x960":420,"640x1136":405,"2560x1600":237,"1125x2436":22,"640x320":12,"800x1280":12,"568x320":3,"1024x768":1},"view":"14690","sizeTotal":40479,"sizeZb":{"300x150":45.61,"1280x720":17.16,"450x225":11.54,"692x191":10.11,"1080x1920":3.39,"720x1280":2.79,"640x100":2.2,"640x360":1.81,"480x800":1.4,"2048x1536":1.24,"640x960":1.04,"640x1136":1,"2560x1600":0.59,"1125x2436":0.05,"640x320":0.03,"800x1280":0.03,"568x320":0.01,"1024x768":0}}}';
+      $data = json_decode($result,true);
+      $arr = array();
+      $lists = $data['datas']['size'];
+      $Bh = Helper::M('Bhcreate');
+      foreach ($lists as $key=>$val){
+          $data1['ad_size_name'] = $key;
+          $k_list = explode('x',$key);
+          $data1['ad_size_width'] = $k_list[0];
+           $data1['ad_size_height'] = $k_list[1];
+           $Bh = Helper::M('Bhcreate');
+           $size_list = $Bh->get($data1);
+           if(empty($size_list)){
+               $size_list = $Bh->add($data1);
+               $arr[] = $size_list;
+           }else{
+               $arr[] = $size_list[0]['size_id'];
+           }
+
+
+      }
+      $data2['adxId'] = 38;
+      $data2['size_list']  =  json_encode($arr);
+      $data2['osType']  = 2;
+      $Bh ->adds($data2);
+      exit;
+      Helper::outJson($result);
+   }
+   /*
+    * 获取媒体列表对应的规格列表
+    */
+   public function getEstimateFlowAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $adxType = Helper::clean($this->getRequest()->getPost('adxType'));//媒体平台集合
+       $data = array('randomNumber'=>'ef6580a866aaee2730ec32578d3f853',);
+       $bh = new BhDspApi();
+       $result = $bh->getEstimateFlow($account_id,$data);
+       Helper::outJson($result);
+   }
+   /*
+    * 获取指定应用类型
+    */
+   public function appListAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $data['adxId'] = 8;
+       $data['page'] = 1;
+       $data['accountId'] =1697020333;
+       $data['level'] =2;
+       $data['osType'] =2;
+       $data['behaviorType'] =1;
+       $data['creativeType'] =1;
+       $data['trafficType'] =1;
+       $data['unkownAppFlag'] =0;
+       $bh = new BhDspApi();
+       $result = $bh->appList($account_id,$data);
+       Helper::outJson($result);
+   }
+}

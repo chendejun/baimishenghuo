@@ -1,0 +1,701 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: cdj
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class MarketController extends BasicController
+{
+
+    /**
+     * [$page 短信列表默认页码]
+     * @var integer
+     */
+    const PAGE = 1;
+    /**
+     * [$pagecount 短信列表默认每页显示记录数]
+     * @var integer
+     */
+    const PAGE_COUNT = 10;
+
+    /**
+     * [SUCCESS_STATE 请求成功状态]
+     * @var integer
+     */
+    const SUCCESS_STATE = 1;
+
+    /**
+     * [FAIL_STATE 请求失败状态]
+     * @var integer
+     */
+    const FAIL_STATE = 0;
+
+    /**
+     * [MARKET_STATUS_SUCCESS 发送成功状态]
+     * @var integer
+     */
+    const MARKET_STATUS_SUCCESS = 3;
+    /**
+     * [FREEZE_STATUS_SUCCESS 解冻成功状态]
+     * @var integer
+     */
+    const FREEZE_STATUS_SUCCESS = 2;
+    /**
+     * [SEND_STATUS_SUCCESS 拉取报告成功状态]
+     * @var integer
+     */
+    const SEND_STATUS_SUCCESS = 1;
+
+    /**
+     * [CONVERSION 金额单位，100转换为元]
+     * @var integer
+     */
+    const CONVERSION = 100;
+
+    protected $tag = [
+        'cycle' => array('最近3天', '最近7天', '最近15天', '最近30天', '最近60天', '指定日期'),
+        'attr' => array('不限', '新用户', '老用户'),
+        'visit' => array('不限', '上午', '下午', '指定到访时间'),
+        'stay' => array('10分钟以下', '10-30分钟', '30-60分钟', '60分钟以上', '指定停留时间'),
+        'frequency' => array('不限', '大于1次/统计周期', '大于3次/统计周期', '大于指定次数'),
+        'type' => array('MAC地址包', 'IMEI号码包','手机号码包')
+    ];
+
+
+    public function indexviewAction()
+    {
+    }
+
+    /*
+     * 获取营销短信列表
+     */
+    public function indexAction()
+    {
+
+        $page = Helper::clean($this->getRequest()->getParam('page', self::PAGE));
+        $pagecount = Helper::clean($this->getRequest()->getParam('pagecount', self::PAGE_COUNT));
+        $market_status = Helper::clean($this->getRequest()->getParam('market_status'));
+        $key_word = Helper::clean($this->getRequest()->getParam('key_word'));
+        $new_data = array();
+        $comp_id = $this->uinfo['comp_id'];//代理商id
+
+        // 构造where条件
+        $comp_id_where = $this->transfromWhere('comp_pid', $comp_id);
+        $market_status_where = $this->transfromWhere('market_status', $market_status);
+        $market_name_where = $this->transfromWhere('market_name', $key_word, 'like');
+        $where = ' 1 '.$comp_id_where . $market_status_where . $market_name_where;
+
+        // 设置分页
+        $start = ($page - 1) * $pagecount;
+        $limit = $start . ',' . $pagecount;
+        // 获取短信列表集
+        $Markete = Helper::M('Market');
+        $data = $Markete->getMarketeList($where, $limit);
+        //var_dump($data[0]);exit;
+
+        // 获取总记录数和总页数
+        $count = count($Markete->getMarketeList($where));
+        $total_page_count = ceil($count / $pagecount);
+        // 获取人群包信息
+        foreach ($data as $key => $value) {
+            // 非定时发送（审核发送）
+            if ($value['send_type'] == 1) {
+                // 审核未通过的时候
+                if ($value['market_status'] == 1 || $value['market_status'] == 4) {
+                    $value['send_time'] = '--';
+                // 审核已通过
+                }elseif($value['market_status'] == 2 || $value['market_status'] == 3) {
+                    $date = $this->getMarketAuditDate($value['market_id']);
+
+                    $value['send_time'] = date('Y-m-d H:i:s',$date);
+                }
+            }
+            $new_data[$key] = $value;
+            // 获取审核不通过的原因
+           if ($value['market_status'] == 4) {
+               $new_data[$key]['audit_remark'] = $audit_remark = $this->getMarketAuditMessage($value['market_id']);
+           }else {
+               $new_data[$key]['audit_remark'] = '';
+           }
+           // 获取人群包信息
+            if (!empty($value['crowd_id'])) {
+                $new_data[$key]['crowd_type'] = 2;
+                $comp_pid_where = $this->transfromWhere('comp_pid', $comp_id);
+                $crowd_id_where = $this->transfromWhere('crowd_id', $value['crowd_id']);
+                $where = ' 1 '.$comp_pid_where . $crowd_id_where;
+                // 得到人群包信息
+                $crowd_data = $Markete->getCrowdRecord($where);
+                if (empty($crowd_data)) {
+                    $new_data[$key]['crowd_name'] = "找不到" . $value['crowd_id'] . "相匹配的人群包！";
+                    $new_data[$key]['crowd_type'] = 2;
+                    $new_data[$key]['tag_list'] = [];
+                    $new_data[$key]['market_file_num'] = 0;
+                } else {
+                    $new_data[$key]['crowd_name'] = $crowd_data['crowd_name'];
+                    // 得到用户标签
+                    $label_info = json_decode($crowd_data['label_info'], true);
+                    $tag_list = $this->getLabelInfo($label_info);
+                    $new_data[$key]['tag_list'] = $tag_list;
+
+                    // 查找附加人群包
+                    if (!empty($value['market_file_id'])) {
+                        $market_file_where = $this->transfromWhere('market_file_id', $value['market_file_id']);
+
+                        $market_file_data = $Markete->getMarketFileInfo(' 1 '.$market_file_where);
+                        if (!empty($market_file_data)) {
+                            $new_data[$key]['market_file_num'] = $market_file_data['file_z_num'];
+                        }else{
+                            $new_data[$key]['market_file_num'] = 0;
+                        }
+                    } else {
+                        // 未上传为0
+                        $new_data[$key]['market_file_num'] = 0;
+
+                    }
+                }
+            } else {
+                $new_data[$key]['crowd_name'] = '手动上传';
+                // 人群包类型，1手动上传，2非手动上传
+                $new_data[$key]['crowd_type'] = 1;
+                $new_data[$key]['tag_list'] = [];
+                $new_data[$key]['market_file_num'] = $value['send_num'];
+            }
+
+        }
+        $new_data = $this->transfromData($new_data);
+
+        Helper::outJson(array('state' => self::SUCCESS_STATE, 'data' => $new_data, 'page' => $page, 'count' => $count, 'total_page_count' => $total_page_count));
+
+    }
+
+
+    /**
+    * [getMarketAuditDate 得到审核成功的时间]
+    * @param  [type] $market_id [description]
+    * @return [type]            [description]
+    */
+   protected function getMarketAuditDate($market_id)
+   {
+
+
+       $market_audit_where = $this->transfromWhere('market_id', $market_id);
+       $audit_status = $this->transfromWhere('audit_status', 1);
+       $where = ' 1 '.$market_audit_where.$audit_status;
+       $result = $this->getMarketAudit($where);
+       if (!empty($result)) {
+           return $result['audit_time'];
+       }else {
+           return '';
+       }
+   }
+
+   /**
+    * [getMarketAudit 得到审核数据]
+    * @param  [type] $where [description]
+    * @return [type]        [description]
+    */
+   protected function getMarketAudit($where)
+   {
+       $Markete = Helper::M('Market');
+
+       //var_dump($where);
+       $result = $Markete->getMarketAudit($where);
+
+       //var_dump($result);exit;
+
+       return $result;
+   }
+
+    /**
+    * [getMarketAudit 得到审核失败的提示消息]
+    * @param  [type] $market_id [description]
+    * @return [type]            [description]
+    */
+   protected function getMarketAuditMessage($market_id)
+   {
+
+       $market_audit_where = $this->transfromWhere('market_id', $market_id);
+       $where = ' 1 '.$market_audit_where;
+       $result = $this->getMarketAudit($where);
+       if (!empty($result)) {
+           return $result['audit_remark'];
+       }else {
+           return '';
+       }
+   }
+
+    protected function getLabelInfo($label_info)
+    {
+        $this->config = Yaf_Registry::get('config');
+        $tag = $this->tag;
+        foreach ($label_info as $key => $value) {
+            $t_name = '';
+            switch ($key) {
+                case 'comp':
+                    $adv = Helper::M('Advertiser');
+                    $comp_id = $value['type'];
+                    $comp_info = $adv->getCompInfo($comp_id);
+                    if ($value['val'] == '0') {
+                        $t_name = $comp_info['comp_name'];
+                    } else {
+                        $t_name = $comp_info['comp_name'] . "(" . $value['val'] . ")";
+                    }
+                    break;
+                case 'cycle':
+                    $t_name = $tag[$key][$value['type']] . "(" . $value['val'] . ")";
+                    break;
+                case 'visit':
+                    if ($value['type'] == 3) {
+                        $t_name = $tag[$key][$value['type']] . "(" . $value['val'] . ")";
+                    } else {
+                        $t_name = $tag[$key][$value['type']];
+                    }
+                    break;
+                case 'stay':
+                    if ($value['type'] == 4) {
+                        $t_name = $tag[$key][$value['type']] . "(" . $value['val'] . ")";
+                    } else {
+                        $t_name = $tag[$key][$value['type']];
+                    }
+                    break;
+                case 'frequency':
+                    if ($value['type'] == 3) {
+                        $t_name = $tag[$key][$value['type']] . "(大于" . $value['val'] . "次/统计周期)";
+                    } else {
+                        $t_name = $tag[$key][$value['type']];
+                    }
+                    if ($value['remove']) {
+                        $t_name .= $t_name . "--排除选中";
+                    }
+                    break;
+                case 'type':
+                    $t_name = $tag[$key][$value];
+                    break;
+                default:
+                    $t_name = $tag[$key][$value['type']];
+                    break;
+            }
+            if (!empty($t_name)) {
+                $tag_list[] = $this->config['tag'][$key] . "：" . $t_name;
+            }
+        }
+
+        //var_dump($tag_list);exit;
+
+        return $tag_list;
+    }
+
+    protected function transfromData($item)
+    {
+
+        $data = array_map(function ($v) {
+
+            // 得到发送失败数量
+            $send_fail = $this->getSendFail($v['market_status'], $v['send_num'], $v['send_success'],$v['send_status']);
+            // 得到返还金额
+            $return_money = $this->getReturnMoney($v['freeze_status'], $v['freeze_money'], $v['use_money']);
+            // 得到发送短信数量
+            $send_msg_num = $this->getSendMessageNum($v['send_num'], $v['send_rate']);
+            // 获取短信总价
+            $total_price = $this->getSendMessageTotalPrice($v['price'], $send_msg_num);
+            return [
+                'market_name' => $v['market_name'], //短信名称
+                'send_time' => $v['send_time'], //发送时间
+                'send_rq_num' => $v['send_num'], //发送数量&覆盖人群
+                'freeze_money' => $v['freeze_money'] / self::CONVERSION, //冻结金额
+                'send_fail' => $send_fail, //发送失败数量（人数）
+                'send_success' => $v['send_success'], //发送成功人数
+                'return_money' => $return_money, //返还金额
+                'crowd_name' => $v['crowd_name'], //发送人群名称
+                'market_status' => $v['market_status'], //发送状态
+                'content' => $v['content'], //短信内容
+                'add_time' => date('Y-m-d H:i:s',$v['add_time']), //提交时间
+                'send_msg_num' => $v['send_rate'], //发送短信数量——》改为计费标准
+                'price' => $v['price']/self::CONVERSION, //短信单价
+                'total_price' => $total_price, //短信单价
+                'send_rate' => $v['send_rate'], //计费标准
+                'tag_list' => $v['tag_list'], //用户标签
+                'market_file_num' => $v['market_file_num'], //附加人群包人数
+                'crowd_type' => $v['crowd_type'], //人群包类型，（1手动，2非手动）
+                'audit_remark'=>$v['audit_remark'],
+                'market_id'=>$v['market_id']
+            ];
+
+        }, $item);
+        return $data;
+    }
+
+    /**
+     * [getSendMessageTotalPrice 得到发送短信的总价]
+     * @param  [type] $price        [单价]
+     * @param  [type] $send_msg_num [总数量]
+     * @return [type]               [description]
+     */
+    protected function getSendMessageTotalPrice($price, $send_msg_num)
+    {
+        return (float)($price * $send_msg_num/self::CONVERSION);
+    }
+
+
+    /**
+     * [getSendMessageNum 得到发送短信数量]
+     * @param  [type] $send_num  [发送人群数量]
+     * @param  [type] $send_rate [每个人发送条数]
+     * @return [type]            [description]
+     */
+    protected function getSendMessageNum($send_num, $send_rate)
+    {
+        return (int)($send_num * $send_rate);
+    }
+
+    /**
+     * [getReturnMoney 得到返回金额]
+     * @param  [int] $freeze_status [解冻状态]
+     * @param  [int] $freeze_money  [冻结金额]
+     * @param  [int] $use_money     [使用金额]
+     * @return [int]                [返回金额]
+     */
+    protected function getReturnMoney($freeze_status, $freeze_money, $use_money)
+    {
+        if ($freeze_status == self::FREEZE_STATUS_SUCCESS) {
+            $return_money = ($freeze_money - $use_money) / self::CONVERSION;
+        } else {
+            $return_money = 0;
+        }
+        return $return_money;
+    }
+
+    /**
+     * [getSendFail 得到发送失败的数量]
+     * @param  [int] $market_status [发送状态]
+     * @param  [int] $send_num      [发送总数量]
+     * @param  [int] $send_success  [成功数量]
+     * @return [int]                [失败数量]
+     */
+    protected function getSendFail($market_status, $send_num, $send_success,$send_status)
+    {
+        if ($market_status == self::MARKET_STATUS_SUCCESS && $send_status == self::SEND_STATUS_SUCCESS) {
+            $send_fail = $send_num - $send_success;
+        } else {
+            $send_fail = '--';
+        }
+        return $send_fail;
+    }
+
+    /**
+     * [transfromWhere description]
+     * @param  [string] $field_name  [字段名]
+     * @param  [string] $field_value [字段值]
+     * @param  string $type [条件类型]
+     * @return [string]              [where查询字符串]
+     */
+    protected function transfromWhere($field_name, $field_value, $type = '=')
+    {
+        $where = '';
+        if (!empty($field_value)) {
+            if ($type == 'like') {
+                $field_value = '%'.$field_value.'%';
+            }
+            if (is_numeric($field_value)) {
+                $where = ' and ' . $field_name . ' ' . $type . ' ' . $field_value.' ';
+            } else {
+                $where = ' and ' . $field_name . ' ' . $type . ' "' . $field_value . '" ';
+            }
+
+        }
+        return $where;
+    }
+
+    /*
+     * 获取签名
+     *
+     */
+    public function getSignAction()
+    {
+
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $Markete = Helper::M('Market');
+        $result = $Markete->getSign($comp_pid);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+    /*
+     * 添加签名
+     */
+    public function addSignAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $sign_name = Helper::clean($this->getRequest()->getPost('sign_name'));
+        $par['sign_name'] = $sign_name;
+        $par['comp_pid'] = $comp_pid;
+        $Markete = Helper::M('Market');
+        $result = $Markete->addSign($par);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+    public function addviewAction()
+    {
+
+    }
+
+    /*
+     * 获取人群包列表
+     */
+    public function getCrowdlistAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $Markete = Helper::M('Market');
+        $result = $Markete->getCrowdlist($comp_pid);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+    /*
+     * 获取人群包详细信息
+     */
+    public function getCrowdinfoAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $crowd_id = Helper::clean($this->getRequest()->getPost('crowd_id'));
+        $Markete = Helper::M('Market');
+        $result = $Markete->getCrowdinfo($crowd_id, $comp_pid);
+        if($result){
+            if($result[0]['label_info']){
+                $label_info = json_decode($result[0]['label_info'], true);
+                $tag_list = $this->getLabelInfo($label_info);
+                $result[0]['key_list'] = $tag_list;
+            }
+        }
+
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+    public function addAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $comp_name = $this->uinfo['comp_name'];//代理商名称
+        //$comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//代理商id
+        $market_name = Helper::clean($this->getRequest()->getPost('market_name'));//营销短信名称
+        $sign_id = Helper::clean($this->getRequest()->getPost('sign_id'));//标签id
+        $content = Helper::clean($this->getRequest()->getPost('content'));//营销短信内容
+        $crowd_id = Helper::clean($this->getRequest()->getPost('crowd_id'));//人群包id
+        $market_file_id = Helper::clean($this->getRequest()->getPost('market_file_id'));//手上上传文件id
+        $send_num = Helper::clean($this->getRequest()->getPost('send_num'));//发送总数
+        $send_rate = Helper::clean($this->getRequest()->getPost('send_rate'));//每个号码当前短信需要发送的次数
+        $price = Helper::clean($this->getRequest()->getPost('price'))*100;//单价
+        $send_type = Helper::clean($this->getRequest()->getPost('send_type'));//发送类型
+        $send_time = Helper::clean($this->getRequest()->getPost('send_time'));//定时发送时间
+        $staff_id = $this->uinfo['staff_id'];
+        $add_time = time();//添加时间
+
+        $freeze_money = $send_num*$send_rate*$price;
+            //$freeze_id = $result['data']['freeze_id'];
+            $data['comp_pid'] = $comp_pid;
+            $data['comp_name'] = $comp_name;//代理商名称
+            $data['market_name'] = $market_name;
+            $data['sign_id'] = $sign_id;
+            $data['content'] = $content;
+            $data['crowd_id'] = $crowd_id;
+            $data['market_file_id'] = $market_file_id;
+            $data['send_num'] = $send_num;
+            $data['send_rate'] = $send_rate;
+            $data['price'] = $price;
+            $data['send_type'] = $send_type;
+            $data['send_time'] = $send_time;
+            $data['staff_id'] = $staff_id;
+            $data['add_time'] = $add_time;
+           // $data['freeze_id'] = $freeze_id;
+            $data['freeze_money'] = $freeze_money;
+             Helper::M()->startTrans();
+            $Markete = Helper::M('Market');
+             $market_id = $Markete->add($data);
+            if($market_id) {
+                //冻结资金
+                $rand = rand(100,10000);
+                $info = array('comp_id' => $comp_pid, 'comp_pid' => $comp_pid, 'amount' => $freeze_money, 'rel_no' => 'sms_'.$rand.$market_id);
+                $detail = array(
+                    array('platform_id' => 4, 'amount' => $freeze_money)
+                );
+                // $freezeid =  $m->freezeAmount($info , $detail);
+
+                $result = BmDspApi::request('fund/freezeAmount', array('info' => $info, 'data' => $detail));
+
+                if (empty($result) || isset($result['error_code'])) {
+                    Helper::M()->rollback();
+                    Helper::outJson(array('api_code' => 0, 'msg' => '添加失败，资金异常'));
+                    exit;
+                } else {
+                    $freeze_id =  $result['data']['freeze_id'];
+                    $update_date['freeze_id'] =$freeze_id;
+                    $result1  = $Markete->edit($market_id,$update_date);
+                    if($result1){
+                        Helper::M()->commit();
+                        $arr = array('api_code' => 1, 'msg' => 'success');
+                        $arr['data'] = $market_id;
+                        Helper::outJson($arr);
+                    }else{
+                        Helper::M()->rollback();
+                        Helper::outJson(array('api_code' => 0, 'msg' => '添加失败'));
+                    }
+                }
+            }
+        Helper::M()->rollback();
+        Helper::outJson(array('api_code' => 0, 'msg' => '添加失败'));
+        exit;
+
+    }
+    /*
+     * 修改营销短信页面
+     */
+    public function editview(){
+
+    }
+    public function editAction(){
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $comp_name = $this->uinfo['comp_name'];//代理商名称
+        $market_id = Helper::clean($this->getRequest()->getPost('market_id'));//营销短信id
+       // $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//代理商id
+        $market_name = Helper::clean($this->getRequest()->getPost('market_name'));//营销短信名称
+        $sign_id = Helper::clean($this->getRequest()->getPost('sign_id'));//标签id
+        $content = Helper::clean($this->getRequest()->getPost('content'));//营销短信内容
+        $crowd_id = Helper::clean($this->getRequest()->getPost('crowd_id'));//人群包id
+        $market_file_id = Helper::clean($this->getRequest()->getPost('market_file_id'));//手上上传文件id
+        $send_num = Helper::clean($this->getRequest()->getPost('send_num'));//发送总数
+        $send_rate = Helper::clean($this->getRequest()->getPost('send_rate'));//每个号码当前短信需要发送的次数
+        $price = Helper::clean($this->getRequest()->getPost('price'))*100;//单价
+        $send_type = Helper::clean($this->getRequest()->getPost('send_type'));//发送类型
+        $send_time = Helper::clean($this->getRequest()->getPost('send_time'));//定时发送时间
+        $freeze_money = $send_num*$send_rate*$price;
+        //冻结资金
+        $rand = rand(100,10000);
+        $info = array('comp_id' => $comp_pid, 'comp_pid' => $comp_pid, 'amount' => $freeze_money, 'rel_no' => 'sms_'.$rand.$market_id);
+        $detail = array(
+            array('platform_id' => 4, 'amount' => $freeze_money)
+        );
+        // $freezeid =  $m->freezeAmount($info , $detail);
+        $result = BmDspApi::request('fund/freezeAmount', array('info' => $info, 'data' => $detail));
+
+         if (empty($result) || isset($result['error_code'])) {
+
+             Helper::outJson(array('state' => 2, 'msg' => '添加失败，资金
+             异常'));
+             exit;
+         } else {
+        $freeze_id = $result['data']['freeze_id'];
+        $data['market_name'] = $market_name;
+        $data['sign_id'] = $sign_id;
+        $data['content'] = $content;
+        $data['crowd_id'] = $crowd_id;
+        $data['market_status'] = 1;
+        $data['market_file_id'] = $market_file_id;
+        $data['send_num'] = $send_num;
+        $data['send_rate'] = $send_rate;
+        $data['price'] = $price*100;
+        $data['send_type'] = $send_type;
+        $data['send_time'] = $send_time;
+        $data['freeze_id'] = $freeze_id;
+        $data['freeze_status'] = 1;
+        $data['freeze_money'] = $freeze_money;
+        $Markete = Helper::M('Market');
+        $market_id = $Markete->edit($market_id,$data);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $market_id;
+        Helper::outJson($arr);
+
+          }
+
+    }
+    /*
+     * 获取历史短信列表
+     */
+    public function hisMarketsAction(){
+        $Markete = Helper::M('Market');
+        $comp_id = $this->uinfo['comp_id'];
+        $result  = $Markete->hisMarkets($comp_id);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+    /*
+     * 获取营销短信详情
+     */
+    public function getInfoAction(){
+        $market_id = Helper::clean($this->getRequest()->getPost('market_id'));//营销短信id
+        $comp_id = $this->uinfo['comp_id'];//代理商id;Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $Markete = Helper::M('Market');
+        $result  = $Markete->getInfo($market_id,$comp_id);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result?$result[0]:'';
+        Helper::outJson($arr);
+
+    }
+    /*
+     * 发送测试短信
+     */
+    public function  testMarketAction(){
+        $comp_id = $this->uinfo['comp_id'];//代理商id Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $phone = Helper::clean($this->getRequest()->getPost('phone'));//发送测试短信电话
+        $content =  Helper::clean($this->getRequest()->getPost('content'));//发送广告内容
+        $Markete = Helper::M('Market');
+        $result = $Markete->getTests($comp_id);
+        $count = $result[0]['counts'];
+        if($count>=5){
+            $arr = array('api_code' => 0, 'msg' => '今日测试条数已超过五条');
+            Helper::outJson($arr);
+        }else{
+            $result = $this->to_sendAction($phone,$content);
+            $result = json_decode($result,true);
+           if($result['send_status']==1){
+                $par['comp_pid'] = $comp_id;
+               $par['add_time'] = time();
+               $par['phone'] = $phone;
+               $par['content'] = $content;
+               $par['ticket_id'] =$result['send_msg_id'] [$phone];
+               $test_id = $Markete->addTest($par);
+               $arr = array('api_code' => 1, 'msg' => '发送成功');
+               Helper::outJson($arr);
+           }else{
+               $arr = array('api_code' => 0, 'msg' => '发送失败，稍后重试');
+               Helper::outJson($arr);
+           }
+        }
+
+    }
+    public function to_sendAction($sms_to,$sms_content){
+        $url= $this->config['config']['api_host'].$this->config['config']['api_version'].'/oauth/access_token.json?app_id='.$this->config['config']['app_id'].'&app_key='.$this->config['config']['app_key'];
+        $res=file_get_contents($url);
+        $res=json_decode($res,true);
+        $access_token=$res['access_token'];
+        $arr=array(
+            'sms_to'=>$sms_to,
+            'sms_content'=>$sms_content,
+            'sms_cate_no'=>'SC045',
+            'access_token'=>$access_token
+        );
+        $url=$this->config['config']['api_host'].$this->config['config']['api_version'].'/sms/send.json';
+        $doNet = new DoNetwork();
+        $res =$doNet->makeRequest($url,'POST',$arr);
+        return $res;
+    }
+    /*
+     * 根据文件id获取文件详情
+     */
+    public function getFilesAction(){
+        $market_file_id = Helper::clean($this->getRequest()->getPost('market_file_id'));//上传文件id
+        $Markete = Helper::M('Market');
+        $files_info = $Markete->getFiles($market_file_id);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $files_info;
+        Helper::outJson($arr);
+
+    }
+}

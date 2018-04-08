@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>广告管理-素材库-本月 </title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+</head>
+<style>
+    .material_list a,.material_list a:visited {color: #333}
+    #search_text{width: 198px;text-indent: 10px;height: 30px;border-radius: 4px;border: 1px solid #ddd;margin-right: 10px;}
+    .select_box select{border: 1px solid #ddd;height: 32px;width: 100px;}
+    .material_label{cursor: pointer;display: inline-block;position: relative;top:5px;}
+    .material_label li{float: left;padding: 0 20px 6px;}
+    .material_label li.cur{border-bottom: 2px solid #3c61af;color: #3c61af;}
+    .material_list li{background-color: #fff;padding:10px;display: inline-block;margin:0 20px 20px 0;position: relative;cursor: pointer;height: 423px;float: left;}
+    .material_list a:visited {color: #333}
+    .material_list .material_img{width: 280px;height: 394px;}
+    .material_list .material_img span{display: block;vertical-align: top;}
+    .material_list .material_img img{width: 100%;max-height: 100%;}
+    .material_list li p{font-weight: bold;}
+    .material_text{width:260px;position:absolute;bottom:10px;background:#000;padding:10px;opacity:0.55;}
+    .material_text h5{margin: 5px 0;color: #3879D9;font-size: 12px;}
+    .material_text span{word-wrap:break-word;display: block;padding: 5px 0;font-size: 12px;color: #fff;}
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+             <span>
+                <a href="/v1.2/materiald/indexview">< 返回素材库</a>
+            </span>
+        </div>
+        <div class="box_table" style="padding-bottom:0px">     
+            <div class="select_box clearfix">
+                    <select name="" id="getgroup">
+                        <option value="">全部版位</option>
+                    </select>
+                    <select name="" id="getSizelist" style="position:relative;left:-5px;">
+                        <option value="">全部尺寸</option>
+                    </select>
+                <div class="fr">
+                    <input type="text" name="" id="search_text" placeholder="素材名称搜索">     
+                    <button type="button" class="bm-btn bm-btn-blue" id="search_btn">搜索</button> 
+                </div>  
+            </div>
+            <ul class="material_label clearfix mt30">
+                <li class="cur">全部标签</li>
+            </ul>
+        </div>
+        <ul id="material_list" class="mt30 material_list clearfix">
+            <!-- <li>
+                <a href="edit.html">
+                    <p>本月</p>
+                    <div class="material_img">
+                        <span><img src="/public/img/pay_pic.png" alt=""></span>
+                    </div>
+                    <div class="material_text hide">
+                        <h5>利得5月份庆周年广告</h5>
+                        <span>https://51lide.100msh.com/indi&98&001&12iiw&12000</span>
+                        <span>2017-06-09 10:45 by 张三 创建</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <p>上月</p>
+                <div class="material_img">
+                    <span><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1511937169812&di=6447e5cce223a6e6eea7d24a2a5a4243&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F15%2F66%2F33%2F82658PICzba_1024.jpg" alt=""></span>
+                </div>
+                <div class="material_text hide">
+                    <h5>利得5月份庆周年广告</h5>
+                    <span>https://51lide.100msh.com/indi&98&001&12iiw&12000</span>
+                    <span>2017-06-09 10:45 by 张三 创建</span>
+                </div>
+            </li> -->
+        </ul>
+        <p class="noMsg"></p>
+    </div>
+
+
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+        laytpl.config({open: '<<',close: '>>'}); //laytpl与php冲突 标签修改
+        var time = getUrlParams('time');
+
+        $('.material_label').on('click','li',function(){
+            var _this = $(this),
+                data = _this.attr('data-id');
+            _this.addClass('cur').siblings().removeClass('cur');
+            serach(data);
+        })
+
+        $('#material_list').on('mouseenter mouseleave','li',function(){
+            $(this).find('.material_text').stop().slideToggle('fast')
+        })
+
+        //获取标签
+        function getTags(){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getTags',
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<li data-id="'+rs.data[i].material_tag_id+'">'+rs.data[i].tag_name+'</li>';
+                    }
+                    $('.material_label').append(str);
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getTags();
+
+        //获取下拉框（全部版位）
+        function getgroup(){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getgroup',
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<option value="'+rs.data[i].adgroup_id+'">'+rs.data[i].adgroup_name+'</option>'
+                    }
+                    $('#getgroup').append(str);
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getgroup();
+
+        //获取下拉框（全部全部尺寸）
+        function getSizelist(){
+            var str = '',adgroup_id = $('#getgroup').val();
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getSizelist',
+                data:{'adgroup_id':adgroup_id},
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<option value="'+rs.data[i].ad_size_id+'">'+rs.data[i].ad_size_name+'</option>'
+                    }
+                    $('#getSizelist').html(str).change();
+                },
+                error: function (rs) {
+                    $('#getSizelist').html('<option value="">全部尺寸</option>');
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+
+        $('#getgroup').change(function(){
+            if($(this).val()==""){
+                $('#getSizelist').html('<option value="">全部尺寸</option>');
+                serach();
+                return;
+            }else{
+                getSizelist();
+            }
+        })
+        $('#getSizelist').change(function(){
+            serach();
+        })
+
+        $('#search_btn').on('click',function(){
+            var search_val = $.trim($('#search_text').val());
+            if(search_val){
+                serach();
+            }else{
+                tipTopShow("请输入素材名称");
+            }
+        });
+
+        //搜索
+        function serach(ids){
+            var group_id = $.trim($('#getgroup').val()) || '',
+                size_id = $.trim($('#getSizelist').val()) || '',
+                tag_id = ids || '',
+                material_name = $.trim($('#search_text').val()) || '',
+                str = "";
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/serach',
+                data:{'group_id': group_id,'size_id':size_id,'tag_id':tag_id,'material_name':material_name,'time':time,'platform_id':''},
+                dataType: 'json',
+                success: function (rs) {
+                    if(rs.api_code==0){
+                        var list_e = $("#material_list"),no_msg = $(".noMsg");
+                        if(rs.data.length == 0){
+                            list_e.html('');
+                            no_msg.text('暂无记录');
+                            return ;
+                        }
+                        no_msg.text('');
+                      	for(var i=0;i<rs.data.length;i++){
+                            str += `<li>
+                                        <a href="/v1.2/Materiald/editview?materialid=`+rs.data[i].material_id+`">
+                                            <p>`+rs.data[i].tag_name+`</p>
+                                            <div class="material_img">
+                                                <span><img src="`+ rs.data[i].img_url +`"></span>
+                                            </div>
+                                            <div class="material_text hide">
+                                                <h5>`+ rs.data[i].material_name+`</h5>
+                                                <span>`+ rs.data[i].material_url +`</span>
+                                                <span>`+ changeTime(rs.data[i].add_time*1000) +` by ` +rs.data[i].staff_name+` 创建</span>
+                                            </div>
+                                        </a>
+                                    </li>`;
+                        }
+                        list_e.html(str);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+
+        //列表
+        function getlists(){
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getlists',
+                data:{'time':time},
+                dataType: 'json',
+                async:false,
+                success: function (rs) {
+                    if(rs.api_code==0){
+                        var list_e = $("#material_list"),str="",no_msg = $(".noMsg");
+                        if(rs.data.length == 0){
+                            list_e.html('');
+                            no_msg.text('暂无记录');
+                            return ;
+                        }
+                        no_msg.text('');
+                        for(var i=0;i<rs.data.length;i++){
+                            str += `<li>
+                                        <a href="/v1.2/Materiald/editview?materialid=`+rs.data[i].material_id+`">                     
+                                            <p>`+rs.data[i].tag_name+`</p>
+                                            <div class="material_img">
+                                                <span><img src="`+ rs.data[i].img_url +`"></span>
+                                            </div>
+                                            <div class="material_text hide">
+                                                <h5>`+ rs.data[i].material_name+`</h5>
+                                                <span>`+ rs.data[i].material_url +`</span>
+                                                <span>`+ changeTime(rs.data[i].add_time*1000) +` by ` +rs.data[i].staff_name+` 创建</span>
+                                            </div>
+                                        </a>
+                                    </li>`;
+                        }
+                        list_e.html(str);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getlists();
+    </script>
+</body>
+
+</html>

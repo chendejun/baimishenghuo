@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的平台-我的广告主</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laytpl/laytpl.js"></script>
+    <style>
+        .layui-layer.layui-layer-page.layui-layer-demo.layer-anim-02 {width: 400px !important;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="advertr_box">
+            <ul class="block_box clearfix">
+                <li class="cur">广告主</li>
+                <li>广告主充值</li>
+                <li>广告消耗</li>
+            </ul>
+            <div class="notice_box" onclick="notice_link()" style="display: none;">
+                <i></i>
+                <ul id="notice_list" class="notice_list">
+                    <li>dfdfdfdfd</li>
+                    <li>45522</li>
+                    <li>9888</li>
+                </ul>
+            </div>
+            <div class="ul_box">
+                <ul class="clearfix">
+                    <li>
+                        <p><i class="club_icons icon6"></i>投放中</p>
+                        <span>0</span>
+                    </li>
+                    <li>
+                        <p><i class="club_icons icon7"></i>有消耗</p>
+                        <span>0</span>
+                    </li>
+                    <li>
+                        <p><i class="club_icons icon8"></i>总数</p>
+                        <span>0</span>
+                    </li>
+                </ul>
+                <ul class="clearfix" style="display: none;">
+                    <li>
+                        <p><i class="club_icons icon9"></i>今日充值</p>
+                        <span>{{$account.today_reg}}</span>
+                    </li>
+                    <li>
+                        <p><i class="club_icons icon9"></i>昨日充值</p>
+                        <span>{{$account.yes_reg}}</span>
+                    </li>
+                    <li>
+                        <p><i class="club_icons icon9"></i>本周充值</p>
+                        <span>{{$account.week_reg}}</span>
+                    </li>
+                </ul>
+                <ul class="clearfix" style="display: none">
+                    <li>
+                        <p><i class="club_icons icon9"></i>今日消耗</p>
+                        <span>{{$account.today_disburse}}</span>
+                    </li>
+                    <li>
+                        <p><i class="club_icons icon9"></i>昨日消耗</p>
+                        <span>{{$account.yes_disburse}}</span>
+                    </li>
+                    <li>
+                        <p><i class="club_icons icon9"></i>本周消耗</p>
+                        <span>{{$account.week_disburse}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- <div class="data_box mt20">
+            <div class="databox_title">我的余额</div>
+            <div class="account clearfix mt30 mb30">
+                <ul class="fl">
+                    <li>
+                        <span>现金账户</span>
+                        <p class="cash_amount">￥{{$account.cash_amount}}</p>
+                    </li>
+                    <i></i>
+                    <li>
+                        <span>虚拟账户</span>
+                        <p class="virtual_amount">￥{{$account.virtual_amount}}</p>
+                    </li>
+                    <i></i>
+                    <li>
+                        <span>赠送账户</span>
+                        <p class="give_amount">￥{{$account.give_amount}}</p>
+                    </li>
+                </ul>
+                <a class="btn_link bm-btn bm-btn-blue fl" href="../account/index">服务商账户充值</a>
+                <div class="accountdetails">
+                    <div class="accstyle account_reg">
+                        <h5>累计充值</h5>
+                        <div class="reg_money">{{$account.history_amount}}</div>
+                    </div>
+                    <div class="accstyle account_con">
+                        <h5>累计支出</h5>
+                        <div class="con_money">{{$account.total_disburse}}</div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <div class="advertr_box mt20">
+            <div class="set_main_ad">
+                <a class="btn_link bm-btn bm-btn-blue fl" href="/V1.2/Advertiser/add">新建广告主</a>
+                <div class="ipt_box">
+                    <select class="bm-select isrelation">
+                        <!-- <option>已开通-关联</option> -->
+                    </select>
+                    <input type="text" class="bm-input searchname" placeholder="广告主名称" />
+                    <span class="btn_link bm-btn bm-btn-blue" id="search_adbtn" onclick="searchFn(this)">搜索</span>
+                </div>
+            </div>
+            <table id="ad_list" class="base_table">
+                <thead>
+                    <tr>
+                        <th>广告主名称</th>
+                        <th>现金账户</th>
+                        <th>虚拟账户</th>
+                        <th>赠送账户</th>
+                        <th>腾讯原账户余额</th>
+                        <th>已投放广告</th>
+                        <th>已消耗金额</th>
+                        <th>联系人</th>
+                        <th>联系电话</th>
+                        <th>资质开通</th>
+                        <th width="125px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr>
+                        <td>深圳市福田区张三的店</td>
+                        <td>¥ 2000.36</td>
+                        <td>¥ 362.03</td>
+                        <td>¥ 362.03</td>
+                        <td>¥ 8500</td>
+                        <td>0</td>
+                        <td>123</td>
+                        <td>李四</td>
+                        <td>13579542654</td>
+                        <td>已开通-关联</td>
+                        <td>
+                            <span class="table-option-btn" onclick="goDetails(' + v.comp_id + ')">查看</span>
+                            <span class="btn_delivery table-option-btn" onclick="goDelivery(' + v.comp_id + ')">广告投放</span>
+                            <span class="btn_recharge table-option-btn mr15" "_id"="205942" "_status"="4" "_name"="marie测试">充值</span>
+                            <span class="" onclick="goDetails()">查看</span>
+                            <span class="btn_delivery table-option-btn" _id="'+v.comp_id+'" _name="'+v.comp_name+'">查看</span>
+                            <span class="" onclick="goDelivery()">广告投放</span>
+                            <span class="btn_delivery table-option-btn" _id="'+v.comp_id+'" _name="'+v.comp_name+'" onclick="goDelivery()">广告投放</span>
+                            <span class="">充值</span>
+                            <span class="btn_recharge table-option-btn mr15" _id="'+v.comp_id+'" _name="'+v.comp_name+'" _amount="'+v.usable_amount+'">充值</span>
+                    </td>
+                    </tr> -->
+                </tbody>
+            </table>
+            <p class="noMsg"></p>
+            <!--列表分页-->
+            <div id="list_page" class="page"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+        $('.block_box').on('click','li',function(){
+            var th = $(this),
+                idx = th.index();
+            th.addClass('cur').siblings('li').removeClass('cur');
+            $('.ul_box').find('ul').eq(idx).show().siblings().hide();
+        })
+        $('body').on('click', '.ad_type', function () {
+            $(this).addClass('bluecolor').siblings('.ad_type').removeClass('bluecolor');
+        })
+        //获取公告
+        function get_notice(){
+            ajax({
+                type: 'GET',
+                url: '/api/adver/action?action=notice_msg',
+                contentType : "text/html;charset=UTF-8",
+                dataType: 'json',
+                success: function(response){
+                    var rs = eval("("+response+")");
+                    if (rs.code==0) {
+                        render_notice_html(rs.data);
+                    } else {
+                        showTip(rs.msg);
+                    }
+                },
+                fail: function(err) {
+                    showTip("网络开小差啦.");
+                }
+            });
+        }
+        //渲染数据
+        function render_notice_html(data){
+            var elem = $("#notice_list"),str="",len=data.length;
+            if( len == 0){
+                $(".notice_box").hide();
+                return;
+            }
+            for(var i=0; i<len; i++){
+                str += '<div class="world">'+ data[i].title +'</div>';
+            }
+            elem.innerHTML = str;
+            setInterval('autoScroll(".notice_box")',2000);
+        }
+
+        //公告滚动
+        function autoScroll(obj){
+            $(obj).find("ul").animate({
+                marginTop : '-='+30
+            },500,'linear',function(){
+                $(this).css({marginTop : "0px"}).find("li:first").appendTo(this);
+            })
+        }
+        $(function(){
+            setInterval('autoScroll(".notice_box")',2000);
+        })
+
+        function notice_link(){
+            alert('充值记录')
+        }
+
+        function goDelivery(id,name,cash,giveamount,gdtStatus) {
+            var gdtAmount = parseFloat(cash) + parseFloat(giveamount);
+            var url = "/v1.2/Delivery/add?comp_id="+id +"&comp_name="+encodeURIComponent(name);   //wifi广告
+            var url2 = "/v1.2/Gdtdelivery/create1?comp_id="+id+"&gdt_status="+gdtStatus+"&gdt_amount="+gdtAmount;  //腾讯广告
+            layer.open({
+                type: 1,
+                skin: 'layui-layer-demo',
+                closeBtn: 1,
+                anim: 2,
+                shadeClose: true,
+                title: " ",
+                content: '<div class="delivery_mode"><h3>请选择要投放的广告平台</h3><a class="ad_type bluecolor" href="' + url + '">WIFI广告</a><a class="ad_type" href="' + url2+ '">腾讯广告</a></div>'
+            });
+        }
+
+        // $("#ad_list tbody").on("click", ".btn_delivery", function () {
+        //     var compName = $(this).attr("_name"),
+        //         id = $(this).attr("_id");
+        //     sessionStorage.setItem('compName', compName);
+        //     location.href = '../delivery/add?compId=' + id;
+        // })
+
+        //遍历腾讯广告开通状态
+        function isrelationType() {
+            var isrelationType = [{ 0: "腾讯广告开通状态", 1: "" }, { 0: "已开通-新建", 1: 3 }, { 0: "已开通-关联", 1: 4 }, { 0: "已开通-授权过期", 1: 5 }, { 0: "未开通", 1: 0 }, { 0: "申请中", 1: 1 }, { 0: "审核不通过", 1: 2 }];
+            var str = ""
+            for (var i = 0, len = isrelationType.length; i < len; i++) {
+                str += "<option value='" + isrelationType[i][1] + "'>" + isrelationType[i][0] + "</option>";
+            }
+            $('.isrelation').html(str)
+        }
+        isrelationType()
+
+        //广告主搜索
+        var skeyWord = '',
+            isrelation = '';
+        function searchFn(th) {
+            var t = $(th),
+                inputDom = t.parent().find('input').val();
+                isrelation = $('.isrelation').val();
+            skeyWord = encodeURIComponent(inputDom);
+            getADList();
+        }
+        //获取投放计划数据
+        var limit = 10;
+        function getADList(curr) {
+            var name = skeyWord ? ('name/' + skeyWord + '/') : '';
+            var gdt_status = isrelation ? ('gdt_status/' + isrelation + '/') : '';
+            $.ajax({
+                type: "GET",
+                url: '/V1.2/Advertiser/list/' + name + gdt_status + 'page/' + (curr || 1) + '/limit/' + limit,
+                dataType: 'json',
+                success: function (rs) {
+                    //console.log(rs)
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function render_table(data) {
+            var list_e = $("#ad_list tbody"), str = "", no_msg = $(".noMsg");
+            if (data.list.length == 0) {
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text("");
+            $.each(data.list, function (k, v) {
+                str += "<tr>"
+                str += "<td>" + v.comp_name + "</td>"
+                str += "<td>" + v.cash_amount + "</td>"
+                str += "<td>" + v.virtual_amount + "</td>"
+                str += "<td>" + v.give_amount + "</td>"
+                str += "<td>" + v.gdt_balance + "</td>"
+                str += "<td>" + v.delivery_num + "</td>"
+                str += "<td>" + v.total_disburse + "</td>"
+                str += "<td>" + v.contacts + "</td>"
+                str += "<td>" + v.mobile_phone + "</td>"
+                str += '<td><span class="table-option-btn" onclick="goDetails(' + v.comp_id +","+v.gdt_apply_status+ ')">详情</span></td>'
+                /*var apply_status = v.gdt_apply_status
+                if (v.gdt_apply_status == 0) {
+                    apply_status = "未开通"
+                } else if (v.gdt_apply_status == 1) {
+                    apply_status = "申请中"
+                } else if (v.gdt_apply_status == 2) {
+                    apply_status = "审核不通过"
+                } else if (v.gdt_apply_status == 3) {
+                    apply_status = "已开通-新建"
+                } else if (v.gdt_apply_status == 4) {
+                    apply_status = "已开通-关联"
+                } else if (v.gdt_apply_status == 5) {
+                    apply_status = "已开通-授权过期"
+                }
+                str += "<td>" + apply_status + "</td>"*/
+                str += "<td>"
+                /*if(v.gdt_wx_bind == 1){
+                    str += '<span>已绑定公众号</span>'
+                }else if(v.gdt_wx_bind == 0){
+                    str += '<span class="table-option-btn" onclick="bindWx(' + v.comp_id +","+v.gdt_apply_status+ ')">绑定公众号</span>'
+                }*/
+                str += '<i class="club_icons icon10 mr15" onclick="goInfo(' + v.comp_id +')">查看</i>'
+                str += '<i class="club_icons icon11 mr15" onclick="goDelivery(' + v.comp_id+",'"+ v.comp_name+"',"+v.cash_amount+","+v.give_amount+ ","+ v.gdt_apply_status+')">广告投放</i>'
+                str += '<i class="btn_recharge club_icons icon12" _id="' + v.comp_id + '" ' + '_cash="' + v.cash_amount + '" ' + '_fictitious="' + v.virtual_amount + '" _name="' + v.comp_name + '" _status="' + v.gdt_apply_status + '" _account_type="' + v.account_type + '" _giveamount="' + v.give_amount + '">充值</i>'
+                str += "</td>"
+                str += "</tr>"
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(pages, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+               // skip: true, //是否开启跳页
+               skin: '#4c94f5',
+               prev: '<em class="layui-icon"></em>',
+               next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getADList(obj.curr);
+                    }
+                }
+            });
+        }  
+        getADList();
+
+        //提示
+        $('body').on('click', '.status_tip', function () {
+            layer.tips(this.getAttribute('data'), this, { time: 5000 });
+        })
+
+        //广告主充值
+        var cacheDOM = "",
+            gdtApplyStatus = "",
+            cash = parseFloat($('.cash_amount').text().split("￥")[1]),
+            fictitious = parseFloat($('.virtual_amount').text().split("￥")[1]),
+            giveamount = parseFloat($('.give_amount').text().split("￥")[1]),
+            idNum = "",
+            status="";
+        $("#ad_list tbody").on("click", ".btn_recharge", function () {
+            var pname = $(this).attr("_name"),
+                pid = $(this).attr("_id"),
+                status = $(this).attr('_status'),
+                accountType = $(this).attr('_account_type'),
+                idNum = $(this).attr('_id');
+            var gdtApplyStatus = status
+            var adData = {
+                'comp_name': pname,
+                'pid': pid,
+                'status': status
+            };
+            var url = "/V1.2/Advertiser/recharge/comp_id/" + pid;
+            cacheDOM = getshopHTML(url);
+            if (cacheDOM == "") { return; }        //加载失败
+
+            if (adData == "") { return; }    //加载失败
+            laytpl(cacheDOM).render(adData, function (result) {         //laytpl异步渲染调用
+                layer.open({        //店铺详细信息弹框
+                    type: 1,
+                    title: "广告主充值",
+                    area: ['750px', ($('body').height() * 0.886) + 'px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+
+            $('.reg_name').text(adData.comp_name);
+            $('.cash_num').text({{$account.cash_amount}});
+            $('.virtual_num').text({{$account.virtual_amount}});
+            $('.give_num').text({{$account.give_amount}});
+            $('#input_comp_id').val(idNum);
+            if (status <4  || (status ==5 && accountType!=1)) {
+                $('.from-spec').eq(2).hide();
+            }
+        })
+        //获取页面DOM HTML信息
+        function getshopHTML(url) {
+            var html = "";
+            $.ajax({
+                type: "GET",
+                url: url,
+                async: false,
+                cache: false,
+                success: function (data) {
+                    html = data;
+                }
+            });
+            return html;
+        }
+        //发送验证码
+        var timerNum = 60;
+        var iCount;
+        function sendCode(t) {
+            var th = $(t);
+            var amount = parseFloat($.trim($('#recharge_money').val())),
+                regType = $('input[name="regType"]:checked').val(),
+                accountValue = $('input[name="accountValue"]:checked').val();
+            if (regType == undefined) {
+                tipTopShow('充值类型不能为空！');
+                return;
+            }
+
+            if ($('.accountValue').length != 0) {
+                if (!$('input[name="accountValue"]:checked').val()) {
+                    tipTopShow('广告主账户类型不能为空！');
+                    return;
+                }
+            } else {
+                if (regType == 1 && (amount > cash)) {
+                    tipTopShow('充值金额不能大于现金账户余额！');
+                    return;
+                }
+                if (regType == 2 && (amount > fictitious)) {
+                    tipTopShow('充值金额不能大于虚拟账户余额！');
+                    return;
+                }
+                if (regType == 0 && (amount > giveamount)) {
+                    tipTopShow('充值金额不能大于赠送账户余额！');
+                    return;
+                }
+            }
+            if ($('input[name="accountValue"]:checked').val() == 1) {   //腾讯充值
+                if (amount < 0.05 || amount > cash) {
+                    tipTopShow('腾讯广告账户最低50元起充,并且最高不超过账户可用余额');
+                    return;
+                }
+                if (regType != 1) {
+                    tipTopShow('腾讯广告只支持现金充值！');
+                    return;
+                }
+            } else if ($('input[name="accountValue"]:checked').val() == 0) {   //DSP充值
+                if (amount < 0.01) {
+                    tipTopShow('DSP账户充值最低0.01元起充！');
+                    return;
+                }
+                if (regType == 1 && amount > cash) {
+                    tipTopShow('充值金额不能大于账户余额！');
+                    return;
+                }
+                if (regType == 0 && amount > fictitious) {
+                    tipTopShow('充值金额不能大于账户余额！');
+                    return;
+                }
+            }
+            if (!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(amount))) {
+                tipTopShow("请输入正确的充值金额！");
+                $('.regmoneyTip').show();
+                return;
+            } else {
+                $('.regmoneyTip').hide();
+            }
+
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/account/sendSms/amount/' + amount,
+                dataType: 'json',
+                success: function (rs) {
+                    tipTopHide();       //隐藏提示框
+                   // console.log(rs)
+                    if(rs.state == 1){
+                        th.attr('disabled',true);
+                        th.html(timerNum+'s后重新获取');
+                        iCount = setInterval(changeTime,1000);
+                        $('.code_tip').html();
+                    }else{
+                        $('.code_tip').html(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        //倒计时
+        function changeTime(){
+          if (timerNum ==1 ){
+              $('#cod_btn').attr('disabled',false).html('获取验证码');
+              clearInterval(iCount);
+              timerNum=60;
+          }else{
+              if(timerNum > 0){
+              timerNum = timerNum - 1;
+              curnum = timerNum;
+              $('#cod_btn').html(curnum+'s后重新获取');
+              }
+          }
+      }
+        //确定充值
+        function rechargeFn() {
+            //------------------------------
+            var amount = $.trim($('#recharge_money').val()),
+                regType = $('input[name="regType"]:checked').val(),
+                account = $('input[name="accountValue"]:checked').val();
+                accountValue = account ? account: 0;
+                recharge_code = $.trim($('#recharge_code').val()),
+                compId = $('#input_comp_id').val();
+
+            if (regType == undefined) {
+                tipTopShow('充值类型不能为空！');
+                return;
+            }
+
+            if ($('.accountValue').length != 0) {
+                if (!$('input[name="accountValue"]:checked').val()) {
+                    tipTopShow('广告主账户类型不能为空！');
+                    return;
+                }
+            } else {
+                if (regType == 1 && (amount > cash)) {
+                    tipTopShow('充值金额不能大于现金账户余额！');
+                    return;
+                }
+                if (regType == 2 && (amount > fictitious)) {
+                    tipTopShow('充值金额不能大于虚拟账户余额！');
+                    return;
+                }
+                if (regType == 0 && (amount > giveamount)) {
+                    tipTopShow('充值金额不能大于赠送账户余额！');
+                    return;
+                }
+            }
+            if ($('input[name="accountValue"]:checked').val() == 1) {   //腾讯充值
+                if (amount < 0.05 || (amount > cash)) {
+                    tipTopShow('腾讯广告账户最低50元起充,并且最高不超过账户可用余额');
+                    return;
+                }
+                if (regType != 1) {
+                    tipTopShow('腾讯广告只支持现金充值！');
+                    return;
+                }
+            } else if ($('input[name="accountValue"]:checked').val() == 0) {   //DSP充值
+                if (amount < 0.01) {
+                    tipTopShow('DSP账户充值最低0.01元起充！');
+                    return;
+                }
+                if (regType == 1 && (amount > cash)) {
+                    tipTopShow('充值金额不能大于账户余额！');
+                    return;
+                }
+                if (regType == 0 && (amount > fictitious)) {
+                    tipTopShow('充值金额不能大于账户余额！');
+                    return;
+                }
+            }
+            if (!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(amount))) {
+                tipTopShow("请输入正确的充值金额！");
+                $('.regmoneyTip').show();
+                return;
+            } else {
+                $('.regmoneyTip').hide();
+            }
+
+            //------------------------------
+            if (!recharge_code) {
+                tipTopShow('验证码不能为空！');
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                url:'/v1.2/account/applyTransfer/comp_id/' + compId + '/amount/' + amount + '/code/' + recharge_code+'/transfer_type/'+accountValue+'/account_type/'+regType,
+                dataType: 'json',
+                success: function (rs) {
+                    tipTopHide();       //隐藏提示框
+                    console.log(rs);
+                    if (rs.state == 1) {
+                        tipTopShow(rs.msg);
+                        setTimeout(function () {
+                            layer.closeAll();
+                        },1000);
+                        //getADList();
+                        location.href = '/V1.2/Advertiser/index';
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //跳转详情
+        function goDetails(id,state) {
+            location.href = "/V1.2/Advertiser/view/comp_id/" + id+"/status/"+state;
+        }
+        function goInfo(id) {
+            location.href = "/V1.2/Advertiser/info/comp_id/" + id;
+        }
+        //跳转绑定公众号
+        function bindWx(id,state) {
+            if(state != 3 && state !=4){
+                layer.confirm('', {
+                    btn: ['确定'],
+                    title: " ",
+                    content: "<div class='tip_title'>提示</div><p class='tip_content'>腾讯广告功能未开通或者授权已过期，请先确认腾讯广告功能正常</p>"
+                }, function(index) {
+                    layer.close(index);
+                })
+            }else{
+                layer.confirm('', {
+                    btn: ['我再想想', '确定'],
+                    title: "    ",
+                    content: "<div class='tip_title'>尊敬的用户:</div><p class='tip_content'>成功绑定公众号后，还需1个工作日完成授权。<br/>授权成功才可以进行朋友圈广告。</p>"
+                }, function(index) {
+                    layer.close(index);
+                }, function() {
+                    window.open("/V1.2/Api/gdtWxCallback?login=1&comp_id="+id);
+                })
+            }
+        }
+
+        $('body').on('click', '.regType', function () {
+            $(this).siblings('.regicon').css('background-position', "0 -31px");
+            $(this).parent().parent().siblings().find('.regicon').css('background-position', "0 0");
+            $('.invoice_type p').hide();
+            $(this).parent().siblings('p').show();
+        })
+        $('body').on('click', '.accountValue', function () {
+            $(this).siblings('.regicon').css('background-position', "0 -31px");
+            $(this).parent().parent().siblings().find('.regicon').css('background-position', "0 0");
+        })
+
+        
+
+        // function closeRegBox(){
+        //     $('#cod_btn').attr('disabled',false).html('获取验证码');
+        //     clearInterval(iCount);
+        //     timerNum=60;
+        //     layer.closeAll();
+        // }
+    </script>
+</body>
+
+</html>

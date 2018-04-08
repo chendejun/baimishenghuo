@@ -1,0 +1,66 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: cdj
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class MarketController extends BasicController {
+
+    public function indexviewAction()
+    {
+    }
+
+    /*
+     * 获取营销短信列表
+     */
+    public function indexAction(){
+
+
+    }
+    /*
+     * 获取签名
+     *
+     */
+    public function getSignAction()
+    {
+
+        $comp_pid  = $this->uinfo['comp_id'];//代理商id
+        $Markete = Helper::M('Market');
+        $result = $Markete->getSign($comp_pid);
+        $arr = array('api_code'=>1,'msg'=>'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+    /*
+     * 添加签名
+     */
+    public function addSignAction(){
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $sign_name =Helper::clean($this->getRequest()->getPost('sign_name'));
+        $par['sign_name'] = $sign_name;
+        $par['comp_pid'] = $comp_pid;
+        $Markete = Helper::M('Market');
+        $result = $Markete->addSign($par);
+        Helper::outJson($result);
+    }
+
+    public function addviewAction()
+    {
+
+    }
+
+   /*
+    * 获取人群包列表
+    */
+   public function getCrowdlistAction(){
+       $comp_pid = $this->uinfo['comp_id'];//代理商id
+       $Markete = Helper::M('Market');
+       $result = $Markete->getCrowdlist($comp_pid);
+       $arr = array('api_code'=>1,'msg'=>'success');
+       $arr['data'] = $result;
+       Helper::outJson($arr);
+   }
+
+}

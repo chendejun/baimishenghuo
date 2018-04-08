@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>微信推广</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <style>
+        .content_box {min-width: 1430px;}
+        .data_box {padding: 12px 20px;}
+        .databox_title {width: 100%;height: 16px;position: relative;}
+        .databox_title::before {content: "";display: inline-block;position: relative;left: 0;top: 3px;width: 14px;height: 16px;background: url(/public/img/money_icon.png);margin-right: 5px;}
+        .data_box ul i {background: #dddddd;}
+        .account .fl {margin-top: 28px;}
+        .data_box .btn_link {width: 150px;margin-left: 5px;margin-top: 37px;}
+        .accstyle>h5 {font-size: 14px;color: #666666;margin-bottom: 10px;}
+        .set_main_ad {height: 73px;width: 100%;}
+        .bm-btn {width: 150px;height: 44px;text-align: center;line-height: 46px;}
+        .input_box {width: 486px;height: 100%;float: right;background: #fff;padding: 0;border: none;position: relative;}
+        .isrelation {width: 150px !important;height: 32px !important;padding: 5px 9px !important;border: 1px solid #dddddd;margin-right: 10px;color: #666666;}
+        .searchname {width: 180px;height: 20px;padding: 5px 9px;border: 1px solid #dddddd;box-sizing: content-box;}
+        #search_adbtn {width: 96px;height: 32px;position: absolute;top: 0;right: 10px;text-align: center;line-height: 32px;}
+        .table-option-btn {margin:0 10px;text-decoration: none;}
+        .delivery_mode {width: 100%;height: 100%;text-align: center;padding-bottom: 23px;}
+        .delivery_mode>h3 {font-size: 16px;color: #333;height: 62px;line-height: 62px;font-weight: 900;margin: 0;}
+        .delivery_mode .ad_type {height: 44px;line-height: 44px;font-size: 14px;display: block;color: #333;}
+        .layui-layer.layui-layer-page.layui-layer-demo.layer-anim-02 {width: 400px !important;/* height: 220px; */}
+        .bluecolor {color: #5877a4 !important;}
+        .layer_tip{padding: 10px;}
+        .layer_tip span{ color: #5b5a5a;  font-size: 16px; line-height: 30px;}
+        .layer_tip p{ color: #5b5a5a; }
+    </style>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laytpl/laytpl.js"></script>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <i class="info_icon icon1"></i>
+            <span>
+                <a href="javascript:;">微信推广 </a> / 公众号管理
+            </span>
+        </div>
+        <div class="data_box mt20">
+            <div class="account clearfix mt30 mb30">
+                <ul class="fl">
+                    <li>
+                        <span>涨粉计划</span>
+                        <p class="plan_num">1</p>
+                    </li>
+                    <i></i>
+                    <li>
+                        <span>累计消耗</span>
+                        <p class="cost_amount">￥3500.2</p>
+                    </li>
+                    <i></i>
+                    <li>
+                        <span>累计冻结 <em class="status_tip" data="统计以下公众号投递时所有冻结的金额，在投放结束结算时对应金额未消耗完 则返还到现金账户。"> ？</em></span>
+                        <p class="freeze_amount">￥500.5</p>
+                    </li>
+                </ul>
+                <a class="btn_link bm-btn bm-btn-blue fl" id="btn_link" href="javascript:;">绑定公众号</a>
+            </div>
+        </div>
+        <div class="box_table mt20">
+            <table id="page_lists" class="base_table">
+                <thead>
+                    <tr>
+                        <th>公众号名称</th>
+                        <th>绑定时间</th>
+                        <th>在投计划</th>
+                        <th>累计吸粉</th>
+                        <th>冻结金额 <em class="status_tip" data="对应公众号投递时冻结的金额，在投放结束结算时对应金额未消耗完 则返还到现金账户。"> ？</em></th>
+                        <th>消耗金额 <em class="status_tip" data="对应公众号总消耗金额。"> ？</em></th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p class="noMsg"></p>
+            <!--列表分页-->
+            <div id="list_page" class="page"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+        var vcacheDOM ='';
+        //获取投放计划数据
+        var limit = 10;
+        function getList(curr) {
+            $.ajax({
+                type: "GET",
+                url: '/V1.2/Officialaccount/index/page/' + (curr || 1) + '/limit/' + limit,
+                dataType: 'json',
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.totalcount, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function render_table(data) {
+            var list_e = $('#page_lists tbody'), str = '', no_msg = $('.noMsg');
+            if (data.length == 0) {
+                list_e.html('');
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text('');
+            $.each(data, function (k, v) {
+                str += '<tr>';
+                str += '<td><span class="table-option-btn" onclick="viewInfo('+v.pn_id+')">' + v.pn_name + '<span></td>';
+                str += '<td>' + v.create_at + '</td>';
+                str += '<td>' + v.plan_name + '</td>';
+                str += '<td>' + v.accumulative_followers + '</td>';
+                str += '<td>￥' + parseFloat(v.freezing_amount).toFixed(2)  + '</td>';
+                str += '<td>￥' + parseFloat(v.accumulative_consumption).toFixed(2) + '</td>';
+                str += '<td>';
+                str += '<span class="table-option-btn" onclick="addPlan()">增加粉丝</span>';
+                str += '<span class="table-option-btn" onclick="delAccount('+v.pn_id+')">解绑</span>';
+                str += '</td>';
+                str += '</tr>';
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(totalcount, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: Math.ceil(totalcount/limit), //总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getList(obj.curr);
+                    }
+                }
+            });
+        }
+        getList();
+
+        //解绑
+        function delAccount(id){
+            var html = '您是否要解除该公众号的绑定';
+            layer.confirm(html, {
+                title:'公众号解绑',
+                area : ['400px', '180px'],
+                btn: ["确定","取消"] //按钮
+                }, function(){
+                    $.ajax({
+                        type: "POST",
+                        url: '/V1.2/Officialaccount/del',
+                        dataType: 'json',
+                        data: {'pn_id': id},
+                        success: function (rs) {
+                            if (rs.state == 1) {         //如果查询成功
+                                tipTopShow(rs.msg);
+                                getList();
+                                setTimeout("layer.closeAll()", 100);
+                            } else {
+                                tipTopShow(rs.msg);
+                            }
+                        },
+                        error: function (rs) {
+                            tipTopShow("查询信息失败，请重试...");    //显示提示框
+                            setTimeout("layer.closeAll()", 100);
+                        }
+                    });
+                }
+            )
+        }
+
+        //增加粉丝
+        function addPlan(){
+            location.href = '/v1.2/plan/createpage';
+        }
+
+        //查看公众号详情
+        function viewInfo(id){
+            $.ajax({
+                type: 'GET',
+                url: '/V1.2/Officialaccount/getInfo/pn_id/'+id,
+                dataType: 'json',
+                success: function(rs){
+                    if(rs.state==1){
+                        tempViewInfo(rs.data);
+                        console.log(rs.data);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(rs){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+        function tempViewInfo(vdata){
+            var url = '/V1.2/Officialaccount/viewpage';
+            vcacheDOM = getshopHTML(url);
+            if (vcacheDOM == '') { return; }        //加载失败
+            if (vdata == '') { return; }    //加载失败
+            laytpl(vcacheDOM).render(vdata, function (result) {         //laytpl异步渲染调用
+                layer.open({        //店铺详细信息弹框
+                    type: 1,
+                    closeBtn:2,
+                    title: '绑定公众号',
+                    area: ['750px', ($('body').height() * 0.886) + 'px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        }
+
+        //提示
+        $('body').on('click', '.status_tip', function () {
+            var html = '<div class="layer_tip"><span>提示</span><p>'+this.getAttribute('data')+'</p></div>';
+            layer.tips(html, this, {
+                skin: 'layui-layer-demo',
+                tips: [3, '#eeeff3'],
+                area: ['300px','130px'],
+                time: 0,
+                closeBtn:1
+            });
+        })
+
+        //绑定公众号
+        var cacheDOM = '';
+        $('body').on('click', '#btn_link', function () {
+            var url = '/v1.2/Officialaccount/createpage';
+            cacheDOM = getshopHTML(url);
+            if (cacheDOM == '') { return; }        //加载失败
+            laytpl(cacheDOM).render({}, function (result) {         //laytpl异步渲染调用
+                layer.open({        //店铺详细信息弹框
+                    type: 1,
+                    title: '绑定公众号',
+                    area: ['750px', ($('body').height() * 0.886) + 'px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        })
+        //获取页面DOM HTML信息
+        function getshopHTML(url) {
+            var html = '';
+            $.ajax({
+                type: "GET",
+                url: url,
+                async: false,
+                cache: false,
+                success: function (data) {
+                    html = data;
+                }
+            });
+            return html;
+        }
+        //图片预览
+        function imgUpload(fileDom,el) {
+            var dataSize = $(fileDom).attr('data-size');
+            //判断是否支持FileReader
+            if(window.FileReader) {
+                var reader = new FileReader();
+            } else {
+                tipTopShow("您的设备不支持图片预览功能，如需该功能请升级您的设备！");
+            }
+            //获取文件
+            var file = fileDom.files[0];
+            var imageType = /^image\//;
+            //是否是图片
+            if(!imageType.test(file.type)) {
+                tipTopShow("请选择图片！");
+                $(fileDom).val('');
+                return;
+            }
+
+            var size = $(fileDom)[0].files[0].size;
+            var fileSize = (Math.round(dataSize *1024));
+
+            console.log(size,fileSize);
+            if(size >fileSize){
+                tipTopShow('图片大小不能大于'+dataSize+'KB');
+                $(fileDom).val('');
+                return;
+            }
+
+            //读取完成
+            reader.onload = function(e) {
+                var img = document.getElementById(el);//获取图片dom
+                img.src = e.target.result;//图片预览
+            };
+            reader.readAsDataURL(file);
+
+
+            /*var formData = new FormData();
+            var ids = $(fileDom).attr('id');
+            var sizeid = $(fileDom).attr('_size');
+            formData.append('file', $('#'+ids)[0].files[0]);
+            formData.append('sizeid',sizeid);
+            console.log(formData);*/
+        }
+
+        //数据提交
+        function postData() {
+            var pn_name = $.trim($('#pn_name').val()),
+                pn_type = $('input[name="pn_type"]:checked').val(),
+                pn_number = $('#pn_number').val(),
+                shop_name = $('#shop_name').val(),
+                pn_appid = $('#pn_appid').val(),
+                shop_id = $('#shop_id').val(),
+                ssid = $('#ssid').val(),
+                pn_appsecret = $('#pn_appsecret').val(),
+                secret_key = $('#secret_key').val(),
+                mobile_decrypt_key = $('#mobile_decrypt_key').val(),
+                biz_code = $('#biz_code').val(),
+                public_cate = $('input[name="public_cate"]:checked').val(),
+                file_logo = $('#file_logo'),
+                file_code = $('#file_code');
+            if(!file_logo[0].files[0]){
+                tipTopShow('请选择logo图片！');
+                return;
+            }
+            if(!pn_name){
+                tipTopShow('请输入公众号名称！');
+                return;
+            }
+            if(!pn_type){
+                tipTopShow('请选择公众号类型！');
+                return;
+            }
+            if(!pn_number){
+                tipTopShow('请输入微信号！');
+                return;
+            }
+            if(!shop_name){
+                tipTopShow('请输入门店名称！');
+                return;
+            }
+            if(!pn_appid){
+                tipTopShow('请输入Appid！');
+                return;
+            }
+            if(!shop_id){
+                tipTopShow('请输入shopid！');
+                return;
+            }
+            if(!ssid){
+                tipTopShow('请输入ssid！');
+                return;
+            }
+            if(!pn_appsecret){
+                tipTopShow('请输入Appsecret！');
+                return;
+            }
+            if(!secret_key){
+                tipTopShow('请输入secretke！');
+                return;
+            }
+            if(!public_cate){
+                tipTopShow('请选择运营类别！');
+                return;
+            }
+            var form = $('#invoice_form')[0],
+                dataPost = new FormData(form);
+            console.log(dataPost);
+            $.ajax({
+                url: '/v1.2/Officialaccount/create',
+                type: 'POST',
+                cache: false,
+                data: dataPost,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    var rs = eval("("+data+")");
+                    if(rs.state==1){
+                        tipTopShow(rs.msg);
+                        getList();
+                        setTimeout("layer.closeAll()", 100);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (data) {
+                    tipTopShow("上传失败");
+                    setTimeout("layer.closeAll()", 100);
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 客流来源 -->
+    <meta charset="UTF-8">
+    <title>百米DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=p38ZbGmkKPLWPNlLNWw42vFZ"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+    <style type="text/css">
+        .content {
+            background-color: #fff;
+            min-height: 650px;
+        }
+
+        .type_box {
+            padding-top: 30px;
+        }
+
+        .layui-form-radio i:hover,
+        .layui-form-radioed i {
+            color: #4aa6fc;
+        }
+
+        .layui-form-checkbox[lay-skin=primary]:hover i {
+            border-color: #4aa6fc;
+        }
+
+        .layui-form-checked[lay-skin=primary] i {
+            background-color: #4aa6fc
+        }
+
+        .layui-form-label {
+            width: auto;
+        }
+
+        .form_box li {
+            color: #999
+        }
+
+        .form_box label {
+            color: #333
+        }
+
+        .form_box {
+            margin: 30px 10px;
+        }
+
+        .layui-form-checkbox[lay-skin=primary] span {
+            color: #999
+        }
+
+        #container {
+            height: 360px;
+            width: 50%;
+            margin-left: 20px;
+        }
+
+        #crowd_table {
+            width: 40%;
+            margin-left: 5%;
+        }
+
+        #crowd_table>ul li {
+            float: left;
+            background-color: #f5f5f5
+        }
+
+        #crowd_table>ul li:nth-child(1) {
+            color: #f5f5f5;
+        }
+
+        #crowd_table li {
+            height: 40px;
+            line-height: 40px;
+        }
+
+        #crowd_table li:nth-child(1) {
+            width: 15%;
+        }
+
+        #crowd_table li:nth-child(2) {
+            width: 20%
+        }
+
+        #crowd_table li:nth-child(3) {
+            width: 65%
+        }
+
+        #crowd_table li .layui-progress-bar {
+            position: initial;
+            background-color: #618cff;
+        }
+
+        #crowd_table li .layui-progress {
+            position: relative;
+            top: 16px;
+            margin-right: 20%;
+            height: 10px;
+            border-radius: 0;
+        }
+
+        #crowd_table li .layui-progress-bar {
+            height: 10px;
+            border-radius: 0;
+        }
+
+        #crowd_table li span {
+            position: absolute;
+            right: -18%;
+            top: -5px;
+        }
+
+        .table_content {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .table_content ul {
+            clear: both;
+            overflow: hidden;
+            zoom: 1;
+            width: 100%;
+            color: #666
+        }
+
+        .table_content ul li {
+            float: left;
+        }
+
+        .table_content ul li:nth-child(1) {
+            text-align: center
+        }
+
+        .layui-form-radio i {
+            font-size: 17px;
+        }
+
+        .layui-form-checked span {
+            color: #009eff!important;
+        }
+
+        /*日期选择*/
+
+        .time_filter {
+            display: inline-block;
+            vertical-align: top;
+            position: relative;
+            margin-left: 5px;
+            display: none;
+        }
+
+        .time_filter .ta_date {
+            width: 198px;
+            height: 38px;
+            line-height: 38px;
+            cursor: pointer;
+            text-align: center;
+            border: non;
+            border-radius: 5px
+        }
+
+        .time_filter .date_title {
+            display: block;
+            cursor: pointer;
+            width: 190px;
+            height: 30px;
+            z-index: 2
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Scenes/index">&lt; 返回人群画像</a>
+            </span>
+        </div>
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="/v1.2/Scenes/flowanalysis">客流分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cuspropety">客户属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">客流来源
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/hotsearch">搜索热点
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/appanalysis">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="create_analysis.html" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        </div>
+
+        <div class="tip_box" style="display:none;">
+            <p class="tip_title">本功能为高级版本付费功能，费用
+                <span>3000元/年。</span>
+            </p>
+            <p class="tip_subtitle">点击下方“修改”按钮，进入本场景修改页面,选择开通“高级版”，完成支付后等待开通，预计完成需要1~2个工作日。</p>
+            <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="create_analysis.html">修改</a>
+        </div>
+
+        <div class="content">
+            <div class="type_box clearfix">
+                <div class="layui-form fl" id="select_box">
+                    <select name="timetype" lay-filter="timetype" class="bm-select select_box fl" id="select_box">
+                        <option value="1" selected="">昨日</option>
+                        <option value="6">近7天</option>
+                        <option value="29">近30天</option>
+                        <option value="0">指定日期</option>
+                    </select>
+                </div>
+                <div class="time_filter layui-input-block fl " id="time_filter">
+                    <div class="ta_date">
+                        <input type="text" class="layui-input" id="date_day" placeholder=" 至 ">
+                    </div>
+                </div>
+                <ul class="item_ul fl" id="item_ul">
+                    <li type="3" class="cur">全部</li>
+                    <li type="1">新访客</li>
+                    <li type="2">老访客</li>
+                </ul>
+                <p class="fl">商圈分析截止到昨日</p>
+            </div>
+
+            <div class="form_box layui-form layui-form-item">
+                <ul class="clearfix">
+                    <li class="fl">
+                        <label class="layui-form-label">性别:</label>
+                        <input type="checkbox" name="sex" value="1" title="男" lay-skin="primary" checked>
+                        <input type="checkbox" name="sex" value="2" title="女" lay-skin="primary">
+                    </li>
+                    <li class="fl">
+                        <label class="layui-form-label">年龄:</label>
+                        <input type="checkbox" name="age" value="1" title="18岁以下" lay-skin="primary" checked>
+                        <input type="checkbox" name="age" value="2" title="18-24岁" lay-skin="primary">
+                        <input type="checkbox" name="age" value="3" title="25-34岁" lay-skin="primary">
+                        <input type="checkbox" name="age" value="4" title="35-44岁" lay-skin="primary">
+                        <input type="checkbox" name="age" value="5" title="45-54岁" lay-skin="primary">
+                        <input type="checkbox" name="age" value="6" title="55-64岁" lay-skin="primary">
+                        <input type="checkbox" name="age" value="7" title="65岁以上" lay-skin="primary">
+                    </li>
+                    <li class="fl">
+                        <label class="layui-form-label">来源:</label>
+                        <input type="checkbox" name="source" value="1" title="居住地" lay-skin="primary" checked>
+                        <input type="checkbox" name="source" value="2" title="办公地" lay-skin="primary">
+                    </li>
+                    <li class="fl" style="display:none;">
+                        <label class="layui-form-label">教育:</label>
+                        <input type="checkbox" name="education" value="高中及以下" title="高中及以下" lay-skin="primary" checked>
+                        <input type="checkbox" name="education" value="本科及专科" title="本科及专科" lay-skin="primary">
+                        <input type="checkbox" name="education" value="硕士以上" title="硕士以上" lay-skin="primary">
+                    </li>
+                    <li class="fl" style="display:none;">
+                        <label class="layui-form-label">收入水平:</label>
+                        <input type="checkbox" name="income" value="3000以内" title="高中及以下" lay-skin="primary" checked>
+                        <input type="checkbox" name="income" value="3000~5000" title="3000~5000" lay-skin="primary">
+                        <input type="checkbox" name="income" value="5000~10000" title="5000~10000" lay-skin="primary">
+                        <input type="checkbox" name="income" value="10000以上" title="10000以上" lay-skin="primary">
+                    </li>
+                    <li class="fl" style="display:none;">
+                        <label class="layui-form-label">有无小孩:</label>
+                        <input type="checkbox" name="ischild" value="有" title="有" lay-skin="primary" checked>
+                        <input type="checkbox" name="ischild" value="无" title="无" lay-skin="primary">
+                    </li>
+                </ul>
+            </div>
+            <div class="clearfix">
+                <div id="container" class="fl"></div>
+                <div id="crowd_table" class="fl">
+                    <ul class="clearfix">
+                        <li>序号</li>
+                        <li>热门来源</li>
+                        <li>客流占比</li>
+                    </ul>
+                    <div class="table_content">
+                        <ul>
+                            <li>1</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>2</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>3</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>4</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>5</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>6</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>7</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>8</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>9</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="https://api.map.baidu.com/library/TrafficControl/1.4/src/TrafficControl_min.js"></script>
+    <script type="text/javascript">
+        var map = new BMap.Map("container"); // 创建地图实例
+        var point = new BMap.Point(116.418261, 39.921984);
+        map.centerAndZoom(point, 13); // 初始化地图，设置中心点坐标和地图级别
+        map.enableScrollWheelZoom(); // 允许滚轮缩放
+        var points = [{
+            "lng": 116.418261,
+            "lat": 39.921984,
+            "count": 50
+        },
+        {
+            "lng": 116.218261,
+            "lat": 39.821984,
+            "count": 150
+        },
+        {
+            "lng": 116.318261,
+            "lat": 39.721984,
+            "count": 100
+        }
+        ];
+        if (!isSupportCanvas()) {
+            alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
+        }
+        heatmapOverlay = new BMapLib.HeatmapOverlay({
+            "radius": 20
+        });
+        map.addOverlay(heatmapOverlay);
+        heatmapOverlay.setDataSet({
+            data: points,
+            max: 100
+        });
+
+        function setGradient() {
+            var gradient = {};
+            var colors = document.querySelectorAll("input[type='color']");
+            colors = [].slice.call(colors, 0);
+            colors.forEach(function (ele) {
+                gradient[ele.getAttribute("data-key")] = ele.value;
+            });
+            heatmapOverlay.setOptions({
+                "gradient": gradient
+            });
+        }
+        //判断浏览区是否支持canvas
+        function isSupportCanvas() {
+            var elem = document.createElement('canvas');
+            return !!(elem.getContext && elem.getContext('2d'));
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                laydate = layui.laydate;
+
+            $("#item_ul li").on("click", function () {
+                $("#item_ul li").removeClass("cur");
+                $(this).addClass("cur");
+                var type = $(this).attr("type");
+            });
+            //日期
+            laydate.render({
+                elem: '#date_day',
+                format: 'yyyy-MM-dd',
+                range: true,
+                min: -30,
+                max: -1,
+                done: function (value, date, endDate) {
+                    if (value) {
+                        var Val = value.split(' - ');
+                        // getOptionVal(Val[0],Val[1], userType)
+                    }
+                }
+            })
+            $("input:checkbox[name='age']:checked").each(function () { // 遍历name=test的多选框
+                console.log($(this).val())
+            });
+            form.on('select(timetype)', function (data) {
+                var category = data.value;  //获取select的value    // var categoryName = data.elem[data.elem.selectedIndex].text;  //获取文本内容
+                form.render('select');
+                console.log(category)
+                var startDate = "",
+                    endDate = "",
+                    userType = $('#item_ul').find('.cur').attr('type');
+                if (category == 0) {
+                    $('#time_filter').show();
+                } else if (category == 1) {
+                    startDate = getDay(-category);
+                    endDate = startDate;
+                    $('#time_filter').hide();
+                    $('#date_day').val("")
+                    // getOptionVal(startDate, endDate, userType);
+                } else {
+                    startDate = getDay(-category);
+                    endDate = inItDate(new Date());
+                    $('#time_filter').hide();
+                    $('#date_day').val("")
+                    // getOptionVal(startDate, endDate, userType);
+                }
+            });
+
+            $('#item_ul li').on('click', function () {
+                $("#item_ul li").removeClass("cur");
+                $(this).addClass("cur");
+                var resultTime = getUlListVal().split('=');
+                console.log(resultTime)
+                // if (resultTime[3] != 0) {
+                //     getOptionVal(resultTime[0], resultTime[1], resultTime[2])
+                // } else {
+                //     tipTopShow('请选择查询日期！');
+                //     return;
+                // }
+            })
+
+
+        })
+        //新老客户切换
+        function getUlListVal() {
+            var userType = $('#item_ul').find('.cur').attr('type'),
+                category = $("select[name='timetype']").val(),
+                startDate = "",
+                endDate = "";
+            if (category == 0) {
+                $('#startTimes').val("").show();
+                $('#endTimes').val("").show();
+                $('.btnTimes').show();
+            } else if (category == 1) {
+                startDate = getDay(-category);
+                endDate = startDate;
+                $('#startTimes').val("").hide();
+                $('#endTimes').val("").hide();
+                $('.btnTimes').hide();
+            } else {
+                startDate = getDay(-category);
+                endDate = inItDate(new Date());
+                $('#startTimes').val("").hide();
+                $('#endTimes').val("").hide();
+                $('.btnTimes').hide();
+            }
+            return startDate + "=" + endDate + "=" + userType + "=" + category
+        }
+        function inItDate(time) {
+            var y = time.getFullYear();
+            var m = time.getMonth() + 1;
+            var d = time.getDate();
+            if (m <= 9) m = "0" + m;
+            if (d <= 9) d = "0" + d;
+            return y + "-" + m + "-" + d
+        }
+        //获取近期日期
+        function getDay(day) {
+            var today = new Date();
+            var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
+            today.setTime(targetday_milliseconds); //注意，这行是关键代码  
+            var tYear = today.getFullYear();
+            var tMonth = today.getMonth();
+            var tDate = today.getDate();
+            tMonth = doHandleMonth(tMonth + 1);
+            tDate = doHandleMonth(tDate);
+            return tYear + "-" + tMonth + "-" + tDate;
+        }
+
+        function doHandleMonth(month) {
+            var m = month;
+            if (month.toString().length == 1) {
+                m = "0" + month;
+            }
+            return m;
+        }
+    </script>
+</body>
+
+</html>

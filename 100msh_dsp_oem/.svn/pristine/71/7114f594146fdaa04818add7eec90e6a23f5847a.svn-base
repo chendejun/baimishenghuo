@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告管理-人群管理-新增人群</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <i class="info_icon icon1"></i>
+        <span><a href="">广告管理</a> / 人群管理 / 新增人群</span>
+    </div>
+    <div class="crowd_form mt20">
+	    <div class="form">
+	        <div class="from-row">
+	            <label>人群名称：</label>
+	            <input type="text" value="" class="bm-input" name="name" id="name" placeholder="请输入人群名称" />
+	        </div>
+	        <div class="from-row clearfix tag_row">
+	            <label>人群标签：</label>
+	            <b class="fl">区域特征</b>
+	            <div class="crowd_nav fl ml20">
+		            <span class="mr10 cur" id="crowd_default" _id="1">不限</span>
+		            <span id="crowd_id" _id="0">省市</span>
+		            <input type="hidden" id="crowd_type" value="1">
+	            </div>
+	            <div class="crowd_box">
+	            	<div id="province_list" class="box_list b1" style="display: none"></div>
+			        <div id="city_list" class="box_list b2" style="display: none"></div>
+			        <div id="area_list" class="box_list b3" style="display: none"></div>
+	            </div>
+	        </div>
+	        <button type="button" id="keep_btn" class="big-btn bm-btn bm-btn-blue">提交保存</button>
+	    </div>
+    </div>
+</div>
+<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/public/js/common.js"></script>
+<script type="text/javascript">
+	(function () {
+		function getAreas(id, isChecked) {
+			var html = '';
+		    $.ajax({
+		        type: "GET",
+		        url: '/crowd/getTag/pid/'+id,
+		        dataType:'json',
+		        async : false,
+		        success: function(rs){
+		            var data = rs.data;
+		            if(rs.state == 1){
+		                $.each(data,function(k,v){
+		                    html +='<li class="lists" id="'+v.c_tag_id+'"><em class="checkbox ' + (isChecked ? 'chose' : '') + '"></em>'+v.tag_name+'</li>';
+		                })
+		            }else{
+		                tipTopShow('获取失败！');
+		            }
+		        },
+		        error:function(rs){
+		            tipTopShow("操作失败请重试！");
+		        }
+		    });
+		    return html;
+		}
+
+		var pList = $('#province_list'),
+        	cList = $('#city_list'),
+        	aList = $('#area_list');
+   		const OPEN = 'cur',
+        	CHOSE = 'chose',
+        	CHILDCHOSE = 'childchose';
+        //选择的区域类型 不限or选择省市
+		$('.crowd_nav span').bind('click',function(){
+			var th = $(this);
+				thisId = th.attr('_id');
+			th.parent().find('span').removeClass('cur');
+			th.addClass('cur');
+			$('#crowd_type').val(thisId);
+			if(thisId ==0){
+				$('.crowd_box').show();
+			}else{
+				$('.crowd_box').hide();
+			}
+		})
+		//选择省市标签
+		$('body').on('click','#crowd_id', function(e){ //点击选择框获取省份列表
+		    var tagId = $(this).attr('_id');
+		    if(pList.html() == '') {
+		    	var data = getAreas(tagId);
+		    	pList.show().html('<ul class="plist">'+ data +'</ul>');
+		    }
+		}).on('click','#province_list li', function(e){ //点击省份获取城市列表
+		    var tagId = $(this).attr('id'),
+	        ul = cList.find('[pid="' + tagId + '"]'),
+	        isChecked = $(this).find('.chose').length > 0;
+		    aList.hide();
+		    cList.show();
+		    $(this).addClass('cur').siblings('li').removeClass('cur');
+		    if(ul.length > 0) {
+		    	ul.show().siblings('ul').hide()
+		    }else {
+		    	var data = getAreas(tagId, isChecked);
+		    	cList.children('ul').hide()
+		    	cList.append('<ul class="plist" pid="' + tagId + '">'+ data +'</ul>');
+		    }
+		}).on('click','#city_list li', function(e){ //点击城市获取区列表
+		    var tagId = $(this).attr('id'),
+		    	pId = $(this).parent().attr('pid'),
+		      child = aList.children('[pid="' + pId + '"]'),
+		      ul = child.children('[pid="' + tagId + '"]'),
+		      isChecked = $(this).find('.chose').length > 0;
+		    aList.show();
+		    $(this).addClass('cur').siblings('li').removeClass('cur').parent().siblings('ul').find('li').removeClass('cur');
+		    if(child.length > 0) {
+		    	child.show().siblings('div').hide()
+		    	if(ul.length > 0) {
+		    		ul.show().siblings('ul').hide()
+		    	}else {
+		    		var data = getAreas(tagId, isChecked);
+			    	child.children('ul').hide()
+			    	child.append('<ul class="plist" pid="' + tagId + '">'+ data +'</ul>');
+		    	}
+		    }else {
+		    	var data = getAreas(tagId, isChecked);
+		    	aList.children('div').hide()
+		    	aList.append('<div pid="' + pId + '"><ul class="plist" pid="' + tagId + '">'+ data +'</ul></div>');
+		    }
+		}).on('click', '#area_list .checkbox', function(e) { //选中或取消区
+			e.stopPropagation()
+			var t = $(this),
+				plist = t.closest('.plist'),
+				pSize = plist.children().length,
+				pid = plist.attr('pid'),
+				ppid = t.closest('div').attr('pid'),
+				pplist = cList.children('[pid="' + ppid + '"]'),
+				ppSize = pplist.children().length,
+				cCheckbox = cList.find('#' + pid).children('.checkbox'),
+				pCheckbox = pList.find('#' + ppid).children('.checkbox');
+
+			if(t.hasClass('chose')) {
+				t.removeClass('chose');
+				cCheckbox.removeClass('chose');
+				if(plist.find('.chose').length == 0) {
+					cCheckbox.removeClass('childchose');
+				}else {
+					cCheckbox.addClass('childchose');
+				}
+
+				pCheckbox.removeClass('chose');
+				if(pplist.find('.chose').length == 0) {
+					if(pplist.find('.childchose').length == 0) {
+						pCheckbox.removeClass('childchose');
+					}else {
+						pCheckbox.addClass('childchose');
+					}
+				}else {
+					pCheckbox.addClass('childchose');
+				}
+			}else {
+				t.addClass('chose');
+				if(plist.find('.chose').length == pSize) {
+					cCheckbox.addClass('chose').removeClass('childchose');
+				}else {
+					cCheckbox.addClass('childchose');
+				}
+
+				if(pplist.find('.chose').length == ppSize) {
+					pCheckbox.addClass('chose').removeClass('childchose');
+				}else {
+					pCheckbox.addClass('childchose');
+				}
+			}
+		}).on('click', '#city_list .checkbox', function(e) { //选中或取消城市
+			e.stopPropagation();
+			var t = $(this),
+				id = t.parent().attr('id'),
+				plist = t.closest('.plist'),
+				pSize = plist.children().length,
+				pid = plist.attr('pid'),
+				aCheckbox = aList.find('[pid="' + id + '"]').find('.checkbox'),
+				pCheckbox = pList.find('#' + pid).children('.checkbox');
+
+			if(t.hasClass('chose')) {
+				t.removeClass('chose childchose');
+				aCheckbox.removeClass('chose');
+
+				pCheckbox.removeClass('chose');
+				if(plist.find('.chose').length == 0) {
+					if(plist.find('.childchose').length == 0) {
+						pCheckbox.removeClass('childchose');
+					}else {
+						pCheckbox.addClass('childchose');
+					}
+				}else {
+					pCheckbox.addClass('childchose');
+				}
+			}else {
+				t.removeClass('childchose').addClass('chose');
+				aCheckbox.addClass('chose');
+
+				if(plist.find('.chose').length == pSize) {
+					pCheckbox.addClass('chose').removeClass('childchose')
+				}else {
+					pCheckbox.addClass('childchose')
+				}
+			}
+		}).on('click', '#province_list .checkbox', function(e) { //选中或取消省份
+			e.stopPropagation();
+			var t = $(this),
+				id = t.parent().attr('id'),
+				cCheckbox = cList.find('[pid="' + id + '"]').find('.checkbox'),
+				aCheckbox = aList.children('[pid="' + id + '"]').find('.checkbox');
+
+			if(t.hasClass('chose')) {
+				t.removeClass('chose childchose');
+				cCheckbox.removeClass('chose');
+				aCheckbox.removeClass('chose');
+
+			}else {
+				t.removeClass('childchose').addClass('chose');
+				cCheckbox.addClass('chose').removeClass('childchose');
+				aCheckbox.addClass('chose');
+			}
+		}).on('click', '#keep_btn', function(e) { //提交
+			e.preventDefault();
+			var name = $('#name').val(),
+		    	crowdType=  $('#crowd_type').val(),
+				areaId = [],result='';
+		    if(!name){
+		    	tipTopShow("人群名称不能为空！");
+		    	return;
+		    }
+		    if(crowdType==0){//选择省市
+			    pList.find('.chose').each(function() {
+					var id = $(this).parent().attr('id');
+					areaId.push(id);
+				})
+				pList.find('.childchose').each(function() {
+					var pid = $(this).parent().attr('id');
+					var cListChose = cList.find('[pid="' + pid + '"]').find('.chose');
+
+					cListChose.each(function() {
+						var id = $(this).parent().attr('id');
+						areaId.push(id);
+					})
+				})
+				cList.find('.childchose').each(function() {
+					var pid = $(this).parent().attr('id');
+					var aListChose = aList.find('[pid="' + pid + '"]').find('.chose');
+
+					aListChose.each(function() {
+						var id = $(this).parent().attr('id');
+						areaId.push(id);
+					})
+				})
+				result = areaId.join(",");
+		    }else{//不限
+		    	result ='0';
+		    }
+		    if(result==''){
+		    	tipTopShow("人群标签不能为空！");
+		    	return;
+		    }
+		    var post_data ={'crowd_name':name,'crowd_info':result};
+		    $.ajax({
+	            type : "POST",
+	            url : "/crowd/add",
+	            data : post_data,
+	            dataType : 'json',
+	            beforeSend : function() {
+	            	//禁用按钮防止重复提交
+	                $('#keep_btn').attr('disabled','disabled');
+	            },
+	            success : function(rs) {
+	                tipTopHide();
+	                if (rs.state == 1) {
+	                    tipTopShow("人群新增成功");
+	                    setTimeout(function(){
+	                        location.href ='/crowd/index';
+	                    },500);
+	                }else{
+	                    tipTopShow(rs.msg);
+	                }
+	                $('#keep_btn').removeAttr('disabled');
+	            },
+	            error : function(rs) {
+	                $('#keep_btn').removeAttr('disabled');
+	                tipTopShow("操作失败请重试！");
+	            }
+	        });
+
+		})
+
+	})()
+</script>
+</body>
+</html>
+

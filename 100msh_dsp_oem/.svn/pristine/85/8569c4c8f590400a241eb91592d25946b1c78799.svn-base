@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>我的广告主-广告主详情</title>
+	    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    	<link rel="stylesheet" href="../../../../../public/css/common.css">
+    	<link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    	<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+		<style>
+			.content_box {min-width: 1504px;}
+			.account_box .box_table {padding: 0 30px;}
+			.advertr_view .line .add_linel { margin-top: 0}
+			.advertr_view .line .add_title {width:100px;}
+			.nav_box ul {position: relative;padding-left: 0}
+			.nav_box ul li {float: left; text-align: center;display: block;cursor: pointer; width:100px; color:#333;}
+			.nav_box ul li.cur {border-bottom: 2px solid #4c94f5;color: #4c94f5;background-color: #fff;}
+			.percent_box ul li {height: 40px}
+
+			.table_style {padding: 50px 30px;}
+			.info_view {margin-top: -30px}
+			.acount_box {background-color: #FFF; overflow: hidden;padding: 0 30px 0;}
+			.acount_box h4 {padding: 10px 0px}
+			.I_box ,.II_box {
+				width:50%;
+				float: left;
+				position: relative;
+			}
+
+			.I_box h3, .II_box h3 {
+				padding: 20px 10px;
+
+			}
+
+			.I_box h3:after, .II_box h3:after{content:" ";height: 15px;width: 3px;background-color: #1087e3;position: absolute;left: 20px;top: 20px;}
+			.I_box h3 i, .II_box h3 i  {position: relative;top: -5px;left: 80px;}
+			.I_box ul, .II_box ul {
+					position: relative;
+					
+				}
+
+			.I_box ul li, .II_box ul li {
+				float: left;
+				width :15%;
+				text-align: center;
+				font-size: 15px;
+				position: relative;
+				
+			}
+		
+		
+			.I_box ul li p:first-child,.II_box ul li p:first-child {
+				color: #999;
+				font-size: 14px;
+			}
+			.I_box ul li p:last-child,.II_box ul li p:last-child {
+				padding: 10px 0;
+
+			}
+
+			 .ta_date input{width: 90%;border: none;outline: none;height: 38px;line-height: 38px;}
+    		.date-picker-wrapper .drp_top-bar .clear-btn {display: block; position: absolute; right: 40px;top: 6px; padding: 3px 5px; margin: 0;font-size: 12px; border-radius: 4px;  
+        cursor: pointer;  border: 1px solid #0076a3;  background: #0095cd;  background: -webkit-gradient(linear,left top,left bottom,from(#00adee),to(#0078a5));  
+        background: -moz-linear-gradient(top,#00adee,#0078a5);  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');  
+        color: #fff;  line-height: initial;  }
+    		.box_title{margin: 20px 0;font-weight: bolder;}
+    		.box_info{margin-bottom: 70px;}
+    		.box_info .flex {display:-webkit-box;display:-webkit-flex;display:flex;}
+    		.box_info .flex .flex_item {-webkit-box-flex:1;-webkit-flex:1;flex:1;height: auto;color: #fff;margin-left: 30px;border-radius: 2px;}
+    		.box_info .flex .flex_item:first-child{margin: 0;}
+    		.box_info h3{margin-top: 40px;font-size: 32px;}
+    		.box_info h4{margin: 20px 0 30px 0;padding: 0;font-size: 14px;}
+   		 	.b_red{background-color: #fda2aa}
+    		.b_yellow{background-color: #fbd28e}
+    		.b_bule{background-color: #8cbbf9}
+    		.b_green{background-color: #88d285}
+    		#transfer_list{margin: 0;}
+    		.Wdate{height: 38px!important;}
+
+       		.layui-layer-content{height: auto!important;}
+        	.layui-layer-content p,.layer_tip span {color:#333}
+		</style>
+		<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+		<script src="../../../../../public/js/layer/layer.js"></script>
+	</head>
+
+
+	<body>
+		<div class="content_box">
+           <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+      </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+               <!--  <a href="javascript:;" class="cur">基本资料</a>
+                <a href="/v1.2/advertiser/advdetail/comp_id/206329">账户详情</a>
+                <a href="/v1.2/advertiser/consume">消耗查询</a> -->
+                <ul>
+                	<li class="cur" data-regtype='1'>基本资料</li>
+                	<li data-regtype='2'>账户详情</li>
+                	<li data-regtype='3'>消耗查询</li>
+                </ul>
+            </div>
+        </div>
+	
+        <div class="advertr_view">
+				<div class="addinput_box">
+					<div class="line h80">
+						<div class="add_linel">
+							<div class="add_title">广告主名称：</div>
+							<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+							<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+						</div>
+						<div class="add_liner">
+						<!-- 	<div class="add_title">联系人：</div>
+							<div class="add_info setedit set_person">{{$data.comp_info.contacts}}</div>
+							<input type="text" class="edit_input edit_person" value={{$data.comp_info.contacts}}> -->
+
+							<div class="add_title">所在区域：</div>
+							<div class="add_info setedit set_address">{{$data.comp_info.pro_name}}　{{$data.comp_info.city_name}}　{{$data.comp_info.region_name}} {{$data.comp_info.comp_addr}}</div>
+						<!-- 	<div class="add_info setedit set_detailsaddress" style="margin-left:95px;">{{$data.comp_info.comp_addr}}</div> -->
+						</div>
+					</div>
+					<div class="line">
+						<div class="add_linel">
+							<div class="add_title">所属行业：</div>
+							<div class="add_info setedit industryname">
+								<!-- {{$data.comp_info.cate_name}} -->
+							</div>
+							<select class="tr_select bm_right seleindust add_industry" onchange="getSecondIndustryValue('.add_industry')"></select>
+							<select class="tr_select bm_right seleindust add_indeatils"></select>
+						</div>
+						<div class="add_liner">
+							<div class="add_title">广告主网址：</div>
+							<div class="add_info setedit set_url">{{$data.comp_info.hd_url}}{{$data.comp_info.website_url}}</div>
+							<select class="trn_select bm_right seleindust hd_url"><option {{if $data.comp_info.hd_url=='http://'}}selected{{/if}}>http://</option><option {{if $data.comp_info.hd_url=='https://'}}selected{{/if}} >https://</option></select>
+							<input type="text" class="edit_input edit_url" value={{$data.comp_info.website_url}}>
+						</div>
+					</div>
+					<div class="line">
+						<div class="add_linel">
+							<div class="add_title">所属服务商：</div>
+							<div class="add_info set_facilitator">{{$data.comp_info.dls_comp_name}}</div>
+							<!-- <input type="text" class="edit_input edit_facilitator" value={{$data.comp_info.dls_comp_name}}> -->
+						</div>
+						<div class="add_liner">
+							<div class="add_title">联系手机号：</div>
+							<div class="add_info set_phone">{{$data.comp_info.mobile_phone}}</div>
+						</div>
+					</div>
+					<div class="line">
+						<div class="add_linel">
+							<div class="add_title">联系人：</div>
+							<div class="add_info setedit set_person">{{$data.comp_info.contacts}}</div>
+							<!-- <input type="text" class="edit_input edit_person" value={{$data.comp_info.contacts}}> -->
+						</div> 
+
+						<div class="add_linel">
+							<div class="add_title">人群画像开通：</div>
+							<div class="add_info set_phone">{{$data.comp_info.total_disburse}}</div>
+						</div>
+
+					</div>
+		
+
+					<div class="line clearfix">
+						<div class="add_linel" style="position:relative;z-index:2;margin-bottom:2px;">
+						
+							<div class="editaddress">
+								<div class="select_wrap">
+									<div class="tr_selectdiv add_provincetitle" data-value="">请选择</div>
+									<ul class="tr_selectlist add_province" onchange="getSecondRegionValue('.add_province')">
+										<li data-value="">请选择</li>
+									</ul>
+								</div>
+								<div class="select_wrap">
+									<div class="tr_selectdiv add_citystitle" data-value="">请选择</div>
+									<ul class="tr_selectlist add_citys" onchange="getSecondRegionValue('.add_citys')">
+										<li data-value="">请选择</li>
+									</ul>
+								</div>
+								<div class="select_wrap">
+									<div class="tr_selectdiv add_countytitle" data-value="">请选择</div>
+									<ul class="tr_selectlist add_county">
+										<li data-value="">请选择</li>
+									</ul>
+								</div>
+							</div>
+							<input type="text" class="edit_input add_detailsaddress" value="{{$data.comp_info.comp_addr}}" placeholder="详细地址,如广东路135号成花大厦" style="width:575px;margin-left:96px;margin-top:5px" />
+						</div>
+					</div>
+				</div>
+
+		 <div class="info_view" style="display: none;">
+              <div class="acount_box">
+                <h4><i class="club_icons icon2"></i>账户详情</h4>
+
+            <div class="I_box">
+                    <h3><i class="club_icons icon1 tabtitle_tip tit1_tip" data-type='1'></i>I类账户</h3>
+                    <ul>
+                        <li>
+                           <P>余额</P>
+                           <p>{{$data.acc_info[2].usable_amount}}</p>
+                       </li>
+                       <li>
+                           <P>冻结中</P>
+                           <p>{{$data.acc_info[2].freeze_amount}}</p>
+                       </li>
+                       <li>
+                           <P>已消耗</P>
+                           <p>{{$data.acc_info[2].total_disburse}}</p>
+                       </li>
+                   </ul>
+            </div>
+            <div class="II_box" >
+                <h3><i class="club_icons icon1 tabtitle_tip tit2_tip" data-type='2'></i>II类账户</h3>
+                <ul>
+                    <li>
+                        <P>余额</P>
+                        <p>{{$data.acc_info[1].usable_amount}}</p>
+                    </li>
+                    <li>
+                        <P>冻结中</P>
+                        <p>{{$data.acc_info[1].freeze_amount}}</p>
+                    </li>
+                    <li>
+                        <P>已消耗</P>
+                        <p>{{$data.acc_info[1].total_disburse}}</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="box_table table_style clearfix">
+                 <h4><i class="club_icons icon2"></i>账户流水记录</h4>
+           <!--      <div class="search_box">
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <table id="recharge_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>转账金额</th>
+                            <th>账户类型</th>
+                            <th>充值操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!-- <!--列表分页/> -->
+                <!-- <div id="list_page" class="page"></div> -->
+	        	<table id="transfer_list" class="base_table">
+	                <thead>
+	                    <tr>
+	                        <th>日期</th>
+	                        <th>投放广告数</th>
+	                        <th>消耗金额</th>
+	                        <th>广告曝光数</th>
+                            <th>广告点击数</th>
+	                        <th>点击率</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+	            <p class="noMsg noMsg2">暂无记录</p>
+	            <!--列表分页-->
+            	<div id="list_page2" class="page"></div>
+            </div> 
+        </div>
+        <div class="data_box" style="display: none;">
+            <div class="box_info">
+                <p class="box_title">消耗详情</p>
+                <ul class="flex">
+                    <li class="flex_item b_red">
+                        <h3>1234.56</h3>
+                        <h4>已投放广告/数</h4>
+                    </li>
+                    <li class="flex_item b_yellow">
+                        <h3>1234.56</h3>
+                        <h4>广告消耗金额/元</h4>
+                    </li>
+                    <li class="flex_item b_bule">
+                        <h3>1234.56</h3>
+                        <h4>已投放短信/条</h4>
+                    </li>
+                    <li class="flex_item b_green">
+                        <h3>1234.56</h3>
+                        <h4>短信消耗金额/元</h4>
+                    </li>
+                </ul>
+            </div>
+            <div class="box_table table_style">
+                <p class="box_title">日消耗明细</p>
+                <div class="search_box">
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <table id="transfer_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>投放广告数</th>
+                            <th>消耗金额</th>
+                            <th>广告曝光数</th>
+                            <th>广告点击数</th>
+                            <th>点击率</th>
+                            <th>投放短信数</th>
+                            <th>短信消耗金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+        </div>
+			
+			
+		
+	</body>
+	<script type="text/javascript">
+
+			//菜单切换
+			$('.nav_box ul li').on('click', function () {
+    			$(this).addClass('cur').siblings().removeClass('cur');
+    			var regtype = $('.nav_box ul li.cur').attr('data-regtype');
+
+    			if(regtype==1){
+         			$('.addinput_box').show();
+        			$('.info_view').hide();
+        			$('.data_box').hide();
+        				
+   			 	}else if(regtype==2){
+        
+         			$('.addinput_box').hide();
+        			$('.info_view').show();
+        			$('.data_box').hide();
+         		
+    			}else {
+    				$('.addinput_box').hide();
+        			$('.info_view').hide();
+        			$('.data_box').show();
+    			}
+			})
+
+
+			var comp_id = {{$data.comp_info.comp_id}};
+			var ifOper = {{$data.comp_info.if_operate}},
+				operId = {{$data.comp_info.ascription_staff_id}};
+        	var limit = 10;
+			// //获取最近6个月充值记录
+        	function getAccountList(curr) {
+            	$.ajax({
+                	type: "GET",
+                	url: '/V1.2/Advertiser/advRecharge/comp_id/' + comp_id + '/page/' + (curr || 1) + '/limit/' + limit,
+                	dataType: 'json',
+               	 success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        renderTabel1(data);     //渲染表格数据
+                        renderPage1(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+               	 error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                	}
+          	  });
+        	}
+
+     	 $('.tabtitle_tip').on('click',function(){	
+            var type = $(this).attr('data-type'),
+                info = ''
+            if(type==1){
+                info='I类账户：可投放除腾讯广告、短信投放外的其他所有广告。'
+            }else if(type==2){
+                info='II类账户：可投放所有广告。'
+            }
+            layer.tips(info,this);
+        })
+
+		</script>
+

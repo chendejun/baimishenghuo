@@ -1,0 +1,51 @@
+<?php
+class ConsumeController extends BasicController {
+    /**
+     *
+     * @return [type] [description]
+     */
+    public function indexAction(){
+
+    }
+    public function countDataAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        if($this->uinfo['user_group'] == "3"){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        $data['platform_id']=Helper::clean($this->getRequest()->getParam('platform_id' , 0));
+        $result = BmDspApi::request('consume/countData',$data,'GET');
+        //print_r($result);
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求消耗统计数据接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function tbDateListAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        $data['platform_id']=Helper::clean($this->getRequest()->getParam('platform_id' , 0));
+        $data['type']=Helper::clean($this->getRequest()->getParam('type' , 1));
+        if($this->uinfo['user_group'] == "3"){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        $result = BmDspApi::request('consume/tbDateList',$data,'GET');
+        //print_r($result);
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求消耗统计图标数据接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+}

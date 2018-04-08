@@ -1,0 +1,23 @@
+<?php
+
+/**
+ *
+ */
+class SceneExtension extends BasicController
+{
+
+    /**
+     * [getAllServerSceneResource 获取指定所有服务商场景资源 002]
+     * @return [array] [description]
+     */
+    public function getAllServerSceneResource()
+    {
+
+        $comp_id = Helper::clean($this->getRequest()->getParam('comp_id'));
+        $result = BmDspApi::request('Scene/getAllServerSceneResource', array('comp_id' => $comp_id));
+        $rel = json_decode($result,true);
+        var_dump($rel);exit;
+    }
+
+
+}

@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <!-- <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/bhdelivery.css"> -->
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step4">
+            <div class="from-row">
+                <label>广告创意：</label>
+                <ul class="idea_change row_type clearfix" id="">
+                    <li class="cur" _type="2">新建创意<i></i></li>
+                    <li _type="1">素材库中选择创意<i></i></li>
+                </ul>
+            </div>
+            <div class="idea_box">
+                <article>
+                   <div class="from-row">
+                        <ul class="img_upload clearfix">
+                            <li>
+                                <div class="file_input" data-resultsize="10240">
+                                    <img id="previewImg1_1">
+                                    <div class="file_text">
+                                        素材大小：600*120  <br>
+                                        <b>本地上传</b>
+                                    </div>
+                                    <input id="fileImg1_1" type="file" name="file" _width="600" _height="120" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg1_1')">
+                                </div>
+                            </li>
+                            <li>
+                                <div class="file_input">
+                                    <img id="previewImg1_2">
+                                    <div class="file_text">
+                                        素材大小：600*120  <br>
+                                        <b>本地上传</b>
+                                    </div>
+                                    <input id="fileImg1_2" type="file" name="file" _width="600" _height="120" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg1_2')">
+                                </div>
+                            </li>
+                            <li>
+                                <div class="file_input">
+                                    <img id="previewImg1_3">
+                                    <div class="file_text">
+                                        素材大小：600*120  <br>
+                                        <b>本地上传</b>
+                                    </div>
+                                    <input id="fileImg1_3" type="file" name="file" _width="600" _height="120" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg1_3')">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+                <article style="display: none">
+                   <div class="from-row">
+                        <label>尺寸：</label>
+                        <div class="layui-input-inline" style="width: 150px;">
+                            <select name="ad_plan" lay-verify="required">
+                                <option value="">全部尺寸</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                        <span class="ml10">标签：</span>
+                        <div class="layui-input-inline" style="width: 150px;">
+                            <select name="ad_tag" lay-verify="required">
+                                <option value="">全部</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                        <span class="ml10">创建时间：</span>
+                        <div class="layui-input-inline" style="width: 150px;">
+                            <select name="ad_time" lay-verify="required">
+                                <option value="2" selected="">全部</option>
+                                <option value="0">本月</option>
+                                <option value="1">上月</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="from-row">
+                        <!-- 素材库start -->
+                        <div class="mod_material mt20 scrollbar" style="height: 500px;padding:15px;overflow-x:hidden">
+                            <p class="noMsg no_matlist"></p>
+                            <div id="mat_lists" class="mat_lists waterfall" _id="">
+                                <div class="item materialPage1">
+                                    <div class="title">腾讯素材240x180</div>
+                                    <div class="photo">
+                                        <em></em><i></i>
+                                        <img src="http://d.100m.net/100msh_upload/201801/20180130/dsp/c497d087ded79dec5c9a9d8a1676a33e.jpg" alt="">
+                                        <div class="mod_btns">
+                                            <span class="btn_chose" _id="351" _url="https://www.baidu.com/?tn=39042058_15_oem_dg" _type="null">选中投放</span>
+                                        </div>
+                                    </div>
+                                    <div class="info">
+                                        <span>腾讯素材</span><span>240x180大小</span>
+                                        <p>https://www.baidu.com/?tn=39042058_15_oem_dg</p>
+                                        <p>2018-1-30 15:29:19 创建 by 小夏</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 素材库end -->
+                    </div>
+                </article>
+            </div>
+             <div class="from-row">
+                <label>落地页地址：</label>
+                <input type="text" class="bm-input layui-input" placeholder="输入广告目标页地址" value="" autocomplete="off">
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(3)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="stepPage(5)">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <!-- <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script> -->
+    <script type="text/javascript">
+        function preStepPage(v){
+            var v = parseInt(v)-1
+            location.href ='./create'+v+'.html';
+        }
+        function nextStepPage(v){
+            var v = parseInt(v)+1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+
+            //广告计划类别选择
+            $('.idea_change').on('click','li',function(){
+                var th = $(this),
+                    idx = th.index();
+                th.addClass('cur').siblings('li').removeClass('cur');
+                $('.idea_box article').eq(idx).show().siblings().hide();
+            })
+
+        })
+
+        function imgPreview(fileDom,el) {
+            var resultSize = $(fileDom).parent().attr('data-resultsize');
+            var fileSize = (Math.round(resultSize * 100 / 1024) / 100) ;
+
+            //判断是否支持FileReader
+            if(window.FileReader) {
+                var reader = new FileReader();
+            } else {
+                tipTopShow("您的设备不支持图片预览功能，如需该功能请升级您的设备！");
+            }
+            //获取文件
+            var file = fileDom.files[0];
+            var imageType = /^image\//;
+            //是否是图片
+            if(!imageType.test(file.type)) {
+                tipTopShow("请选择图片！");
+                $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+
+            var size = $(fileDom)[0].files[0].size;
+
+            if(size >resultSize){
+                tipTopShow('图片大小不能大于'+fileSize+'KB');
+                 $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+            //读取完成
+            reader.onload = function(e) {
+                //获取图片dom
+                var img = document.getElementById(el);
+                //图片路径设置为读取的图片
+                /*img.src = e.target.result;*/
+            };
+            reader.readAsDataURL(file);
+            var formData = new FormData();
+            var ids = $(fileDom).attr('id');
+            var sizeid = $(fileDom).attr('_size');
+            formData.append('file', $('#'+ids)[0].files[0]);
+            formData.append('sizeid',sizeid);
+            $.ajax({
+                url: '/material/uploadFile',
+                type: 'POST',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    var rs = eval("("+data+")");
+                    console.log(rs);
+                    if(rs.state==1){
+                        tipTopShow('上传成功！');
+                        document.getElementById(el).src = rs.url;
+                        $('#'+ids).attr('_url',rs.url);
+                        $('#'+ids).attr('_filesize',size);
+                    }else{
+                        $('#'+ids).removeAttr('_url');
+                        $('#'+ids).removeAttr('_filesize');
+                        tipTopShow(rs.msg);
+                    }
+                    $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                },
+                error: function (data) {
+                    tipTopShow("上传失败");
+                    $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                }
+            })
+        }
+    </script>
+</body>
+</html>

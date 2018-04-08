@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step1">
+            <div class="from-row">
+                <label>广告主：</label>
+                <div class="layui-input-inline">
+                    <select name="ad_user" lay-verify="required" lay-filter="ad_user" lay-search="" id="ad_user">
+                        <option value="">请输入搜索广告主名称</option>
+                    </select>
+                </div>
+                <div class="user_recent">
+                    <p class="pat_nav">最近投放广告主<i></i></p>
+                    <ul id="user_recent_list" class="clearfix">
+                        <li class="recent_li cur" _id="1" _amount="2.00">
+                            <span>环球资源1</span>
+                            <b>账户余额￥5877</b>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>广告计划：</label>
+                <ul class="row_type clearfix" id="new_plan">
+                    <li class="cur" _type="2">选择已有广告计划<i></i></li>
+                    <li _type="1">新建广告计划<i></i></li>
+                </ul>
+                <div class="plan_box">
+                    <article class="layui-input-inline">
+                        <select name="ad_plan" lay-verify="required" lay-filter="ad_plan" lay-search="" id="ad_plan" >
+                            <option value="">请输入搜索计划名称</option>
+                        </select>
+                    </article>
+                    <article style="display: none">
+                        <input type="text" class="bm-input layui-input" id="ad_plan_ipt" placeholder="请输入计划名称" value="" autocomplete="off">
+                    </article>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>计划日期：</label>
+                <input type="text" class="bm-input layui-input mid_ipt" name="startDate" id="startDate" value="2" placeholder="请选择开始日期"/> <b>至</b>
+                <input type="text" class="bm-input layui-input mid_ipt" name="endDate" id="endDate" value="" placeholder="请选择结束日期"/>
+                <div class="row_check">
+                    <input type="checkbox" name="sw_time" value="" lay-filter="sw_time" id="sw_time" lay-skin="primary" title="长期投放"/>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>日预算：</label>
+                <input type="text" value="" name="budget" id="budget" class="bm-input layui-input" placeholder="请填写日预算金额" />
+                <div class="row_check">
+                    <input type="checkbox" name="budgetSwitch" lay-filter="budgetSwitch" id="budgetSwitch" value="0" lay-skin="primary" title="无限制"/>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>总预算：</label>
+                <input type="text" value="" name="totalBudget" class="bm-input layui-input" placeholder="请填写总预总金额" />
+                <div class="row_check">
+                    <input type="checkbox" name="totalBudgetSwitch" value="0" lay-skin="primary" title="无限制"/>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>投放目标：</label>
+                <div class="ad_format">
+                    <!-- <input type="radio" name="ad_device" value="1" title="PC端" checked lay-filter="edition"> -->
+                    <input type="radio" name="ad_device" value="2" title="移动端" checked>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>移动端系统：</label>
+                <div class="ad_format">
+                    <input type="radio" name="ad_sys" value="2" title="IOS" lay-filter="edition" checked>
+                    <input type="radio" name="ad_sys" value="1" title="安卓" lay-filter="edition">
+                </div>
+            </div>
+            <div class="from-row">
+                <label>投放速度：</label>
+                <div class="ad_format">
+                    <input type="radio" name="ad_rate" value="0" lay-filter="ad_rate" title="按花费控制" checked lay-filter="edition">
+                    <input type="radio" name="ad_rate" value="1" lay-filter="ad_rate" title="按展示量控制" lay-filter="edition">
+                    <ul class="box_rate">
+                        <li>
+                            <div class="layui-input-inline">
+                                <select name="interest" lay-filter="ser_per" id="term">
+                                    <option value="2" selected>匀速</option>
+                                    <option value="1">加速</option>
+                                </select>
+                            </div>
+                            <input type="text" class="bm-input layui-input sm_ipt">元/天
+                        </li>
+                        <li style="display: none">
+                            <input type="text" class="bm-input layui-input sm_ipt"> 千次/天
+                        </li>
+                    </ul>
+                    <div class="box_count mt20">
+                        单用户每日展示上限 <input type="text" class="bm-input layui-input sm_ipt"> 次/天
+                    </div>
+                </div>
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="stepPage(2)">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript">
+        var stgqw1 = sessionStorage.getItem('stgqw1') ? JSON.parse(sessionStorage.getItem('stgqw1')) : '', //页面缓存
+            urlCompId = getUrlParams('comp_id') ? getUrlParams('comp_id') : null, //广告主id
+            urlAmount = getUrlParams('gdt_amount') ? getUrlParams('gdt_amount') : null, //广告主现金账户+赠送账户
+            urlStatus = getUrlParams('gdt_status') ? getUrlParams('gdt_status') : null; //广点通开通状态
+        var domUserList = $('#ad_user'),
+            domReUserList = $('#user_recent_list'),
+            domNewPlan = $('#new_plan'),
+            domAdPlan = $('#ad_plan'),
+            domAdPlanIpt = $('#ad_plan_ipt'),
+            domdBudge = $('#budget');//日预算
+
+        var getUserTimer, //步骤1
+            getPlanTimer,
+            domPlanList = $('#plan_list'),
+
+            domcType = $('#campaign_type'),//推广目标
+            domcMore = $('input[name="ad_format"]');//投放方式
+
+        function nextStepPage(v){
+            var v = parseInt(v)+1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            var today = get_date(0);
+            $('#startDate').val(today);
+             //日期
+            laydate.render({
+                elem: '#startDate',
+                type: 'date',
+                min: today
+            });
+            //日期
+            laydate.render({
+                elem: '#endDate',
+                type: 'date',
+                min: today
+            });
+
+            //初始化
+            function init(){
+                getUserList();
+            }
+            init();
+
+            //获取广告主列表&近期广告主列表
+            function getUserList (){
+                var rs = {
+                    "state": 1,
+                    "msg": "",
+                    "data": [
+                    {
+                    "comp_id": "206103",
+                    "gdt_wx_bind": "0",
+                    "gdt_apply_status": "3",
+                    "comp_name": "腾讯广告主",
+                    "gdt_account_id": "100001515",
+                    "expire_time": null,
+                    "system_status": "1",
+                    "usable_amount": 780
+                    },
+                    {
+                    "comp_id": "206104",
+                    "gdt_wx_bind": "1",
+                    "gdt_apply_status": "3",
+                    "comp_name": "微信广告主",
+                    "gdt_account_id": "100001516",
+                    "expire_time": null,
+                    "system_status": "1",
+                    "usable_amount": 4199956315
+                    },
+                    {
+                    "comp_id": "206106",
+                    "gdt_wx_bind": "0",
+                    "gdt_apply_status": "1",
+                    "comp_name": "投放组测试",
+                    "gdt_account_id": "100001539",
+                    "expire_time": null,
+                    "system_status": "2",
+                    "usable_amount": 199
+                    }
+                    ]
+                }
+                /*$.ajax({
+                    type: "GET",
+                    url: "/v1.2/Gdtdelivery/getCompList",
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.state == 1){*/
+                        var data = rs.data,
+                            str ='<option value>直接选择或搜索选择广告主</option>',
+                            html='';
+                            if(!data){
+                                domUserList.html('');
+                                domReUserList.html('');
+                                return;
+                            }
+                            $.each(data,function(k,v){
+                                str += '<option value="'+v.comp_id+'" _amount="'+v.usable_amount+'">' + v.comp_name + '</option>';
+                                html +='<li class="recent_li" _id="'+v.comp_id+'" _amount="'+v.usable_amount+'"><span>'+v.comp_name+'</span><b>账户余额￥'+v.usable_amount+'</b></li>'
+                            });
+                            domUserList.html(str);
+                            domReUserList.html(html);
+                            form.render();
+                        /*}else{
+                            domUserList.html('');
+                            domReUserList.html('');
+                        }
+                        form.render();
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });*/
+            }
+
+            //获取广告计划列表
+            function getPlanList (compId){
+                console.log(compId);
+                var rs={
+                    "state": 1,
+                    "msg": "",
+                    "data": {
+                    "total_count": "37",
+                    "total_page": 4,
+                    "page": 1,
+                    "list": [
+                    {
+                    "campaign_id": "245",
+                    "comp_id": "206104",
+                    "comp_name": "微信广告主",
+                    "campaign_name": "新计划0323",
+                    "campaign_type": "1",
+                    "daily_budget": "15000",
+                    "configured_status": "1",
+                    "campaign_more": "1",
+                    "product_type": "6",
+                    "freeze_id": "896",
+                    "comp_pname": "OEM账户测试1",
+                    "create_time": "2018-3-23",
+                    "platform_name": "腾讯平台",
+                    "z_cpm_num": "0",
+                    "z_cpc_num": "0",
+                    "clicking_rate": "0",
+                    "ad_pay": "0"
+                    },
+                    {
+                    "campaign_id": "243",
+                    "comp_id": "206104",
+                    "comp_name": "微信广告主",
+                    "campaign_name": "朋友圈百米测试包2",
+                    "campaign_type": "3",
+                    "daily_budget": "100000",
+                    "configured_status": "1",
+                    "campaign_more": "3",
+                    "product_type": "4",
+                    "freeze_id": "884",
+                    "comp_pname": "OEM账户测试1",
+                    "create_time": "2018-3-21",
+                    "platform_name": "腾讯平台",
+                    "z_cpm_num": "0",
+                    "z_cpc_num": "0",
+                    "clicking_rate": "0",
+                    "ad_pay": "0"
+                    },
+                    {
+                    "campaign_id": "242",
+                    "comp_id": "206104",
+                    "comp_name": "微信广告主",
+                    "campaign_name": "朋友圈测试包1",
+                    "campaign_type": "3",
+                    "daily_budget": "100000",
+                    "configured_status": "1",
+                    "campaign_more": "3",
+                    "product_type": "4",
+                    "freeze_id": "883",
+                    "comp_pname": "OEM账户测试1",
+                    "create_time": "2018-3-21",
+                    "platform_name": "腾讯平台",
+                    "z_cpm_num": "0",
+                    "z_cpc_num": "0",
+                    "clicking_rate": "0",
+                    "ad_pay": "0"}]}
+                    }
+                /*$.ajax({
+                    type: "GET",
+                    url: '/v1.2/Gdtdelivery/index/page/1/platform_id/2/status/1/comp_id/'+ compId,
+                    dataType:'json',
+                    success: function(rs){*/
+                        if(rs.state == 1){
+                            var data = rs.data;
+                            var str ='<option value>直接选择或搜索选择广告计划</option>';
+                            if(!data){
+                                domAdPlan.html('');
+                                return;
+                            }
+                            $.each(data.list,function(k,v){
+                                str += '<option value="'+v.campaign_id+'" _budget="'+parseFloat(v.daily_budget/100) +'" _more="'+v.campaign_more+'">'+v.campaign_name+'</option>';
+                            });
+                            domAdPlan.html(str);
+                        }else{
+                            domAdPlan.html('');
+                        }
+                        form.render();
+                    /*},
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });*/
+            }
+
+            //选择近期广告主搜索结果
+            domReUserList.on('click','.recent_li',function(e){
+                var th = $(this),
+                    id = th.attr('_id'),
+                    amount = th.attr("_amount");
+                th.addClass('cur').siblings().removeClass('cur');
+                domUserList.val(id).attr('_amount',amount);
+                getPlanList(id);
+                form.render();
+                reNewInput();//广告计划重置
+            })
+            //广告主选择
+            form.on('select(ad_user)', function (data) {
+                var amount='';
+                if(data.value){
+                    amount = data.elem[data.elem.selectedIndex].getAttribute('_amount');
+                    domUserList.attr('_amount',amount);
+                    getPlanList(data.value);
+                    form.render();
+                    $('.recent_li').removeClass('cur');
+                    reNewInput();//广告计划重置
+                }
+            });
+
+            //广告计划类别选择
+            domNewPlan.on('click','li',function(){
+                var th = $(this),
+                    idx = th.index(),
+                    type = th.attr('_type');
+                th.addClass('cur').siblings('li').removeClass('cur');
+                $('.plan_box article').eq(idx).show().siblings().hide();
+                if(type==1){
+                    domAdPlan.val('');
+                    form.render();
+                }
+                reNewInput();//广告计划重置
+
+            })
+
+            //已有广告计划选择
+            form.on('select(ad_plan)', function (data) {
+                var val = data.value,
+                    elem = amount = data.elem[data.elem.selectedIndex],
+                    dBudge = elem.getAttribute("_budget"),//日预算
+                    cMore = elem.getAttribute("_more");
+                if(val){
+                    domdBudge.val(dBudge).attr('disabled',true);
+                }
+
+            });
+
+            //长期投放
+            form.on('checkbox(sw_time)', function (data) {
+                //是否被选中，true或者false
+                if (data.elem.checked == true) {
+                    $('#startDate').val(today).attr('disabled',true);
+                    $('#endDate').val('').attr('disabled',true);
+                }else{
+                    $('#startDate').removeAttr('disabled');;
+                    $('#endDate').removeAttr('disabled');;
+                }
+            })
+            //无限制
+            form.on('checkbox(budgetSwitch)', function (data) {
+                //是否被选中，true或者false
+                if (data.elem.checked == true) {
+                    domdBudge.val('').attr('disabled',true);
+                }else{
+                    domdBudge.removeAttr('disabled');
+                }
+            })
+            //无限制
+            form.on('radio(ad_rate)', function (data) {
+                var val = data.value;
+                $('.box_rate li').eq(val).show().siblings().hide();
+            })
+        })
+
+        //广告主校验
+        function getChoseUserId(){
+            var val = $.trim(domAdUser.val()),
+                title = $.trim(domAdUser.attr('_title')),
+                id = domAdUser.attr('_id');
+            if(!val){
+                return {"success":false,msg:"请选择广告主！"};
+            }
+            if(val != title){
+                return {"success":false,msg:"请选择正确的广告主！"};
+            }
+            return {"success":true,"data":id};
+        }
+        //广告计划搜索 校验
+        function getChosePlanId(){
+            var val = $.trim(domAdPlan.val()),
+                title = $.trim(domAdPlan.attr('_title')),
+                id = domAdPlan.attr('_id');
+            if(!val){
+                return {"success":false,msg:"请选择广告计划！"};
+            }
+            if(val != title){
+                return {"success":false,msg:"请选择正确的广告计划！"};
+            }
+            return {"success":true,"data":id};
+        }
+        //广告计划重置
+        function reNewInput(){
+            domAdPlan.val('').attr('_title','');
+            //domNewPlan.find('li[_type="2"]').click();
+            domcType.val('').attr('disabled',false);//推广目标
+            domdBudge.val('').attr('disabled',false);//日预算
+            domcMore.attr('disabled',false);//投放形式
+        }
+
+        //页面校验
+        function checkDataStept1(){
+            var compId = getChoseUserId(),
+                planId = getChosePlanId(),
+                playType = domAdPlan.attr('_type'),//1新增 2选择
+                compAmount = domAdUser.attr('_amount'),
+                compName = domAdUser.val(),//广告名称
+                valAdPlan = $.trim(domAdPlan.val()),//计划名称
+                valcType = domcType.val(),//推广目标
+                valdBudge = domdBudge.val(),//日预算
+                minAmtNum = domcType.attr('minAmt'),
+                maxAmtNum = domcType.attr('maxAmt'),
+                userAmount = domAdUser.attr('_amount'),//账户余额
+                valcMore = $('input[name="ad_format"]:checked').val(),//投放方式
+                setdayTip = {'6':'日预算最低150元，最高400万元！','4':'日预算最低1000元，最高1千万元！'};
+
+            if(!compId.success){
+                return {"success":false,msg:compId.msg};
+            }
+            if(playType==2 && !planId.success){
+                return {"success":false,msg:planId.msg};
+            }
+            if(!valAdPlan){
+                return {"success":false,msg:"请输入计划名称"};
+            }
+            if(!valdBudge){
+                return {"success":false,msg:"请输入日预算"};
+            }
+            if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(valdBudge))){
+                return {"success":false,msg:"请输入正确日预算金额！"};
+            }
+            if(parseFloat(valdBudge)< parseFloat(minAmtNum) || parseFloat(valdBudge)>parseFloat(maxAmtNum)){
+                return {"success":false,msg:setdayTip[valcType]};
+            }
+            if(playType==1 && (parseFloat(valdBudge) > parseFloat(userAmount))){
+                return {"success":false,msg:"当前广告主余额不足，请充值后再投放!"};
+            }
+            return {"success":true,"data":{"comp_id":compId.data,"comp_name":compName,"comp_amount":compAmount,"campaign_isadd":playType,"campaign_id":(playType==2 ? planId.data:''),"campaign_name":valAdPlan,"product_type":valcType,"campaign_more":valcMore,"day_money":valdBudge}};
+        }
+        function checkname(){
+            var compId = getChoseUserId(),
+                playType = domAdPlan.attr('_type'),//1新增 2选择
+                valAdPlan = $.trim(domAdPlan.val());//计划名称
+                var ck_type;
+            if (valAdPlan && playType==1) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/v1.2/materiald/checkcamp',
+                    dataType:'json',
+                    data:{comp_id:compId.data,campaign_name:valAdPlan},
+                    async:false,
+                    success: function(rs){
+                        if (rs.api_code == 1) {
+                            ck_type = 1;
+                        } else {
+                            ck_type = 0;
+                        }
+                    },
+                    error: function(rs){
+                        return {"success":false,msg:"广告计划失败!"};
+                    }
+                });
+                if (ck_type ==1) {
+                    return {"success":true,msg:""};
+                } else {
+                    return {"success":false,msg:"计划名称已存在!"};
+                }
+                
+            }
+        }
+
+        function nextStepPage1(){
+            var res = checkDataStept1();
+            var ckn = checkname();
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            if(res.data.campaign_isadd==1){
+                if( !ckn.success){
+                    tipTopShow(ckn.msg);
+                    return;    
+                }
+            }            
+
+            sessionStorage.setItem('stgqw1',JSON.stringify(res.data));
+            console.log(res.data);
+            location.href='/v1.2/gdtdelivery/create2';
+        }
+        //渲染缓存数据
+        function readPageInfo(data){
+            domAdUser.val(data.comp_name).attr('_id',data.comp_id).attr('_amount',data.comp_amount).attr('_title',data.comp_name);
+            domAdPlan.val(data.campaign_name).attr('_type',data.campaign_isadd).attr('_title',data.campaign_name);
+            domcType.val(data.product_type);
+            domdBudge.val(data.day_money);
+            if(data.product_type==4){
+                $('.wx_label').show();
+                $('.gdt_label').hide();
+                $('input[name="ad_format"][value="3"]').attr('checked',true);
+            }else{
+                $('.wx_label').hide();
+                $('.gdt_label').show();
+                $('input[name="ad_format"][value="'+data.campaign_more+'"]').attr('checked',true);
+            }
+            domNewPlan.find('li[_type="'+data.campaign_isadd+'"]').addClass('cur').siblings().removeClass('cur');
+            if(data.campaign_isadd==2){
+                domAdPlan.attr('_id',data.campaign_id);
+                domcType.attr('disabled',true);//推广目标
+                domdBudge.attr('disabled',true);//日预算
+                domcMore.attr('disabled',true); //投放方式
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/27
+ * Time: 11:49
+ */
+Class DeliveryController extends  BasicController{
+
+
+
+
+    /**
+     * 查询当前投放的详细信息
+     */
+    public function getDeliveryInfoAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $deliveryId = Helper::clean($this->getRequest()->getParam('id' , ''));
+        $deliveryId = intval($deliveryId);
+        $deliModel = Helper::M("Delivery");
+        $deliinfo  = $deliModel->getDeliveryInfo($deliveryId);
+        Helper::outJson(array('state'=>1,'msg'=>'','data'=>$deliinfo));
+    }
+    /**
+     *投放的自定义人群包列表
+     */
+    public function getCrowListAction(){
+        //搜索
+        $where = "comp_pid=" . $this->uinfo['comp_id']." AND if_show = 1 AND audit_status=3 ";
+        $keyword = Helper::clean($this->getRequest()->getParam('keyword' , ''));
+        if(!empty($keyword)){
+            $where.=" AND crowd_name LIKE '%".$keyword."%'";
+        }
+        $deli = Helper::M("Delivery");
+        $list = $deli->getCrowdlList($where);
+        Helper::outJson(array('state'=>1,'msg'=>'','data'=>$list));
+    }
+
+
+
+
+    //添加投放
+    public function addAction(){
+        if(isset($_POST)&&!empty($_POST)) {
+
+
+            $materialModel = Helper::M("Material");
+            $deliModle = Helper::M("Delivery");
+            $crowdModel = Helper::M("Dcrowd");
+            //添加投放
+            $this->db    = Yaf_Registry::get('db');
+            $this->db->dsp->startTrans();
+            $data['delivery_name'] = Helper::clean($this->getRequest()->getPost('delivery_name'));
+            //根据素材id获取素材的信息并序列化存储
+            $materialId = Helper::clean($this->getRequest()->getPost('material_id'));
+            $data['material_id'] = intval($materialId);
+            if($data['material_id']==0){
+                Helper::outJson(array('state'=>0 , 'msg' => '请选择你要投放的素材！'));
+            }
+            $materialInfo = $materialModel->getMaterialInfo($materialId);
+            $materialSize = $materialModel->getMaterialSizeInfo($materialId);
+            $materialData = array();
+            foreach ($materialSize as $key => $value) {
+                //把图片复制到新的目录下
+                $url = $this->copyPicAction($value['img_url']);
+                $materialData[$key]['img_url'] = $url;
+                $materialData[$key]['ad_size_id'] = $value['ad_size_id'];
+                $materialData[$key]['material_url'] = $materialInfo['material_url'];
+                $ad_post_info = $deliModle->getPosInfo($value['ad_size_id']);
+                $materialData[$key]['ad_post_id'] = $ad_post_info['ad_pos_id'];
+            }
+            $data['adgroup_id'] = $materialInfo['adgroup_id'];
+            $data['material_info'] = serialize($materialData);
+            $data['crowd_type'] = Helper::clean($this->getRequest()->getPost('crowd_type'));
+            //根据人群包id获取人群标签
+            if( $data['crowd_type']==2){
+                $corwdid = Helper::clean($this->getRequest()->getPost('crowd_id'));
+                $data['crowd_id'] = intval($corwdid);
+                if ($data['crowd_id'] == 0) {
+                    Helper::outJson(array('state' => 0, 'msg' => '请选择您要投放的人群包！'));
+                }
+                $crow_all =  $crowdModel->getCrowdById($corwdid);
+                $label_info=json_decode($crow_all['label_info'],true);
+                if(!empty($label_info['region'])){
+                    $crow_info = implode(",",$label_info['region']);
+                }
+            } else {
+                $crow_info =  Helper::clean($this->getRequest()->getPost('crowd_info'));
+                $crow_info = trim($crow_info,",");
+            }
+            if($crow_info!=0){
+                $data['crowd_info'] = ",".$crow_info.",";
+            } else { $data['crowd_info'] = 0;}
+            $data['z_money'] = Helper::clean($this->getRequest()->getPost('z_money'));
+            $data['bid_type'] = Helper::clean($this->getRequest()->getPost('bid_type'));
+            $data['bid_money'] = Helper::clean($this->getRequest()->getPost('bid_money'));
+            $data['day_money'] = Helper::clean($this->getRequest()->getPost('day_money'));
+            $data['delivery_start_date'] = Helper::clean($this->getRequest()->getPost('delivery_start_date'));
+            $data['delivery_end_date'] = Helper::clean($this->getRequest()->getPost('delivery_end_date'));
+            $data['delivery_start_time'] = Helper::clean($this->getRequest()->getPost('delivery_start_time'));;
+            $data['delivery_end_time'] = Helper::clean($this->getRequest()->getPost('delivery_end_time'));;
+            $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));
+            $data['ad_type'] = Helper::clean($this->getRequest()->getPost('ad_type'));
+            $data['comp_pid'] = $this->uinfo['comp_id'];
+            $data['add_staff_id'] = $this->uinfo['staff_id'];
+            $data['add_time'] = time();
+            if($data['adgroup_id']==3&&$data['ad_type']==1&&$data['bid_type']==1){
+                Helper::outJson(array('state'=>0 , 'msg' =>'插屏广告竞价投放不能选择cpm投放'));
+            }
+            if($data['adgroup_id']==3&&$data['ad_type']==2&&$data['bid_type']==2){
+                Helper::outJson(array('state'=>0 , 'msg' =>'插屏广告排期投放不能选择cpc投放'));
+            }
+            if($data['adgroup_id']==2&&($data['ad_type']!=2||$data['bid_type']!=1)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'全屏广告只能是排期cpm投放'));
+            }
+            if($data['day_money']> $data['z_money']){
+                Helper::outJson(array('state'=>0 , 'msg' =>'日预算不能大于总预算'));
+            }
+            if($data['day_money']<50){
+                Helper::outJson(array('state'=>0 , 'msg' =>'日预算不能小于50'));
+            }
+            if($data['bid_type']==1&&$data['bid_money']<1){
+                Helper::outJson(array('state'=>0 , 'msg' =>'CPM每千人次曝光不能低于1元'));
+            }
+            if($data['bid_type']==2&&$data['bid_money']<0.15){
+                Helper::outJson(array('state'=>0 , 'msg' =>'CPC每次点击计价 0.15元'));
+            }
+            if( $data['bid_money']>$data['day_money']){
+                Helper::outJson(array('state'=>0 , 'msg' =>'出价不能大于日预算'));
+            }
+            if(empty($data['delivery_name']) || empty($data['z_money']) || empty($data['bid_money']||empty($data['delivery_start_date'])||empty($data['delivery_end_date']))){
+                Helper::outJson(array('state'=>0 , 'msg' => '广告名称,总预算，出价,投放日期不能为空！'));
+            }
+            $deliveryId = $deliModle->add($data);
+            if ($deliveryId) {
+                $z_money = Helper::transAmount($data['z_money'],0);
+                //添加冻结记录
+                $freeze_data['money'] = $z_money;
+                $freeze_data['record_info'] = "新增投放$deliveryId";
+                $freeze_data['add_time'] = time();
+                $freeze_insert_id = $deliModle->addFreezeGdt($freeze_data);
+                if (empty($freeze_insert_id)) {
+                    $this->db->dsp->rollback();
+                    Helper::outJson(array('state' => 2, 'msg' => '冻结记录添加失败'));
+                }
+                //冻结资金
+                $m = Helper::M('Account');
+                $info = array('comp_id'=>$data['comp_id'],'comp_pid'=> $data['comp_pid'],'amount'=>$z_money,'rel_no'=>$freeze_insert_id);
+                $detail = array(
+                    array('platform_id'=>1,'amount'=>$z_money)
+                );
+               // $freezeid =  $m->freezeAmount($info , $detail);
+                $result = BmDspApi::request('fund/freezeAmount' , array('info'=>$info,'data'=>$detail));
+                if(empty($result) || isset($result['error_code'])){
+                    Helper::outJson(array('state' => 2, 'msg' => '添加失败，资金异常'));
+                    $this->db->dsp->rollback();
+                    exit;
+                }else {
+                    $freezeid = $result['data']['freeze_id'];
+                    //更新冻结资金id
+                    $data['freeze_id'] = $freezeid;
+                    $res = $deliModle->update($data, $deliveryId);
+                    $freeze_update['freeze_id'] = $freezeid;
+                    $res_freeze_record = $deliModle->updateFreezeGdt($freeze_update,$freeze_insert_id);
+                    if(!$res||!$res_freeze_record){
+                        Helper::outJson(array('state' => 2, 'msg' => '添加失败，资金未冻结'));
+                        $this->db->dsp->rollback();
+                        exit();
+                    }
+                }
+                $this->db->dsp->commit();
+                //添加操作日志
+                $log_content[] = "广告管理 :". "广告添加";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('广告添加',$log_content_str,'LC003',"LOT001");
+                Helper::outJson(array('state' => 1, 'msg' => '添加成功'));
+            } else {
+                Helper::outJson(array('state' => 2, 'msg' => '添加失败'));
+            }
+            exit();
+        }
+
+    }
+
+
+    /**
+     * 投放列表
+     */
+    public function indexAction(){
+        $page = Helper::clean($this->getRequest()->getParam('page' , 0));
+        $limit = Helper::clean($this->getRequest()->getParam('limit' , 15));
+        $deliveryName = Helper::clean($this->getRequest()->getParam('name' , ''));
+        $deliveryStatus = Helper::clean($this->getRequest()->getParam('status' , ''));
+        $start = $page>0?($page-1)*$limit:0;
+        $where = 'del_status=0 AND deli.`comp_pid`=' . $this->uinfo['comp_id'];
+        if($deliveryStatus!="") $where .=  " AND  delivery_status in(". $deliveryStatus.")";
+        if(!empty($deliveryName)) $where .=  " AND (delivery_name like \"%{$deliveryName}%\" OR comp.comp_name like \"%{$deliveryName}%\")";
+        $accountModel = Helper::M('Account');
+    	$account_ids=$accountModel->getComp_ids();
+    	if(!empty($account_ids)) $where .=  " AND comp_id in($account_ids)";
+        if($page!=0){
+            $deliModel = Helper::M('Delivery');
+            $list = $deliModel->getDeliveryList($where , $start , $limit);
+            $count = $deliModel->getDeliveryCount($where);
+            $pages = ceil($count/$limit);
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>array('pages' => $pages , 'list' => $list)));
+        }
+
+
+    }
+
+
+    /**
+     * 修改投放
+     */
+    public  function  editAction(){
+
+        if(isset($_POST)&&!empty($_POST)) {
+            $materialModel = Helper::M("Material");
+            $crowdModel = Helper::M("Dcrowd");
+            $deliModle = Helper::M("Delivery");
+            //修改投放
+            $this->db    = Yaf_Registry::get('db');
+            $this->db->dsp->startTrans();
+            $data['delivery_name'] = Helper::clean($this->getRequest()->getPost('delivery_name'));
+            //根据素材id获取素材的信息并序列化存储
+            $materialId = Helper::clean($this->getRequest()->getPost('material_id'));
+            $deliveryId = Helper::clean($this->getRequest()->getPost('delivery_id'));
+            $data['material_id'] = intval($materialId);
+            if(intval($deliveryId)==0){
+                Helper::outJson(array('state' => 0, 'msg' => '请选择要修改的广告！'));
+            }
+            if (intval($materialId)==0) {
+                Helper::outJson(array('state' => 0, 'msg' => '请选择要投放的素材！'));
+            }
+            $materialInfo = $materialModel->getMaterialInfo($materialId);
+            $materialSize = $materialModel->getMaterialSizeInfo($materialId);
+            $materialData = array();
+            if(empty($materialInfo)||empty($materialSize)){
+                Helper::outJson(array('state' => 0, 'msg' => '请重新选择有效的素材！'));
+            }
+            foreach ($materialSize as $key => $value) {
+                $url = $this->copyPicAction($value['img_url']);
+                $materialData[$key]['img_url'] = $url;
+                $materialData[$key]['ad_size_id'] = $value['ad_size_id'];
+                $materialData[$key]['material_url'] = $materialInfo['material_url'];
+                $materialData[$key]['material_name'] = $materialInfo['material_name'];
+                $ad_post_info = $deliModle->getPosInfo($value['ad_size_id']);
+                $materialData[$key]['ad_post_id'] = $ad_post_info['ad_pos_id'];
+            }
+            $data['material_info'] = serialize($materialData);
+            $data['adgroup_id'] = $materialInfo['adgroup_id'];
+            $data['crowd_type'] = Helper::clean($this->getRequest()->getPost('crowd_type'));
+            //根据人群包id获取人群标签
+            $corwdid = Helper::clean($this->getRequest()->getPost('crowd_id'));
+            if($data['crowd_type']==2){
+                $data['crowd_id'] = intval($corwdid);
+                if ($data['crowd_id'] == 0) {
+                    Helper::outJson(array('state' => 0, 'msg' => '请选择您要投放的人群包！'));
+                }
+                $crow_all =  $crowdModel->getCrowdById($corwdid);
+                $label_info=json_decode($crow_all['label_info'],true);
+                if(!empty($label_info['region'])){
+                    $crow_info = implode(",",$label_info['region']);
+                }
+
+            } else{
+                $crow_info =  Helper::clean($this->getRequest()->getPost('crowd_info'));
+                $crow_info = trim($crow_info,",");
+            }
+            if($crow_info!=0){
+                $data['crowd_info'] = ",".$crow_info.",";
+            } else { $data['crowd_info'] = 0;}
+
+            $data['z_money'] = Helper::clean($this->getRequest()->getPost('z_money'));
+            $data['bid_type'] = Helper::clean($this->getRequest()->getPost('bid_type'));
+            $data['bid_money'] = Helper::clean($this->getRequest()->getPost('bid_money'));
+            $data['day_money'] = Helper::clean($this->getRequest()->getPost('day_money'));
+            $data['delivery_start_date'] = Helper::clean($this->getRequest()->getPost('delivery_start_date'));
+            $data['delivery_end_date'] = Helper::clean($this->getRequest()->getPost('delivery_end_date'));
+            $data['delivery_start_time'] = Helper::clean($this->getRequest()->getPost('delivery_start_time', ""));
+            $data['delivery_end_time'] = Helper::clean($this->getRequest()->getPost('delivery_end_time', ""));
+            $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));
+            $data['ad_type'] = Helper::clean($this->getRequest()->getPost('ad_type'));
+            $data['comp_pid'] = $this->uinfo['comp_id'];
+            $data['edit_staff_id'] = $this->uinfo['staff_id'];
+            $data['audit_status'] = 0;
+            $data['delivery_status'] = 0;
+            $data['edit_time'] = time();
+            if($data['adgroup_id']==3&&$data['ad_type']==1&&$data['bid_type']==1){
+                Helper::outJson(array('state'=>0 , 'msg' =>'插屏广告竞价投放不能选择cpm投放'));
+            }
+            if($data['adgroup_id']==3&&$data['ad_type']==2&&$data['bid_type']==2){
+                Helper::outJson(array('state'=>0 , 'msg' =>'插屏广告排期投放不能选择cpc投放'));
+            }
+            if($data['adgroup_id']==2&&($data['ad_type']!=2||$data['bid_type']!=1)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'全屏广告只能是排期cpm投放'));
+            }
+            if($data['day_money']> $data['z_money']){
+                Helper::outJson(array('state'=>0 , 'msg' =>'日预算不能大于总预算'));
+            }
+        	if($data['day_money']<50){
+                Helper::outJson(array('state'=>0 , 'msg' =>'日预算不能小于50'));
+            }
+            if($data['bid_type']==1&&$data['bid_money']<1){
+                Helper::outJson(array('state'=>0 , 'msg' =>'CPM每千人次曝光不能低于1元'));
+            }
+            if($data['bid_type']==2&&$data['bid_money']<0.15){
+                Helper::outJson(array('state'=>0 , 'msg' =>'CPC每次点击计价 0.15元'));
+            }
+            if( $data['bid_money']>$data['day_money']){
+                Helper::outJson(array('state'=>0 , 'msg' =>'出价不能大于日预算'));
+            }
+            if (empty($data['delivery_name']) || empty($data['z_money']) || empty($data['bid_money'] || empty($data['delivery_start_date']) || empty($data['delivery_end_date']))) {
+                Helper::outJson(array('state' => 0, 'msg' => '广告名称,总预算，出价,投放日期不能为空！'));
+            }
+
+            $res = $deliModle->update($data, $deliveryId);
+            if ($res) {
+                $z_money = Helper::transAmount($data['z_money'],0);
+                //添加冻结记录
+                $freeze_data['money'] = $z_money;
+                $freeze_data['record_info'] = "新增投放$deliveryId";
+                $freeze_data['add_time'] = time();
+                $freeze_insert_id = $deliModle->addFreezeGdt($freeze_data);
+                if (empty($freeze_insert_id)) {
+                    $this->db->dsp->rollback();
+                    Helper::outJson(array('state' => 2, 'msg' => '冻结记录添加失败'));
+                }
+                //冻结资金
+                $m = Helper::M('Account');
+                $info = array('comp_id'=>$data['comp_id'],'comp_pid'=> $data['comp_pid'],'amount'=>$z_money,'rel_no'=>$freeze_insert_id);
+                $detail = array(
+                    array('platform_id'=>1,'amount'=>$z_money)
+                );
+                // $freezeid =  $m->freezeAmount($info , $detail);
+                $result = BmDspApi::request('fund/freezeAmount' , array('info'=>$info,'data'=>$detail));
+                if(empty($result) || isset($result['error_code'])){
+                    Helper::outJson(array('state' => 2, 'msg' => '添加失败，资金异常'));
+                    $this->db->dsp->rollback();
+                    exit;
+                }else {
+                    $freezeid = $result['data']['freeze_id'];
+                    //更新冻结资金id
+                    $data['freeze_id'] =$freezeid;
+                    $res = $deliModle->update($data, $deliveryId);
+                    $freeze_update['freeze_id'] = $freezeid;
+                    $res_freeze_record = $deliModle->updateFreezeGdt($freeze_update,$freeze_insert_id);
+                    if(!$res||!$res_freeze_record){
+                        Helper::outJson(array('state' => 2, 'msg' => '添加失败，资金未冻结'));
+                        $this->db->dsp->rollback();
+                        exit();
+                    }
+                }
+                $this->db->dsp->commit();
+                //添加操作日志
+                $log_content[] = "广告管理 :". "广告修改";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('广告修改',$log_content_str,'LC003',"LOT002");
+                Helper::outJson(array('state' => 1, 'msg' => '修改成功'));
+            } else {
+                Helper::outJson(array('state' => 2, 'msg' => '修改失败'));
+            }
+            exit();
+
+        }
+    }
+    
+
+    /**
+     * 投放结束
+     */
+    public  function  endAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+    	set_time_limit(1000);
+        $delivery_id = Helper::clean($this->getRequest()->getParam('delivery_id' , ''));
+        $delivery_Model = Helper::M("Delivery");
+        $advertising_info  = $delivery_Model->getDeliveryInfo($delivery_id);
+        if(empty($advertising_info)){
+        	Helper::outJson(array('state' => 0, 'msg' => '该广告投放不存在！'));
+        }else{
+	        if($advertising_info['delivery_status']!=1){
+	    		Helper::outJson(array('state' => 0, 'msg' => '只允许投放中的广告进行结束！'));
+	    	}else{
+	    		if($advertising_info['delivery_deal_status']!=2){
+	    			Helper::outJson(array('state' => 0, 'msg' => '您的广告正在下发，请稍后再试！'));
+	    		}
+	    	}
+        }
+    	//修改投放广告状态记录
+    	$record_data=array(
+    		"delivery_id"=>$delivery_id,
+    		"from_delivery_status"=>'1',
+    		"to_delivery_status"=>'3',
+    		"edit_staff_id"=>$this->uinfo['staff_id'],
+    		"record_time"=>time(),
+    	);
+    	$num=0;
+    	$this->db    = Yaf_Registry::get('db');
+    	$this->db->dsp->startTrans();
+    	$add_res=$delivery_Model->addAdvetisingStatus($record_data);//审核广告投放的状态修改记录添加
+		if(!$add_res){$num++;}
+		$material_info=unserialize($advertising_info["material_info"]);
+		$ad_size_id=$material_info[0]['ad_size_id'];
+    		
+		$plat_info=$delivery_Model->getPosInfo($ad_size_id);
+		$state_con_data=array(
+    		"crontab_title"=>$advertising_info['delivery_name']."投放任务",
+    		"delivery_id"=>$delivery_id,
+    		"platform_id"=>$plat_info['platform_id'],
+    		"ad_pos_id"=>$plat_info['ad_pos_id'],
+			"platform_type"=>1,
+    		"crontab_add_time"=>time(),
+    	);
+    	$add_cres=$delivery_Model->addAdvetisingStateCrontab($state_con_data);//审核广告投放的记录添加
+		if(!$add_cres){$num++;}
+    	//修改广告投放审核状态
+    	$ad_data=array("delivery_status"=>'3',"delivery_status_handling"=>1,"edit_staff_id"=>$this->uinfo['staff_id'],"edit_time"=>time(),);
+    	$edit_ad_res=$delivery_Model->editAdvetising($ad_data, $delivery_id);
+    	if(!$edit_ad_res){$num++;}
+    	if($num>0){
+    		$this->db->dsp->rollback();//100msh_ad广告数据库事务回滚
+    		Helper::outJson(array('state' => 2, 'msg' => '广告投放状态操作失败,请重新操作!'));
+    	}else{
+    		$this->db->dsp->commit();//100msh_ad广告数据库事务提交
+			//添加操作日志
+			$log_content[] = "广告管理 :". "广告结束";
+			$log_content_str = implode(" , ",$log_content);
+			$log_obj = Helper::M('Log');
+			$log_obj->create_log('广告修改',$log_content_str,'LC003',"LOT002");
+    		Helper::outJson(array('state' => 1, 'msg' => '广告投放状态操作成功!'));
+    	}
+    }
+
+    public function getUseMoneyAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $comp_id = Helper::clean($this->getRequest()->getParam('comp_id' , ''));
+        $d=  Helper::M('Delivery');
+        $res = $d->getAccountInfoByCompId($comp_id);
+        $useMoney =   Helper::transAmount($res['usable_amount'],1);
+        Helper::outJson(array('state' => 1, 'msg' => '','usemoney'=>$useMoney,'name'=>$res['comp_name']));
+
+
+    }
+    //首页代理商每天每小时的统计
+    public  function countComppDeliveryAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $startTime = Helper::clean($this->getRequest()->getParam('starttime' ,''));
+        if(empty($startTime)){$startTime  = date("Y-m-d",time()-3600*24);}
+        $where = "comp_pid=".$this->uinfo['comp_id'];
+        $where.= " AND stat_day='$startTime'";
+        $m = Helper::M('Delivery');
+        $result = $m->countByCompp($where);
+        $list = array();
+        if($result){
+            for($i=0;$i<=23;$i++){
+                $list[$i]['stat_day'] = $startTime;
+                $list[$i]['stat_time'] = $i+1;
+                $list[$i]['cpm_num'] = 0;
+                $list[$i]['cpc_num'] = 0;
+                $list[$i]['con_rate'] = 0.00;
+               foreach($result as $k=>$v){
+                   if($v['stat_time']==$list[$i]['stat_time']){
+                       $list[$i]['cpm_num'] = $v['cpm_num'];
+                       $list[$i]['cpc_num'] = $v['cpc_num'];
+                       $list[$i]['con_rate'] = $v['con_rate'];
+                   }
+               }
+
+            }
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$list));
+        } else {
+            Helper::outJson(array('state'=>0,'msg'=>'暂无数据'));
+        }
+    }
+
+
+    //复制图片到新的目录下
+    function copyPicAction($url){
+        $this->config = Yaf_Registry::get('config');
+        $ACCESSORY_FOLDER = $this->config['config']['ACCESSORY_FOLDER'];
+        $ACCESSORY_URL = $this->config['config']['ACCESSORY_URL'];
+        $filename = basename($url);
+        $u = str_replace($filename,"",$url);
+        $new_url = substr($u,0,strlen($u)-4);
+        $new_url = $new_url."copydsp/";
+        $new_url = str_replace($ACCESSORY_URL,$ACCESSORY_FOLDER,$new_url);
+        if(!file_exists($new_url)){
+            $this->createDirectoryAction($new_url,$mode=0777);
+        }
+        $copy_url = $new_url.$filename;
+        $real_url = str_replace($ACCESSORY_URL,$ACCESSORY_FOLDER,$url);
+        if(file_exists($copy_url)){
+            return str_replace($ACCESSORY_FOLDER,$ACCESSORY_URL,$copy_url);
+        } else {
+            $res =  copy($real_url,$copy_url);
+            if($res){
+                return str_replace($ACCESSORY_FOLDER,$ACCESSORY_URL,$copy_url);
+            }
+        }
+
+
+    }
+    //创建目录
+    function createDirectoryAction($dir,$mode=0777){
+        if( ! $dir ){return 0;}global $_LANG;
+        $dir = str_replace( "\\", "/", $dir);
+        $mdir = "";
+        foreach(explode("/", $dir) as $val){
+            $mdir .= $val."/";
+            if( $val == ".." || $val == "." ){continue;}
+            if(!file_exists($mdir)) {
+                if(!@mkdir($mdir)){
+                    //echo sprintf($_LANG["l_createdir_failing"],$mdir);
+                    echo sprintf('目录创建不成功',$mdir);
+                    echo $dir;
+                    exit;
+                }else{chmod($mdir,$mode);}
+            }
+        }
+        return true;
+    }
+    public function addst2Action(){}
+    public function addst3Action(){}
+    public function  editst2Action (){}
+    public function editst3Action(){}
+
+    //获取默认地区
+    public function getDefaultAreaAction(){
+        //查询代理商的可投放区域
+        $crowdModel = Helper::M("Dcrowd");
+        $sc_id = $crowdModel->getUseCity($this->uinfo['comp_id']) ;
+        if($sc_id==0){
+            Helper::outJson(array('state'=>1 ,'area_id'=>0, 'msg' => '无限制'));
+        } else {
+            //地区id转换并获取其子集
+            $cityData = $crowdModel->getCtagId($sc_id);
+            Helper::outJson(array('state'=>1 ,'area_id'=>$cityData, 'msg' => '有限制'));
+        }
+    }
+
+
+}

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-财务管理</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/js/layui/css/layui.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layui/layui.js"></script>
+</head>
+<style type="text/css">
+    .rc_form .row_label{ width: 112px; }
+    .rc_form .label_row{ padding-left: 122px; height: auto;}
+    .rc_form .label_row span{margin-left: 20px;}
+    .rc_form .label_row b{font-weight: normal;}
+    .rc_form .mod_box{ padding:20px 0 0 50px;border-bottom: 1px solid #f2f4f5;}
+    .rc_box{ padding:0;color:#666; }
+    .rc_box p{line-height: 40px;}
+    .rc_box .cont_tip{margin:5px 0 40px 0;}
+    .rc_box p b{color:#f56c6c; font-weight: normal;}
+    .rc_box h4 {padding:15px 0; border-bottom: none;}
+    .rc_box .mod_nav{padding-left:50px; margin:0;}
+    .rc_box .mod_cont{padding-left:50px;}
+    .rc_box .row_label{ width: 157px; }
+    .rc_box .label_row{ padding-left: 167px;}
+    .agreemt_box{line-height: 20px;}
+    .agreemt_box input{ height:auto;}
+
+    .send_sms{padding: 10px 30px;}
+    .send_sms .send_notice{margin: 10px 0;}
+    .send_sms .send_notice p{ font-size: 14px; color: #666; line-height:24px;}
+    .send_sms .row_btn {text-align: center;margin-top: 20px;}
+    .send_sms .send_box .bm-btn-white:disabled{border: 1px solid #ddd; color: #999; background: #fff;}
+</style>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+        </div>
+	      <form class="label_form rc_form">
+            <div class="mod_box">
+                <div class="label_row">
+                    <label class="row_label">广告主名称：</label>
+                    <p>{{$data.comp_name}}</p>
+                    <!-- 广告主ID：{{$data.comp_id}} <br>
+                    服务商ID：{{$data.comp_pid}} -->
+                </div>
+                <div class="label_row">
+                    <label class="row_label">广告主账户余额：</label>
+                    <p>I 类账户<span>￥<b id="comp_amount_v1">0</b></span></p>
+                    <p>II 类账户<span>￥<b id="comp_amount_v2">0</b></span></p>
+                </div>
+            </div>
+            <div class="recharge_box rc_box">
+            	    <h4><i class="club_icons icon2"></i>服务商账户充值</h4>
+                  <ul class="mod_nav clearfix">
+                      <li class="cur" data="2">
+                          <p>I 类账户充值</p>
+                      </li>
+                      <li data="1">
+                          <p>II 类账户充值</p>
+                      </li>
+                  </ul>
+                  <div class="mod_cont">
+                      <div class="cont_box">
+                          <p class="cont_tip">I 类账户说明：I 类账户只能投放主流网络广告，包括今日头条、爱奇艺、优酷、微博等，<b>不支持腾讯广告（含朋友圈广告）、短信投放。</b>
+                          </p>
+                          <div class="label_row">
+                              <label class="row_label">您的 I 类账户可用余额：</label>
+                              <p>￥<span id="agent_amount_v1">0</span></p >
+                          </div>
+                      </div>
+                      <div class="cont_box" style="display: none;">
+                          <p class="cont_tip">II 类账户说明：II 类广告可投放全网广告。</p>
+                          <div class="label_row">
+                              <label class="row_label">您的 II 类账户可用余额：</label>
+                              <p>￥<span id="agent_amount_v2">0</span></p >
+                          </div>
+                      </div>
+                      <div class="label_row">
+                          <label class="row_label">请输入转账金额：</label>
+                          <input type="text" value="" class="bm-input" name="charge_amount" id="charge_amount" placeholder="请输入充值金额">
+                      </div>
+                      <label class="agreemt_box">
+                          <input type="checkbox" name="agreemt_check"> 我已知晓转账后不可撤
+                      </label>
+                      <div class="btn_box">
+                          <button type="button" class="bm-btn bm-btn-blue" id="transfer" disabled="disabled">立即转账</button>
+                      </div>
+                  </div>
+            </div>
+        </form>
+    </div>
+    <script id="tempSend" type="text/html">
+        <div class="send_sms">
+            <div class="send_notice">
+                <p>充值需要验证操作授权。</p>
+                <p>请输入系统管理员手机号收到的验证码。</p>
+            </div>
+            <div class="send_box">
+                <input type="text" name="send_num" class="bm-input" placeholder="请输入验证码">
+                <button type="button" id="code_btn" class="bm-btn bm-btn-white"> 获取验证码 </button>
+            </div>
+            <div class="row_btn">
+                <a href="javascript:;" class="bm-btn bm-btn-blue" id="transfer_btn">确定</a>
+            </div>
+        </div>
+    </script>
+<script>
+    // transfer_type/【0为DSP账户充值，1广点通充值
+    // account_type/【1为Ⅱ类账户，2为Ⅰ类账户】
+    var transfer_type = 0,
+        comp_id = {{$data.comp_id}},
+        comp_pid = {{$data.comp_pid}};
+
+    //账户信息
+    function getCompInfo(id,pid){
+        $.ajax({
+            type: "GET",
+            url: '/v1.2/account/remainCash/comp_id/'+ id+','+pid,
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.state == 1) {
+                    var comp_amount = rs.data[id],
+                        agent_amount = rs.data[pid];
+                    $('#comp_amount_v1').html(comp_amount.cash_1.usable_amount);
+                    $('#comp_amount_v2').html(comp_amount.cash_2.usable_amount);
+                    $('#agent_amount_v1').html(agent_amount.cash_1.usable_amount);
+                    $('#agent_amount_v2').html(agent_amount.cash_2.usable_amount);
+
+                }else {
+                    tipTopShow(rs.msg);
+                }
+            },
+            error: function (rs) {
+                tipTopShow("查询信息失败，请重试..."); //显示提示框
+            }
+        });
+    }
+    getCompInfo(comp_id,comp_pid);
+    layui.use(['form', 'layer','laytpl'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            laytpl = layui.laytpl;
+        laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+        var timerNum = 90,
+            iCount,
+            cacheDOM = '';
+
+        $('.mod_nav').on('click','li',function(){
+            var th = $(this),
+                idx = th.index(),
+                data = th.attr('data');
+            th.addClass('cur').siblings().removeClass('cur');
+            $('.cont_box').eq(idx).show().siblings('.cont_box').hide();
+        })
+        $('input[name="agreemt_check"]').change(function(){
+            var th = $(this),
+                transfer = $('#transfer');
+            if(th.is(':checked')){
+                transfer.attr('disabled',false);
+            }else{
+                transfer.attr('disabled',true);
+            }
+        })
+
+        //显示
+        $('body').on('click', '#transfer', function () {
+            var amount = $.trim($('#charge_amount').val()),
+                account_type = $('.mod_nav .cur').attr('data'),
+                amountV1 = $('#agent_amount_v1').text(),
+                amountV2 = $('#agent_amount_v2').text(),
+                usableAmt = account_type==1 ? amountV2 :amountV1;
+            if(!amount){
+                layui.layer.msg('请输入充值金额');
+                return;
+            }
+            if (!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(amount))) {
+                layui.layer.msg("请输入正确的充值金额！");
+                return;
+            }
+            if(parseFloat(amount)>parseFloat(usableAmt)){
+                layui.layer.msg("账户可用余额不足!");
+                return;
+            }
+            if (cacheDOM == '') {
+                cacheDOM = $('#tempSend').html();
+            }
+            layer.open({        //店铺详细信息弹框
+                type: 1,
+                anim: 2,
+                title: "转账充值",
+                area: ['400px', '250px'],
+                shadeClose: false, //开启遮罩关闭
+                content: cacheDOM
+            });
+
+        }).on('click', '#code_btn', function () {
+            sendsms();
+        }).on('click','#transfer_btn', function(){
+            var code = $.trim($('input[name="send_num"]').val()),
+                amount = $.trim($('#charge_amount').val()),
+                account_type = $('.mod_nav .cur').attr('data');
+            if(!code){
+                layui.layer.msg('请输入验证码');
+                return;
+            }
+            confirmCharge(amount,code,account_type);
+        })
+
+        //发送验证码
+        function sendsms(){
+            var amount = $.trim($('#charge_amount').val());
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/account/sendSms/amount/'+ amount,
+                dataType: 'json',
+                success: function (rs) {
+                    tipTopHide();
+                    if (rs.state == 1) {
+                        layui.layer.msg(rs.msg);
+                        $('#code_btn').html(timerNum+'s后重新获取').attr('disabled',true);
+                        iCount = setInterval(changeTime,1000);
+                    }else {
+                        layui.layer.msg(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+                }
+            });
+        }
+        //确认充值
+        function confirmCharge (amount,code,account_type){
+            $.ajax({
+              type: "POST",
+              url: '/v1.2/account/applyTransfer/comp_id/' +  comp_id + '/amount/' + amount + '/code/' + code + '/transfer_type/' + transfer_type + '/account_type/' + account_type,
+              dataType: 'json',
+              success: function (rs) {
+                  tipTopHide();
+                  if (rs.state == 1) {
+                      var comp_v1 = $('#comp_amount_v1'),
+                          comp_v2 = $('#comp_amount_v2');
+                      if(account_type==1){
+                          comp_v2.html(parseFloat(comp_v2.text())+parseFloat(amount));
+                          $('#agent_amount_v2').html(rs.usable_amount);
+                      }else{
+                          comp_v1.html(parseFloat(comp_v1.text())+parseFloat(amount));
+                          $('#agent_amount_v1').html(rs.usable_amount);
+                      }
+                      $('#code_btn').attr('disabled',false).html('获取验证码');
+                      clearInterval(iCount);
+                      timerNum = 90;
+                      $('#charge_amount').val('');
+                      layer.closeAll();
+                  }
+                  layui.layer.msg(rs.msg);
+              },
+              error: function (rs) {
+                  layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+              }
+          });
+        }
+        //倒计时
+        function changeTime(){
+            if (timerNum ==1 ){
+                $('#code_btn').attr('disabled',false).html('获取验证码');
+                clearInterval(iCount);
+                timerNum = 90;
+            }else{
+                if(timerNum > 0){
+                timerNum = timerNum - 1;
+                curnum = timerNum;
+                $('#code_btn').html(curnum+'s后重新获取').attr('disabled',true);
+                }
+            }
+        }
+    });
+</script>
+</body>
+
+
+
+

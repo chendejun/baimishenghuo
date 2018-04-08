@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>代理商充值</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/js/layui/css/layui.css" />
+    <script type="text/javascript" src="/public/js/layui/layui.js"></script>
+</head>
+<style>
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(/public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .bm-btn {
+        padding: 0 10px;
+        width: auto;
+        box-sizing: border-box;
+        margin-right: 10px;
+    }
+
+    .agentinfo_wrapper {
+        width: 100%;
+        overflow: hidden;
+        padding: 60px 50px 25px 50px;
+        box-sizing: border-box;
+    }
+
+    .agentinfo_wrapper .line {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .agentinfo_wrapper .line:nth-of-type(1) {
+        margin-bottom: 39px;
+    }
+
+    .agentinfo_wrapper .line:nth-of-type(2) {
+        margin-bottom: 29px;
+    }
+
+    .agentinfo_wrapper .line .linetit {
+        font-size: 16px;
+        color: #666666;
+        width: 128px;
+        float: left;
+        text-align: right;
+    }
+
+    .agentinfo_wrapper .line .linecon {
+        font-size: 16px;
+        color: #666666;
+        float: left;
+    }
+
+    .agentinfo_wrapper .line .linecon .typename {
+        width: 150px;
+        margin-right: 11px;
+        display: block;
+        float: left;
+    }
+
+    .agentinfo_wrapper .line .linecon .type1account,
+    .agentinfo_wrapper .line .linecon .type2account {
+        width: 135px;
+        margin-right: 11px;
+        color: #333333;
+        font-weight: 900;
+        float: left;
+    }
+
+    .regNav {
+        width: 679px;
+        height: 58px;
+        line-height: 58px;
+        border: 1px solid #cccccc;
+        border-radius: 7px;
+        margin-top: 12px;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .regNav .nav {
+        float: left;
+        border-right: 1px solid #cccccc;
+        height: 100%;
+        width: 24.88%;
+        text-align: center;
+        color: #999999;
+        font-size: 15px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .regNav .nav:last-of-type {
+        border-right: none;
+    }
+
+    .regNav .nav .cur {
+        border: 1px solid #409eff;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 98.8%;
+        height: 97.4%;
+    }
+
+    .regNav .nav:first-of-type .cur {
+        border-radius: 7px 0 0 7px;
+    }
+
+    .regNav .nav:last-of-type .cur {
+        border-radius: 0 7px 7px 0;
+    }
+
+    .accountExplain {
+        font-size: 15px;
+        color: #989898;
+        margin-bottom: 50px;
+    }
+
+    .accountExplain>span {
+        color: #f56a6d;
+    }
+
+    .explain_wrap {
+        padding-bottom: 19px;
+        border-bottom: 1px solid #f2f4f3;
+    }
+
+    .explain_wrap .line {
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+    }
+
+    .explain_wrap .line .left {
+        width: 160px;
+        overflow: hidden;
+        font-size: 14px;
+        color: #666666;
+        float: left;
+        text-align: right;
+    }
+
+    .explain_wrap .line .right {
+        font-size: 16px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .explain_wrap .line .right input {
+        width: 198px;
+        height: 48px;
+        border: 1px solid #f3f4f6;
+        color: #999999;
+        padding: 0 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+        font-weight: normal;
+    }
+
+    .regBtnbox {
+        width: 100%;
+        padding-top: 20px;
+    }
+
+    .layui-form-checkbox[lay-skin=primary] i {
+        width: 15px;
+        line-height: 15px;
+    }
+
+    .layui-form-checked[lay-skin=primary] i {
+        background-color: #409eff;
+    }
+
+    .layui-form-checkbox[lay-skin=primary]:hover i {
+        border-color: #409eff;
+    }
+
+    #regBtn {
+        width: 120px;
+        height: 40px;
+        box-sizing: border-box;
+    }
+
+    .info_box .explain_wrap {
+        display: none;
+    }
+
+    #layerregbox {
+        padding: 10px 19px 20px 19px;
+    }
+
+    .layerreginfo {
+        color: #666666;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    #getnumber {
+        width: 198px;
+        height: 38px;
+        border: 1px solid #f3f5f6;
+        color: #a1a1a1;
+        font-size: 14px;
+        padding: 0 9px;
+        box-sizing: border-box;
+        margin-right: 10px;
+    }
+
+    .getNumbox .time {
+        color: #4c94f5;
+    }
+
+    .layui-layer-btn {
+        text-align: center !important;
+    }
+
+    .layui-layer-btn a {
+        height: 28px !important;
+        line-height: 28px !important;
+        width: 60px;
+        padding-top: 3px !important;
+        padding-bottom: 3px !important;
+    }
+
+    .layui-layer-btn .layui-layer-btn0 {
+        background: #4c94f5 !important;
+    }
+
+    #successreg {
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+    #successreg p {
+        text-align: center !important;
+        font-size: 20px;
+        padding-top: 40px;
+        box-sizing: border-box;
+    }
+
+    #closeRegBox {
+        width: 90px;
+        height: 40px;
+        background: #4c94f5;
+        color: #fff;
+        cursor: pointer;
+        text-align: center;
+        line-height: 40px;
+        font-size: 14px;
+        margin: 0 auto;
+        border-radius: 4px;
+        margin-top: 20px;
+    }
+
+    .layui-layer-title {
+        background: #fff !important;
+    }
+
+    .settime,
+    #getnumber {
+        float: left;
+    }
+
+    .settime {
+        height: 36px;
+        line-height: 36px;
+        width: auto;
+        -webkit-tap-highlight-color: transparent;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Settle/index?isreturn=1">
+                    <i class="backlist"></i>返回代理商列表</a>
+            </span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="agentinfo_wrapper">
+                <div class="line">
+                    <div class="linetit">代理商名称：</div>
+                    <div class="linecon">{{$data.comp_name}}</div>
+                </div>
+                <div class="line">
+                    <div class="linetit">账户余额：</div>
+                    <div class="linecon">
+                        <span class="typename">Ⅰ类账户</span>
+                        <span class="type1account comp_id1">00.00</span>
+                        <span class="typename">Ⅱ类账户</span>
+                        <span class="type2account comp_id2">00.00</span>
+                    </div>
+                </div>
+                <div class="line">
+                    <div class="linetit">人群分析剩余：</div>
+                    <div class="linecon">
+                        <span class="typename">高级版可用次数</span>
+                        <span class="type1account"><b class="comp_cid1">0</b>次</span>
+                        <span class="typename">APP分析版可用次数</span>
+                        <span class="type2account"><b class="comp_cid2">0</b>次</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info_box">
+                <div class="box_title">充值</div>
+                <div class="regNav">
+                    <div class="nav" data-type='1'>
+                        <div class="cur"></div>
+                        <span>Ⅰ类账户充值</span>
+                    </div>
+                    <div class="nav" data-type='2'>
+                        <span>Ⅱ类账户充值</span>
+                    </div>
+                    <div class="nav" data-type='3'>
+                        <span>高级版次数充值</span>
+                    </div>
+                    <div class="nav" data-type='4'>
+                        <span>APP分析版次数充值</span>
+                    </div>
+                </div>
+                <div class="explain_wrap">
+                    <div class="accountExplain">Ⅰ类账户说明：Ⅰ类账户只能投放主流网络广告，包括今日头条、爱奇艺、优酷、微博等，
+                        <span>不支持腾讯广告（包含朋友圈广告）短信投放。</span>
+                    </div>
+                    <div class="line">
+                        <div class="left">你的Ⅰ类账户可用余额：</div>
+                        <div class="right">￥<span class="comp_pid1 recharge_val">00.00</span></div>
+                    </div>
+                    <div class="line">
+                        <div class="left">请输入转账金额：</div>
+                        <div class="right">
+                            <input type="text" data-type='1' placeholder="请填写充值金额" />
+                        </div>
+                    </div>
+                </div>
+                <div class="explain_wrap">
+                    <div class="accountExplain">Ⅱ类账户说明：Ⅱ类广告可投放全网广告。</div>
+                    <div class="line">
+                        <div class="left">你的Ⅱ类账户可用余额：</div>
+                        <div class="right">￥<span class="comp_pid2 recharge_val">00.00</span></div>
+                    </div>
+                    <div class="line">
+                        <div class="left">请输入转账金额：</div>
+                        <div class="right">
+                            <input type="text" data-type='2' placeholder="请填写充值金额" />
+                        </div>
+                    </div>
+                </div>
+                <div class="explain_wrap">
+                    <div class="accountExplain">高级版本说明：指人群画像开通高级版本的可用次数。</div>
+                    <div class="line">
+                        <div class="left">你的账户可用次数：</div>
+                        <div class="right"><b class="comp_cpid1 recharge_val">0</b>次</div>
+                    </div>
+                    <div class="line">
+                        <div class="left">请输入本次充值次数：</div>
+                        <div class="right">
+                            <input type="text" data-type='3' placeholder="请填写充值次数" />
+                        </div>
+                    </div>
+                </div>
+                <div class="explain_wrap">
+                    <div class="accountExplain">APP分析版本说明：指人群画像开通APP分析版本的可用次数，注意本功能开通前，必须先开通人群画像高级版本。</div>
+                    <div class="line">
+                        <div class="left">你的账户可用次数：</div>
+                        <div class="right"><b class="comp_cpid2 recharge_val">0</b>次</div>
+                    </div>
+                    <div class="line">
+                        <div class="left">请输入本次充值次数：</div>
+                        <div class="right">
+                            <input type="text" data-type='4' placeholder="请填写充值次数" />
+                        </div>
+                    </div>
+                </div>
+                <div class="regBtnbox form_box layui-form layui-form-item">
+                    <input type="checkbox" name="sex" value="1" title="我已知晓充值后不可撤销" id="IsDis" lay-skin="primary" lay-filter="sex">
+                </div>
+                <button class="btn_link bm-btn bm-btn-disable" id="regBtn" disabled="disabled">立即充值</button>
+            </div>    
+        </div>
+    </div>
+    <div class="reg_tipbox">
+
+    </div>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript">
+
+        var comp_pid = '{{$data.comp_pid}}',   //当前登录服务商
+            comp_id = '{{$data.comp_id}}';  //充值的代理商
+
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form(),
+                layer = layui.layer,
+                element = layui.element,
+                laydate = layui.laydate;
+
+            //余额
+            function remainCash() {       
+                $.ajax({
+                    type: "GET",
+                    url: "/v1.2/account/remainCash/comp_id/"+comp_pid+","+comp_id,
+                    dataType: 'json',
+                    success: function (res) {
+                        console.log(res)
+                        var comp_pid = res.data['{{$data.comp_pid}}'],  //当前登录服务商余额
+                            comp_id = res.data['{{$data.comp_id}}'];    //充值的代理商余额
+                        $('.comp_id1').html(comp_id.cash_1.usable_amount)      //充值的代理商Ⅰ类账户可用余额
+                        $('.comp_id2').html(comp_id.cash_2.usable_amount)      //充值的代理商Ⅱ类账户可用余额
+                        $('.comp_pid1').html(comp_pid.cash_1.usable_amount)  //当前登录服务商Ⅰ类账户可用余额
+                        $('.comp_pid2').html(comp_pid.cash_2.usable_amount)  //当前登录服务商Ⅱ类账户可用余额
+                    },
+                    error: function (err) {
+                        layui.layer.msg('网络出错，请稍后重试！');
+                    }
+                })
+            }
+            remainCash();
+
+            //次数
+            function sceneResource(){            
+                $.ajax({
+                    type: "GET",
+                    url: "/v1.2/SceneExtension/getAllServerSceneResource/comp_id/"+comp_pid+","+comp_id,
+                    dataType: 'json',
+                    success: function (res) {
+                        console.log(res)
+                        var comp_pid = res.data['{{$data.comp_pid}}'],  //当前登录服务商次数
+                            comp_id = res.data['{{$data.comp_id}}'];    //充值的代理商次数
+
+                        $('.comp_cid1').html(comp_id.high_num)      //充值的代理商高级版本数
+                        $('.comp_cid2').html(comp_id.app_num)       //充值的代理商app分析版本数
+                        $('.comp_cpid1').html(comp_pid.high_num)    //当前登录服务商高级版本数
+                        $('.comp_cpid2').html(comp_pid.app_num)     //当前登录服务商app分析版本数
+                    },
+                    error: function (err) {
+                        layui.layer.msg('网络出错，请稍后重试！');
+                    }
+                })   
+            }
+            sceneResource();
+
+
+            form.on('checkbox(sex)', function (data) {
+                //是否被选中，true或者false
+                if (data.elem.checked == true) {
+                    $('#regBtn').removeAttr('disabled');
+                    $('#regBtn').attr('class', 'btn_link bm-btn bm-btn-blue')
+                } else {
+                    $('#regBtn').attr('disabled', 'disabled');
+                    $('#regBtn').attr('class', 'btn_link bm-btn bm-btn-disable')
+                }
+            });
+
+            //获取短信验证码
+            $('#regBtn').on('click', function (e) {
+                var thatInput = $('.explain_wrap input:visible'),
+                    recharge_val = $('.explain_wrap .recharge_val:visible').html(),
+                    thatVal = $.trim(thatInput.val()),
+                    reg_num = /^[1-9][0-9]*$/,  //次数正则
+                    reg_money = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;   //金额正则
+
+                if(!thatVal){
+                    layui.layer.msg(thatInput.attr('placeholder'));
+                    return false;
+                }
+                
+                //充值金额  发送验证码
+                if(thatInput.attr('placeholder') == '请填写充值金额'){
+                    if(reg_money.test(thatVal)){
+                        if(parseFloat(recharge_val)<parseFloat(thatVal)){
+                            layui.layer.msg('账户可用余额不足');
+                        }else{
+                            $.ajax({
+                                type: "GET",
+                                url: "/v1.2/account/sendSms/amount/"+thatVal,
+                                dataType: 'json',
+                                success: function (res) {
+                                    if(res.state == 1){
+                                        RegTipFn();
+                                    }else{
+                                        layui.layer.msg(res.msg);
+                                    }   
+                                },
+                                error: function (err) {
+                                    layui.layer.msg('网络出错，请稍后重试！');
+                                }
+                            })
+                        }               
+                    }else{
+                        layui.layer.msg('请填写正确的转账金额');
+                    }
+                }
+                //充值次数  发送验证码
+                if(thatInput.attr('placeholder') == '请填写充值次数'){
+                    if(reg_num.test(thatVal)){ 
+                        if(parseFloat(recharge_val)<parseFloat(thatVal)){
+                            layui.layer.msg('账户可用次数不足');
+                        }else{
+                            $.ajax({
+                                type: "GET",
+                                url: "/v1.2/Sceneextension/sendShortMessage/num/"+thatVal,
+                                dataType: 'json',
+                                success: function (res) {
+                                    console.log(res);
+                                    if(res.state == 1){
+                                        RegTipFn();
+                                    }else{
+                                        layui.layer.msg(res.msg);
+                                    }  
+                                },
+                                error: function (err) {
+                                    layui.layer.msg('网络出错，请稍后重试！');
+                                }
+                            })
+                        }    
+                    }else{
+                        layui.layer.msg('请填写正确的充值次数');
+                    }
+                }
+            })
+
+            //重新发送
+            $('body').on('click', '.settime', function (e) {
+                var flag = $('.settime').attr('data-flag');
+                if (flag == 1) {
+                    var thatInput = $('.explain_wrap input:visible'),
+                        thatVal = $.trim(thatInput.val())
+                    $.ajax({
+                        type: "GET",
+                        url: "/v1.2/account/sendSms/amount/"+thatVal,
+                        dataType: 'json',
+                        success: function (res) {
+                            layui.layer.msg(res.msg);
+                        },
+                        error: function (err) {
+                            layui.layer.msg('网络出错，请稍后重试！');
+                        }
+                    })
+
+
+                    var countdown = 90;
+                    $('.settime').html('<span class="time">' + countdown + '</span>秒后重新发送');
+                    var cleartime = setInterval(function () {
+                        if (countdown == 0) {
+                            $('.settime').html("重新获取验证码");
+                            $('.settime').attr('data-flag', 1)
+                            countdown = 90;
+                            clearInterval(cleartime);
+                        } else {
+                            $('.time').text(countdown);
+                            $('.settime').attr('data-flag', 2)
+                            countdown--;
+                        }
+                    }, 1000)
+                }
+            })
+
+            //系统管理员手机尾号
+            var mobileTailPhone = '';
+            $.ajax({
+                type: "GET",
+                url: "/v1.2/SceneExtension/getMobileTailPhone",
+                dataType: 'json',
+                success: function (res) {
+                    if(res.state == 1){
+                        mobileTailPhone  = res.phone;
+                    }        
+                },
+                error: function (err) {
+                    layui.layer.msg('网络出错，请稍后重试！');
+                }
+            })
+
+            //充值弹框
+            function RegTipFn() {
+                clearInterval(cleartime);
+                var str = '<div id="layerregbox">'
+                str += '<div class="layerreginfo">充值需要验证操作授权<br/>请输入系统管理员手机号（尾号'+mobileTailPhone+'）收到的验证码。</div>'
+                str += '<div class="getNumbox">'
+                str += '<input type="text" id="getnumber" placeholder="请输入验证码"/>'
+                str += '<div class="settime" data-flag="1"><span class="time">90</span>秒后重新发送</div>'
+                str += '</div>'
+                str += '</div>'
+                layer.open({
+                    type: 1,
+                    btn: ['确定'],
+                    skin: 'layui-layer-demo', //样式类名
+                    anim: 2,
+                    title: " ",
+                    area: ['400px', '225px'],
+                    shadeClose: true, //开启遮罩关闭
+                    content: str,
+                    yes: function (index, layero) {
+                        pay(cleartime);
+                    },
+                    cancel: function (index, layero) {
+                        clearInterval(cleartime);
+                    }
+                });
+
+                var countdown = 90;
+                $('.settime').html('<span class="time">' + countdown + '</span>秒后重新发送');
+                var cleartime = setInterval(function () {
+                    if (countdown == 0) {
+                        $('.settime').html("重新获取验证码");
+                        $('.settime').attr('data-flag', 1)
+                        countdown = 90;
+                        clearInterval(cleartime);
+                    } else {
+                        $('.time').text(countdown);
+                        $('.settime').attr('data-flag', 2)
+                        countdown--;
+                    }
+                }, 1000)
+            }
+
+
+            function pay(cleartime){
+                //转账金额充值
+                var code = $('#getnumber').val();
+                var thatInput = $('.explain_wrap input:visible'),
+                    num = $.trim(thatInput.val()),
+                    type = thatInput.attr('data-type'),
+                    account_type,resource_type;
+
+                if(thatInput.attr('placeholder') == '请填写充值金额'){
+                    //1为Ⅱ类账户，2为Ⅰ类账户
+                    if(type == 1){
+                        account_type = 2;
+                    }
+                    if(type == 2){
+                        account_type = 1;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: "/v1.2/account/applyTransfer/comp_id/"+comp_id+"/amount/"+num+"/code/"+code+"/transfer_type/0/account_type/"+account_type,
+                        dataType: 'json',
+                        success: function (res) {
+                            console.log(res);
+                            if(res.state == 1){
+                                clearInterval(cleartime);
+                                layer.close(); //如果设定了yes回调，需进行手工关闭
+                                //请求充值接口
+                                SuccessCallBack();
+                            }else{
+                                layui.layer.msg(res.msg);
+                            }
+                        },
+                        error: function (err) {
+                            layui.layer.msg('网络出错，请稍后重试！');
+                        }
+                    })
+                }
+
+                if(thatInput.attr('placeholder') == '请填写充值次数'){
+                    //2为高级版 3为app分析版 
+                    if(type == 3){
+                        resource_type = 2;
+                    }
+                    if(type == 4){
+                        resource_type = 3;
+                    }
+                    $.ajax({
+                        type: "POST",
+                        // url: "/v1.2/SceneExtension/transferServerSceneResource/from_comp_id/"+comp_pid+"/to_comp_id/"+comp_id+"/resource_type/"+type+"/transfer_number/"+num+"/code/"+code,
+                        url: "/v1.2/SceneExtension/transferServerSceneResource/",
+                        data:{"from_comp_id":comp_pid,"to_comp_id":comp_id,"resource_type":resource_type,"transfer_number":num,"code":code},
+                        dataType: 'json',
+                        success: function (res) {
+                            if(res.state == 1){
+                                clearInterval(cleartime);
+                                layer.close(); //如果设定了yes回调，需进行手工关闭
+                                //请求充值接口
+                                SuccessCallBack();
+                            }else{
+                                layui.layer.msg(res.msg);
+                            }
+                        },
+                        error: function (err) {
+                            layui.layer.msg('网络出错，请稍后重试！');
+                        }
+                    })   
+                }
+            }
+
+            //充值成功
+            function SuccessCallBack() {
+                var str = '<div id="successreg">'
+                str += '<p>充值成功!</p>'
+                str += '</div>'
+                layer.open({
+                    type: 1,
+                    skin: 'layui-layer-demo', //样式类名
+                    anim: 2,
+                    title: " ",
+                    area: ['400px', '222px'],
+                    shadeClose: true, //开启遮罩关闭
+                    content: str,
+                    btn: ['确定'],
+                    yes: function(){
+                        remainCash();
+                        sceneResource();
+                        layer.closeAll();
+                    }
+                });
+            }
+    
+
+
+        });
+
+
+
+
+
+        $('.info_box').find('.explain_wrap').eq(0).show();
+        $('.regNav .nav').on('click', function () {
+            var index = $(this).index();
+            $(this).find('span').before('<div class="cur"></div>').closest('.nav').siblings().find('.cur').remove();
+            $('.info_box').find('.explain_wrap').eq(index).show().siblings('.explain_wrap').hide();
+        })
+    </script>
+</body>
+
+</html>

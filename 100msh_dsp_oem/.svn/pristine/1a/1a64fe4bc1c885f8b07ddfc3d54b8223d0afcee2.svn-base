@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="../../../../..//public/css/base.css">
+    <link rel="stylesheet" href="../../../../..//public/css/common.css">
+</head>
+<style>
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .info_box {
+        width: 100%;
+        overflow: hidden;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .agentinfolist {
+        width: 100% !important;
+        overflow: hidden;
+        display: block;
+        position: relative !important;
+        left: 0;
+        top: 0;
+        padding-left: 0 !important;
+        padding-bottom: 15px !important;
+        border-bottom: 1px solid #f2f4f5;
+    }
+
+    .infolist li {
+        width: 100%;
+        padding: 23px 0 0 66px;
+        box-sizing: border-box;
+    }
+
+    .linetitle {
+        color: #666666;
+        font-size: 15px;
+        float: left;
+        width: 200px;
+        text-align: right;
+        margin-right: 12px;
+    }
+
+    .agentdata,
+    .editinputinfo {
+        color: #5d5d5d;
+        font-size: 15px;
+        float: left;
+    }
+
+    .bm-btn {
+        padding: 0 10px;
+        width: auto;
+        box-sizing: border-box;
+        margin-right: 10px;
+    }
+
+    .agentdata span {
+        margin-right: 15px !important;
+    }
+
+    .adcount {
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
+        color: #666666;
+    }
+
+    .adcount div {
+        margin-right: 96px;
+        padding-right: 8px;
+        float: left;
+    }
+
+    #userList {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+        margin-bottom: 49px;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 15px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+
+    #edituserinfo {
+        widows: 120px;
+        height: 40px;
+        margin: 0 auto;
+    }
+
+    .userinfo_wrapper {
+        text-align: center;
+    }
+
+    .resetadminTip {
+        color: #f56c6c;
+        padding-left: 327px;
+        height: 22px;
+        line-height: 22px;
+        display: none;
+        overflow: hidden;
+    }
+
+    .setphonebox,
+    .adinfobox {
+        width: auto;
+        overflow: hidden;
+    }
+
+    .setphonebox {
+        display: none;
+    }
+
+    .setphone,
+    .setname,.setuserphone,.setusername {
+        width: 148px;
+        height: 38px;
+        line-height: 38px;
+        border: 1px solid #ddd;
+        padding: 0 10px;
+        margin-right: 9px;
+    }
+
+    .setphoneTip {
+        padding-left: 212px;
+        height: 22px;
+        line-height: 22px;
+        color: #c4c4c4;
+        display: none;
+        overflow: hidden;
+    }
+    #saveInfo,.editinputinfo{
+        display: none;
+    }
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/advertiser/index?isreturn=1">
+                    <i class="backlist"></i>返回代理商列表</a>
+            </span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <a href="javascript:;" class="cur">基本资料</a>
+                <a href="./accountdetails.html">账户详情</a>
+                <a href="/v1.2/account/invoice">消耗查询</a>
+                <a href="./crowdportrait.html">人群画像开通记录</a>
+            </div>
+            <div class="info_box">
+                <div class="box_title">基础信息</div>
+                <ul class="agentinfolist">
+                    <li style="width:100%;">
+                        <div class="linetitle">服务商名称：</div>
+                        <div class="showbaseinfo agentdata">江苏省苏州市代理商</div>
+                        <div class="editinputinfo">
+                            <input type="text" class="setname" />
+                        </div>
+                    </li>
+                    <li>
+                        <div class="linetitle">所在地区：</div>
+                        <div class="showbaseinfo agentdata">江苏省苏州</div>
+                        <div class="editinputinfo">
+                            <select class="bm-select">
+                                <option>省</option>
+                            </select>
+                            <select class="bm-select">
+                                <option>市</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="linetitle">状态：</div>
+                        <div class="showbaseinfo agentdata">正常</div>
+                        <div class="editinputinfo">
+                            <select class="bm-select">
+                                <option>正常</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="linetitle">联系人：</div>
+                        <div class="showbaseinfo agentdata">张大鹏</div>
+                        <div class="editinputinfo">
+                            <input type="text" class="setusername" />
+                        </div>
+                    </li>
+                    <li>
+                        <div class="linetitle">联系电话：</div>
+                        <div class="showbaseinfo agentdata">123465678995</div>
+                        <div class="editinputinfo">
+                            <input type="text" class="setuserphone" />
+                        </div>
+                    </li>
+                    <li style="width:100%;height:100px;">
+                        <div class="linetitle">管理员账号：</div>
+                        <div class="agentdata" style="width:70%;">
+                            <div class="adinfobox">
+                                <span>123465678995</span>
+                                <button class="btn_link bm-btn bm-btn-blue" id="resetpassword" onclick="resetPasswordFn()">重置管理员密码</button>
+                                <button class="btn_link bm-btn bm-btn-blue" id="editNumber" onclick="EditNumberFn()">修改管理员账号</button>
+                            </div>
+                            <div class="setphonebox">
+                                <input type="text" class="setphone" placeholder="请输入新的手机账号" />新账号密码为账号后六位</div>
+                        </div>
+                        <div class="resetadminTip">重置后密码为账号后6位，保存修改后将生效。</div>
+                        <div class="setphoneTip">注意：保存生效后，系统会自动下发短信给原、新账号提示调整。</div>
+                    </li>
+                </ul>
+                <div class="box_title">客户信息</div>
+                <div class="userinfo_wrapper">
+                    <div class="adcount">
+                        <div class="adnum">广告主数：
+                            <span>3</span>
+                        </div>
+                        <div class="nextagent">下级代理商数：
+                            <span>3</span>
+                        </div>
+                    </div>
+                    <div id="userList">
+                        <table id="dmp_list" class="base_table">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>开通时间</th>
+                                    <th>广告主数</th>
+                                    <th>全网利润率</th>
+                                    <th>投放广告数</th>
+                                    <th>广告消耗金额</th>
+                                    <th>投放短信数</th>
+                                    <th>短信消耗金额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="noMsg"></p>
+                        <!--列表分页-->
+                        <div id="list_page" class="page"></div>
+                    </div>
+                    <button class="btn_link bm-btn bm-btn-blue" id="edituserinfo">修改基础信息</button>
+                    <button class="btn_link bm-btn bm-btn-blue" id="saveInfo">保存修改</button>
+                </div>
+            </div>
+        </div>
+        </script>
+        <!--人群详情end-->
+        <script type="text/javascript" src="../../../../..//public/js/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="../../../../..//public/js/common.js"></script>
+        <script src="../../../../..//public/js/layer/layer.js"></script>
+        <script src="../../../../..//public/js/laypage/laypage.js"></script>
+        <script type="text/javascript" src="../../../../..//public/js/laytpl/laytpl.js"></script>
+        <script type="text/javascript">
+            laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+            //重置管理员密码
+            function resetPasswordFn(){
+                $('.resetadminTip').show();
+            }
+            function EditNumberFn(){
+                $('.adinfobox').hide();
+                $('.resetadminTip').hide();
+                $('.setphonebox').show();
+                $('.setphoneTip').show();
+            }
+
+            function showNextTableAction(that) {
+                if ($(that).hasClass('cur') == false) {
+                    $(that).addClass('cur');
+                    $(that).closest('.firsttable').next('.secondtable').show();
+                } else {
+                    $(that).removeClass('cur');
+                    $(that).closest('.firsttable').next('.secondtable').hide();
+                }
+            }
+            $('#edituserinfo').on('click',function(){
+                $(this).hide();
+                $('#saveInfo').show();
+                $('.showbaseinfo').hide();
+                $('.editinputinfo').show();
+            })
+
+
+
+            //搜索
+            var skeyWord = '';
+            function searchFn(th) {
+                var t = $(th),
+                    inputDom = t.parent().find('input[type="text"]').val();
+                setStatu = $('#statu_id').val();
+                setCrowdType = $('#crowd_type').val();
+                skeyWord = encodeURIComponent(inputDom);
+                getList();
+            }
+            //获取数据
+            var limit = 10, currNum = 1;
+            function getList(curr) {
+                var name = skeyWord ? ('/keyword/' + skeyWord) : '',
+                    status = setStatu ? ('/audit_status/' + setStatu) : '',
+                    crowdType = setCrowdType ? ('/crowd_type/' + setCrowdType) : '',
+                    start_date = startDate ? ('/start_date/' + startDate) : '',
+                    end_date = endDate ? ('/end_date/' + endDate) : '';
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/ncrowd/index/page/' + (curr || 1) + '/limit/' + limit + name + status + crowdType + start_date + end_date,
+                    dataType: 'json',
+                    success: function (rs) {
+                        tipTopHide();       //隐藏提示框
+                        if (rs.state == 1) {         //如果查询成功
+                            var data = rs.data;     //返回数据赋值
+                            console.log(data);
+                            render_table(data, curr);     //渲染表格数据
+                            renderPage(data.pages, curr);
+                        } else {
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error: function (rs) {
+                        tipTopShow("查询信息失败，请重试...");    //显示提示框
+                    }
+                });
+            }
+
+            //分页
+            function renderPage(pages, curr) {
+                //显示分页
+                laypage({
+                    cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                    pages: pages, //通过后台拿到的总页数
+                    //skip: true, //是否开启跳页
+                    skin: '#4c94f5',
+                    prev: '<em class="layui-icon"></em>',
+                    next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function (obj, first) { //触发分页后的回调
+                        currNum = obj.curr;
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getList(obj.curr);
+                        }
+                    }
+                });
+            }
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>账户中心-支出记录</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/daterangepicker/moment.min.js"></script>
+    <script type="text/javascript" src="/public/js/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="/public/js/daterangepicker/daterangepicker.min.css"/>
+</head>
+<style>
+    .ta_date input{width: 90%;border: none;outline: none;height: 30px;line-height: 30px;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 支出记录</span>
+        </div>
+        <div class="data_box">
+           <!--  <div class="search_box">
+               <input type="text" value="" class="bm-input" placeholder="选择时间段" />
+               <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+           </div> -->
+            <div class="box_table table_style">
+                <div class="search_box">
+                    <div class="radio_box fl">
+                        <label> <input type="radio" name="timer" value="1">本周</label>
+                        <label> <input type="radio" name="timer" value="2">上周</label>
+                        <label> <input type="radio" name="timer" value="3">本月</label>
+                    </div>
+                    <div class="date_filter">
+                        <div class="ta_date">
+                            <input type="text" id="daterange" class="input-put" placeholder="选择查询日期">
+                            <input type="hidden" name="start_date" id="start_date"/>
+                            <input type="hidden" name="end_date" id="end_date"/>
+                        </div>
+                    </div>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <table id="transfer_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>支出对象</th>
+                            <th>账户类型</th>
+                            <th>支出金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var startDate= '',endDate='';
+        $(function(){
+            var monthDate = getMonthDate(),
+                todayDate = get_date(0),
+    	        daterange = $('#daterange'),
+                startId = $('#start_date'),
+                endId = $('#end_date');
+            $("input[name=timer]").bind("change",function(){
+                if(this.value == 1){//本周
+                    startDate = getTime(0);
+                    endDate = todayDate;
+                }else if(this.value == 2){//上周
+                    startDate = getTime(7);
+                    endDate = getTime(1);
+                }else{//本月
+                    startDate = monthDate[0];
+                    endDate = todayDate;
+                }
+                daterange.val(startDate + ' 至 ' + endDate);
+                startId.val(startDate);
+                endId.val(endDate);
+            })
+            $('#daterange').click(function(){
+                $("input[name=timer]").attr('checked',false);
+            })
+            //日期选择
+            $('#daterange').dateRangePicker({
+                language:'cn',
+                separator:' 至 ',
+                endDate: new Date(),
+                maxDate:new Date(),
+                maxDays:60,
+                setValue: function(timer,stTimer,endTime){
+                    daterange.val(timer);
+                    startId.val(stTimer);
+                    endId.val(endTime);
+                    startDate=stTimer;
+                    endDate=endTime;
+                },
+            });
+        });
+        //取本周、上周日期
+        function getTime(t){
+            var now = new Date(),
+                year=now.getFullYear(),
+                month=now.getMonth()+1,
+                date=now.getDate(),
+                day= (now.getDay() == 0)? 7: now.getDay(),
+                timer;
+            t = t + (day-1);
+            if(month>1){
+                month = month;
+            }else{//跨年的问题
+                year = year-1;
+                month = 12;
+            }
+            now.setDate(now.getDate()-t);
+            year = now.getFullYear();
+            month = now.getMonth()+1;
+            date = now.getDate();
+            timer = year+"-"+(month<10?('0'+month):month)+"-"+(date<10?('0'+date):date);
+            return timer ;
+        }
+        //取本月
+        function getMonthDate(){
+            var now = new Date(),
+                year=now.getFullYear(),
+                month=now.getMonth()+1,
+                day = new Date(year,month,0).getDate();
+            var firstdate = year+'-'+(month<10?('0'+month):month)+'-'+'01';
+            var lastdate = year+'-'+(month<10?('0'+month):month)+'-'+(day<10?('0'+day):day);
+            return [firstdate,lastdate];
+        }
+        //搜索
+        function searchFn(){
+            getTransferList();
+        }
+        //获取数据
+        var limit = 10;
+        function getTransferList(curr){
+            var start_date = startDate ? ('/start_date/'+startDate+'/') :'',
+                end_date = endDate ? ('end_date/'+endDate) :'';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/account/transfer/page/'+ (curr || 1)+'/limit/'+ limit+start_date+end_date,
+                dataType:'json',
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.state == 1){         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.pages, curr);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function render_table(data){
+            var list_e = $("#transfer_list tbody"),str="",no_msg = $(".noMsg");
+            if(data.list.length == 0){
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return ;
+            }
+            no_msg.text("");
+            $.each(data.list,function(k,v){
+                str +='<tr>',
+                str +='<td>'+ v.transfer_time +'</td>';
+                str +='<td>'+ v.comp_name +'</td>';
+                str +='<td>'+ v.acc_type +'</td>';
+                str +='<td>'+ v.amount +'</td>';
+                str +='</tr>';
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(pages,curr){
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                skip: true, //是否开启跳页
+                skin: '#5877a4',
+                curr: curr || 1, //当前页
+                jump: function(obj, first){ //触发分页后的回调
+                    if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getTransferList(obj.curr);
+                    }
+                }
+            });
+        }
+        getTransferList();
+    </script>
+</body>
+</html>

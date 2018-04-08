@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 客流分析 -->
+    <meta charset="UTF-8">
+    <title>百米DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <style type="text/css">
+        .table_box{border:1px solid #f4f5f6;}
+        .table_box>ul{background-color: #f6f6f6;color: #999999}
+        .table_box ul{clear: both;overflow:hidden;zoom:1;width: 100%;color: #666}
+        .table_box li{float:left;text-align:left;height:40px;line-height:40px;padding-left:2%; }
+        .table_box li:nth-child(1){width: 28%}
+        .table_box li:nth-child(2){width: 18%}
+        .table_box li:nth-child(3){width: 48%}
+        .table_box .online::before{content:'';width:6px;height:6px;background-color:#47c23a;display:inline-block;margin-right:6px;border-radius:50%;position:relative;top:-1px;}
+        .table_box .offline::before{content:'';width:6px;height:6px;background-color:#f56c6c;display:inline-block;margin-right:6px;border-radius:50%;position:relative;top:-1px;}
+        .table-more{height: 40px;line-height: 40px;border-top: 1px solid #fcfcfc;text-align: center;cursor: pointer;}
+        .table_content{max-height: 400px;overflow-y: scroll;}
+        .flow_data{margin-top: 20px;}
+        .flow_data b{color: #333;font-size: 14px;padding: 10px 0;display: inline-block;}
+        .flow_data i{color: #999;font-size: 12px;padding: 10px 0;display: inline-block;}
+        .flow_data ul{border:1px solid #f4f5f6}
+        .flow_data li{color: #999;font-size: 14px;line-height: 30px;margin: 26.5px 0;text-align: left;padding-left: 2%;width: 17.9%;border-left: 1px solid #f2f4f5;}
+        .flow_data li:nth-child(1){border-left: none;}
+        .flow_data span{color: #333!important;font-size: 20px!important;}
+        .table_content ul{display: none}
+        .table_content .tr_show{display: block;}
+        .date_flow{margin-top: 80px;}
+        .date_flow1{margin-top: 40px;}
+        .flow_trend{width: 100%;height:300px;}
+        .date_flow a{font-size: 14px;color: #999;}
+        .date_flow .layui-form{width: 220px;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>百米DMP / 客流人群分析</span>
+        </div>
+
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="javascript:;" class="cur">客流分析
+                    <p></p>
+                </a>
+                <a href="cus_propety.html">客户属性
+                    <p></p>
+                </a>
+                <a href="cus_prefrence.html">消费偏好
+                    <p></p>
+                </a>
+                <a href="trade_analysis.html">商圈分析
+                    <p></p>
+                </a>
+                <a href="cus_source.html">客流来源
+                    <p></p>
+                </a>
+                <a href="hot_search.html">搜索热点
+                    <p></p>
+                </a>
+                <a href="app_analysis.html">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+            <!--菜单内容-->
+        </div>
+        <div class="data_box">
+            <div class="table_box">
+                <ul>
+                    <li>设备概况</li>
+                    <li>放置位置</li>
+                    <li>当前状态</li>
+                </ul>
+                <div class="table_content">
+                    <ul class="tr_show">
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul class="tr_show">
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="offline">离线</li>
+                    </ul>
+                    <ul class="tr_show">
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="offline">离线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="offline">离线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                </div>
+                <div class="table-more">
+                    <i class="layui-icon">&#xe61a;</i>
+                </div>
+            </div>
+            <!-- 客流数据  -->
+            <div class="flow_data">
+                <div class="clearfix">
+                    <b class="fl">客流数据</b>
+                    <i class="fr">每5分钟更新</i>
+                </div>
+                <ul class="clearfix">
+                    <li>客流量<br><span>1537</span></li>
+                    <li>停留进店<br><span>282</span></li>
+                    <li>停留率<br><span>72.85%</span></li>
+                    <li>新客率<br><span>2.79%</span></li>
+                    <li>平均停留时长/分钟<br><span>36</span></li>
+                </ul>
+            </div>
+
+            <!-- 7天客流趋势 -->
+            <div class="date_flow date_flow1">
+                <div class="clearfix">
+                    <div class="layui-form fl">
+                        <select name="">
+                            <option value="1" selected="">近7天客流趋势</option>
+                            <option value="2">近30天客流趋势</option>
+                        </select>
+                    </div>
+                    <a class="fr"><i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend1"></div>
+            </div>
+            
+            <!-- 近30天24小时时段客流趋势 -->
+            <div class="date_flow date_flow2">
+                <div class="clearfix">   
+                    <div class="layui-form fl">
+                        <select name="">
+                            <option value="1" selected="">近30天24小时时段客流趋势</option>
+                            <option value="2">仅查周一至周四</option>
+                            <option value="3">仅查周五</option>
+                            <option value="4">仅查周六</option>
+                            <option value="5">仅查周日</option>
+                        </select>
+                    </div>
+                    <a class="fr"><i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend2"></div>
+            </div>
+
+            <!-- 今日停留时长分析 -->
+            <div class="date_flow date_flow3">
+                <div class="clearfix">   
+                    <div class="layui-form fl">
+                        <select name="">
+                            <option value="1" selected="">今日停留时长分析</option>
+                            <option value="2">昨日停留时长分析</option>
+                            <option value="3">近7天停留时长分析</option>
+                            <option value="4">近30天停留时长分析</option>
+                        </select>
+                    </div>
+                    <a class="fr"><i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend3"></div>
+            </div>
+
+            <!-- 今日与昨日客流同比分析 -->
+            <div class="date_flow date_flow4">
+                <div class="clearfix">   
+                    <div class="layui-form fl">
+                        <select name="">
+                            <option value="1" selected="">今日与昨日客流同比分析</option>
+                            <option value="2">客流同比分析-指定对比日期</option>
+                        </select>
+                    </div>
+                    <a class="fr"><i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend4"></div>
+            </div>
+
+            <!-- 近7天新老顾客对比 -->
+            <div class="date_flow date_flow5">
+                <div class="clearfix">   
+                    <div class="layui-form fl">
+                        <select name="">
+                            <option value="1" selected="">近7天新老顾客对比</option>
+                            <option value="2">近30天新老顾客对比</option>
+                        </select>
+                    </div>
+                    <a class="fr"><i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend5"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form(),
+                layer = layui.layer
+
+            $('.table-more').on('click', function () {
+                $('.table_content ul:not(.tr_show)').toggle();
+
+            });
+    
+        });
+
+
+        //7天客流趋势   
+        var $flow_trend1 = document.getElementById("flow_trend1"),
+            $flow_trend2 = document.getElementById("flow_trend2"),
+            $flow_trend3 = document.getElementById("flow_trend3"),
+            $flow_trend4 = document.getElementById("flow_trend4"),
+            $flow_trend5 = document.getElementById("flow_trend5"),
+            flowTrend1 = echarts.init($flow_trend1),
+            flowTrend2 = echarts.init($flow_trend2),
+            flowTrend3 = echarts.init($flow_trend3),
+            flowTrend4 = echarts.init($flow_trend4),
+            flowTrend5 = echarts.init($flow_trend5);
+        crowd_snalysis(flowTrend1,['1100','1500','1300','1400','1300','1600','1100'],['2018-01-01','2018-01-02','2018-01-03','2018-01-04','2018-01-05','2018-01-06','2018-01-07']);
+        crowd_snalysis(flowTrend2,['1100','1500','1300','1400','1300','1600','1100'],['2018-01-01','2018-01-02','2018-01-03','2018-01-04','2018-01-05','2018-01-06','2018-01-07']);
+        crowd_snalysis(flowTrend3,['1100','1500','1300','1400','1300','1600','1100'],['2018-01-01','2018-01-02','2018-01-03','2018-01-04','2018-01-05','2018-01-06','2018-01-07']);
+        crowd_snalysis(flowTrend4,['1100','1500','1300','1400','1300','1600','1100'],['2018-01-01','2018-01-02','2018-01-03','2018-01-04','2018-01-05','2018-01-06','2018-01-07']);
+        crowd_snalysis(flowTrend5,['1100','1500','1300','1400','1300','1600','1100'],['2018-01-01','2018-01-02','2018-01-03','2018-01-04','2018-01-05','2018-01-06','2018-01-07']);			
+		function crowd_snalysis(el,setData,xdata) {
+		    var set = { 
+		        tooltip : {
+		            trigger: 'axis',
+		            confine:true,
+		            axisPointer : {
+		                type : 'line'
+		            },
+		            formatter: '时间：{b0}<br />人数：{c0}'
+		        },
+		        grid: {
+		            left: '0%',
+		            right: '0%',
+		            bottom: '0%',
+		            width:"100%",
+		            containLabel: true                
+		        },              
+		        xAxis : [
+                    {          
+		                type : 'category',
+		                data :xdata,
+                        boundaryGap: true,
+		                axisLabel:{
+		                    textStyle:{
+		                        fontSize:10
+		                    }          
+		                }
+		            }
+		        ], 
+		        yAxis : [
+		            {
+                        splitLine:{show: false}, 
+		                name : "人数",
+		                type : "value",      
+		            }
+		        ],
+		        series : [
+		            {
+		                name:'人数',
+		                type:'line',
+		                symbol: 'circle',
+		                smooth: false,
+		                areaStyle: {normal: {color:'#fff'}},
+		                label: {
+		                    normal: {
+		                        show: true,
+		                        position: 'top',
+		                        formatter: '{c}',
+		                        textStyle:{
+		                        	fontSize:10
+		                        }
+		                    }
+		                },
+		                itemStyle: {
+		                    normal:{
+		                        color:'#53d99d'
+		                    }                       
+		                },
+		                data:setData
+		            }
+		        ]
+		    };            
+		    el.setOption(set);   
+		};
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>

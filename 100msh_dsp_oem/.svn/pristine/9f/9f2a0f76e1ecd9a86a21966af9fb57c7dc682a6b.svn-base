@@ -1,0 +1,475 @@
+<?php
+
+/**
+ * 场景
+ */
+class ScenesController extends BasicController
+{
+
+    /**
+     * [SCENE_NAME_LEN 场景名称长度]
+     * @var [INT]
+     */
+    const SCENE_NAME_LEN = 32*3;
+
+    /**
+     * [SUCCESS_STATE 请求成功状态]
+     * @var integer
+     */
+    const SUCCESS_STATE = 1;
+
+    /**
+     * [FAIL_STATE 请求失败状态]
+     * @var integer
+     */
+    const FAIL_STATE = 0;
+
+    /**
+     * [NOT_ENOUGH 余额不够]
+     * @var integer
+     */
+    const NOT_ENOUGH = -1;
+
+    /**
+     * [MIN_DETECTION_RADIUS 探测最小半径]
+     * @var integer
+     */
+    const MIN_DETECTION_RADIUS = 1;
+    /**
+     * [MAX_DETECTION_RADIUS 探测最大半径]
+     * @var integer
+     */
+    const MAX_DETECTION_RADIUS = 30;
+    /**
+     * [MIN_STOP_TIME 停留最小时间]
+     * @var integer
+     */
+    const MIN_STOP_TIME = 1;
+    /**
+     * [MAX_STOP_TIME 停留最大时间]
+     * @var integer
+     */
+    const MAX_STOP_TIME = 30;
+
+    /**
+     * [SENIOR 高级版单价]
+     * @var integer
+     */
+    const SENIOR = 3000;
+
+    /**
+     * [getAgentAdvertiser 得到代理商广告主]
+     * @return [type] [description]
+     */
+    public function getAgentAdvertiserAction()
+    {
+        $uinfo = $_SESSION['uinfo'];
+        var_dump($uinfo);exit;
+        $scenes = Helper::M('Scenes');
+        $rel = $scenes->getAgentAdvertiser($uinfo['comp_id']);
+        // 去掉已有场景的广告主
+        $data = $this->removeAdvertiser($rel);
+
+        Helper::outJson(array('state'=>self::SUCCESS_STATE,'data'=>$data));
+    }
+
+    /**
+     * [removeAdvertiser 去除已有场景的广告主]
+     * @param  [array] $advertiser_list []
+     * @return [array]      [新数组]
+     */
+    protected function removeAdvertiser($advertiser_list)
+    {
+        $new_advertiser_list = array();
+        foreach ($advertiser_list as $key => $value) {
+            if ((int)$value['scene_id'] == 0 ) {
+                unset($value['scene_id']);
+                $new_advertiser_list[] = $value;
+            }
+        }
+
+        return $new_advertiser_list;
+    }
+
+    /**
+     * [getAdvertiserMac 得到指定广告主设备]
+     * @return [type] [description]
+     */
+    public function getAdvertiserMacAction()
+    {
+        $uinfo = $_SESSION['uinfo'];
+        $comp_id = Helper::clean($this->getRequest()->getParam('comp_id',0));
+        if (empty($comp_id)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"请设置广告主id"));
+        }
+        // 验证该广告主是否是该账户所有。
+        $AdvertiserOwnership = $this->checkAdvertiserOwnership($comp_id);
+        if ($AdvertiserOwnership != $uinfo['comp_id']) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"广告主不存在"));
+        }
+        // 得到设备
+        $scenes = Helper::M('Scenes');
+        $data = $scenes->getAdvertiserMac($comp_id);
+        Helper::outJson(array('state'=>self::SUCCESS_STATE,'data'=>$data));
+    }
+
+    /**
+     * [checkAdvertiserOwnership 验证广告主的所有权]
+     * @param  [type] $comp_id [description]
+     * @return [type]          [description]
+     */
+    protected function checkAdvertiserOwnership($comp_id)
+    {
+        $scenes = Helper::M('Scenes');
+        $where = 'comp_id = '.$comp_id.' and comp_type = 1';
+        $rel = $scenes->getAdvertiserInfo($where);
+        return $rel['comp_pid'];
+    }
+
+    /**
+     * [checkSceneAction 验证是否能提交场景]
+     * @return [array] [表单数组]
+     */
+    protected function checkScene()
+    {
+        $scenes_info['scene_name']  = Helper::clean($this->getRequest()->getPost('scene_name '));
+        $scenes_info['comp_id']  = Helper::clean($this->getRequest()->getPost('comp_id'));
+        $scenes_info['mac_id_array']  = Helper::clean($this->getRequest()->getPost('mac_id_array'));
+        $scenes_info['stop_time ']  = Helper::clean($this->getRequest()->getPost('stop_time'));
+        $scenes_info['detection_radius ']  = Helper::clean($this->getRequest()->getPost('detection_radius'));
+        $scenes_info['email']  = Helper::clean($this->getRequest()->getPost('email'));
+        $scenes_info['business_start_time']  = Helper::clean($this->getRequest()->getPost('business_start_time'));
+        $scenes_info['business_end_time']  = Helper::clean($this->getRequest()->getPost('business_end_time'));
+        $scenes_info['area']  = Helper::clean($this->getRequest()->getPost('area'));
+        $scenes_info['floor_number']  = Helper::clean($this->getRequest()->getPost('floor_number'));
+        $scenes_info['longitude']  = Helper::clean($this->getRequest()->getPost('longitude'));
+        $scenes_info['latitude']  = Helper::clean($this->getRequest()->getPost('latitude'));
+        $scenes_info['service_start_time']  = Helper::clean($this->getRequest()->getPost('service_start_time'));
+        $scenes_info['service_end_time']  = Helper::clean($this->getRequest()->getPost('service_end_time'));
+        $scenes_info['term']  = Helper::clean($this->getRequest()->getPost('term'));
+        $scenes_info['scenes_type']  = Helper::clean($this->getRequest()->getPost('scenes_type'));
+        $scenes_info['is_auto_update']  = Helper::clean($this->getRequest()->getPost('is_auto_update',2));
+
+        // 验证场景信息
+        $this->checkScenesinfo($scenes_info);
+
+        // 得到所需金额
+        $amount = $this->getAmount($scenes_info['scenes_type'],$scenes_info['term']);
+
+        // 得到服务商可用金额
+        $usable_amount = $this->getServerAvailableAmount();
+
+        // 判断余额是否充足
+        $this->checkSufficientBalance($amount,$usable_amount);
+
+        return $scenes_info;
+
+    }
+
+    /**
+     * [checkSceneApiAction 验证是否能提交场景对外接口]
+     * @return [type] []
+     */
+    public function checkSceneApiAction()
+    {
+        $this->checkScene();
+        Helper::outJson(array('state'=>self::SUCCESS_STATE,'msg'=>''));
+    }
+
+
+    /**
+     * [sendShortMessageAction 发送短信]
+     * @return [type] [description]
+     */
+    public function sendShortMessageAction()
+    {
+        $code = $this->getRandomCode();
+        $mobile_phone = $this->getMobilePhone();
+        $content = '付款验证码：'.$code.'，您正支付人群画像服务费用，请在3分钟内填写验证码完成验证。';
+        $_SESSION['code'] = $code;
+        $result = BmDspApi::request('sms/send' , array('content' => $content ,'mobile_phone'=>$mobile_phone)); //发送短信验证码
+        if(empty($result) || isset($result['error'])){
+         Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>empty($result)?'短信发送异常，请稍后再试！':$result['error']));
+        }else{
+         Helper::outJson(array('state'=>self::SUCCESS_STATE,'msg'=> $result['msg'] , 'code' => $result['api_code']));
+        }
+    }
+
+
+    /**
+     * [paymentAction 支付接口]
+     * @return [type] [description]
+     */
+    public function paymentAction()
+    {
+
+        // 验证表单数据
+        //$scenes_info = $this->checkScene();
+        // 得到验证码
+        //$code = Helper::clean($this->getRequest()->getPost('code'));
+        // 验证验证码是否正确
+        //$this->checkCode($code);
+        $scenes_info['comp_id'] = 206090;
+        $scenes_info['scenes_type'] = 2;
+        $scenes_info['term'] = 1;
+        // 插入充值记录表
+        $uinfo = $_SESSION['uinfo'];
+        $scenes = Helper::M('Scenes');
+        $record_id = $scenes->generatingRechargeRecord($uinfo['comp_id'],$scenes_info['comp_id']);
+
+        // 得到所需金额
+        $amount = $this->getAmount($scenes_info['scenes_type'],$scenes_info['term']);
+        // 扣款
+        $result = $this->debit($uinfo['comp_id'],$record_id,$amount);
+        // 更新充值记录表
+        $record_rel = $scenes->updateRechargeRecord($result['rel_no'],$result['trade_no']);
+        if (empty($record_rel)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"插入充值记录失败！"));
+        }
+    }
+
+    /**
+     * [debit 扣款]
+     * @param [type] $comp_pid [服务商id]
+     * @param [type] $rel_no   [唯一编号]
+     * @param [type] $amount   [扣款金额单位分]
+     */
+    protected function debit($comp_pid,$rel_no,$amount)
+    {
+        // 支付
+        $payment_data = array(
+            'comp_id' => $comp_pid,
+            'rel_no'=>$rel_no,
+            'amount'=>$amount,
+            'type'=>13
+        );
+        $result = BmDspApi::request('fund/payment' , $payment_data);
+        if (!empty($result) && $result['api_code'] == 0 &&  $result['data']['status'] == 1) {
+            return $result['data'];
+        }else{
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"扣款失败"));
+        }
+    }
+
+    /**
+     * [getRandomCode 得到随机码]
+     * @return [type] [description]
+     */
+    protected function getRandomCode()
+    {
+         return rand(1000,9999);
+    }
+
+    /**
+     * [getMobilePhone 得到手机号码]
+     * @return [type] [description]
+     */
+    protected function getMobilePhone()
+    {
+        $uinfo = $_SESSION['uinfo'];
+        $scenes = Helper::M('Scenes');
+        $phone = $scenes->getMobilePhone($uinfo['comp_id']);
+        return $phone;
+    }
+
+
+    /**
+     * [checkSufficientBalance 判断余额是否足够]
+     * @param  [type] $amount        [所需金额]
+     * @param  [type] $usable_amount [可用余额]
+     * @return [type]                [description]
+     */
+    protected function checkSufficientBalance($amount,$usable_amount)
+    {
+        if ($amount>$usable_amount) {
+            Helper::outJson(array('state'=>self::NOT_ENOUGH,'msg'=>"余额不够！"));
+        }
+    }
+
+    /**
+     * [checkCode 验证验证码输入是否正确]
+     * @param  [type] $code [输入的验证码]
+     * @return [type]       [description]
+     */
+    protected function checkCode($code)
+    {
+        if (empty($_SESSION['code']) || !isset($_SESSION['code'])) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"短信session失效！"));
+        }
+        if ($_SESSION['code'] != $code) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"验证码输入错误！"));
+        }
+    }
+
+    /**
+     * [getAmount 得到所需金额]
+     * @param  [int] $scenes_type [场景类型]
+     * @param  [int] $term        [年限]
+     * @param  [bool] $cent        [是否转化为分]
+     * @return [type]              [description]
+     */
+    protected function getAmount($scenes_type,$term,$cent = true)
+    {
+        $amount = 0;
+        switch ($scenes_type) {
+            // 高级版
+            case 2:
+                $amount = $term*self::SENIOR;
+                break;
+        }
+        if ($cent) {
+            return $amount*100;
+        }else {
+            return $amount;
+        }
+    }
+
+    /**
+     * [getServerAvailableAmount 得到服务商可用金额]
+     * @return [type] [description]
+     */
+    protected function getServerAvailableAmount()
+    {
+        $uinfo = $_SESSION['uinfo'];
+        $scenes = Helper::M('Scenes');
+        $data = $scenes->getServerAvailableAmount($uinfo['comp_id']);
+
+        if (empty($data)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"账户不存在！"));
+        }
+
+        return $data['usable_amount'];
+
+    }
+
+    /**
+     * [checkScenesinfo 验证场景信息是否符合要求]
+     * @param  array  $scenesinfo [description]
+     * @return [type]             [void]
+     */
+    protected  function checkScenesinfo(array $scenes_info)
+    {
+        // 验证广告主名称
+        $this->checkSceneName($scenes_info['scene_name']);
+        // 验证广告主
+        $this->checkAdvertiser($scenes_info['comp_id']);
+
+        // 验证人群筛选条件
+        $this->checkScreeningConditions($scenes_info['detection_radius'],$scenes_info['stop_time']);
+
+        // 验证邮箱
+        $this->checkEmail($scenes_info['email']);
+
+        // 验证营业面积
+        $this->checkArea($scenes_info['area']);
+
+    }
+
+    /**
+     * [checkSceneName 验证场景名称]
+     * @param  [type] $scene_name [场景名称]
+     * @return [type]             [void]
+     */
+    protected function checkSceneName($scene_name)
+    {
+        // 必填
+        if ($scene_name === '' || $scene_name === false || $scene_name === null) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"请输入场景名称！"));
+        }
+        //最大长度为32个汉字
+        if (strlen($scene_name) > self::SCENE_NAME_LEN) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"场景名称最多32个汉字"));
+        }
+
+    }
+
+    /**
+     * [checkSceneName 验证广告主]
+     * @param  [type] $comp_id [广告主id]
+     * @return [type]             [void]
+     */
+    protected function checkAdvertiser($comp_id)
+    {
+        $uinfo = $_SESSION['uinfo'];
+        // 必填
+        if (empty($comp_id)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"请选择广告主！"));
+        }
+        // 验证该广告主是否是该账户所有。
+        $AdvertiserOwnership = $this->checkAdvertiserOwnership($comp_id);
+        if ($AdvertiserOwnership != $uinfo['comp_id']) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"广告主不存在"));
+        }
+
+        // 验证广告主是否已经存在场景
+        $this->checkAdvertiserScene($comp_id);
+
+    }
+
+    /**
+     * [checkAdvertiserScene 验证广告主是否存在场景]
+     * @param  [type] $comp_id [广告主id]
+     * @return [type]          [void]
+     */
+    protected function checkAdvertiserScene($comp_id)
+    {
+        $scenes = Helper::M('Scenes');
+        $rel = $scenes->getAdvertiserScene($comp_id);
+        if (!empty($rel)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"广告主已存在场景"));
+        }
+    }
+
+    /**
+     * [checkScreeningConditions 验证人群筛选条件]
+     * @param  [int] $detection_radius [探测半径]
+     * @param  [int] $stop_time        [停留标准]
+     * @return [type]                   [void]
+     */
+    protected function checkScreeningConditions($detection_radius,$stop_time)
+    {
+        // 必填
+        if (empty($detection_radius) || empty($stop_time)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"筛选条件不能为空！"));
+        }
+        if ( $detection_radius>self::MAX_DETECTION_RADIUS || $detection_radius<self::MIN_DETECTION_RADIUS) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"探测半径不符合要求！"));
+        }
+        if ( $stop_time>self::MAX_STOP_TIME || $stop_time<self::MIN_STOP_TIME) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"停留标准不符合要求！"));
+        }
+    }
+
+    /**
+     * [checkEmail 验证邮箱]
+     * @param  [string] $email [邮箱]
+     * @return [type]        [description]
+     */
+    protected function checkEmail($email)
+    {
+        // 必填
+        if (empty($email)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"请输入邮箱！"));
+        }
+
+        if (!preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/",$email)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"请输入正确格式的邮箱！"));
+        }
+    }
+
+    /**
+     * [checkArea 验证建筑面积]
+     * @param  [int] $area [面积]
+     * @return [type]       [description]
+     */
+    protected function checkArea($area)
+    {
+        if (!(is_numeric($area) && $area>0)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"建筑面积必须是大于0的数字"));
+        }
+
+    }
+
+
+
+}

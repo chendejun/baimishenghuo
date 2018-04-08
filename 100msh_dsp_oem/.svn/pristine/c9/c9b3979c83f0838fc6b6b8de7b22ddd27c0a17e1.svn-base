@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>微信推广</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <style>
+        .ad_nav {height: 41px;border-bottom: 1px solid #dfdfdf;padding-left: 38px;float: left; margin-right: 60px;}
+        .ad_nav .nav {width: 102px;float: left;height: 40px;line-height: 40px;text-align: center;background: #fff;cursor: pointer;}
+        .nav_active {border: 1px solid #dfdfdf;border-bottom: 1px solid #fff;color: #356bb7;}
+        .data_box{padding-bottom: 0;}
+        .data_box .bm-btn{margin-top: 2px;}
+        .table-option-btn {text-decoration: none;width: 60px;display: inline-block;}
+        .mod_pay{ padding: 20px; }
+        .mod_pay h3{text-align: center;line-height: 60px;font-size: 20px;margin: 0; }
+        .mod_pay .from-row label,.from-spec span{width: 100px;}
+        .mod_pay .from-row p{line-height: 30px;display: block;}
+        .mod_pay .from-row p.org{color: #f08519;font-size: 20px;}
+        .mod_pay .from-row,.mod_pay .from-spec{padding-left: 120px;}
+        .mod_pay .bm-btn{line-height: 38px; height: 38px; text-align: center; margin: 20px 10px;}
+        .mod_pay .cancel_btn{background: #ccc;}
+        .mod_pay .set_bottom{margin: 0; text-align: center;}
+        .layui-layer.layui-layer-page.layui-layer-demo.layer-anim-02 {width: 400px !important;/* height: 220px; */}
+        .layer_tip{padding: 10px;}
+        .layer_tip span{ color: #5b5a5a;  font-size: 16px; line-height: 30px;}
+        .layer_tip p{ color: #5b5a5a; }
+    </style>
+</head>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <i class="info_icon icon1"></i>
+            <span>
+                <a href="javascript:;">微信推广 </a> / 涨粉计划
+            </span>
+        </div>
+        <div class="data_box mt20 clearfix">
+            <div class="ad_nav fl">
+                <div class="nav nav_active" data-type="">全部</div>
+                <div class="nav" data-type="-1">审核失败</div>
+                <div class="nav" data-type="1">审核中</div>
+                <div class="nav" data-type="2">排队中</div>
+                <div class="nav" data-type="3">已投放</div>
+                <div class="nav" data-type="4">待支付</div>
+                <div class="nav" data-type="5">已完成</div>
+            </div>
+            <a class="big-btn bm-btn bm-btn-blue fl" href="javascript:;" onclick="goCreatePage();">新增计划</a>
+        </div>
+        <div class="box_table">
+            <table id="page_lists" class="base_table">
+                <thead>
+                    <tr>
+                        <th>公众号名称</th>
+                        <th>计划名称</th>
+                        <th>投放日期</th>
+                        <th>完成条件</th>
+                        <th>新增粉丝</th>
+                        <th>净增粉丝</th>
+                        <th>订单金额</th>
+                        <th>结算金额</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p class="noMsg"></p>
+            <!--列表分页-->
+            <div id="list_page" class="page"></div>
+        </div>
+        </div>
+    </div>
+    <script id="tempForm" type="text/html">
+        <div class="form mod_pay">
+            <h3>金额结算</h3>
+            <div class="from-row">
+                <label>计划名称</label>
+                <input type="text" class="bm-input wd300" value="<< d.plan_name >>" disabled="disabled">
+            </div>
+            <div class="from-row">
+                <label>公众号</label>
+                <input type="text" class="bm-input wd300" value="<< d.pn_name >>" disabled="disabled">
+            </div>
+            <div class="from-spec">
+                <span>结算类型</span>
+                <label>
+                    <input type="radio" name="pn_type" value="1" disabled="disabled" << (d.settlement_type==1?'checked ="checked"':'')>>/>净增粉丝
+                </label>
+                <label>
+                    <input type="radio" name="pn_type" value="2" disabled="disabled" << (d.settlement_type==2?'checked ="checked"':'')>>/>新增粉丝
+                </label>
+            </div>
+            <div class="from-row">
+                <label>投放日期</label>
+                <p><< d.start_date>> - << d.end_date>> </p>
+            </div>
+            <div class="from-row">
+                <label><< d.agent_type==1 ? '选择区域' :'代理公司'>></label>
+                <p><< d.agent_type==1 ? '选择区域' : d.agent_name>></p>
+            </div>
+            <div class="from-row">
+                <label>粉丝增加</label>
+                <<# if(d.tmp_amount_state==2){ >> <!-- 是否补差价状态 1是，2否 -->
+                <p class="org"><< d.settlement_type ==1 ?'净增':'新增' >><< d.followers >>位</p>
+                <<# } >>
+                <<# if(d.tmp_amount_state==1){ >>
+                <p class="org"><< d.settlement_type ==1 ?'净增':'新增' >><< d.followers >>位 -->
+                    << d.settlement_type ==1 ?'净增':'新增' >><< d.change_gaining_followers >>位
+                </p>
+                <<# } >>
+            </div>
+            <div class="from-row">
+                <label>金额</label>
+                <<# if(d.tmp_amount_state==2){ >> <!-- 是否补差价状态 1是，2否 -->
+                <p class="org">￥<< d.amount >></p>
+                <<# } >>
+                <<# if(d.tmp_amount_state==1){ >>
+                <p class="org">￥<< d.tmp_amount >></p>
+                <<# } >>
+            </div>
+            <div class="set_bottom mt20">
+                <a href="javascript:;" class="bm-btn cancel_btn" onclick="javascript:layer.closeAll();">取消</a>
+                <a href="javascript:;" class="bm-btn bm-btn-blue"  onclick="payFn(<< d.plan_id >>)">确认付款</a>
+            </div>
+        </div>
+    </script>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+        laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+        var aType = checkAgentType();
+        function SetNavStyle() {
+            $('.ad_nav').find('.nav').on({
+                click: function () {
+                    $(this).addClass('nav_active').siblings().removeClass('nav_active');
+                    navType = $('.nav_active').attr('data-type');
+                    getList(1,navType);
+                }
+            })
+        }
+        //初始化
+        function init(){
+            SetNavStyle();//菜单切换
+            getList();//列表
+        }
+        init();
+        //新增计划跳转
+        function goCreatePage(){
+            location.href='/v1.2/plan/createpage?agent_type=' + aType;
+        }
+
+        //获取投放计划数据
+        var limit = 10;
+        function getList(curr,status) {
+            var planStatus = status ? ('/plan_dsp_status/' + status) :'';
+            $.ajax({
+                type: "GET",
+                url: '/V1.2/plan/index/page/' + (curr || 1) + '/limit/' + limit +planStatus,
+                dataType: 'json',
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.totalcount, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        var status_tip = { '-1':'审核失败','1':'审核中','2':'排队中','3':'已投放','4':'待支付','5':'已完成'};
+        function render_table(data) {
+            var list_e = $('#page_lists tbody'), str = '', no_msg = $('.noMsg');
+            if (data.length == 0) {
+                list_e.html('');
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text('');
+            $.each(data, function (k, v) {
+                str += '<tr>';
+                str += '<td>' + v.pn_name + '</td>';
+                str += '<td>' + v.plan_name + '</td>';
+                str += '<td>' + v.start_date+' - '+ v.end_date + '</td>';
+                str += '<td>' + v.gaining_followers + '</td>';
+                str += '<td>' + v.new_add_followers + '</td>';
+                str += '<td>' + v.net_growth_followers + '</td>';
+                str += '<td>￥' + parseFloat(v.order_amount).toFixed(2)  + '</td>';
+                str += '<td>' + (v.settlement_amount =='未结算'? v.settlement_amount : '￥'+parseFloat(v.settlement_amount).toFixed(2)) + '</td>';
+                str += '<td>' + status_tip[v.plan_dsp_status] + (v.is_read!=0 ? '<em class="status_tip" onclick="getPlanCause(this,'+ v.plan_id +')"> ? </em>' :'') + '</td>';
+                str += '<td>';
+                if(v.plan_dsp_status =='-1' || (v.plan_dsp_status =='3' && v.tmp_amount_state==2)){
+                    str += '<span class="table-option-btn" onclick="editPlan('+ v.plan_id +')">修改</span>';
+                }else if(v.plan_dsp_status =='4' ||(v.plan_dsp_status =='3' && v.tmp_amount_state==1)){
+                    str += '<span class="table-option-btn pay_operate" _id="'+ v.plan_id +'">支付</span>';
+                }
+                /*str += '<span class="table-option-btn" onclick="viewInfo()">详情</span>';*/
+                if(v.plan_dsp_status =='2' || v.plan_dsp_status =='3'){
+                    str += '<span class="table-option-btn" onclick="stopPlan('+ v.plan_id +')">停止投放</span>';
+                }else if(v.plan_dsp_status =='-1'){
+                    str += '<span class="table-option-btn" onclick="cancelPlan('+ v.plan_id +')">取消投放</span>';
+                }else if(v.plan_dsp_status =='5'){
+                    str += '<span class="table-option-btn" onclick="renewPlan('+ v.plan_id +')">重新投放</span>';
+                }else{
+                    str +='-'
+                }
+                str += '</td>';
+                str += '</tr>';
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(totalcount, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象,jquery对象。
+                pages: Math.ceil(totalcount/limit), //总页数
+                skip: true, //是否开启跳页
+                skin: '#5877a4',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getList(obj.curr);
+                    }
+                }
+            });
+        }
+
+        //提示
+        function getPlanCause(th,id){
+            $.ajax({
+                type:'GET',
+                url:'/v1.2/Plan/getPlanStateMessage/plan_id/'+id,
+                dataType:'json',
+                success: function(rs){
+                    if (rs.state == 1) {
+                        var cause = rs.data.message ? rs.data.message :'暂无';
+                        var html = '<div class="layer_tip"><span>提示</span><p>'+ cause +'</p></div>';
+                        layer.tips(html, th, {
+                            skin: 'layui-layer-demo',
+                            tips: [3, '#eeeff3'],
+                            area: ['300px','130px'],
+                            time: 0,
+                            closeBtn:1
+                        });
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+        //支付
+        $('body').on('click','.pay_operate',function(){
+            var id = $(this).attr('_id'),
+                cacheDOM = $('#tempForm').html(),
+                infocacheDOM = payInfo(id);
+                console.log(infocacheDOM);
+                if(infocacheDOM==''){return;}
+                infocacheDOM.plan_id = id;
+            laytpl(cacheDOM).render(infocacheDOM, function (result) {//laytpl异步渲染调用
+                layer.open({
+                    type: 1,
+                    closeBtn:0,
+                    title:false,
+                    area: ['650px', '500px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        })
+        //支付详情
+        function payInfo(id){
+            var data ='';
+            $.ajax({
+                type:'GET',
+                url:'/v1.2/Plan/getPaymentInfoApi/plan_id/'+id,
+                dataType:'json',
+                async : false,
+                beforeSend:function(){
+                    tipTopHide("正在查询数据");
+                },
+                success: function(rs){
+                    tipTopHide();
+                    if(rs.state == 1){
+                        data = rs.data;
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+
+                }
+            });
+            return data;
+        }
+        //支付
+        function payFn(id){
+            $.ajax({
+                type:'POST',
+                url:'/v1.2/Plan/payment',
+                dataType:'json',
+                data:{'plan_id':id},
+                success: function(rs){
+                    if (rs.state == 1) {
+                        tipTopShow(rs.msg);
+                        getList();
+                        setTimeout("layer.closeAll()", 100);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                    setTimeout("layer.closeAll()", 100);
+                }
+            })
+        }
+        //修改
+        function editPlan(id){
+            location.href = '/v1.2/plan/editpage?agent_type='+aType+'&plan_id='+id;
+        }
+        //重新投放
+        function renewPlan(id){
+            location.href = '/v1.2/plan/createpage?&agent_type='+aType+'&plan_id='+id;
+        }
+        //停止投放
+        function stopPlan(id){
+            var html = '确认申请停止该计划？';
+            layer.confirm(html, {
+                title:'停止投放',
+                btn: ["确定","取消"] //按钮
+                }, function(){
+                    $.ajax({
+                        type:'POST',
+                        url:'/v1.2/Plan/stopPlan',
+                        dataType:'json',
+                        data:{'plan_id':id},
+                        success: function(rs){
+                            if (rs.state == 1) {
+                                tipTopShow(rs.msg);
+                                getList();
+                                setTimeout("layer.closeAll()", 100);
+                            } else {
+                                tipTopShow(rs.msg);
+                            }
+                        },
+                        error: function (rs) {
+                            tipTopShow("查询信息失败，请重试...");
+                            setTimeout("layer.closeAll()", 100);
+                        }
+                    })
+                }
+            );
+        }
+        //取消投放
+        function cancelPlan(id){
+            var html = '确认取消投放？';
+            layer.confirm(html, {
+                title:'取消投放',
+                btn: ["确定","取消"] //按钮
+                }, function(){
+                    $.ajax({
+                        type:'POST',
+                        url:'/v1.2/Plan/cancelPlan',
+                        dataType:'json',
+                        data:{'plan_id':id},
+                        success: function(rs){
+                            if (rs.state == 1) {
+                                tipTopShow(rs.msg);
+                                getList();
+                                setTimeout("layer.closeAll()", 100);
+                            } else {
+                                tipTopShow(rs.msg);
+                            }
+                        },
+                        error: function (rs) {
+                            tipTopShow("查询信息失败，请重试...");
+                            setTimeout("layer.closeAll()", 100);
+                        }
+                    })
+                }
+            );
+        }
+
+        //判断代理商类型
+        function checkAgentType(){
+            var aType ='';
+            $.ajax({
+                type: 'GET',
+                url: '/v1.2/Plan/checkAgentType',
+                dataType: 'json',
+                async: false,
+                success: function(rs){
+                    if(rs.state == 1){
+                        aType = rs.agent_type;
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+            return aType;
+        }
+
+    </script>
+</body>
+
+</html>

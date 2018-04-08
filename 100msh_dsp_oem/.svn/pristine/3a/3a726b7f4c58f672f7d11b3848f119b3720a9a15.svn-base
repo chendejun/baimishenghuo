@@ -1,0 +1,41 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class BhcreativeController extends BasicController {
+
+    /*
+     * 获取媒体列表
+     */
+  public function getAdSlotDataAction(){
+
+      $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+      $data['dealType'] = 1;
+      $data['creativeType'] = 1;//创意类型
+      $data['mediaType'] = 1;//媒体类型
+      $data['osType'] = 2;//系统类型
+      $data['trafficType'] = 1;
+      $data['platformType'] = 2;
+      $data['behaviorType'] = 1;
+      $bh = new BhDspApi();
+      $result = $bh->getAdSlotData($account_id,$data);
+      Helper::outJson($result);
+   }
+   /*
+    * 获取媒体列表对应的规格列表
+    */
+   public function getEstimateFlowAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $adxType = Helper::clean($this->getRequest()->getPost('adxType'));//媒体平台集合
+       $data['adxType'] =  $adxType;
+       $data['creativeType'] = 1;
+       $data['randomNumber'] = '0fb406832e6deb8f4175b3c13d9ba70f';
+       $bh = new BhDspApi();
+       $result = $bh->getEstimateFlow($account_id,$data);
+       Helper::outJson($result);
+   }
+}

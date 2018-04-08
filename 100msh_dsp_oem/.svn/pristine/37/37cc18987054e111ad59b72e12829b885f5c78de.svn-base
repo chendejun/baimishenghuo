@@ -1,0 +1,355 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/bhdelivery.css">
+    <style type="text/css">
+    	.media .m1 .item.choose:after{background-color: transparent;}
+    	.media .m1 .item:after{content: "";background-color: rgba(0,0,0,0.1); position: absolute;left: 0;right: 0;top: 0;bottom: 0;}
+    	.media .choose-buttons span{height:40px; cursor: pointer; color: #4c94f5; display: inline-block;padding: 0 10px;text-decoration:underline;}
+    	.app-list{margin-top: 30px;overflow: hidden;}
+    	.app-list .select{float: left;height:430px;border: 1px solid #E1E5EC;overflow-y: auto;}
+    	.app-list .arrow{float: left;width: 30px;height: 30px;border: 1px solid #E1E5EC;text-align: center;line-height: 30px;margin: 200px 10px 0 10px;}
+    	.app-list .select-left{width: 456px;}
+    	.app-list .select-right{width: 286px;}
+    	.app-list .title{height: 40px;line-height: 40px;padding-left: 20px;border-bottom: 1px solid #E1E5EC;background: #f5f9fc;}
+    	.app-list .select-left li{height: 40px;line-height: 40px;padding-left: 20px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;
+    		border-bottom:1px solid #E1E5EC ;}
+    	.app-list .tags li{float: left;height: 30px;padding: 0px 10px;line-height: 30px; background:#d9ecf5; text-align: center; color: #499dd2;margin: 10px;}
+    	.app-list .tags li .icon{display: inline-block;cursor: pointer;}
+    
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form layui-form">
+        <div class="step_bar">
+            <ul class="clearfix">
+                <li class="cur">
+                    <span class="step_icon icon1">1</span>
+                    <p>广告计划</p>
+                    <i class="line"></i>
+                </li>
+                <li class="cur">
+                    <span class="step_icon icon2">2</span>
+                    <p>投放人群</p>
+                    <i class="line"></i>
+                </li>
+                <li class="cur">
+                    <span class="step_icon icon3">3</span>
+                    <p>投放媒体</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon4">4</span>
+                    <p>广告创意</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon5">5</span>
+                    <p>排期和出价</p>
+                    <i class="line"></i>
+                </li>
+            </ul>
+        </div>
+        <div class="step_box step3">
+            <div class="from-row">
+                <label>广告行为：</label>
+                <input type="radio" name="ad_active" value="0" title="跳转网页" checked lay-filter="edition">
+                <input type="radio" name="ad_active" value="1" title="下载应用" lay-filter="edition">
+            </div>
+            <div class="from-row">
+                <label>创意形式：</label>
+                <input type="radio" name="ad_style" value="0" title="横幅" checked lay-filter="edition">
+                <input type="radio" name="ad_style" value="1" title="视频贴片" lay-filter="edition">
+                <input type="radio" name="ad_style" value="2" title="原生信息流" lay-filter="edition">
+                <input type="radio" name="ad_style" value="3" title="开屏" lay-filter="edition">
+            </div>
+            <div class="from-row">
+                <label>媒体选择：</label>
+                <input type="radio" name="user_media" value="0" title="全网自动选择" checked lay-filter='user_media'> 
+                <input type="radio" name="user_media" value="1" title="指定应用" lay-filter='user_media'>
+            </div>
+            <div class="from-row media">
+            	<div class="media_box m1">
+            		<div class="choose-buttons"><span class="allChoose">全选</span> <span class="noChoose">反选</span></div>
+                    <ul class="clearfix contain">
+               		
+               		</ul>
+                </div>
+                <div class="media_box m2" style="display: none;">
+                    <ul class="clearfix contain">
+                        
+                    </ul>
+                    
+                 	<div class="app-list clearfix">
+                 		<div class="select-left select">
+                 			<div class="select-contain">
+                 				<div class="title">可选项目</div>
+	                 			<ul class="apps">
+	                 				<!--<li id='1'><input type="checkbox" value="1" title="发呆1" lay-skin="primary" lay-filter='app'> </li>-->
+	                 			
+	                 			</ul>
+                 			</div>
+                 		</div>
+                 		<div class="arrow">
+                 			<i class="layui-icon">&#xe65b;</i>   
+                 		</div>
+                 		<div class="select-right select">
+                 			<div class="select-contain">
+                 				<div class="title">已选项目</div>
+	                 			<ul class="tags">
+	                 				
+	                 			</ul>
+                 			</div>
+                 		</div>
+                 	</div>
+                </div>
+                
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="preStepPage(3)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="nextStepPage(3)">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/underscore-min.js"></script>
+    <script type="text/javascript">
+//  	已选择的app
+    	var hasChooseApp = [];
+    	
+//  	已经选择的媒体id
+		var MediaID = [];
+		
+//		全部媒体ID
+        var allMediaID = [];
+		
+    	
+    	function preStepPage(v){
+            var v = parseInt(v)-1
+            location.href ='./create'+v+'.html';
+	        }
+        function nextStepPage(v){
+            var v = parseInt(v)+1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+	            var form = layui.form,
+	                layer = layui.layer,
+	                layedit = layui.layedit,
+	                element = layui.element,
+	                laydate = layui.laydate;
+	                form.on('radio(user_media)', function(data){
+					  if(data.value == 0){
+					  	$('.media .m1').show(200);
+					  	$('.media .m2').hide(100);
+					  	getAdxs(0);
+					  }else if(data.value == 1){
+					  	$('.media .m2').show(200);
+					  	$('.media .m1').hide(100);
+					  	getAdxs(1);
+					  }
+					});  
+					
+					 form.on('checkbox(app)', function(data){
+					 	var app = {};
+						 	app.name = data.elem.title; 
+						 	app.value = data.value;
+					 	if(data.elem.checked){
+						 	hasChooseApp.push(app);
+							renderAppTag(hasChooseApp[hasChooseApp.length-1]);
+							form.render();
+					 	}else{
+//					 		删除当前的app
+					 		hasChooseApp = _.filter(hasChooseApp, function(item){ return item.value !== app.value  }); 
+					 		
+					 		$('#'+app.name).remove();
+					 		form.render();
+					 		console.log(hasChooseApp)
+					 		
+					 	}
+					 })
+					
+	        })
+        
+        
+    	 $(function() {
+    	 	
+    	 	$('body').on('click','.media .m2 .contain li',function(){
+    	 		$(this).addClass('on').siblings().removeClass('on')
+    	 	})
+    	 	
+//			全选媒体
+			$('.choose-buttons .allChoose').click(function(){
+				$('.media .m1 .contain li').each(function(){
+					$(this).addClass('choose');
+				})
+				MediaID = allMediaID;
+			})
+			
+//	                    反选媒体
+	       
+	       $('.choose-buttons .noChoose').click(function(){
+				$('.media .m1 .contain li').each(function(){
+					$(this).removeClass('choose');
+				})
+				MediaID = [];
+			})
+        });
+        
+        getAdxs(0);
+        
+//     	获取对应选择的媒体列表
+		function getAdxs(type){
+			var mediaType = type;
+			$.ajax({
+                type: "POST",
+                url:'/v1.2/Bhdelivery/getAdxs',
+                dataType:"json",
+                data : {
+                	'osType_o':0,
+                	'osType_i':0,
+                	'behavior_type_t':0,
+                	'behavior_type_x':0,
+                	'action_type_h':0,
+                	'action_type_s':0,
+                	'action_type_y':0,
+					'action_type_k':0,
+                	'source_type_q':0,
+                	'source_type_z':0
+                },
+                success: function(rs){
+                    if(rs.api_code == 1){
+//                    获取所有的媒体id:adx_Id
+					 MediaID = _.map(rs.data,function(item){
+					 	return item.adx_Id
+					 })
+					 allMediaID = MediaID;
+					 renderMedia_box(rs.data,mediaType);
+					
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(data){
+                    tipTopShow("查询失败，请重试...");
+                }
+            });
+		}
+		
+//		获取媒体下面的app列表
+		function getApp(id){
+			$.ajax({
+                type: "POST",
+                url:'/v1.2/Bhdelivery/getApp',
+                dataType:"json",
+                data : {
+                	'adx_Id':id
+                },
+                success: function(rs){
+                    if(rs.api_code == 1){
+					 renderAppList(rs.data);
+					
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(data){
+                    tipTopShow("查询失败，请重试...");
+                }
+            });
+		}
+		
+	
+		function renderMedia_box(data,type){
+//			0为全网,1为指定
+			var contentA = $('.media .m1 .contain');
+			var contentB = $('.media .m2 .contain');
+			var mediaType = type;
+			var str = '';
+			if(mediaType == 0){
+				$.each(data, function (k, v) {
+					str += '<li class="item choose" onclick="hasChooseMedia(this,'+v.adx_Id+')">';
+					str += '<img src="/public/'+v.logo+' ">';
+					str += '</li>';
+				})
+				contentA.html(str);
+			}else{
+				$.each(data, function (k, v) {
+					str += '<li class="item" onclick="getApp('+v.adx_Id+')">';
+					str += '<img src="/public/'+v.logo+' ">';
+					str += '</li>';
+				})
+				contentB.html(str)
+				$('.media .m2 .contain li:first-child').addClass('on')
+			}
+		}
+		
+		function renderAppList(data){
+			var content =$('.select-left .apps')
+			var str = '';
+			$.each(data, function (k, v) {
+					str += '<li id='+v.aid+'>'
+					str += "<input type='checkbox' value="+v.aid+' title='+v.name+' lay-skin="primary" lay-filter="app">'
+					str += '<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>'+v.name+'</span><i class="layui-icon"></i></div>'
+					str += '</li>'
+				})
+			content.html(str);
+		}
+	
+		function renderAppTag(data){
+			
+			var content = $('.select-right .tags');
+			var str = '';
+			str += '<li class="col" id="'+data.name+'">';
+			str += '<span>'+data.name+'</span>';
+			str += '<span class="icon" onclick="deleApp(this,'+data.value+')"><i class="layui-icon">&#x1006;</i></span>';
+			str += '</li>';
+			content.append(str);
+		}
+		
+		function hasChooseMedia(obj,id){
+			//删除不要的媒体ID
+			var id = String(id);
+			$(obj).toggleClass('choose');
+			if(!$(obj).hasClass('choose')){
+				MediaID = _.filter(MediaID,function(item){
+					return item != id
+				})
+			}else{
+				MediaID.push(id);
+			}
+			
+		}
+		
+		function deleApp(obj,id){
+			$(obj).parent().remove();
+			$('#'+id).children().removeClass('layui-form-checked');
+			$('#'+id).find('input[type=checkbox]').attr('checked',false);
+		}
+		
+		
+		
+		
+		
+       
+        
+        
+        
+   
+        
+       
+    </script>
+</body>
+</html>

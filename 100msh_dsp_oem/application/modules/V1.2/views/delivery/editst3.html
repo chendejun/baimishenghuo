@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改投放</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <style type="text/css">
+        .form{background-color: #FFF;padding:20px;}
+        .form .from-row{padding-left: 160px;margin-top: 20px;min-height: 40px;}
+        .form .from-row label{font-weight: normal; color: #333333;font-family: "微软雅黑";line-height: 40px;width: 150px;}
+        .form .from-row .bm-input{height: 40px;line-height: 40px;}
+        .form .from-row .bm-select{height: 40px;line-height: 40px;}
+        .wd300{width: 300px;}
+        .input-tip{color: #999999;margin-left: 10px;}
+        .a-option{color: #356bb7;text-decoration: underline;}
+        .form .from-row .c-label{position: static;display: inline-block;width: 100px;text-align: left;}
+        .up-btn{width: 150px;height: 42px;line-height: 42px;color: #FFF;display: inline-block;background-color: #ec6941;text-align: center;border-radius: 2px;position: relative;}
+        .up-btn.up-add-btn{padding-left: 18px;width: 132px;}
+        .up-btn .up-icon{font-size: 24px;font-weight: bold;position: absolute;left: 50px;top: -2px;}
+        .commit-box{padding:20px;text-align: center;margin-top: 50px;}
+        .commit-box .bm-btn{width: 200px;height: 42px;line-height: 42px;}
+        .p-load-more{width: 100%;display: block;text-align: center;color: #356bb7;height: 45px;line-height: 45px;}
+        .user_list{position: absolute;display: block;height: 200px;width:300px;z-index: 10;background: #fff;overflow-y: scroll;border: 1px solid #dddddd;margin: -1px;}
+        .user_list ul{padding: 10px;}
+        .user_list ul li{line-height: 30px; cursor: pointer;}
+        .tip_span{display: none;}
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/delivery/index">< 返回Wi-Fi广告</a></span>
+    </div>
+    <form id="putForm" class="form mt20">
+        <div class="flow_steps">
+            <ul class="clearfix">
+                <li>1. 广告计划</li>
+                <li class="current_pre">2. 人群和素材</li>
+                <li class="current last">3. 排期和出价</li>
+            </ul>
+        </div>
+        <div class="from-row">
+            <label>投放类型：</label>
+            <div class="">
+                <label for="fasttype" class="c-label"><input type="radio" id="fasttype" name="adtype" value="1" checked="checked"/>&nbsp;&nbsp;竞价投放</label>
+                <label for="standardtype" class="c-label"><input type="radio" id="standardtype" name="adtype" value="2" />&nbsp;&nbsp;排期投放</label>
+                <em class="status_tip" data="竞价投放和排期投放的区别<br/>1、竞价投放：根据价高者获得投放机会。<br/>2、排期投放：根据提交申请的时间前后排期投放，可选择指定的开始日期起，由系统自动根据当前投放情况进行排期投放。<br/>3、排期开始日期和结束日期在当前日期的2-31天间。即排期投放的广告必须提前2天申请，且结束日期不能超过31天。">？</em>
+            </div>
+        </div>
+        <div class="from-row">
+            <label>出价方式：</label>
+            <select id="way" class="bm-select wd300">
+                <option value="1" _title="CPM每千人次曝光1元，加价0.01元起" _cost='1'>CPM</option>
+                <option value="2" _title="CPC每次点击计价0.15元，加价0.01元起" _cost='0.15'>CPC</option>
+            </select>
+        </div>
+        <div class="from-row tip_row">
+            <label>底价：</label>
+            <p class="input-tip" id="way_tip" style="line-height: 40px;">CPM每千人次曝光1元，加价0.01元起<p>
+        </div>
+        <div class="from-row">
+            <label>出价：</label>
+            <input type="text" id="charge" class="bm-input wd300" value="" placeholder="￥" />
+            <span class="input-tip tip_span">排期广告的出价为固定价格</span>
+        </div>
+        <div class="from-row">
+            <label>投放日期：</label>
+            <input type="text" id="sd_text" class="bm-input Wdate" value="" placeholder="开始日期" />
+            &nbsp;&nbsp;至&nbsp;&nbsp;
+            <input type="text" id="ed_text" class="bm-input Wdate" value="" placeholder="结束日期" />
+        </div>
+        <div class="from-row">
+            <label>投放时间：</label>
+            <div class="">
+                <label for="allTime" class="c-label"><input type="radio" id="allTime" name="chioceTime" value="0" checked="checked"/>&nbsp;&nbsp;全时段</label>
+                <label for="customTime" class="c-label"><input type="radio" id="customTime" name="chioceTime" value="1" />&nbsp;&nbsp;自定义时间</label>
+                <span style="display: none;" id="customTimeBox">
+                    <select id="timeAear1" class="bm-select" style="width: 80px;"></select>
+                    <select id="timeAear2" class="bm-select" style="width: 80px;"></select>
+                </span>
+            </div>
+        </div>
+        <div class="commit-box">
+            <button type="button" class="bm-btn bm-btn-white" onclick="preStep(2)">上一步</button>
+            <button type="button" class="commit-btn bm-btn bm-btn-blue" onclick="commit(2)">确定投放</button>
+        </div>
+    </form>
+    </div>
+    <script type="text/javascript">
+        var pageType = '3',addType = false;
+    </script>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="/public/js/delivery.js"></script>
+</body>
+</html>

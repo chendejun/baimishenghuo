@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-操作员管理</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laytpl/laytpl.js"></script>
+    <style>
+        .status_tip {text-align: center;line-height: 16px;font-weight: 900;}
+    </style>
+</head>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 我的账户</span>
+        </div>
+        <div class="percent_box">
+            <div class="nav_box">
+                <a href="/v1.2/account/index">账户信息</a>
+                <a href="/v1.2/account/rechargelist">充值记录</a>
+                <a href="/v1.2/account/invoice">发票开具</a>
+                <a href="javascrip:;" class="cur">操作员管理</a>
+            </div>
+            <div class="box_table table_style manage_box">
+            	<div class="add_opt">
+                	<a href="javascrip:;" class="bm-btn bm-btn-blue" onclick="addperatorFn()">新建操作员</a>
+            	</div>
+                <div class="search_box">
+                	<select class="bm-select" id="manage_selt">
+                		{{foreach from=$user_group  key=key item=val}}
+                			<option value="{{$key}}">{{$val}}</option>
+						{{/foreach}}
+                	</select>
+                    <input type="text" class="bm-input" name="staff_name" placeholder="操作员搜索"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="getUserList()">搜索</a>
+                </div>
+                <table id="manage_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>操作员账号</th>
+                            <th>操作员名称</th>
+                            <th>员工身份</th>
+                            <th>创建日期</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+	var limit = 10,
+		page = 1;
+	function getUserList(page){
+		var user_group = $('#manage_selt').val(),
+			staff_name = $('input[name="staff_name"]').val();
+		var postData = {'staff_name':staff_name,'user_group':user_group,'page':page?page:'1','limit':limit};
+		$.ajax({
+	        type: "POST",
+	        dataType: "json",
+	        url: "/index/userlist",
+	        data: postData,
+	        success: function(rs){
+	            if(rs.state==1){
+	                var data = rs.data;
+	                render_table(data.pages, data.list);
+	                renderPage(data.pages, page);
+	            }else{
+	              tipTopShow(rs.msg);
+	            }
+	        },
+	        error: function(r){
+                tipTopShow("查询信息失败，请重试...");    //显示提示框
+	        }
+	    });
+	}
+	getUserList();
+	//渲染表格数据
+    function render_table(pages,data){
+        var list_e = $("#manage_list tbody"),str="",no_msg = $(".noMsg"),
+        	userGroup ={'2':'财务组','3':'投放组','4':'管理组'},
+        	statusTip ={'0':'停用','1':'正常'};
+        if(pages == 0){
+            list_e.html("");
+            no_msg.text("暂无记录");
+            return ;
+        }
+        no_msg.text("");
+        $.each(data,function(k,v){
+            str +='<tr>',
+            str +='<td>'+ v.user_name +'</td>';
+            str +='<td>'+ v.staff_name +'</td>';
+            str +='<td>'+ userGroup[v.user_group] +'</td>';
+            str +='<td>'+ v.add_time +'</td>';
+            str +='<td>'+ statusTip[v.status] +'</td>';
+            str +='<td><span class="table-option-btn" onclick="editFn('+v.staff_id+','+v.user_group+','+v.status+')">设置</span></td>';
+            str +='</tr>';
+        });
+        list_e.html(str);
+    }
+	//分页
+    function renderPage(pages,curr){
+        //显示分页
+        laypage({
+            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+            pages: pages, //通过后台拿到的总页数
+            //skip: true, //是否开启跳页
+            skin: '#4c94f5',
+            prev: '<em class="layui-icon"></em>',
+            next: '<em class="layui-icon"></em>',
+            curr: curr || 1, //当前页
+            jump: function(obj, first){ //触发分页后的回调
+                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                    getUserList(obj.curr);
+                }
+            }
+        });
+    }
+    //新建操作员
+    function addperatorFn(){
+        var cacheDOM = '';
+        var url = '/index/addperator';
+        cacheDOM = getshopHTML(url);
+        if (cacheDOM == '') { return; }
+        laytpl(cacheDOM).render({}, function (result) { //laytpl异步渲染调用
+            layer.open({
+                type: 1,
+                title: '',
+                closeBtn:0,
+                area: ['820px', '500px'],
+                shadeClose: false, //点击遮罩关闭
+                content: result
+            });
+        });
+    }
+    //操作
+    function editFn(id,group,status){
+    	var cacheDOM = '';
+        var url = '/index/editperator?staff_id='+id;
+        cacheDOM = getshopHTML(url);
+        if (cacheDOM == '') { return; }
+        laytpl(cacheDOM).render({}, function (result) { //laytpl异步渲染调用
+            layer.open({
+                type: 1,
+                title: '',
+                closeBtn:0,
+                area: ['820px', '500px'],
+                shadeClose: false, //点击遮罩关闭
+                content: result
+            });
+        });
+        $('input[name="edit_perator_group"][value="'+group+'"]').click();
+        if(status==0){
+            $('#mov_name').show();
+            $('#mov_select').hide();
+        }else{
+            $('#mov_name').hide();
+            $('#mov_select').show();
+        }
+        $('input[name="perator_status"][value="'+status+'"]').click();
+    }
+    //重置密码
+    function rePswFn(t,id){
+        var data = $(t).attr('_data');
+        if(data==1){
+            tipTopShow('已重置为默认密码');
+            return false;
+        }
+        var postData ={'trun_pwd':1,'staff_id':id};
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/index/editPerator",
+            data: postData,
+            success: function(rs){
+                if(rs.state==1){
+                    $(t).attr('_data',1);
+                    $('#rePsw_tip').html('已重置为默认密码');
+                    tipTopShow(rs.msg);
+                }else{
+                  tipTopShow(rs.msg);
+                }
+            },
+            error: function(r){
+                tipTopShow("查询信息失败，请重试...");    //显示提示框
+            }
+        });
+    }
+    //新增操作员
+    function addPeratorPost(){
+        var mobile = $('input[name="mobile"]').val(),
+            staff_name = $('input[name="perator_name"]').val(),
+            user_group = $('input[name="perator_group"]:checked').val();
+        if(!mobile){
+            tipTopShow('请输入操作员账号！');
+            return false;
+        }
+        if(!checkTel(mobile)){
+            tipTopShow('操作员账号必须为手机号！');
+            return false;
+        }
+        if(!staff_name){
+            tipTopShow('请输入操作员名字！');
+            return false;
+        }
+        if(staff_name.length>10){
+            tipTopShow('操作员名称不超过10个汉字！');
+            return false;
+        }
+        if(!user_group){
+            tipTopShow('请选择员工身份！');
+            return false;
+        }
+        var postData ={'mobile':mobile,'staff_name':staff_name,'user_group':user_group};
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/index/addPerator",
+            data: postData,
+            success: function(rs){
+                if(rs.state==1){
+                    tipTopShow(rs.msg);
+                    getUserList();
+                    setTimeout("layer.closeAll()", 100);
+                }else{
+                  tipTopShow(rs.msg);
+                }
+            },
+            error: function(r){
+                tipTopShow("查询信息失败，请重试...");    //显示提示框
+                setTimeout("layer.closeAll()", 100);
+            }
+        });
+    }
+    //修改操作员
+    function editPeratorPost(id){
+        var staff_name = $('input[name="edit_perator_name"]').val(),
+            user_group = $('input[name="edit_perator_group"]:checked').val(),
+            status = $('input[name="perator_status"]:checked').val(),
+            move_staff_id = $('#mov_select').val();
+        if(!staff_name){
+            tipTopShow('请输入操作员名字！');
+            return false;
+        }
+        if(staff_name.length>10){
+            tipTopShow('操作员名称不超过10个汉字！');
+            return false;
+        }
+        if(!user_group){
+            tipTopShow('请选择员工身份！');
+            return false;
+        }
+        if(status==0 && !move_staff_id){
+            tipTopShow('请选择新操作员！');
+            return false;
+        }
+        var postData ={'staff_id':id,'staff_name':staff_name,'user_group':user_group,'status':status,'move_staff_id':move_staff_id};
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/index/editPerator",
+            data: postData,
+            success: function(rs){
+                if(rs.state==1){
+                    tipTopShow(rs.msg);
+                    getUserList();
+                    setTimeout("layer.closeAll()", 100);
+                }else{
+                  tipTopShow(rs.msg);
+                }
+            },
+            error: function(r){
+                tipTopShow("查询信息失败，请重试...");    //显示提示框
+                setTimeout("layer.closeAll()", 100);
+            }
+        });
+    }
+
+    $('body').on('click', '.regType', function () {
+        var val = $(this).val();
+        $(this).siblings('.regicon').css('background-position', "0 -31px");
+        $(this).parent().parent().siblings().find('.regicon').css('background-position', "0 0");
+        $('.regType_tip p').hide();
+        $('.rgTip'+val).show();
+    })
+    $('body').on('click', '.status_inp', function () {
+        var val = $(this).val();
+        $(this).siblings('.regicon').css('background-position', "0 -31px");
+        $(this).parent().parent().siblings().find('.regicon').css('background-position', "0 0");
+        if(val==0){
+            $('.move_desc').show();
+        }else{
+            $('.move_desc').hide();
+        }
+    })
+
+</script>
+</html>

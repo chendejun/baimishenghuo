@@ -1,0 +1,55 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/27
+ * Time: 18:46
+ */
+Class Bhdelivery extends  Model{
+
+	/**
+	 * @author	cdj
+	 * @desc	获取广告主列表
+	 * @param array() $data
+	 */
+    public function getcamp($comp_id){
+        $data =  $this->db->bh->query('SELECT *  FROM bh_delivery_campaign WHERE comp_id= '.$comp_id);
+        return $data;
+    }
+    /*
+     * 创建广告计划
+     */
+    public function addcamp($data){
+        return $this->db->bh->table( "bh_delivery_campaign" )->data( $data )->insert(  );
+    }
+
+    /*
+     * 获取人群定向列表
+     */
+    public function getCrowdlist($comp_pid)
+    {
+        $data = $this->db->dsp->query("select crowd_id,crowd_name from dsp_crowd_info WHERE  comp_pid=" . $comp_pid . " and audit_status=3 and crowd_type!=2");
+        return $data;
+    }
+    /*
+     * 获取条件下规格列表
+     */
+    public function getAdxs($where){
+        if($where){
+            $data =  $this->db->bh->query('SELECT *  FROM bh_adx_size WHERE '.$where);
+        }else{
+            $data =  $this->db->bh->query('SELECT *  FROM bh_adx_size ');
+        }
+
+        return $data;
+    }
+  /*
+   * 获取媒体列表
+   */
+  public function getAdxlist($lists){
+      $data =  $this->db->bh->query("SELECT *  FROM bh_adx_size WHERE adx_Id in $lists" );
+      return $data;
+  }
+
+
+}

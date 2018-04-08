@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>广告管理-素材库-新增素材</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+</head>
+<style>
+    .material_table span{display: inline-block;width: 80px;text-align: right;height: 30px;line-height: 30px;margin-right: 20px;}
+    #label_list{width: 90%}
+    #label_list li{float: left;cursor: pointer;height: 30px;line-height: 30px;padding: 0 32px;color: #666;border: 1px solid #ddd;margin: 4px 20px 4px 0;;position: relative;}
+    #label_list li:hover{color: #3c61af;border: 1px solid #3c61af;background-color: #d8dfef;}
+    #label_list li.cur{color: #3c61af;border: 1px solid #3c61af;}
+    #label_list li.add i{display: none;background: url(/public/img/close_icon.png) center no-repeat;width: 9px;height: 9px;position: absolute;top:5px;right: 5px;}
+    #label_add{color: #666;border: 1px solid #ddd;width: 44px;height: 32px;line-height: 32px;background-color: #fff;font-size: 22px;margin: 4px 20px 4px 0;}
+    .add_label_box{display: none;margin-top: 4px;}
+    #add_label_text{width: 78px;border: 1px solid #3c61af;border-radius: 0;}
+    #add_label_btn{background-color: #3c61af;border: 1px solid #3c61af;height: 32px;padding: 0 10px;color: #fff}
+    .material_table>label{height:32px;display:inline-block;line-height:32px;margin-right:16px;cursor: pointer;}
+    .material_table input[type="text"]{height: 30px;width: 278px;border:1px solid #ddd;border-radius: 4px;padding: 0 10px;}
+    .material_table>label input[type="radio"]{width:16px;height:16px;position:relative;top:3px;margin-right:8px;}
+    #material_position ul img{padding: 30px 100px;}
+    .file_input{width:260px;height:160px;position:relative;margin:0 15px;cursor: pointer;}
+    .file_input>img{width:260px;height:160px;position:absolute;border-radius: 4px;}
+    .file_input input{width:260px!important;height:160px!important;position:absolute;padding:0!important;box-sizing: border-box;top:0;}
+    .file_input input[type="file"]{opacity: 0;cursor: pointer;}
+    .file_text{text-align: center;font-size: 12px;color: #999;padding-top: 45px;}
+    .file_text b{margin: 10px 0;display: inline-block}
+    .more_img{position: relative;}
+    .more_img i,.table td i{background: url(/public/img/moreimg_icon.png) center no-repeat;width: 22px;height: 22px;display:block;position: absolute;top:12px;right:12px;}
+    .table td i{top:7px;}
+    .submit_box{margin: 50px 0 0 100px;}
+    .submit_box button{width: 150px;height: 40px;line-height: 40px;}
+    #del_btn{background-color: #fff;color: #999;border:1px solid #ddd;}
+    .layui-layer-content{height: auto!important;}
+    .layui-layer-btn-c{margin-top: 20px;}
+    .layui-layer-btn a{width: 150px;height: 40px!important;line-height: 40px!important;margin: 0!important;background-color: #5877a4!important;;}
+    .table {border:solid #ddd 1px;}
+    .table  th {border-bottom:solid #ddd 1px;background-color:#e1e1e1;color:#000;font-weight:400}
+    .table tr:hover {background-color:#f2f2f8}
+    .table tbody td,.table th {padding:10px;text-align:center;font-size:14px}
+    .table tbody td {border-right:solid #ddd 1px;border-bottom:solid #ddd 1px;word-wrap:break-word;word-break:break-all;position: relative}
+    .table td:nth-child(3){padding-right:46px} 
+    .table label{display: inline-block;width: 100%;cursor: pointer;} 
+    .table input[type="radio"]{width: 16px;height: 16px;position: relative;top:2px;cursor: pointer;}
+    #adv_ul{margin: 30px -14px 0;}
+    .header_nav {padding: 10px 0; display: none;}
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="header_nav clearfix">
+            <a href="javascript:;'" class="bm-btn bm-btn-blue" id="back_btn">&lt;&lt;返回</a>
+        </div>
+        <div class="title_box">
+            <i class="info_icon icon1"></i>
+            <span>
+                <a href="">广告管理</a> /
+                <a href="">素材库</a> / 新增素材
+            </span>
+        </div>
+        <div class="box_table mt20">
+            <div class="material_table clearfix mb10">
+                <span class="fl">标签：</span>
+                <ul id="label_list" class="fl clearfix">
+                    <li class="cur hide">平常</li>
+                    <!-- <li>周末</li>
+                    <li>假期</li> -->
+                    <button id="label_add" class="fl">+</button>
+                    <div class="add_label_box fl clearfix">
+                        <input type="text" name="" id="add_label_text" class="fl" placeholder="新标签名称">
+                        <input type="button" value="保存" id="add_label_btn" class="fl">
+                    </div>  
+                </ul>
+            </div>
+            <div class="material_table mb10">
+                <span class="fl">名称：</span>
+                <input type="text" name="" id="material_name">
+            </div>
+            <div class="material_table mb10">
+                <span class="fl">跳转地址：</span>
+                <input type="text" name="" id="material_url" placeholder="http://">
+            </div>
+            <div class="material_table mb10" id="material_position">
+                <span class="fl">版位分类：</span>
+                <!-- <label><input name="material_position" type="radio" value="1" status = '1' checked/>移动banner类</label>
+                <label><input name="material_position" type="radio" value="2" status = '2'/>移动全屏类</label>
+                <label><input name="material_position" type="radio" value="3" status = '3'/>移动插件类</label>
+                <label><input name="material_position" type="radio" value="4" status = '4'/>PC广告类</label>   -->
+                <ul>
+                    <li><img src="/public/img/banner_bg.png" alt="移动banner类"></li>
+                    <li class="hide"><img src="/public/img/fullscreen_bg.png" alt="移动全屏类"></li>
+                    <li class="hide"><img src="/public/img/insertscreen_bg.png" alt="移动插件类"></li>
+                    <li class="hide"><img src="/public/img/pc_bg.png" alt="PC广告类"></li>
+                </ul>
+            </div>
+            <div class="material_table clearfix">
+                <span class="fl">广告素材：</span>
+                <div class="fl">
+                    <p style="margin-top: 5px;">选择要上传的格式</p>
+                    <table id="adv_table" class="table">
+                        <!-- <tr>
+                            <td><label><input name="table_r" type="radio" value="1"/></label></td>
+                            <td>600*300</td>
+                            <td>支持 jpg\png 格式，小于100KB，多图 <i></i></td>
+                        </tr> -->
+                    </table>
+                    <ul id="adv_ul" class="fl clearfix">
+                        <!-- <li class="file_input fl more_img">
+                            <i></i>
+                            <img id="preview_c"/>
+                            <div class="file_text">          
+                                素材大小：640*120  <br>
+                                <b>点击上传</b>  <br>
+                                (本版位分类为多素材类型
+                                JPG，小于400KB)
+                            </div>
+                            <input type="file" name="file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'preview_c')">
+                        </li> -->
+                    </ul>
+            </div>
+            </div>
+            <div class="submit_box mt20">
+                <button type="button" class="bm-btn bm-btn-blue mr20" id="add_btn" onclick="submit()">确定保存</button> 
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+        var paramGroupId = getUrlParams('groupId') ? getUrlParams('groupId'):'',//url参数来源于腾讯广告投放素材新增
+            paramSizeId =  getUrlParams('sizeId') ? getUrlParams('sizeId') :'',
+            backUrl='';
+        if(paramGroupId){
+            $('.header_nav').show();
+            backUrl = "/v1.2/gdtdelivery/create3";
+        }
+        $('#back_btn').click(function(){
+            location.href = backUrl;
+        });
+
+
+        $('#label_list').on('click','li',function(){
+            $(this).addClass('cur').siblings().removeClass('cur');
+        })
+        .on('click','i',function(){
+            var _that = $(this).parent('.add'); 
+            delTags(_that); 
+        })
+        .on("mouseover mouseout",'li',function(event){
+            if(event.type == "mouseover"){
+                $(this).children('i').css('display','inline-block');
+            }else if(event.type == "mouseout"){
+                $(this).children('i').css('display','none');
+            }
+        });
+
+
+        $('#label_add').on('click',function(){
+            var label_len = $('#label_list').find('.add').length;
+            if(label_len < 15){
+                $('#add_label_text').val('');
+                $(".add_label_box").show();
+            }else{
+                tipTopShow('最多添加15个标签');
+            }
+        });
+
+        //添加标签
+        $('#add_label_btn').on('click',function(){
+            var new_label = $('#add_label_text').val();
+            if($.trim(new_label)){            
+                $.ajax({
+                    type: "POST",
+                    url: '/v1.2/materiald/addTags',
+                    data:{'tag_name':new_label},
+                    dataType: 'json',
+                    success: function (rs) {
+                        getTags();
+                        $('#add_label_text').val('');
+                        $('.add_label_box').hide();
+                    },
+                    error: function (rs) {
+                        tipTopShow("查询信息失败，请重试...");
+                    }
+                });
+            }else{
+                tipTopShow('请输入新标签名称');
+            }
+        });
+
+        //获取标签
+        function getTags(){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getTags',
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<li class="add" data-id="'+rs.data[i].material_tag_id+'">'+rs.data[i].tag_name+'<i></i></li>';
+                    }
+                    $('#label_list').find('.add').remove();
+                    $("#label_list li:last").after(str);
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getTags();
+
+        //删除标签
+        function delTags(_that){
+            var material_tag_id = _that.attr('data-id');
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/delTags',
+                data:{'material_tag_id':material_tag_id},
+                dataType: 'json',
+                success: function (rs) {
+                    _that.remove();
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+
+        //获取版位分类
+        function getgroup(){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getgroup',
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<label><input name="material_position" type="radio" value="'+rs.data[i].adgroup_id+'"/>'+rs.data[i].adgroup_name+'</label>';
+                    }
+                    $('#material_position span').after(str);
+                    if(paramGroupId){
+                        $('#material_position input').attr('disabled','disabled');
+                        $('#material_position').find('input[value="'+paramGroupId+'"]').attr('checked',true);
+                        getSizelist(paramGroupId);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getgroup();
+
+        $('#material_position').on('change','input[name="material_position"]',function(){
+            var this_index = $(this).val();
+            $('#material_position li').hide();
+            $('#material_position li:eq('+(this_index - 1)+')').show();
+            getSizelist(this_index);
+            $('#adv_ul').hide();
+        })
+
+        //获取版位尺寸
+        function getSizelist(this_index){
+            var str = '<tr><th>选择</th><th>尺寸大小</th><th>类型</th></tr>';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getSizelist',
+                data:{'adgroup_id':this_index},
+                dataType: 'json',
+                success: function (rs) {
+                    console.log(rs)
+                    for(var i = 0;i < rs.data.length;i++){
+                        str +=   '<tr>';
+                        if(rs.data[i].ad_size_pid == null){
+                            str +=   '<td><label><input name="table_r" type="radio" value="'+rs.data[i].ad_size_id+'"/></label></td>';
+                        }
+                        str += '<td class="cc">'+rs.data[i].ad_size_name+'</td>';
+                        // if(isMoreImg(parseInt(rs.data[i].ad_size_id)) == 1){ //单图
+                        //     str +=   '<td>支持 jpg / png 格式，小于100KB，单图</td>';
+                        // }else if(isMoreImg(parseInt(rs.data[i].ad_size_id)) == 2){
+                        //     str +=   '<td>支持 jpg / png 格式，小于100KB，多图<i></i></td>';
+                        // }
+                        if(rs.data[i].is_images==0){
+                            str += '<td>支持 jpg / png 格式，单图</td>';
+                        }else if(rs.data[i].is_images==1){
+                            str += '<td>支持 jpg / png 格式，多图<i></i></td>';
+                        }
+                        str +=   '</tr>';
+                    }
+                    $('#adv_table').html(str);
+                    if(paramSizeId){
+                        $('#adv_table input').attr('disabled','disabled');
+                        $('#adv_table').find('input[value="'+paramSizeId+'"]').attr('checked',true);
+                        getSizeInfo(paramSizeId);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+
+        //尺寸详情 是否多图
+        // function isMoreImg(size_id){ 
+        //     $.ajax({
+        //         type: "POST",
+        //         url: '/v1.2/materiald/getSizeInfo',
+        //         data:{'size_id':size_id},
+        //         dataType: 'json',
+        //         async:false,
+        //         success: function (rs) {
+        //             if(rs.data.length == 1){//单图
+        //                 status = '1';
+        //             }
+        //             if(rs.data.length > 1){//多图
+        //                 status = '2';
+        //             }
+        //         },
+        //         error: function (rs) {
+        //             tipTopShow("查询信息失败，请重试...");
+        //         }
+        //     }); 
+        //     return status;
+        // }
+
+        $('#adv_table').on('click','input[name="table_r"]',function(){          
+            getSizeInfo($(this).val())
+        });
+
+        function getSizeInfo(ids){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getSizeInfo',
+                data:{'size_id':ids},
+                dataType: 'json',
+                success: function (rs) {
+                    console.log(rs);
+                    if(rs.data.length == 1){//单图
+                        var fileSize = (Math.round(rs.data[0].img_size * 100 / 1024) / 100)
+                        str +=  `<li class="file_input fl" data-resultsize="`+rs.data[0].img_size+`">
+                                    <img id="preview_`+ ids +`"/>
+                                    <div class="file_text">          
+                                            素材大小：`+ rs.data[0].ad_size_name +`  <br>
+                                            <b>点击上传</b>  <br>
+                                            (JPG / PNG，小于`+ fileSize +`KB)
+                                    </div>
+                                    <input id="file`+ids+`" type="file" name="file" _size="`+ rs.data[0].ad_size_id +`" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'preview_`+ids+`')">
+                                </li>`;
+                    }
+                    if(rs.data.length > 1){//多图
+                        ImgSize1=rs.data[0].img_size;
+                        ImgSize2=rs.data[1].img_size;
+                        for(var i = 0;i<rs.data.length;i++){
+                           var fileSize = (Math.round(rs.data[i].img_size * 100 / 1024) / 100); 
+                            str +=  `<li class="file_input fl"  data-resultsize="`+rs.data[i].img_size+`">
+                                        <img id="preview_`+ i +`"/>
+                                        <div class="file_text">          
+                                                素材大小：`+ rs.data[i].ad_size_name +`  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于`+fileSize+`KB)
+                                        </div>
+                                        <input id="file`+i+`" type="file" name="file" _size="`+ rs.data[i].ad_size_id +`" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'preview_`+ i +`')">
+                                    </li>`;
+                        }
+                    }
+                    $('#adv_ul').show().html(str);  
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });    
+        }
+
+
+        function imgPreview(fileDom,el) {
+            var resultSize = $(fileDom).parent().attr('data-resultsize');
+            var fileSize = (Math.round(resultSize * 100 / 1024) / 100) ;
+
+            //判断是否支持FileReader
+            if(window.FileReader) {
+                var reader = new FileReader();
+            } else {
+                tipTopShow("您的设备不支持图片预览功能，如需该功能请升级您的设备！");
+            }
+            //获取文件
+            var file = fileDom.files[0];
+            var imageType = /^image\//;
+            //是否是图片
+            if(!imageType.test(file.type)) {
+                tipTopShow("请选择图片！");
+                $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+
+            var size = $(fileDom)[0].files[0].size;
+
+            if(size >resultSize){
+                tipTopShow('图片大小不能大于'+fileSize+'KB');
+                 $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+            //读取完成
+            reader.onload = function(e) {
+                //获取图片dom
+                var img = document.getElementById(el);
+                //图片路径设置为读取的图片
+                /*img.src = e.target.result;*/
+            };
+            reader.readAsDataURL(file);
+            // $("#"+el).css('z-index','999');
+            var formData = new FormData();
+            var ids = $(fileDom).attr('id');
+            var sizeid = $(fileDom).attr('_size');
+            formData.append('file', $('#'+ids)[0].files[0]);
+            formData.append('sizeid',sizeid);
+            $.ajax({
+                url: '/material/uploadFile',
+                type: 'POST',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    var rs = eval("("+data+")");
+                    console.log(rs);
+                    if(rs.state==1){
+                        tipTopShow('上传成功！');
+                        document.getElementById(el).src = rs.url;
+                        $('#'+ids).attr('_url',rs.url);
+                        $('#'+ids).attr('_filesize',size);
+                        
+                    }else{
+                        $('#'+ids).removeAttr('_url');
+                        $('#'+ids).removeAttr('_filesize');
+                        tipTopShow(rs.msg);
+                    }
+                    $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                },
+                error: function (data) {
+                    tipTopShow("上传失败");
+                    $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                }
+            })
+            
+        }
+
+
+        //提交
+        function submit(){
+            var material_name = $.trim($('#material_name').val()),  //素材名称
+                material_url = $.trim($('#material_url').val()),    //跳转地址
+                adgroup = $('input[name="material_position"]:checked').val(),   //版位分类
+                adsize =  $('input[name="table_r"]:checked').val(),     //规格尺寸
+                tagid = $('#label_list .cur').attr('data-id'), //标签id
+                urlDom = $('input[type="file"]:visible');
+            if(!tagid){
+                tipTopShow("请选择标签！");
+                return;
+            }         
+            if(!material_name){
+                tipTopShow("请输入素材名称！");
+                return;
+            }
+            if(!material_url){
+                tipTopShow("请输入跳转地址！");
+                return;
+            }
+            if(!checkUrl(material_url)){
+                tipTopShow("请输入正确的跳转地址！");
+                return;
+            }   
+            var imgurls = [],
+                urlData='',
+                hasUrl = false;
+            urlDom.each(function(){
+                var data_obj = {},
+                    thUrl = $(this).attr('_url')? $(this).attr('_url'):"",
+                    thSize = $(this).attr('_size')? $(this).attr('_size'):"",
+                    file_Size = $(this).attr('_filesize')? $(this).attr('_filesize'):"";
+                data_obj.img_url = thUrl;
+                data_obj.ad_size_id = thSize;
+                data_obj.img_size = file_Size
+                imgurls.push(data_obj)
+                if(adsize==thSize){
+                    urlData = thUrl;  
+                }
+                thUrl ? hasUrl = true : hasUrl = false;
+            })
+            if(!hasUrl || !urlData){
+                tipTopShow("请上传图片,并与规格相符！");
+                return;
+            }
+            imgurls = JSON.stringify(imgurls);
+
+            var post_data ={"material_name":material_name,"material_url":material_url,"adgroup_id":adgroup,"size_id":adsize,"tag_id":tagid,"img_url":imgurls};
+            console.log(post_data)
+            $.ajax({
+                type : "POST",
+                url : "/v1.2/materiald/add",
+                data : post_data,
+                dataType : 'json',
+                beforeSend : function() {
+                    //禁用按钮防止重复提交
+                    $("#add_btn").attr('disabled','disabled');
+                },
+                success : function(rs) {
+                	console.log(rs)
+                    $("#add_btn").removeAttr('disabled');
+                    if (rs.api_code == 0) {
+                        tipTopShow("申请提交成功");
+                        if(paramGroupId){
+                            location.href = backUrl;
+                        }else{
+                            location.href ='/v1.2/Materiald/indexview';
+                        }
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error : function(rs) {
+                    console.log(rs);
+                    $("#add_btn").removeAttr('disabled');
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+
+    </script>
+</body>
+
+</html>

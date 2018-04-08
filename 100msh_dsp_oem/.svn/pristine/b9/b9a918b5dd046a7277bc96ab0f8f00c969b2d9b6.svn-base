@@ -1,0 +1,86 @@
+<style type="text/css">
+    .account_wrap {width: auto;height: 38px;position: relative;float: left;margin-right: 20px;}
+    .regtype_span{position: relative;}
+    .account_span {float: left;width: 18px;height: 18px;position: relative;left: 0;top: 50%;margin-top: -9px;margin-right: 5px;}
+    .regtype_span>.regType{opacity: 0;}
+    .account_span>.accountValue {position: absolute;left: 1px;top: 1px;z-index: 2;opacity: 0;}
+    .regicon {width: 15px;height: 15px;position: absolute;left: 0;top: 1px;background: url(/public/img/radio_icons.png);background-position: 0 0;background-size: cover;z-index: 1;opacity: 1;}
+    .invoice_form .from-row label,.invoice_form .from-spec span {width: 100px !important;}
+    .invoice_form .form .from-row,.invoice_form .form .from-spec{padding-left: 130px;}
+    .layui-layer-setwin {display: none;}
+    .file_input{width:130px;height:130px;position:relative;}
+    .file_input>img {width: 130px;height: 130px;position: absolute;top: 0}
+    .emp{color: red;}
+    .from-row p{line-height: 38px;}
+</style>
+
+<div class="invoice_form">
+    <div class="form" style="width:710px;">
+        <div class="from-row">
+            <label><em class="emp">*</em>logo</label>
+            <div class="file_input">
+                <img id="logo_img" src="http://d.100m.net/100msh_upload/<< d.pn_logo >>">
+            </div>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>公众号名称</label>
+            <p><< d.pn_name >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>公众号类型</label>
+            <p><< d.public_type ==1 ?'订阅号':'服务号'>></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>微信号</label>
+            <p><< d.pn_number >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>门店名称</label>
+            <p><< d.shop_name >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>Appid</label>
+            <p><< d.pn_appid >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>shopid</label>
+            <p><< d.shop_id >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>ssid</label>
+            <p><< d.ssid >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>Appsecret</label>
+            <p><< d.pn_appsecret >></p>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>secretke</label>
+            <p><< d.secret_key >></p>
+        </div>
+        <div class="from-row">
+            <label>手机号解密秘钥</label>
+            <p><< d.mobile_decrypt_key >></p>
+        </div>
+        <div class="from-row">
+            <label>biz码</label>
+            <p><< d.biz_code >></p>
+        </div>
+        <div class="from-spec">
+            <span><em class="emp">*</em>运营类别</span>
+            <p><< d.public_cate ==1 ?'全国':'自营'>></p>
+        </div>
+        <div class="from-row">
+            <label>二维码图片</label>
+            <div class="file_input">
+                <img id="code_img" src="http://d.100m.net/100msh_upload/<<d.pn_qrcode>>">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    console.log(<<d.platform_id >>)
+</script>
+
+
+

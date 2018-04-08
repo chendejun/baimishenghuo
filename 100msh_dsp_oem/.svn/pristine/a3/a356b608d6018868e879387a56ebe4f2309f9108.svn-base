@@ -1,0 +1,168 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class BhdeliveryController extends BasicController {
+
+
+    public function addview1Action(){
+
+    }
+    public function addview2Action(){
+
+    }
+    public function addview3Action(){
+
+    }
+    public function addview4Action(){
+
+    }
+    public function addview5Action(){
+
+    }
+    /*
+     * 获取广告计划列表
+     */
+     public function getCampAction(){
+         $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+         $Bhdelivery = Helper::M('Bhdelivery');
+         $result = $Bhdelivery->getcamp($comp_id);
+         Helper::outJson($result);
+      }
+
+      /*
+       *添加计划
+       */
+      public function addCampAction(){
+          $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+          $bh_campaign_name = Helper::clean($this->getRequest()->getPost('bh_campaign_name'));//广告计划名称
+          $startDate = Helper::clean($this->getRequest()->getPost('startDate'));//开始时间
+          $endDate = Helper::clean($this->getRequest()->getPost('endDate'));//结束时间
+          $budgetSwitch = Helper::clean($this->getRequest()->getPost('budgetSwitch'));//日预算状态
+          $budget = Helper::clean($this->getRequest()->getPost('budget'));//日预算
+          $totalBudgetSwitch = Helper::clean($this->getRequest()->getPost('totalBudgetSwitch'));//总预算状态
+          $totalBudget = Helper::clean($this->getRequest()->getPost('totalBudget'));//总预算
+          $data['comp_id'] = $comp_id;
+          $data['bh_campaign_name'] = $bh_campaign_name;
+          $data['startDate'] = $startDate;
+          $data['endDate'] = $endDate;
+          $data['budgetSwitch'] = $budgetSwitch;
+          $data['budget'] = $budget*100;
+          $data['totalBudgetSwitch'] = $totalBudgetSwitch;
+          $data['totalBudget'] = $totalBudget*100;
+          $data['comp_pid'] = $this->uinfo['comp_id'];//代理商id
+          $data['add_staff_id'] = $this->uinfo['staff_id'];
+          $data['add_time'] = time();
+          $Bhdelivery = Helper::M('Bhdelivery');
+          $result = $Bhdelivery->addcamp($data);
+          Helper::outJson($result);
+      }
+
+    /*
+   * 获取人群包列表
+   */
+    public function getCrowdlistAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->getCrowdlist($comp_pid);
+        if($result){
+            foreach($result as $key=>$val){
+                $Markete = Helper::M('Market');
+                $result = $Markete->getCrowdinfo($val['crowd_id'], $comp_pid);
+                if($result){
+                    $result[$key]['number'] = '';
+                }else{
+                    $result[$key]['number'] = '';
+                }
+            }
+        }
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+    /*
+     * 添加活动
+     */
+    public function add1Action(){
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+
+    }
+
+    /*
+     * 获取媒体列表
+     */
+  public function getAdSlotDataAction(){
+
+      $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+      $data['dealType'] = 1;
+      $data['creativeType'] = 1;//创意类型
+      $data['mediaType'] = 1;//媒体类型
+      $data['osType'] = 2;//系统类型
+      $data['trafficType'] = 1;
+      $data['platformType'] = 2;
+      $data['behaviorType'] = 1;
+      $bh = new BhDspApi();
+      $result = '{"code":0,"msg":"ok","message":"成功","reason":"","datas":{"bid":"30806500","click":"74450","cost":"13705331600.0","size":{"640x100":41402,"720x1280":12108,"640x960":7531,"960x640":508},"view":"1576510","sizeTotal":61613,"sizeZb":{"640x100":67.2,"720x1280":19.65,"640x960":12.22,"960x640":0.82}}}';
+      $data = json_decode($result,true);
+      $arr = array();
+      $lists = $data['datas']['size'];
+      $Bh = Helper::M('Bhcreate');
+      foreach ($lists as $key=>$val){
+          $data1['ad_size_name'] = $key;
+          $k_list = explode('x',$key);
+          $data1['ad_size_width'] = $k_list[0];
+           $data1['ad_size_height'] = $k_list[1];
+           $Bh = Helper::M('Bhcreate');
+           $size_list = $Bh->get($data1);
+           if(empty($size_list)){
+               $size_list = $Bh->add($data1);
+               $arr[] = $size_list;
+           }else{
+               $arr[] = $size_list[0]['size_id'];
+           }
+
+
+      }
+      $data2['adxId'] = 66;
+      $data2['size_list']  =  json_encode($arr);
+      $data2['osType']  = 2;
+      $Bh ->adds($data2);
+      exit;
+      Helper::outJson($result);
+   }
+   /*
+    * 获取媒体列表对应的规格列表
+    */
+   public function getEstimateFlowAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $adxType = Helper::clean($this->getRequest()->getPost('adxType'));//媒体平台集合
+       $data = array('randomNumber'=>'ef6580a866aaee2730ec32578d3f853',);
+       $bh = new BhDspApi();
+       $result = $bh->getEstimateFlow($account_id,$data);
+       Helper::outJson($result);
+   }
+   /*
+    * 获取指定应用类型
+    */
+   public function appListAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $data['adxId'] = 8;
+       $data['page'] = 1;
+       $data['accountId'] =1697020333;
+       $data['level'] =2;
+       $data['osType'] =2;
+       $data['behaviorType'] =1;
+       $data['creativeType'] =1;
+       $data['trafficType'] =1;
+       $data['unkownAppFlag'] =0;
+       $bh = new BhDspApi();
+       $result = $bh->appList($account_id,$data);
+       Helper::outJson($result);
+   }
+}

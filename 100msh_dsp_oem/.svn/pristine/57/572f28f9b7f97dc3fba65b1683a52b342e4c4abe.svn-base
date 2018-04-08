@@ -1,0 +1,26 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class NoticeController extends BasicController {
+
+
+
+    /*
+     * 获取广告组列表
+     */
+    public function getcompanysiteAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $comp_pid = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $Notice = Helper::M('Notice');
+        $result=  $Notice->
+        return $result;
+        echo  $result;
+
+    }
+
+}

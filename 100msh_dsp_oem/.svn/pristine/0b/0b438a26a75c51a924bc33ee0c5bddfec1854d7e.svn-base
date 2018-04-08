@@ -1,0 +1,40 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class MarketController extends BasicController {
+
+    public function indexviewAction()
+    {
+    }
+
+    /*
+     * 获取网站风格
+     */
+    public function indexAction(){
+
+        $page = Helper::clean($this->getRequest()->getParam('page',0));
+        $limit = Helper::clean($this->getRequest()->getParam('limit',10));
+        $status = Helper::clean($this->getRequest()->getParam('status'));
+        $keywords = Helper::clean($this->getRequest()->getParam('keywords'));
+        $start = $page>0?($page-1)*$limit:0;
+        $Market = Helper::M('Market');
+        $comp_pid = $this->uinfo['comp_id'];
+        $list = $Market->getList($comp_pid , $start , $limit,$status,$keywords);
+        $count = $Market->getCountList($comp_pid);
+        $pages = ceil($count/$limit); //总页数
+        Helper::outJson(array('state'=>1 , 'msg'=>'','list'=>$list,'totalPages'=>$pages,'page'=>$page ));
+    }
+    /*
+     * 添加页
+     */
+    public function addviewAction()
+    {
+    }
+
+
+}

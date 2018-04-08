@@ -1,0 +1,6 @@
+<?php
+class SettleController extends BasicController {
+	public function indexAction(){
+        $this->getView();
+	}
+}

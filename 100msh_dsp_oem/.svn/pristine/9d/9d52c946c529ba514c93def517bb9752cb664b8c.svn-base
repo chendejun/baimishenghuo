@@ -1,0 +1,83 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class BhcreativeController extends BasicController {
+
+    /*
+     * 获取媒体列表
+     */
+  public function getAdSlotDataAction(){
+
+      $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+      $data['dealType'] = 1;
+      $data['creativeType'] = 1;//创意类型
+      $data['mediaType'] = 1;//媒体类型
+      $data['osType'] = 2;//系统类型
+      $data['trafficType'] = 1;
+      $data['platformType'] = 2;
+      $data['behaviorType'] = 1;
+      $bh = new BhDspApi();
+      $result = $bh->getAdSlotData($account_id,$data);
+      $result = '{"code":0,"msg":"ok","message":"成功","reason":"","datas":{"bid":"109748000","click":"4700","cost":"1316118200.0","size":{"640x100":190198,"640x960":16907,"720x1280":2620,"320x50":1660,"500x600":1598,"300x200":995,"640x320":843,"600x120":836,"600x500":702,"640x1136":637,"960x640":534,"728x90":482,"250x300":479,"720x1080":185,"300x250":177,"600x128":166,"468x60":165,"400x300":144,"1125x2001":29,"1080x1794":15,"1080x2034":15,"1440x2560":13,"1080x1800":11,"1080x2160":10,"480x800":10,"720x1208":6,"1080x2040":5,"1080x1788":5,"540x960":4,"1080x1776":4,"800x480":4,"1536x2048":4,"1080x1808":3,"1440x2416":3,"720x1356":3,"1080x2094":2,"1440x2408":2,"1080x2030":2,"720x1344":1,"768x1024":1,"720x1184":1,"1080x1821":1,"720x1200":1,"480x60":1,"1440x2434":1,"1440x2792":1,"1440x2427":1,"1152x1920":1,"1080x2208":1,"1920x1080":1,"1080x2070":1,"1080x1980":1,"1080x2008":1,"1080x2076":1,"320x568":1,"1080x1830":1},"view":"736040","sizeTotal":219496,"sizeZb":{"640x100":86.65,"640x960":7.7,"720x1280":1.19,"320x50":0.76,"500x600":0.73,"300x200":0.45,"640x320":0.38,"600x120":0.38,"600x500":0.32,"640x1136":0.29,"960x640":0.24,"728x90":0.22,"250x300":0.22,"720x1080":0.08,"300x250":0.08,"600x128":0.08,"468x60":0.08,"400x300":0.07,"1125x2001":0.01,"1080x1794":0.01,"1080x2034":0.01,"1440x2560":0.01,"1080x1800":0.01,"1080x2160":0,"480x800":0,"720x1208":0,"1080x2040":0,"1080x1788":0,"540x960":0,"1080x1776":0,"800x480":0,"1536x2048":0,"1080x1808":0,"1440x2416":0,"720x1356":0,"1080x2094":0,"1440x2408":0,"1080x2030":0,"720x1344":0,"768x1024":0,"720x1184":0,"1080x1821":0,"720x1200":0,"480x60":0,"1440x2434":0,"1440x2792":0,"1440x2427":0,"1152x1920":0,"1080x2208":0,"1920x1080":0,"1080x2070":0,"1080x1980":0,"1080x2008":0,"1080x2076":0,"320x568":0,"1080x1830":0}}}';
+      $data = json_decode($result,true);
+      $arr = array();
+      $lists = $data['datas']['size'];
+      $Bh = Helper::M('Bhcreate');
+      foreach ($lists as $key=>$val){
+          $data1['ad_size_name'] = $key;
+          $k_list = explode('x',$key);
+          $data1['ad_size_width'] = $k_list[0];
+           $data1['ad_size_height'] = $k_list[1];
+           $Bh = Helper::M('Bhcreate');
+           $size_list = $Bh->get($data1);
+           if(empty($size_list)){
+               $size_list = $Bh->add($data1);
+               $arr[] = $size_list;
+           }else{
+               $arr[] = $size_list[0]['size_id'];
+           }
+
+
+      }
+      $data2['adxId'] = 35;
+      $data2['size_list']  =  json_encode($arr);
+      $data2['osType']  = 2;
+      $Bh ->adds($data2);
+      exit;
+      Helper::outJson($result);
+   }
+   /*
+    * 获取媒体列表对应的规格列表
+    */
+   public function getEstimateFlowAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $adxType = Helper::clean($this->getRequest()->getPost('adxType'));//媒体平台集合
+       $data = array('randomNumber'=>'ef6580a866aaee2730ec32578d3f853',);
+       $bh = new BhDspApi();
+       $result = $bh->getEstimateFlow($account_id,$data);
+       Helper::outJson($result);
+   }
+   /*
+    * 获取指定应用类型
+    */
+   public function appListAction(){
+       $account_id = Helper::clean($this->getRequest()->getPost('account_id'));
+       $data['adxId'] = 8;
+       $data['page'] = 1;
+       $data['accountId'] =1697020333;
+       $data['level'] =2;
+       $data['osType'] =2;
+       $data['behaviorType'] =1;
+       $data['creativeType'] =1;
+       $data['trafficType'] =1;
+       $data['unkownAppFlag'] =0;
+       $bh = new BhDspApi();
+       $result = $bh->appList($account_id,$data);
+       Helper::outJson($result);
+   }
+}

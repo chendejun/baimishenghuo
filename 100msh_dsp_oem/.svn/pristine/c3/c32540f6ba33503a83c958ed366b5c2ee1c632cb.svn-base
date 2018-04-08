@@ -1,0 +1,49 @@
+<?php
+
+Class BhCity extends  Model{
+
+	/**
+     * 查询全网广省市列表
+     */
+    public function getBhCity($pid=0,$level){ 
+        if($level==2){
+            $where="`level`=$level AND `pId` = $pid ORDER BY bh_id desc";
+        }else{
+            $where="`level`=$level ORDER BY bh_id asc";
+        }
+        $list =  $this->db->bh->query("SElECT * FROM `bh_city` WHERE $where " );
+        return $list;
+    }
+	/**
+     * 查询全网广省市列表
+     */
+    public function getBhCityArea($type=1,$cityId){ 
+        if($type==1){
+            $arealist =  $this->db->bh->query("SElECT * FROM `bh_city_area` WHERE `type`=0 " );
+            EXIT;
+        }else{
+            $where="`cityId`=$cityId and type in(1,2)";
+            $list =  $this->db->bh->query("SElECT * FROM `bh_city_area` WHERE $where" );
+            if(!empty($list)){
+            	$arealist=array();
+            	foreach ($list as $key=>$val){
+            		if($val['type']==1){
+            			$arealist[$val['bh_area_id']]=$val;
+            		}
+            	}
+            	print_r($arealist);
+            	foreach ($arealist as $key1=>$val1){
+            		echo $key1;
+	            	foreach ($list as $key=>$val){
+		            	if($key1==$val['pid']){
+		            		$arealist[$key1]['area_data'][]=$val;
+		            	}
+		            }
+            	}
+            	print_r($arealist);
+            	exit;
+            }
+        }
+        return $arealist;
+    }
+}

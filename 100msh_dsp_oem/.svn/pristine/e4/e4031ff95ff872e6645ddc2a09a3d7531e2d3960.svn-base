@@ -1,0 +1,374 @@
+<?php
+/**
+ * material 素材类
+ * @author :wzw
+ **/
+
+class materialMod extends commonMod{
+
+    /*
+     * 获取默认素材列表
+     */
+    public function getMlists(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('comp_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getMlists($data['comp_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+
+    /*
+     * 搜索y月份素材详情
+     * @param  time    获取月份的素材列表
+     */
+    public function getlists(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('comp_id','time');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getlists($data['comp_id'],$data['time']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+
+    /*
+     *素材搜索
+     * @param  group_id  版位
+     * @param   size_id  规格id
+     * @param    tag_id    标签id
+     * @param    material_name 素材名称
+     */
+
+    public function serach(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('comp_id','group_id','size_id','tag_id','material_name','time','platform_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        if($data['platform_id']==1){
+            $result = $material->wifiSerach($data['comp_id'],$data['group_id'],$data['size_id'],$data['tag_id'],$data['material_name'],$data['time']);
+        }else{
+            $result = $material->serach($data['comp_id'],$data['group_id'],$data['size_id'],$data['tag_id'],$data['material_name'],$data['time']);
+        }
+
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+    *素材搜索y
+    * @param  group_id  版位
+    * @param   size_id  规格id
+    * @param    tag_id    标签id
+    * @param    time   时间
+    */
+
+    public function yserach(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('comp_id','group_id','size_id','tag_id','time','img_size','img_size1','page','limit');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->yserach($data['comp_id'],$data['group_id'],$data['size_id'],$data['tag_id'],$data['time'],$data['img_size'],$data['img_size1'],$data['page'],$data['limit']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['page_count'] = $result['page_count'];
+        $arr['data'] = $result['data'];
+        $this->rest->sendData($arr);
+    }
+
+
+
+    /*
+     * 获取素材详情  即修改素材
+     */
+    public  function  materialDetail(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('material_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->materialDetail($data['material_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+
+    /*
+    * 获取所有版位
+    * @author cdj
+    *
+    */
+    public function getAdgroup(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ();
+        $material = new material();
+        $result = $material->getAdgroup();
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+
+    /*
+  * 获取规格列表
+  * @author cdj
+  */
+    public function getSizelist(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('adgroup_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getSizelist($data['adgroup_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+* 获取gdt规格列表
+* @author cdj
+*/
+    public function getSizelistgdt(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('adgroup_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getSizelistgdt($data['adgroup_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+ * 获取wifi规格列表
+ * @author cdj
+ */
+    public function getSizelistwifi(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('adgroup_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getSizelistwifi($data['adgroup_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+     * 根据规格id选择规格详细列表
+     */
+    public  function getSizeInfo(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('size_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getSizeInfo($data['size_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+
+    /*
+     * 获取标签
+     * @author cdj
+     */
+    public function getTags(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('comp_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        //$comp_pid = $material->getCompPid($data['comp_pid']);
+        $result = $material->getTags($data['comp_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+     * 添加标签
+     */
+    public function addTags(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('comp_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->addTags($data);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+     * 删除标签
+     */
+    public function delTags(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('material_tag_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->delTags($data);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+    /*
+     * 添加素材
+     */
+    public function add(){
+
+        $this->rest->restrictPostMethod();
+        $this->rest->checkParam ('comp_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->add($data);
+        if($result){
+            $arr = array('api_code'=>0,'msg'=>'success');
+            $arr['data'] = array('baseurl'=>$result);
+            $this->rest->sendData($arr);
+        }else{
+            $this->rest->sendError(400701);
+        }
+
+    }
+    /*
+     * 获取素材详情
+     */
+    public function getmaterial(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ('material_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getmaterial($data['material_id']);
+        if($result){
+            $arr = array('api_code'=>0,'msg'=>'success');
+            $arr['data'] = $result;
+            $this->rest->sendData($arr);
+        }else{
+            $this->rest->sendError(400701);
+        }
+    }
+    /*
+     * 修改素材
+     */
+    public function edit(){
+        $this->rest->restrictPostMethod();
+        $this->rest->checkParam ('comp_id','material_id');
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->edit($data);
+        if($result){
+            $arr = array('api_code'=>0,'msg'=>'success');
+            $arr['data'] = array('baseurl'=>$result);
+            $this->rest->sendData($arr);
+        }else{
+            $this->rest->sendError(400701);
+        }
+
+    }
+    /*
+     * 获取广告位
+     */
+    public function getAdpostion(){
+        $this->rest->restrictGetMethod ();
+        $this->rest->checkParam ();
+        $data = $this->rest->getData();
+        $material = new material();
+        $result = $material->getAdpostion($data['adgroup_id'],$data['size_id']);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        $this->rest->sendData($arr);
+    }
+
+    /*
+     *获取预估人数，定式访问接口
+     */
+    public  function getnumber(){
+        $material = new material();
+        $data = $material->getPositions();
+        $site_info= array(SITE_SET_QZONE,SITE_SET_QQCLIENT,SITE_SET_MUSIC,SITE_SET_MOBILE_UNION,SITE_SET_QQCOM,SITE_SET_QQCOM,SITE_SET_WECHAT,SITE_SET_MOBILE_INNER);
+
+        foreach($data as $key=>$val){
+            $data['account_id']= 100000838;
+            $site = $site_info[$val['site_set']];
+            $data['adgroup'] = '{"site_set":["'.$site.'"],"product_type":"PRODUCT_TYPE_LINK"}';
+            $data['adcreative'] ='[{"adcreative_template_id":'.$val['adcreative_template_id'].'}]';
+            $data['targeting'] = '{"gender":["MALE"]}';
+            $result = GdtApi::request('estimation/get',$data,'POST');
+            $pos_number = $result['data']['approximate_count'];
+            $result =  $material->updateNumber($val['ad_pos_rel_id'],$pos_number);
+        }
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $this->rest->sendData($arr);
+
+    }
+    /*
+     * 上传图片到广点通
+     * account_id
+     * comp_id
+     * ms_id
+     */
+    public function  uploadGdt(){
+
+        /* $data=$file_data=array();
+         $data['account_id']=1457;
+         $data['file']=new CURLFile('/data001/data/sites/100msh_upload/gdt/760fc47677a5a1fd19a572cb796827c7.png');
+         $data['signature']=md5_file('http://d.100m.net/100msh_upload/gdt/760fc47677a5a1fd19a572cb796827c7.png');
+         $result = GdtApi::request('images/add',$data,'POST');
+         var_dump($result);*/
+        //$this->rest->sendData($result['data']);
+        //$this->rest->restrictPostMethod();
+        $this->rest->restrictPostMethod();
+        $this->rest->checkParam ('ms_id','material_id');
+        $data = $this->rest->getData();
+        $ms_id = $data['ms_id'];
+        $material = new material();
+        $comp_id = $data['comp_id'];
+        $gdt_image_info  = $material->getgdtImg($ms_id,$comp_id);
+        if($gdt_image_info){
+            $arr = array('api_code'=>0,'msg'=>'success');
+            $arr['data'] = array('img_id'=>$gdt_image_info['img_id'],'gdt_image_id'=>$gdt_image_info['gdt_image_id']);
+            $this->rest->sendData($arr);
+            exit;
+        }
+
+        //$data['account_id'] =  $data['account_id'];
+        $targetings = new targetings();
+        $result = $targetings->getAccount($comp_id);
+        $data_par['account_id'] = $result[0]['gdt_account_id'];
+        $material_id = $data['material_id'];
+
+        $ms_info = $material->getmsInfo($ms_id);
+        //var_dump($ms_info);
+        $mg_url = substr($ms_info[0]['img_url'],25);
+        //echo $mg_url;
+        $file = APP::$config['ACCESSORY_FOLDER'].$mg_url;
+        $data_par['file']=new CURLFile($file);
+        $data_par['signature']=md5_file($ms_info[0]['img_url']);
+        //$data['signature']=md5_file('http://d.100m.net/100msh_upload/201712/20171208/dsp/32252d5c5b61455faf3d244557a272ce.jpg');//md5_file('http://d.100m.net/100msh_upload/gdt/760fc47677a5a1fd19a572cb796827c7.png');
+
+        $gdt_result = GdtApi::request('images/add',$data_par,'POST',$data['gdt_token']);
+        $gdt_image_id = $gdt_result['data']['image_id'];
+        $img_id = $material->addgdtImg($comp_id,$ms_id,$material_id,$gdt_image_id,$data['gdt_token']);
+        if($img_id){
+            $arr = array('api_code'=>0,'msg'=>'success');
+            $arr['data'] = array('img_id'=>$img_id,'gdt_image_id'=>$gdt_image_id);
+            $this->rest->sendData($arr);
+        }else{
+            $this->rest->sendError(400701);
+        }
+    }
+    /*
+     * 检查计划名称是否已存在
+     */
+    public  function  checkCam(){
+        $this->rest->restrictPostMethod();
+        $this->rest->checkParam ('comp_id','campaign_name');
+        $data = $this->rest->getData();
+        $par['comp_id'] = $data['comp_id'];
+        $par['campaign_name'] = $data['campaign_name'];
+        $material = new material();
+        $result = $material->checkCam($par);
+        if($result){
+            $arr = array('api_code'=>0,'msg'=>'此计划名称已存在');
+        }else{
+            $arr = array('api_code'=>1,'msg'=>'可用');
+        }
+        $this->rest->sendData($arr);
+    }
+
+}

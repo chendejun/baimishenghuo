@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/css/layui.css" >
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box"><span>百米DMP / 客流人群分析</span></div>
+
+    <div class="tab_box clearfix" >
+        <div class="menu_box fl ">
+            <a href="javascript:;" class="cur">客流分析<p></p></a>
+            <a href="cus_propety.html">客户属性<p></p></a>
+            <a href="cus_prefrence.html">消费偏好<p></p></a>
+            <a href="trade_analysis.html">商圈分析<p></p></a>
+            <a href="cus_source.html">客流来源<p></p></a>
+            <a href="hot_search.html">搜索热点<p></p></a>
+            <a href="app_analysis.html">常用APP分析<p></p></a>
+            <div class="menu_bottom"></div>
+        </div>
+        <a href="" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        <!--菜单内容-->
+    </div>
+    <div class="tip_box">
+        <p class="tip_title">还没有创建任何分析报表,赶紧去新建一个吧。</p>
+        <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="create_analysis.html">新建分析表</a>
+    </div>
+</div>
+<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+
+<script>
+
+</script>
+</body>
+</html>

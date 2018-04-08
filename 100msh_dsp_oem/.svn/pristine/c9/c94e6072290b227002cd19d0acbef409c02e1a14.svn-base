@@ -1,0 +1,511 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class MaterialdController extends BasicController {
+
+    public function getaccess(){
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+        return  $access_token;
+    }
+
+    /**
+     * 素材列表(按月排序)
+     */
+    public function indexAction(){
+
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+       $comp_id = $this->uinfo['comp_id'];
+       $url = $this->config['dsp']['url']."material/getMlists?access_token=".$access_token."&comp_id=".$comp_id;
+       $doNet = new DoNetwork();
+       $result =$doNet->makeRequest($url);
+      echo $result;
+
+    }
+    /*
+     *
+     */
+    public function indexviewAction()
+    {
+    }
+
+    /**
+     * 素材详情
+     */
+    public function infoAction(){
+
+    }
+    /*
+     * 获取广告组列表
+     */
+    public function getgroupAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getAdgroup?access_token=".$access_token;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取规格
+     * @param  adgroup_id
+     */
+    public function getSizelistAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getSizelist?access_token=".$access_token."&adgroup_id=".$adgroup_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+* 获取规格
+* @param  adgroup_id
+*/
+    public function getSizelistgdtAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getSizelistgdt?access_token=".$access_token."&adgroup_id=".$adgroup_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+  * 获取规格
+  * @param  adgroup_id
+  */
+    public function getSizelistwifiAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getSizelistwifi?access_token=".$access_token."&adgroup_id=".$adgroup_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取详细规格
+     * @param size_id
+     *
+     */
+    public function getSizeInfoAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getSizeInfo?access_token=".$access_token."&size_id=".$size_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取标签
+     * getTags
+     */
+    public function getTagsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getTags?access_token=".$access_token."&comp_id=".$comp_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 添加标签
+     */
+    public function addTagsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $tag_name =  Helper::clean($this->getRequest()->getPost('tag_name'));
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/addTags?access_token=".$access_token."&comp_id=".$comp_id."&tag_name=".$tag_name;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 删除标签
+     */
+    public function delTagsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $material_tag_id =  Helper::clean($this->getRequest()->getPost('material_tag_id'));
+        $comp_pid = $this->uinfo['comp_pid'];
+        $url = $this->config['dsp']['url']."material/delTags?access_token=".$access_token."&material_tag_id=".$material_tag_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取月份详细列表
+     * getlists
+     */
+    public function getlistsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $time = Helper::clean($this->getRequest()->getPost('time'));
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getlists?access_token=".$access_token."&comp_id=".$comp_id."&time=".$time;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 搜索素材
+     *
+     */
+    public function serachAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $group_id =  Helper::clean($this->getRequest()->getPost('group_id'));
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));
+        $tag_id =  Helper::clean($this->getRequest()->getPost('tag_id'));
+        $material_name =  Helper::clean($this->getRequest()->getPost('material_name'));
+        $time =  Helper::clean($this->getRequest()->getPost('time'));
+        $platform_id =  Helper::clean($this->getRequest()->getPost('platform_id'));;
+        $comp_id = $this->uinfo['comp_id'];
+        $comp_pid = $this->uinfo['comp_pid'];
+        $url = $this->config['dsp']['url']."material/serach?access_token=".$access_token."&comp_id=".$comp_id."&comp_pid".$comp_pid."&group_id=".$group_id."&size_id=".$size_id."&tag_id=".$tag_id."&material_name=".$material_name."&time=".$time."&platform_id=".$platform_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+    * 搜索素材创意
+    *
+    */
+    public function yserachAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $group_id =  Helper::clean($this->getRequest()->getPost('group_id'));
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));
+        $tag_id =  Helper::clean($this->getRequest()->getPost('tag_id'));
+        $time =  Helper::clean($this->getRequest()->getPost('time'));
+         $img_size=  Helper::clean($this->getRequest()->getPost('img_size'));
+         $img_size1 =  Helper::clean($this->getRequest()->getPost('img_size1'));
+         $page =  Helper::clean($this->getRequest()->getPost('page'));
+         $limit = Helper::clean($this->getRequest()->getPost('limit'));
+        $comp_id = $this->uinfo['comp_id'];
+        $comp_pid = $this->uinfo['comp_pid'];
+        $url = $this->config['dsp']['url']."material/yserach?access_token=".$access_token."&comp_id=".$comp_id."&comp_pid".$comp_pid."&group_id=".$group_id."&size_id=".$size_id."&tag_id=".$tag_id."&time=".$time."&img_size=".$img_size."&img_size1=".$img_size1."&page=".$page."&limit=".$limit;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 添加素材
+     *
+     */
+    public function addAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+       $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));//广告位id
+       $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));//规格id
+       $tag_id =  Helper::clean($this->getRequest()->getPost('tag_id'));//标签id
+       $material_url =  Helper::clean($this->getRequest()->getPost('material_url'));//跳转地址
+        $material_name =  Helper::clean($this->getRequest()->getPost('material_name'));//标签名称
+        $link_name_type =  Helper::clean($this->getRequest()->getPost('link_name_type'));//标签名称
+        $comp_id = $this->uinfo['comp_id'];
+        $comp_pid =  $this->uinfo['comp_pid'];
+        $staff_id = $this->uinfo['staff_id'];
+        $add_time = time();
+        $source_type = 1;
+        $img_info  =  Helper::clean($this->getRequest()->getPost('img_url'));
+        //$url = $this->config['dsp']['url']."material/add?access_token=".$access_token."&comp_id=".$comp_id."&adgroup_id=".$adgroup_id."&material_url=".$material_url."&size_id=".$size_id."&tag_id=".$tag_id."&material_name=".$material_name."&comp_pid=".$comp_pid."&add_time=".$add_time."&source_type=".$source_type."&img_info=".$img_info;
+       $url =  $this->config['dsp']['url']."material/add";
+       $data['access_token'] = $access_token;
+       $data['comp_id'] = $comp_id;
+        $data['adgroup_id'] = $adgroup_id;
+        $data['material_url'] = $material_url;
+        $data['size_id'] = $size_id;
+        $data['add_staff_id'] = $staff_id;
+        $data['tag_id'] = $tag_id;
+        $data['material_name'] = $material_name;
+        $data['comp_pid'] = $comp_pid;
+        $data['add_time'] = $add_time;
+        $data['source_type'] = $source_type;
+        $data['link_name_type'] = $link_name_type;
+        $data['img_info'] = $img_info;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        //$result  = file_get_contents($url);
+        echo $result;
+    }
+    /*
+     * 添加素材模板
+     */
+    public function addviewAction(){
+
+    }
+    /*
+    * 修改素材模板
+    */
+    public function  editviewAction(){
+
+    }
+    /*
+     * 获取广告位
+     */
+    public function getAdpostionAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $adgroup_id = Helper::clean($this->getRequest()->getPost('adgroup_id'));
+        $size_id = Helper::clean($this->getRequest()->getPost('size_id'));
+        $url = $this->config['dsp']['url']."material/getAdpostion?access_token=".$access_token."&adgroup_id=".$adgroup_id."&size_id=".$size_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+    }
+
+    /*
+     * 获取素材祥情
+     */
+    public function getmaterialAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $material_id = Helper::clean($this->getRequest()->getPost('material_id'));
+        $url = $this->config['dsp']['url']."material/getmaterial?access_token=".$access_token."&material_id=".$material_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+    }
+    /*
+     * 修改素材
+     */
+    public function editAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $material_id = Helper::clean($this->getRequest()->getPost('material_id'));//广告位id
+        $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));//广告位id
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));//规格id
+        $tag_id =  Helper::clean($this->getRequest()->getPost('tag_id'));//标签id
+        $material_url =  Helper::clean($this->getRequest()->getPost('material_url'));//跳转地址
+        $material_name =  Helper::clean($this->getRequest()->getPost('material_name'));//标签名称
+        $link_name_type =  Helper::clean($this->getRequest()->getPost('link_name_type'));//标签名称
+        $comp_id = $this->uinfo['comp_id'];
+        $comp_pid =  $this->uinfo['comp_pid'];
+        $staff_id =  $this->uinfo['staff_id'];
+        $edit_time = time();
+        $source_type = 1;
+        $img_info  =  Helper::clean($this->getRequest()->getPost('img_url'));
+        //$url = $this->config['dsp']['url']."material/add?access_token=".$access_token."&comp_id=".$comp_id."&adgroup_id=".$adgroup_id."&material_url=".$material_url."&size_id=".$size_id."&tag_id=".$tag_id."&material_name=".$material_name."&comp_pid=".$comp_pid."&add_time=".$add_time."&source_type=".$source_type."&img_info=".$img_info;
+        $url =  $this->config['dsp']['url']."material/edit";
+        $data['access_token'] = $access_token;
+        $data["material_id"] = $material_id;
+        $data['comp_id'] = $comp_id;
+        $data['adgroup_id'] = $adgroup_id;
+        $data['material_url'] = $material_url;
+        $data['size_id'] = $size_id;
+        $data['tag_id'] = $tag_id;
+        $data['edit_staff_id'] = $staff_id;
+        $data['material_name'] = $material_name;
+        $data['comp_pid'] = $comp_pid;
+        $data['edit_time'] = $edit_time;
+        $data['source_type'] = $source_type;
+        $data['img_info'] = $img_info;
+        $data['link_name_type'] = $link_name_type;
+
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        //$result  = file_get_contents($url);
+        echo $result;
+    }
+    /*
+     * 获取定向选择列表
+     */
+    public function gettargetingsAction(){
+
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $url = $this->config['dsp']['url']."targetings/getTarget?access_token=".$access_token;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       echo $result;
+    }
+    /*
+    * 获取定向选择列表详情
+    */
+    public function gettargetlistAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $type = Helper::clean($this->getRequest()->getPost('type'));//类型
+        $url = $this->config['dsp']['url']."targetings/getTargetList?access_token=".$access_token."&type=".$type;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        echo $result;
+    }
+    /*
+     * 获取区域标签列表
+     */
+    public function gettargetregionsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['type'] =Helper::clean($this->getRequest()->getPost('type'));//广告主id
+        $data['aregion_id'] =  Helper::clean($this->getRequest()->getPost('region_id'));//定向名称
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/getTargetRegions";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        echo  $result;
+    }
+    /*
+    * 获取区域标签列表
+    */
+    public function getfriendtargetregionsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['type'] =Helper::clean($this->getRequest()->getPost('type'));//广告主id
+        $data['aregion_id'] =  Helper::clean($this->getRequest()->getPost('region_id'));//定向名称
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/getFriendTargetRegions";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        echo  $result;
+    }
+    /*
+     * 添加定向
+     */
+    public function addtargetAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $data['targeting_name'] =  Helper::clean($this->getRequest()->getPost('targeting_name'));//定向名称
+         $data['targeting'] =  Helper::clean($this->getRequest()->getPost('targeting'));//定向内容
+        $data['type'] =  Helper::clean($this->getRequest()->getPost('type'));//定向内容
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/addTarget";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+      echo  $result;
+    }
+    /*
+     * 获取定向包
+     */
+    public function gettargetsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $data['type'] = Helper::clean($this->getRequest()->getPost('type'));//定向包类型 1 哦普通定向包  2   朋友圈定向包
+        $data['targeting_name'] = Helper::clean($this->getRequest()->getPost('targeting_name'));//定向包名称
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/getTargets";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+      echo  $result;
+    }
+    /*
+     * 获取百米定向包
+     */
+    public function getdmpsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_pid'] = $this->uinfo['comp_id'];;//广告主id
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/getDmps";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        echo  $result;
+    }
+    /*
+     * 上传百米包
+     */
+    public function addcustomAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $data['crowd_id'] = Helper::clean($this->getRequest()->getPost('crowd_id'));//广告主id
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/addCustom";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        echo  $result;
+    }
+
+    /*
+     * 修改定向包
+     */
+    public function edittargetAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $data['targeting_id'] = Helper::clean($this->getRequest()->getPost('targeting_id'));//广告主id
+        $data['targeting_name'] =  Helper::clean($this->getRequest()->getPost('targeting_name'));//定向名称
+        $data['targeting'] =  Helper::clean($this->getRequest()->getPost('targeting'));//定向内容
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/editTarget";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+       echo  $result;
+    }
+    /*
+     * 获取预估人数
+     */
+    public  function getnumberAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $data['adgroup'] = Helper::clean($this->getRequest()->getPost('adgroup'));//广告主id
+        $data['adcreative'] =  Helper::clean($this->getRequest()->getPost('adcreative'));//定向名称
+        $data['targeting'] =  Helper::clean($this->getRequest()->getPost('targeting'));//定向内容
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."targetings/getNumber";
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        echo  $result;
+    }
+
+    /*
+     * 获取计划名
+     */
+    public  function checkcamAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $access_token = $this->getaccess();
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $data['campaign_name'] = Helper::clean($this->getRequest()->getPost('campaign_name'));//广告主id
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."material/checkCam";
+        echo $url;exit;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url,'POST',$data);
+        echo  $result;
+    }
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="../../../../..//public/css/base.css">
+    <link rel="stylesheet" href="../../../../..//public/css/common.css">
+    <link rel="stylesheet" href="../../../../..//public/css/dateRange.css">
+    <script type="text/javascript" src="../../../../..//public/js/dateRange.js"></script>
+</head>
+<style>
+    .table-option-btn {
+        text-decoration: none;
+    }
+
+    .mod_timer {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .temp_box {
+        padding: 20px;
+    }
+
+    .searchbox {
+        float: right;
+        position: relative;
+        width: 238px;
+        height: 38px;
+        border: 1px solid #f2f4f5;
+    }
+
+    .bm-input {
+        border: none;
+    }
+
+    .searchBtnIcon {
+        background: url(../../../../../public/img/search_icon.png) no-repeat top center;
+        display: block;
+        position: absolute;
+        top: 5px;
+        right: 0px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 15px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+    #dmp_list tr td:nth-of-type(1){
+        width:11%;
+    }
+    #dmp_list tr td:nth-of-type(2){
+        width:25%;
+    }
+    #dmp_list tr td:nth-of-type(3){
+        width:16%;
+    }
+    #dmp_list tr td:nth-of-type(4){
+        width:13%;
+    }
+    #dmp_list tr td:nth-of-type(5){
+        width:23%;
+    }
+
+    #dmp_list td span.editinfo,
+    #dmp_list td span.stopinfo,
+    #dmp_list td span.reg {
+        margin-right: 30px;
+        color: #5d9cf5
+    }
+
+    .nexttable {
+        width: 12px;
+        height: 12px;
+        background: url(../../../../../public/img/showtable.png) no-repeat top center;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .secondtable>td{
+        padding: 0 !important;
+    }
+    .secondtable>td table{
+        width: 100%;
+        overflow: hidden;
+    }
+    .secondtable>td table td:nth-of-type(2){
+        padding-left: 60px !important;
+        box-sizing: border-box;
+    }
+    .secondtable{display: none;}
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 代理管理</span>
+        </div>
+        <div class="data_box mt20 delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" onClick="addFn()" style="width:100px;">新建代理</a>
+            <input type='hidden' name='if_add' id='if_add' />
+            <div class="searchbox">
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="代理商名称搜索" />
+                <i class="searchBtnIcon"></i>
+            </div>
+            <div class="mt20">
+                <table id="dmp_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>序列</th>
+                            <th>代理公司</th>
+                            <th>联系人</th>
+                            <th>当前状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="firsttable">
+                            <td>1</td>
+                            <td>
+                                <span class="nexttable" onclick="showNextTableAction(this)"></span>小牛先生代理公司</td>
+                            <td>张三</td>
+                            <td>正常</td>
+                            <td>
+                                <span class="editinfo">修改</span>
+                                <span class="stopinfo">停用</span>
+                                <span class="reg">代理商充值</span>
+                            </td>
+                        </tr>
+                        <tr class="secondtable">
+                            <td colspan="6">
+                                <table>
+                                    <tr class="firsttable">
+                                        <td></td>
+                                        <td>小牛先生代理公司</td>
+                                        <td>张三</td>
+                                        <td>正常</td>
+                                        <td>
+                                            <span class="editinfo">修改</span>
+                                            <span class="stopinfo">停用</span>
+                                            <span class="reg">代理商充值</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>小牛先生代理公司</td>
+                            <td>张三</td>
+                            <td>正常</td>
+                            <td>
+                                <span class="editinfo">修改</span>
+                                <span class="stopinfo">停用</span>
+                                <span class="reg">代理商充值</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+    </div>
+    </script>
+    <!--人群详情end-->
+    <script type="text/javascript" src="../../../../..//public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../..//public/js/common.js"></script>
+    <script src="../../../../..//public/js/layer/layer.js"></script>
+    <script src="../../../../..//public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="../../../../..//public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+        laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+
+        function showNextTableAction(that){
+            if($(that).hasClass('cur')==false){
+                $(that).addClass('cur');
+                $(that).closest('.firsttable').next('.secondtable').show();
+            }else{
+                $(that).removeClass('cur');
+                $(that).closest('.firsttable').next('.secondtable').hide();
+            }
+        }
+
+
+
+        //搜索
+        var skeyWord = '';
+        function searchFn(th) {
+            var t = $(th),
+                inputDom = t.parent().find('input[type="text"]').val();
+            setStatu = $('#statu_id').val();
+            setCrowdType = $('#crowd_type').val();
+            skeyWord = encodeURIComponent(inputDom);
+            getList();
+        }
+        //获取数据
+        var limit = 10, currNum = 1;
+        function getList(curr) {
+            var name = skeyWord ? ('/keyword/' + skeyWord) : '',
+                status = setStatu ? ('/audit_status/' + setStatu) : '',
+                crowdType = setCrowdType ? ('/crowd_type/' + setCrowdType) : '',
+                start_date = startDate ? ('/start_date/' + startDate) : '',
+                end_date = endDate ? ('/end_date/' + endDate) : '';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/ncrowd/index/page/' + (curr || 1) + '/limit/' + limit + name + status + crowdType + start_date + end_date,
+                dataType: 'json',
+                success: function (rs) {
+                    tipTopHide();       //隐藏提示框
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        console.log(data);
+                        render_table(data, curr);     //渲染表格数据
+                        renderPage(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //分页
+        function renderPage(pages, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    currNum = obj.curr;
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getList(obj.curr);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

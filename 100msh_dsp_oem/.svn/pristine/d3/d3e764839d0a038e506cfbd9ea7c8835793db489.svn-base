@@ -1,0 +1,13 @@
+<?php
+
+/**
+ *
+ */
+class Portraits extends Model
+{
+
+    function __construct(argument)
+    {
+        # code...
+    }
+}

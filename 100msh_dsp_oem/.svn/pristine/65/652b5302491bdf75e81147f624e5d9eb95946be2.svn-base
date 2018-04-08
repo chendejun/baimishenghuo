@@ -1,0 +1,293 @@
+/**4444**/
+$('#mask').on({
+    click: function () {
+        $('.tr_selectlist').removeClass('show');
+        $(this).hide()
+    }
+})
+$('.select_wrap').find('.tr_selectdiv').on({
+    click: function () {
+        if ($(this).siblings('.tr_selectlist').hasClass('show') == false) {
+            $(this).siblings('.tr_selectlist').addClass('show');
+            $('#mask').show();
+        } else {
+            $(this).siblings('.tr_selectlist').removeClass('show');
+            $('#mask').hide();
+        }
+    }
+})
+//给输入框赋值
+$('.select_wrap .tr_selectlist').on("click", "li", function () {
+    $(this).parent().siblings('.tr_selectdiv').html($(this).html());
+    $(this).parent().siblings('.tr_selectdiv').attr("data-value", $(this).attr("data-value"))
+    $(this).parent().removeClass('show');
+    $('#mask').hide()
+})
+
+//设置市
+$('.add_province').on('click', 'li', function () {
+    var typeid = $(this).attr('data-value');
+    var className = $('.add_citys').attr('class').split(" ")[1];
+    var selector = "." + className;
+    if (typeid == "") {
+        $('.add_citystitle').attr('data-value', "");
+        $('.add_citystitle').html("请选择");
+        $('.add_citys').html("<li data-value=''>请选择</li>");
+        $('.add_countytitle').attr('data-value', "");
+        $('.add_countytitle').html("请选择");
+        $('.add_county').html("<li data-value=''>请选择</li>");
+        $('.tr_selectlist').removeClass('show');
+        $('#mask').hide()
+        return;
+    }
+    getRegionData(typeid, selector);
+    $('.tr_selectlist').removeClass('show');
+    $('#mask').hide()
+})
+//设置区
+$('.add_citys').on('click', 'li', function () {
+    var typeid = $(this).attr('data-value');
+    var className = $('.add_county').attr('class').split(" ")[1];
+    var selector = "." + className;
+    if (typeid == "") {
+        $('.add_countytitle').text("请选择")
+        $('.add_countytitle').attr('data-value', "");
+        $('.add_county').html('<li data-value="">请选择</li>');
+        $('.tr_selectlist').removeClass('show');
+        $('#mask').hide()
+    } else {
+        getRegionData(typeid, selector)
+    }
+    $('.tr_selectlist').removeClass('show');
+    $('#mask').hide()
+})
+//**************************城市联动开始************************
+function getRegionData(type, selector) {
+    $.ajax({
+        type: "GET",
+        url: "/V1.2/Advertiser/getScList/sc_id/" + type,
+        dataType: 'json',
+        success: function (res) {
+            if (res.state == 1) {
+                var list = res.sc_list;
+                SetRegionValue(list, selector)
+                if (selector == ".add_citys") {
+                    $('.add_citystitle').html($('.add_citys').find('li').eq(0).text());
+                    $('.add_citystitle').attr('data-value', $('.add_citys').find('li').eq(0).attr('data-value'));
+                    $('.add_countytitle').attr('data-value', "");
+                    $('.add_countytitle').html("请选择");
+                    $('.add_county').html("<li data-value=''>请选择</li>");
+                    $('.tr_selectlist').removeClass('show');
+                    $('#mask').hide()
+                } else if (selector == ".add_county") {
+                    $('.add_countytitle').html("请选择")
+                    $('.add_countytitle').attr("data-value", $('.add_county').find('li').eq(0).attr('data-value'))
+                }
+            }
+        },
+        error: function (err) {
+            //  console.log(err)
+            tipTopShow("获取区域分类失败！");
+        }
+    });
+}
+//给所在地区分类赋值
+function SetRegionValue(list, selector) {
+    var str = "<li data-value=''>请选择</li>";
+    var citys = ".add_citys"
+    $.each(list, function (key, value) {
+        str += "<li data-value='" + value.sc_id + "'>" + value.sc_name + "</li>"
+    })
+    $(selector).html(str)
+}
+
+function getSecondRegionValue(selector) {
+    var nextType = $(selector)
+    getRegionData(nextType, selector)
+}
+
+//**************************城市联动结束************************
+//**************************获取行业分类开始************************
+//获取所属行业分类    
+function getIndustryData(type) {
+    $('.add_indeatils').html("<option value=''>请选择</option>")
+    $.ajax({
+        type: "GET",
+        url: "/V1.2/Advertiser/getCate/cate_id/" + type,
+        dataType: 'json',
+        success: function (res) {
+            //  console.log(res)
+            if (res.state == 1) {
+                var list = res.cate_list;
+                SetIndustryValue(list, type)
+            }
+        },
+        error: function (err) {
+            tipTopShow("获取行业分类失败！");
+        }
+    });
+}
+//给行业分类赋值
+function SetIndustryValue(list, type) {
+    var str = "<option value=''>请选择</option>";
+    $.each(list, function (key, value) {
+        str += "<option value='" + value.cate_id + "'>" + value.cate_name + "</option>"
+    })
+    if (type == 0) {
+        $('.add_industry').html(str)
+    } else {
+        $('.add_indeatils').html(str)
+    }
+}
+
+function getSecondIndustryValue(selector) {
+    var secondType = $(selector).val();
+    getIndustryData(secondType)
+}
+
+
+//**************************获取行业分类结束************************
+
+//上传资质证件
+function AjaxUploadImg(id, selectorId, moreflag) {
+    var logo = document.getElementById(id);
+    var file = logo.files[0].type,
+        imgOld = '',
+        LogoW = "",
+        logoH = "",
+        comp_id = $('.add_photoswrapper').attr('comp-id');
+    if ($(selectorId).closest('.photos_div').find('img').length > 0) {
+        imgOld = $(selectorId).closest('.photos_div').find('img').attr('src');
+    }
+    var ImgSize = logo.files[0].size;
+    fileSize = (Math.round(ImgSize * 100 / 1024) / 100) //根据filesize，转换成KB
+
+    //是否是图片
+    var imageType = /^image\//;
+    if (!imageType.test(file)) {
+        tipTopShow("请选择图片！");
+        return;
+    }
+    if (moreflag) {
+        var idIndex = $(selectorId).parent().index()
+    }
+    if (id == "logo") {
+        var input = document.getElementById(id);
+        if (input.files) { //获取图片的物理宽度、高度
+            var f = input.files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = e.target.result;
+                var image = new Image();
+                image.onload = function () {
+                    LogoW = image.width;
+                    logoH = image.height;
+                    postImg(id, selectorId, moreflag, fileSize, idIndex, LogoW, logoH, imgOld, comp_id)
+                };
+                image.src = data;
+            };
+            reader.readAsDataURL(f);
+        } else {
+            var image = new Image();
+            image.onload = function () {
+                LogoW = image.width;
+                logoH = image.height;
+                postImg(id, selectorId, moreflag, fileSize, idIndex, LogoW, logoH, imgOld, comp_id)
+            }
+            image.src = input.value;
+        }
+    } else {
+        postImg(id, selectorId, moreflag, fileSize, idIndex, "", "", imgOld, comp_id)
+    }
+}
+
+//上传图片请求
+function postImg(id, selectorId, moreflag, fileSize, idIndex, LogoW, logoH, imgOld, comp_id) {
+    //根据filesize的计算图片的大小
+    if (id == "logo") {
+        if (fileSize > 400) {
+            tipTopShow("商标图片大小不能超过400K");
+            var node = $("#" + id).parent().html(),
+                parentNode = $("#" + id).parent();
+                parentNode.html("");
+                parentNode.html(node);
+            return;
+        }
+        if (LogoW != 512 || logoH != 512) {
+            tipTopShow("商标图片大小必须为512*512像素");
+            var node = $("#" + id).parent().html(),
+                parentNode = $("#" + id).parent();
+                parentNode.html("");
+                parentNode.html(node);
+            return;
+        }
+    } else {
+        if (fileSize > (1024 * 2)) {
+            tipTopShow("图片大小不能超过2M");
+            var node = $("#" + id).parent().html(),
+                parentNode = $("#" + id).parent();
+                parentNode.html("");
+                parentNode.html(node);
+            return;
+        }
+    }
+
+    $.ajaxFileUpload({
+        url: "/V1.2/Advertiser/upImg",
+        fileElementId: id,
+        fileSize: 1,
+        dataType: 'json',
+        fileFilter: 'jpg,png',
+        data: {
+            filename: id,
+            imgOld: imgOld,
+            comp_id: comp_id,
+        },
+        beforeSend: function () {
+            tipTopHide("正在上传中...");
+        },
+        success: function (rs) {
+            console.log(rs);
+            tipTopHide();
+            if (rs.state == 1) {
+                setTimeout(function () {
+                    var ImgHtml ='<img src="' + rs.url + '" style="width:261px;height:158px;display:block;"/>';                 
+                    var newInput = '<div class="photosMask">';
+                        newInput += '<div class="openImg"><a href="'+ rs.url+'"  target="_blank">查看大图</a></div>';
+                        newInput += '<div class="updataph"><span class="updateImg">重新上传</span>';
+                        newInput +=  '<input type="file" class="pushImg" id="' + id + '" name="' + id + '" onchange="AjaxUploadImg(' + "'" + id + "','" + selectorId + "'" + ')" />'
+                        newInput += '</div>';
+                        newInput += '</div>';
+                        if($(selectorId).parent().parent().parent().hasClass('photos_div')==true){
+                            $(selectorId).closest('.photos_div').html(ImgHtml+newInput);
+                        }else{
+                            $(selectorId).closest('.photosMore_div').html(ImgHtml+newInput);
+                        }
+                    if (moreflag) {
+                        if ($('.photosMore_div').length < 5) {
+                            var str = "";
+                            str += '<div class="photosMore_div">'
+                            str += '<span class="show add_bg"></span>'
+                            str += '<span style="display:block;height:25px;line-height:25px;text-align:center;padding-top:0;">点击上传更多资质照片</span>'
+                            str += '<input type="file" class="pushmoreImg morePushImg" id="' + id + idIndex + '" name="' + id + idIndex + '" onchange="AjaxUploadImg(' + "'" + id + idIndex + "','" + selectorId + idIndex + "',1" + ')" />'
+                            str += '</div>'
+                            $('.add_photoswrapper').append(str);
+                        } else if ($('.photosMore_div').length > 5) {
+                            tipTopShow('更多资质最多上传五张！');
+                        }
+                    }
+                }, 1000);
+            } else {
+                tipTopShow(rs.msg);
+            }
+
+        },
+        error: function (rs, textStatus, errorThrown) {
+            // console.log(rs)
+            if (!textStatus) {
+                tipTopShow(rs);
+            }
+        }
+    });
+    return false;
+}

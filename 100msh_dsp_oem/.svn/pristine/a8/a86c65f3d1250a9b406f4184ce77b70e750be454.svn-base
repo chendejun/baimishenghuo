@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>效果报告-投放效果报告</title>
+	<link rel="stylesheet" href="../../../../../public/css/base.css">
+	<link rel="stylesheet" href="../../../../../public/css/common.css">
+	<link rel="stylesheet" href="../../../../../public/css/dateRange.css">
+	<script type="text/javascript" src="../../../../../public/js/dateRange.js"></script>
+</head>
+<style>
+	.mod_echarts {
+		width: 100%;
+		height: 450px;
+	}
+
+	.mod_timer {
+		float: right;
+	}
+
+	.charts_nav {
+		margin-bottom: 10px;
+		height: 40px;
+		line-height: 40px;
+		border-radius: 5px;
+		border: 1px solid #E0E0E0;
+		display: inline-block;
+	}
+
+	.charts_nav li {
+		width: 80px;
+		height: auto;
+		cursor: pointer;
+	}
+	
+    .charts_nav li:first-child{
+    	border-radius: 5px 0 0 5px;
+    	border-left: 1px solid #dfdfdf;
+    }
+    
+    .charts_nav li:last-child{
+    	border-radius: 0 5px 5px 0;
+    	border-right: 1px solid #dfdfdf;	
+    }
+    
+	.tr_select {
+		width: 100px;
+		height: 40px;
+		border: 1px solid #dddddd;
+		border-radius: 4px;
+		padding: 5px;
+		color: #666666;
+		margin-left: 20px;
+	}
+
+	.charts_nav a.cur,
+	.charts_nav li.cur {
+		border-color: #4c94f5;
+	    color: #fff;
+	    background-color: #4c94f5;
+	}
+	.user_noMsg {
+		width: 100%;
+		text-align: center;
+		padding-top: 25px;
+		color: #f08519;
+	}
+</style>
+
+<body style="height:100%;">
+	<div class="content_box">
+		<div class="title_box">
+			<span><a href="/v1.2/report/index">< 返回广告效果</a></span>
+		</div>
+		<div class="box_table mt20">
+			<h4>重要提示：数据统计截止到昨日，当日数据请隔日查看。</h4>
+			<table id="userInfo" class="base_table">
+				<thead>
+					<tr>
+						<th>广告名称</th>
+						<th>所属广告主</th>
+						<th class="zmoney">总预算</th>
+						<th>日预算</th>
+						<th>出价</th>
+						<th>出价类型</th>
+						<!--<th>投放类型</th>-->
+						<th class="controlType"></th>
+						<th>广告扣费</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<p class="user_noMsg"></p>
+		</div>
+		<div class="data_box mt20 delivery_nav">
+			<div class="charts_box">
+				<h3 class="charts_title"></h3>
+				<div class="mod_timer">
+					<span>时间筛选：</span>
+					<div class="date_filter">
+						<div class="ta_date">
+							<span class="date_title" id="date_day"></span>
+							<i class="arrow"></i>
+						</div>
+					</div>
+				</div>
+				<ul class="charts_nav  clearfix" id="charts_nav">
+					<li type="1" class="cur">浏览量</li>
+					<li type="2">点击量</li>
+					<li type="3">点击率</li>
+					<li type="4">广告扣费</li>
+					<li type="5">区域分布</li> 
+				</ul>
+				<div id="mod_echarts" class="mod_echarts"></div>
+			</div>
+		</div>
+		<div class="box_table mt20">
+			<h4><i class="info_icon icon7"></i>效果报告
+			<select class="tr_select proportionnum" onchange="getArea()"> 
+				<option value="1">按省份</option>
+				<option value="2">按城市</option>
+			</select> 
+			</h4>
+			
+			<table id="list" class="base_table">
+				<thead>
+					<tr>
+						<th class="date">日期</th>
+						<th class="city">城市</th>
+						<th>广告曝光数</th>
+						<th>广告点击数</th>
+						<th>广告点击率</th>
+						<th>广告扣费</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<p class="noMsg"></p>
+			<!--列表分页-->
+			<div id="list_page" class="page"></div>
+		</div>
+	</div>
+	<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+	<script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+	<script src="../../../../../public/js/laypage/laypage.js"></script>
+	<script type="text/javascript">
+		var infoId = getUrlParams('id') ? getUrlParams('id') : '';
+		var pageType = getUrlParams('pageType') ? getUrlParams('pageType') : '';
+		console.log(pageType)
+		//var startDate=get_date(30),endDate=get_date(1);
+		var startDate = CurentTime(), endDate = CurentTime();
+//		console.log(startDate);
+		var curType = 1;
+//		默认为省
+		var AreaType = 2;
+//		地区列表数据
+		var areaData = [];
+		var totalData = {};
+		$(function () {
+			$('.tr_select').hide();
+			$('#list .city').hide();
+			$('#list .date').show();
+			$("#charts_nav li").on("click", function () {
+				if ($(this).hasClass("cur")) {
+					return;
+				}
+				$("#charts_nav li").removeClass("cur");
+				$(this).addClass("cur");
+				curType = $(this).attr("type");
+				if(curType != 5 ){
+					getData();
+					$('#list .date').show();
+					$('.tr_select').hide();
+					$('#list .city').hide();
+				}else{
+//					区域选择
+					$('.tr_select').show();
+					$('#list .city').show();
+					$('#list .date').hide();
+					getArea();
+				}
+			});
+//			切换不同个广告详情
+			if(pageType == 0){
+				$('#userInfo .controlType').html('投放类型');
+				getUserInfo();
+			}else if(pageType == 1){
+				$('#userInfo .controlType').html('投放速度控制');
+				getDeliveryInfo();
+			}
+			
+		});
+		
+		
+		/*日期选择*/
+		var dateRange = new pickerDateRange('date_day', {
+			startDate: startDate,
+			endDate: endDate,
+			theme: 'ta',
+			monthRangeMax: 1, // 日期最大范围(以月计算)
+			isTodayValid : true,
+			success: function (obj) {
+				startDate = obj.startDate;
+				endDate = obj.endDate;
+				if (startDate != '' || endDate != '') {
+					$("#date_day").html(obj.startDate + ' 至 ' + obj.endDate);
+					if(curType != 5){
+						getData();
+					}else{
+						getArea();
+					}
+				}
+			}
+		});
+		
+		//省市选择
+		function getArea(){
+			AreaType=$(".tr_select").val();
+			var type = AreaType ? ('/type/' + AreaType) : '';
+			var st = startDate ? ('/start_date/' + startDate) : '';
+			var et = endDate ? ('/end_date/' + endDate) : '';
+			$.ajax({
+				type: "GET",
+				url: '/v1.2/BhDeliveryAchieved/getAdvertAreaInfo/bh_delivery_id/' + infoId + type+ st + et,
+//				url:'areaApi.json',
+				dataType: 'json',
+				success: function (rs) {
+					if (rs.state == 1) {
+						var data = rs.data;
+						if (data.list.length == 0) {
+							tipTopShow("暂无记录！");
+							$('#list tbody').html("")
+							$('.noMsg').text("暂无记录");
+							renderChart(data);
+						}else{
+							var page_total = Math.ceil(data.list.length/10);
+							areaData = data.list;
+							totalData = data.total_data;
+							render_table1(areaData.slice(0,10),totalData);
+							renderChart(data);
+							renderPage(page_total,1);
+						}
+
+					}else {
+						tipTopShow(rs.msg);
+					}
+				},
+				error: function (rs) {
+					tipTopShow("查询信息失败，请重试...");    //显示提示框
+				}
+			});
+			
+		}
+		
+		//其他数据获取
+		function getData() {
+//			console.log(startDate)
+//			console.log(endDate)
+			// var st = startDate ? ('/starttime/' + startDate) : '';
+			// var et = endDate ? ('/endtime/' + endDate) : '';
+			var st = startDate ? ('/start_date/' + startDate) : '';
+			var et = endDate ? ('/end_date/' + endDate) : '';
+			$.ajax({
+				type: "GET",
+				url: '/v1.2/BhDeliveryAchieved/advertisedList/bh_delivery_id/' + infoId + st + et,
+//				url:'api.json',
+				dataType: 'json',
+				success: function (rs) {
+					if (rs.state == 1) {
+						var data = rs.data;
+//						console.log(rs.data)   		
+						renderPage(0,0);
+						if (data.list.length == 0) {
+							tipTopShow("暂无记录！");
+							$('#list tbody').html("")
+							$('.noMsg').text("暂无记录");
+							if (curType == 3) {
+								renderChart2(data);
+							} else {
+								renderChart(data);
+							}
+						}else{
+							render_table(data);
+							if (curType == 3) {
+								renderChart2(data);
+							} else {
+								renderChart(data);
+							}
+						}
+
+					}else {
+						tipTopShow(rs.msg);
+					}
+				},
+				error: function (rs) {
+					tipTopShow("查询信息失败，请重试...");    //显示提示框
+				}
+			});
+		}
+		getData();
+
+		
+		//广告主详情数据
+		function getUserInfo() {
+			$.ajax({
+				type: "GET",
+				url: '/v1.2/Gdtdelivery/deliveryStatInfo/delivery_id/' + infoId,
+				dataType: 'json',
+				async: false,
+				beforeSend: function () {
+					tipTopHide("正在查询数据");    //显示提示框
+				},
+				success: function (rs){
+					console.log(rs)
+					tipTopHide();
+					if (rs.state == 1) {         //如果查询成功
+						var data = rs.data;     //返回数据赋值
+						var list_e = $("#userInfo tbody"), str = "", no_msg = $(".user_noMsg");
+						if (data.length == 0) {
+							list_e.html("");
+							no_msg.text("暂无记录");
+							return;
+						}
+						no_msg.text("");
+						var zmoneystr = "",dayMoney="";
+						str = '<tr>';
+						str += '<td>' + data.delivery_name + '</td>';
+						str += '<td>' + data.comp_name + '</td>';
+						if (data.platform_id == 1) {
+							zmoneystr = '<td>' + data.z_money + '</td>';
+							dayMoney = data.day_money;
+							$('.zmoney').show()
+						} else {
+							dayMoney = parseFloat(data.day_money/100);
+							$('.zmoney').hide()
+						}
+						str += zmoneystr
+						str += '<td>' + dayMoney + '</td>';
+						str += '<td>' + data.bid_money + '</td>';
+						str += '<td>' + data.bid_type_name + '</td>';
+						str += '<td>' + data.ad_type_name + '</td>';
+						str += '<td>' + round(data.ad_pay, 3) + '</td>';
+						str += '</tr>';
+						list_e.html(str);
+					} else {
+						tipTopShow(rs.msg);
+					}
+				},
+				error: function (rs) {
+					//console.log(rs)
+					tipTopShow("查询信息失败，请重试...");    //显示提示框
+				}
+			});
+		}
+		
+		
+			//全网广告详情
+		function getDeliveryInfo(){
+				var data = '';
+				$.ajax({
+					type: "POST",
+					url: '/v1.2/Bhdelivery/getDeliveryInfo',
+					data:{'bh_delivery_id':infoId},
+					dataType: 'json',
+					async: false,
+					beforeSend: function () {
+						tipTopHide("正在查询数据");    //显示提示框
+					},
+					success: function (rs) {
+						
+						tipTopHide();
+						if (rs.api_code == 1) {         //如果查询成功
+							data = rs.data;  //返回数据赋值
+							var list_e = $("#userInfo tbody"), str = "", no_msg = $(".user_noMsg");
+							if (data.length == 0) {
+								list_e.html("");
+								no_msg.text("暂无记录");
+								return;
+							}
+							no_msg.text("");
+							str = '<tr>';
+							str += '<td>' + data.delivery_name + '</td>';
+							str += '<td>' + data.comp_name + '</td>';
+							str += '<td>' + data.campaign_totalBudget + '</td>';
+							str += '<td>' + data.campaign_budget + '</td>';
+							str += '<td>' + data.bid + '</td>';
+							str += '<td>' + data.bidTyp_name + '</td>';
+							str += '<td>' + data.budgetAllocationType_name+'</td>';
+							str += '<td>' + data.reportspend + '</td>';
+							str += '</tr>';
+							list_e.html(str);
+						} else {
+							tipTopShow(rs.msg);
+						}
+					},
+					error: function (rs) {
+						console.log(rs)
+						tipTopShow("查询信息失败，请重试...");    //显示提示框
+					}
+				});
+			}
+			
+
+		//图表渲染
+		function renderChart(data) {
+			var data = data.list;
+			var modEcharts = echarts.init(document.getElementById('mod_echarts'));
+			var xData = [], xAreaData = [],showData = [],xValue1 = [], xValue2 = [], xValue3 = [], xValue4 = [], xValue5 = [],i = data.length - 1, nameData = [], showValue = [];
+			for (var p in data) {
+//				if (data[p].stat_time) {
+//					xData[p] = data[p].stat_time + "点";
+//				} else {
+//					xData[p] = data[p].stat_day;
+//				}
+				xData[p] = data[p].the_date;
+				xAreaData[p] = data[p].cityId;
+				xValue1[p] = data[p].view;
+				xValue2[p] = data[p].click;
+				xValue4[p] = round(data[p].reportSpend, 2);
+				xValue5[p] = data[p].view;
+				xValue3[p] = parseFloat(data[p].clicking_rate);
+			}
+			if (curType == 1) {
+				showValue = xValue1;
+				showData = xData;
+				nameData = ['浏览量', '点击率'];
+			}
+			if (curType == 2) {
+				showValue = xValue2;
+				showData = xData;
+				nameData = ['点击量', '点击率'];
+			}
+			if (curType == 4) {
+				showValue = xValue4;
+				showData = xData;
+				nameData = ['广告扣费', '点击率'];
+			}
+			if (curType == 5) {
+				showValue = xValue5;
+				showData = xAreaData;
+				nameData = ['浏览量', '点击率'];
+			}
+			option = {
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+						type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+					},
+					formatter: function (params) {
+						var content = '';
+						for (var i = 0; i < params.length; i++) {
+							if (params[i].name) {
+								content += "时间：" + params[i].name + "<br />";
+								break;
+							}
+						} for (var i = 0, key = {}; i < params.length; i++) {
+							key = params[i];
+							if (key.seriesName == '点击率' && (typeof key.value != 'undefined')) {
+								key.value = key.value + ' %';
+							}
+							if (typeof key.value === 'undefined' || key.value === '-') {
+								key.value = '暂无';
+							}
+							content += key.seriesName + "：" + key.value + "<br />";
+						}
+						return content;
+					}
+				},
+				grid: {
+					left: '2%',
+					right: '4%',
+					bottom: 60,
+					top: 30,
+					containLabel: true
+				},
+				legend: {
+					x: 'center',
+					y: 'bottom',
+					data: nameData,
+				},
+				xAxis: [
+					{
+						type: 'category',
+						data: showData,
+						axisTick: {
+							alignWithLabel: true
+						}
+					}
+				],
+				yAxis: [
+					{
+						name: nameData[0],
+						type: 'value',
+						minInterval: 1,
+						axisLine: { // 轴线
+							show: true,
+							lineStyle: {
+								color: '#888888',
+								type: 'solid',
+								width: 1
+							}
+						},
+						axisTick: { // 轴标记
+							show: true,
+							length: 1,
+							lineStyle: {
+								type: 'solid',
+								width: 0
+							}
+						}
+					},
+					{
+						name: nameData[1],
+						type: 'value',
+						axisLine: { // 轴线
+							show: true,
+							lineStyle: {
+								color: '#888888',
+								type: 'solid',
+								width: 1
+							}
+						},
+						axisTick: { // 轴标记
+							show: true,
+							length: 1,
+							lineStyle: {
+								type: 'solid',
+								width: 0
+							}
+						},
+						axisLabel: {
+							formatter: '{value} %'
+						}
+					}
+				],
+				series: [
+					{
+						name: nameData[0],
+						type: 'bar',
+						smooth: true,
+						itemStyle: {
+							normal: {
+								color: '#36b1ff'
+							}
+						},
+						data: showValue
+					},
+					{
+						name: nameData[1],
+						type: 'line',
+						smooth: true,
+						yAxisIndex: 1,
+						itemStyle: {
+							normal: {
+								color: '#fe3c69'
+							}
+						},
+						data: xValue3
+					}
+				]
+			};
+			modEcharts.setOption(option);
+		};
+		
+		function renderChart2(data) {
+			var data = data.list;
+			var modEcharts = echarts.init(document.getElementById('mod_echarts'));
+			var xData = [], xValue = [], i = data.length - 1;
+			for (var p in data) {
+				xData[i] = data[p].the_date;
+				xValue[i] = parseFloat(data[p].clicking_rate);
+				i--;
+			}
+			//xData 日期      xValue数据
+			option = {
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+						type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+					},
+					formatter: function (params) {
+						var content = '';
+						for (var i = 0; i < params.length; i++) {
+							if (params[i].name) {
+								content += "时间：" + params[i].name + "<br />";
+								break;
+							}
+						} for (var i = 0, key = {}; i < params.length; i++) {
+							key = params[i];
+							if (key.seriesName == '点击率' && (typeof key.value != 'undefined')) {
+								key.value = key.value + ' %';
+							}
+							if (typeof key.value === 'undefined' || key.value === '-') {
+								key.value = '暂无';
+							}
+							content += key.seriesName + "：" + key.value + "<br />";
+						}
+						return content;
+					}
+				},
+				grid: {
+					left: '2%',
+					right: '4%',
+					bottom: 60,
+					top: 30,
+					containLabel: true
+				},
+				legend: {
+					x: 'center',
+					y: 'bottom',
+					data: ['点击率'],
+				},
+				xAxis: [
+					{
+						type: 'category',
+						data: xData,
+						axisTick: {
+							alignWithLabel: true
+						}
+					}
+				],
+				yAxis: [
+					{
+						name: '点击率',
+						type: 'value',
+						axisLine: { // 轴线
+							show: true,
+							lineStyle: {
+								color: '#888888',
+								type: 'solid',
+								width: 1
+							}
+						},
+						axisTick: { // 轴标记
+							show: true,
+							length: 1,
+							lineStyle: {
+								type: 'solid',
+								width: 0
+							}
+						},
+						axisLabel: {
+							formatter: '{value} %'
+						}
+					}
+				],
+				series: [
+					{
+						name: '点击率',
+						type: 'line',
+						smooth: true,
+						itemStyle: {
+							normal: {
+								color: '#fe3c69'
+							}
+						},
+						data: xValue
+					}
+				]
+			};
+			modEcharts.setOption(option);
+		};
+
+		//效果报告表格渲染
+		function render_table(data) {
+			var list_e = $("#list tbody"), str = "",totalStr = '', no_msg = $(".noMsg");
+			if (data.length == 0) {
+				list_e.html("");
+				no_msg.text("暂无记录");
+				return;
+			}
+			no_msg.text("");
+			$.each(data.list, function (k, v) {
+				var time = ""
+				str += '<tr>';
+//				if (v.stat_time) {
+//					time = v.stat_time + "点"
+//				} else {
+//					time = v.stat_day
+//				}
+				str += '<td>' + v.the_date + '</td>';
+				str += '<td>' + v.view + '</td>';
+				str += '<td>' + v.click + '</td>';
+				str += '<td>' + parseFloat(v.clicking_rate) + '%</td>';
+				str += '<td>' + round(v.reportSpend, 2) + '</td>';
+				str += '</tr>';
+			})
+			totalStr += '<tr>',
+			totalStr += '<td>' + data.total_data.总计 + '</td>';
+			totalStr += '<td>' + data.total_data.view + '</td>';
+			totalStr += '<td>' + data.total_data.click + '</td>';
+			totalStr += '<td>' + parseFloat(data.total_data.clicking_rate) + '%</td>';
+			totalStr += '<td>' + round(data.total_data.reportSpend,2) + '</td>';
+			totalStr += '</tr>',
+			list_e.html(str+totalStr);
+		}
+		function render_table1(data,totalData) {
+			var list_e = $("#list tbody"), str = "",totalStr = '', no_msg = $(".noMsg");
+			if (data.length == 0) {
+				list_e.html("");
+				no_msg.text("暂无记录");
+				return;
+			}
+			no_msg.text("");
+			$.each(data, function (k, v) {
+				var time = ""
+				str += '<tr>';
+				str += '<td>' + v.cityId + '</td>';
+				str += '<td>' + v.view + '</td>';
+				str += '<td>' + v.click + '</td>';
+				str += '<td>' + parseFloat(v.clicking_rate) + '%</td>';
+				str += '<td>' + round(v.reportSpend, 2) + '</td>';
+				str += '</tr>';
+			})
+			totalStr += '<tr>',
+			totalStr += '<td>' + totalData.总计 + '</td>';
+			totalStr += '<td>' + totalData.view + '</td>';
+			totalStr += '<td>' + totalData.click + '</td>';
+			totalStr += '<td>' + parseFloat(totalData.clicking_rate) + '%</td>';
+			totalStr += '<td>' + round(totalData.reportSpend,2) + '</td>';
+			totalStr += '</tr>',
+			list_e.html(str+totalStr);
+		}
+
+		//保留两位小数（四舍五入）
+		function round(number, fractionDigits) {
+			with (Math) {
+				return round(number * pow(10, fractionDigits)) / pow(10, fractionDigits);
+			}
+		}
+
+		//扇形图表
+		// function renderChart3() {
+		// 	var modEcharts = echarts.init(document.getElementById('mod_echarts'));
+		// 	option = {
+		// 		tooltip: {
+		// 			trigger: 'item',
+		// 			formatter: "{a} <br/>{b} : {c} ({d}%)"
+		// 		},
+		// 		legend: {
+		// 			orient: 'vertical',
+		// 			left: 'left',
+		// 			data: ['广告曝光次数', '广告点击数', '广告点击率', '广告扣费']
+		// 		},
+		// 		series: [
+		// 			{
+		// 				name: '区域分布',
+		// 				type: 'pie',
+		// 				radius: '55%',
+		// 				center: ['50%', '60%'],
+		// 				data: [
+		// 					{ value: 335, name: '广告曝光次数' },
+		// 					{ value: 310, name: '广告点击数' },
+		// 					{ value: 234, name: '广告点击率' },
+		// 					{ value: 135, name: '广告扣费' }
+		// 				],
+		// 				itemStyle: {
+		// 					emphasis: {
+		// 						shadowBlur: 10,
+		// 						shadowOffsetX: 0,
+		// 						shadowColor: 'rgba(0, 0, 0, 0.5)'
+		// 					}
+		// 				}
+		// 			}
+		// 		]
+		// 	};
+
+		// 	modEcharts.setOption(option);
+
+		// }
+
+
+	    //分页
+	    function renderPage(pages,curr){
+	        //显示分页
+	        laypage({
+	            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+	            pages: pages, //通过后台拿到的总页数
+	            skin: '#4c94f5',
+				prev: '<em class="layui-icon"></em>',
+				next: '<em class="layui-icon"></em>',
+	            curr: curr || 1, //当前页
+	            jump: function(obj, first){ //触发分页后的回调
+	                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+	                	var start = (obj.curr-1)*10;
+	                    render_table1(areaData.slice(start,end),totalData);
+	                    if(obj.curr < pages){
+	                    	var end = obj.curr*10;
+	                    	render_table1(areaData.slice(start,end),totalData);
+	                    }else if(obj.curr == pages){
+	                    	render_table1(areaData.slice(start),totalData);
+	                    }
+	                }
+	            }
+	        });
+	    }
+//	    获取当前的日期
+	    function CurentTime (){
+		        var now = new Date();
+		        var year = now.getFullYear();       //年
+		        var month = now.getMonth() + 1;     //月
+		        var day = now.getDate();            //日
+		        var clock = year + "-";
+		        if(month < 10)
+		            clock += "0";
+		        clock += month + "-";
+		        if(day < 10)
+		            clock += "0"; 
+		        clock += day + " ";
+		        return(clock); 
+	    }
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>我的广告主-广告主详情</title>
+	    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    	<link rel="stylesheet" href="../../../../../public/css/common.css">
+    	<link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    	<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+		<style>
+			.content_box {min-width: 1504px;}
+			.account_box .box_table {padding: 0 30px;}
+			.advertr_view .line .add_linel { margin-top: 0}
+			.advertr_view .line .add_title {width:100px;}
+	
+		</style>
+		<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="/public/js/common.js"></script>
+		<script src="/public/js/layer/layer.js"></script>
+	</head>
+
+
+	<body>
+		<div class="content_box">
+           <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+      </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <a href="javascript:;" class="cur">基本资料</a>
+                <a href="/v1.2/advertiser/advdetail/comp_id/206329">账户详情</a>
+                <a href="/v1.2/advertiser/consume">消耗查询</a>
+            </div>
+        </div>
+	
+        <div class="advertr_view">
+				<div class="addinput_box">
+					<div class="line h80">
+						<div class="add_linel">
+							<div class="add_title">广告主名称：</div>
+							<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+							<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+						</div>
+						<div class="add_liner">
+						<!-- 	<div class="add_title">联系人：</div>
+							<div class="add_info setedit set_person">{{$data.comp_info.contacts}}</div>
+							<input type="text" class="edit_input edit_person" value={{$data.comp_info.contacts}}> -->
+
+							<div class="add_title">所在区域：</div>
+							<div class="add_info setedit set_address">{{$data.comp_info.pro_name}}　{{$data.comp_info.city_name}}　{{$data.comp_info.region_name}} {{$data.comp_info.comp_addr}}</div>
+						<!-- 	<div class="add_info setedit set_detailsaddress" style="margin-left:95px;">{{$data.comp_info.comp_addr}}</div> -->
+						</div>
+					</div>
+					<div class="line">
+						<div class="add_linel">
+							<div class="add_title">所属行业：</div>
+							<div class="add_info setedit industryname">
+								<!-- {{$data.comp_info.cate_name}} -->
+							</div>
+							<select class="tr_select bm_right seleindust add_industry" onchange="getSecondIndustryValue('.add_industry')"></select>
+							<select class="tr_select bm_right seleindust add_indeatils"></select>
+						</div>
+						<div class="add_liner">
+							<div class="add_title">广告主网址：</div>
+							<div class="add_info setedit set_url">{{$data.comp_info.hd_url}}{{$data.comp_info.website_url}}</div>
+							<select class="trn_select bm_right seleindust hd_url"><option {{if $data.comp_info.hd_url=='http://'}}selected{{/if}}>http://</option><option {{if $data.comp_info.hd_url=='https://'}}selected{{/if}} >https://</option></select>
+							<input type="text" class="edit_input edit_url" value={{$data.comp_info.website_url}}>
+						</div>
+					</div>
+					<div class="line">
+						<div class="add_linel">
+							<div class="add_title">所属服务商：</div>
+							<div class="add_info set_facilitator">{{$data.comp_info.dls_comp_name}}</div>
+							<!-- <input type="text" class="edit_input edit_facilitator" value={{$data.comp_info.dls_comp_name}}> -->
+						</div>
+						<div class="add_liner">
+							<div class="add_title">联系手机号：</div>
+							<div class="add_info set_phone">{{$data.comp_info.mobile_phone}}</div>
+						</div>
+					</div>
+					<div class="line">
+						<div class="add_linel">
+							<div class="add_title">联系人：</div>
+							<div class="add_info setedit set_person">{{$data.comp_info.contacts}}</div>
+							<!-- <input type="text" class="edit_input edit_person" value={{$data.comp_info.contacts}}> -->
+						</div> 
+
+						<div class="add_linel">
+							<div class="add_title">人群画像开通：</div>
+							<div class="add_info set_phone">{{$data.comp_info.total_disburse}}</div>
+						</div>
+
+					</div>
+		
+
+					<div class="line clearfix">
+						<div class="add_linel" style="position:relative;z-index:2;margin-bottom:2px;">
+						
+							<div class="editaddress">
+								<div class="select_wrap">
+									<div class="tr_selectdiv add_provincetitle" data-value="">请选择</div>
+									<ul class="tr_selectlist add_province" onchange="getSecondRegionValue('.add_province')">
+										<li data-value="">请选择</li>
+									</ul>
+								</div>
+								<div class="select_wrap">
+									<div class="tr_selectdiv add_citystitle" data-value="">请选择</div>
+									<ul class="tr_selectlist add_citys" onchange="getSecondRegionValue('.add_citys')">
+										<li data-value="">请选择</li>
+									</ul>
+								</div>
+								<div class="select_wrap">
+									<div class="tr_selectdiv add_countytitle" data-value="">请选择</div>
+									<ul class="tr_selectlist add_county">
+										<li data-value="">请选择</li>
+									</ul>
+								</div>
+							</div>
+							<input type="text" class="edit_input add_detailsaddress" value="{{$data.comp_info.comp_addr}}" placeholder="详细地址,如广东路135号成花大厦" style="width:575px;margin-left:96px;margin-top:5px" />
+						</div>
+					</div>
+				</div>
+
+				<script>
+					var comp_id = {{$data.comp_info.comp_id}};
+					console.log(comp_id);
+
+					function loc(url) {
+						location.href = url;
+					}
+				</script>
+	</body>

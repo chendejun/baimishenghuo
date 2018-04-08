@@ -1,0 +1,89 @@
+<?php
+/**
+ * HTTP请求
+ * sakmon 2016/08/11
+ */
+class DoNetwork{
+	/**
+	 * 执行请求
+	 * @param  [type] $url    [description]
+	 * @param  string $method [description]
+	 * @param  array  $data   [description]
+	 * @return [type]         [description]
+	 */
+	static public function makeRequest( $url , $method =  'GET' , $data = [] , $cookie='' , $header = [] , $timeout = 50000 ) {
+        if(strtoupper($method) == 'GET' && !empty($data)){
+            if(strpos($url , '?') !== false){
+                $url .= '&' . http_build_query($data);
+            }else{
+                $url .= '?' . http_build_query($data);
+            }
+            
+		}
+
+        $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_URL, $url);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+	    curl_setopt($ch, CURLOPT_TIMEOUT_MS,$timeout); //超时设定
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		if (strtoupper($method) == 'POST') {
+            //var_dump($data);
+	        curl_setopt($ch, CURLOPT_POST, 1);  
+	        curl_setopt($ch, CURLOPT_POSTFIELDS,$data);
+	    }
+	    if(!empty($cookie)){
+			curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+		}
+	    if(!empty($header)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        }
+        curl_setopt($ch, CURLOPT_HEADER, false);  
+	    $result = curl_exec($ch);
+	    if($result === false){
+	    	echo curl_error($ch);
+	    }
+	    curl_close($ch);
+	    return $result;
+	}
+
+	/**
+	 * 异步请求
+	 * @param  [type]  $host [description]
+	 * @param  [type]  $path [description]
+	 * @param  integer $port [description]
+	 * @return [type]        [description]
+	 */
+	static public function fp($host , $path , $port = 80){
+        $fp = fsockopen($host, $port , $errno, $errstr, 30);
+        if (!$fp) {
+        	BmException::errorLog($errstr);
+        } else {
+            $out = "GET $path HTTP/1.1\r\n";
+            $out .= "Host: $host\r\n";
+            $out .= "Connection: Close\r\n\r\n";
+
+            fwrite($fp, $out);
+            fclose($fp);
+        }
+ 	}
+ 	/**
+ 	 * [gdt description]
+ 	 * @param  [type] $path   [description]
+ 	 * @param  array  $param  [description]
+ 	 * @param  array  $header [description]
+ 	 * @param  string $method [description]
+ 	 * @return [type]         [description]
+ 	 */
+ 	static public function gdt($path , $param = array(), $header=[] , $method = 'POST'){
+ 		if(empty($header)) $header = array('Content-Type: application/json');
+ 		$timestamp = time();
+ 		$nonce = md5(http_build_query($param).$timestamp);
+ 		$access_token = Yaf_Registry::get('gdt_access_token');
+ 		$url = "https://sandbox-api.e.qq.com/v1.0/{$path}?access_token={$access_token}&timestamp={$timestamp}&nonce={$nonce}";
+ 		if(strtoupper($method) == 'GET'){
+ 			$url .= '&' . http_build_query($param);
+ 		}
+ 		return json_decode(self::makeRequest($url , $method , $param , '' , $header) , true);
+ 	}
+}

@@ -1,0 +1,18 @@
+<?php
+class Nav extends Model{
+	public function getNavByGroup($group_id){
+		$row = $this->db->dsp->table('dsp_oem_group')->field('nav_ids')->where("group_id='{$group_id}'")->find();
+		if(empty($row)) return false;
+		$nav_ids = json_decode($row['nav_ids'] , true);
+		$list = $this->db->dsp->query("SELECT nav_id,title,icon,href,pid,spread FROM dsp_oem_nav WHERE nav_id IN(".implode(',', $nav_ids).")  AND `status`=1 ORDER BY nav_id ASC");
+		$data = array();
+		foreach ($list as $key => $val) {
+			if($val['pid'] == 0){
+				$data[$val['nav_id']] = $val;
+			}else{
+				$data[$val['pid']]['children'][] = $val;
+			}
+		}
+		return $data;
+	}
+}

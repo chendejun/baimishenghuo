@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>我的广告主-广告主详情</title>
+	    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    	<link rel="stylesheet" href="../../../../../public/css/common.css">
+    	<link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    	<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+		<style>
+			.content_box {min-width: 1504px;}
+			.table_style {padding: 50px 30px;}
+			.acount_box {background-color: #FFF; overflow: hidden;padding: 0 30px 0;}
+			.acount_box h4 {padding: 10px 0px}
+			.I_box ,.II_box {
+				width:50%;
+				float: left;
+				position: relative;
+			}
+
+			.I_box h3, .II_box h3 {
+				padding: 20px 10px;
+
+			}
+
+			.I_box h3:after, .II_box h3:after{content:" ";height: 15px;width: 3px;background-color: #1087e3;position: absolute;left: 20px;top: 20px;}
+			.I_box h3 i, .II_box h3 i  {position: relative;top: -5px;left: 80px;}
+			.I_box ul, .II_box ul {
+					position: relative;
+					
+				}
+
+			.I_box ul li, .II_box ul li {
+				float: left;
+				width :15%;
+				text-align: center;
+				font-size: 15px;
+				position: relative;
+				
+			}
+		
+		
+			.I_box ul li p:first-child,.II_box ul li p:first-child {
+				color: #999;
+				font-size: 14px;
+			}
+			.I_box ul li p:last-child,.II_box ul li p:last-child {
+				padding: 10px 0;
+
+			}
+
+	/*		.I_box ul li:after{
+				content: '';
+    			width: 1px;
+    			background: #f2f2f2;
+    			background: red;
+    			position: relative;
+    			top: -50px;
+    			right: 1px;
+    			clear: both;
+    			content: '\0020';
+    			display: block;
+    			height: 30px;
+			}*/
+
+			#recharge_list {margin-top: 10px}
+				
+		</style>
+		<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="/public/js/common.js"></script>
+		<script src="/public/js/layer/layer.js"></script>
+			}
+	</head>
+
+
+	<body>
+		<div class="content_box">
+           <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+      </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+              <a href="basicdetail.html">基本资料</a>
+                <a href="javascript:;" class="cur">账户详情</a>
+                <a href="/v1.2/account/invoice">消耗查询</a>
+            </div>
+        </div>
+
+        	<div class="acount_box">
+        		<h4><i class="club_icons icon2"></i>账户详情</h4>
+
+				<div class="I_box">
+					<h3><i class="club_icons icon1" onclick="showtips()" id="stps"></i>I类账户</h3>
+					<ul>
+        				<li>
+        					<P>余额</P>
+        					<p>15600</p>
+        				</li>
+        				<li>
+        					<P>冻结中</P>
+        					<p>15600</p>
+        				</li>
+        				<li>
+        					<P>已消耗</P>
+        					<p>15600</p>
+        				</li>
+        			</ul>
+				</div>
+			<div class="II_box" >
+				<h3><i class="club_icons icon1" onclick="showtips()" id="stps"></i>II类账户</h3>
+				<ul>
+        			<li>
+        				<P>余额</P>
+        				<p>15600</p>
+        			</li>
+        			<li>
+        				<P>冻结中</P>
+        				<p>15600</p>
+        			</li>
+        			<li>
+        				<P>已消耗</P>
+        				<p>15600</p>
+        			</li>
+        		</ul>
+			</div>
+        </div>
+
+               <div class="box_table table_style clearfix">
+               	 <h4><i class="club_icons icon2"></i>账户流水记录</h4>
+                <div class="search_box">
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <table id="recharge_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>转账金额</th>
+                            <th>账户类型</th>
+                            <th>充值操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!-- <!--列表分页/> -->
+                <div id="list_page" class="page"></div>
+            </div> 
+        </div>
+
+        <script>
+        	
+        	 function showtips(){
+            var msg = '<span style="color:black;">现金账户：在线充值、线下转账等方式充值金额；<br>赠送账户：活动赠送，如充值赠送、活动抽奖等金额；<br>虚拟账户：系统赠送，仅可用于WIFI广告投放的金额；<br>现金和赠送账户可投放所有广告，扣费时的账户顺序：<br>WIFI广告：先从虚拟账户扣除，如余额不足依次从现金账户、赠送账户扣除。<br>其他广告：先从现金账户扣除、如余额不足从赠送账户中扣除。</span>';
+            layer.tips(msg, '#stps',{tips: [3, '#f5f5f5'], area: ['450px', 'auto'],time: 0,closeBtn:1});
+        }
+
+
+        </script>
+	</body>

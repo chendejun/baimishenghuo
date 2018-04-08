@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告管理-素材库</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+</head>
+<style type="text/css">
+    .adgroup_size dd{margin-bottom: 20px;}
+    .a-upload{position: relative; margin-left: 20px;}
+    .a-upload  input {position: absolute;top: 0;left: 0;right: 0;bottom: 0;opacity: 0;filter: alpha(opacity=0);cursor: pointer}
+    .wd300{width: 300px;}
+    .material_box{ background: #fff; padding: 20px;}
+    .material_box .adgroup_pic{margin: 20px 0 40px; padding-left: 90px;}
+    .material_box .adgroup_pic img{ width: 220px;}
+    .material_box .adgroup_pic li{float: left; padding-left:100px;}
+    .material_box .adgroup_div label{margin-right: 10px;}
+    .size_box input{width: 140px;margin-left: 20px; }
+    .size_box input.size_radio{width: 20px;}
+    .pic_row{position: relative;}
+    .pic_row b{position: absolute; font-weight: normal;}
+    .pic_row .adgroup_size{padding-left: 80px;}
+    .header_nav {padding: 10px 0; display: none;}
+</style>
+<body>
+    <div class="content_box w1500">
+        <div class="header_nav clearfix">
+            <a href="javascript:;'" class="bm-btn bm-btn-blue" id="back_btn">&lt;&lt;返回</a>
+        </div>
+        <div class="title_box">
+            <i class="info_icon icon1"></i>
+            <sapn><a href="">广告管理</a> / <a href="/Material/index">素材库</a> / 新增素材</sapn>
+        </div>
+        <div class="material_box mt20">
+             <div class="form">
+                <div class="from-row">
+                    <label>素材名称:</label>
+                    <input type="text" value="" class="bm-input wd300" id="material_name" name="material_name" placeholder="素材名称" />
+                </div>
+                <div class="from-row">
+                    <label>跳转地址:</label>
+                    <input type="text" value="" class="bm-input wd300" id="material_url" name="material_url" placeholder="跳转地址" />
+                </div>
+                <div class="from-spec">
+                    <span>素材类型：</span>
+                    <div class="adgroup_div">
+                    </div>
+                </div>
+                <div class="adgroup_pic">
+                </div>
+                <div class="pic_row mt20" style="height: 100px;">
+                    <b>素材图片:</b>
+                    <div class="adgroup_size">
+                    </div>
+                </div>
+                <div class="btn_box mt20 mb15">
+                     <button type="button" id="submit_btn" class="bm-btn bm-btn-blue" onclick="submit()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    var type = getUrlParams('type') ? getUrlParams('type'):'',//url参数来源于新增投放
+        backUrl='';
+    if(type==1){
+        $('.header_nav').show();
+        backUrl = "../delivery/addst2";
+    }
+    if(type==2){
+        $('.header_nav').show();
+        backUrl = "../delivery/editst2";
+    }
+    $('#back_btn').click(function(){
+        location.href = backUrl;
+    });
+    //素材规格
+    function getGroupSet(){
+        $.ajax({
+            type: "GET",
+            url: '/material/getGroupSize',
+            dataType:'json',
+            success: function(rs){
+                tipTopHide();
+                if(rs.state == 1){
+                    var str='',pic='',size='';
+                    $.each(rs.data,function(k,v){
+                        var gsize='',sizeId='';
+                        $.each(v.ad_size_info,function(i,j){
+                          /*gsize +='<dd><span>规格大小：'+j.ad_size_name+'</span>\
+                                    <a href="javascript:;" class="a-upload bm-btn bm-btn-blue" _id="'+j.ad_size_id+'" onclick="formDataUpload('+j.ad_size_id+')">\
+                                        <input type="file" class="bm-btn" name="file'+j.ad_size_id+'">上传图片\
+                                    </a></dd>';*/
+                            gsize +='<dd><label><input type="radio" name="size" class="size_radio" _id="'+j.ad_size_id+'" /><span>规格大小：'+j.ad_size_name+'</span>\
+                                        <input type="file" class="fileid" name="file'+j.ad_size_id+'" id="file'+j.ad_size_id+'" _id="'+j.ad_size_id+'">\
+                                        <button type="button" class="a-upload bm-btn bm-btn-blue" onclick="formDataUpload('+j.ad_size_id+',this)">上传图片</button>\
+                                    </dd></label>';
+                        })
+                        size+='<dl class="size_box size_box'+v.adgroup_id+'" '+(k!=0 ? 'style="display:none"':'')+ '>'+gsize+'</dl>';
+
+                        str+='<label class="label_box" _id="'+v.adgroup_id+'"><input type="radio" name="adgroup" value="'+v.adgroup_id+'" '+(k==0 ? 'checked="checked"':'')+ '>'+v.adgroup_name+'</label>';
+                        pic+='<ul class="clearfix pic_box pic_box'+v.adgroup_id+'"'+(k!=0 ? 'style="display:none"':'')+ '>\
+                                <li class="fl"><img src="'+v.adgroup_show_url+'" alt=""></li>\
+                            </ul>';
+                    });
+                    $('.adgroup_div').append(str);
+                    $('.adgroup_pic').append(pic);
+                    $('.adgroup_size').append(size);
+                    $('.size_box input[name="size"]').eq(0).attr("checked",'checked');
+                }
+            }
+        });
+    }
+    getGroupSet();
+
+    $('body').on('click','.label_box',function(e){
+        var id = $(this).attr('_id');
+        $('.pic_box').hide();
+        $('.size_box').hide();
+        $('.pic_box'+id).show();
+        $('.size_box'+id).show().find("input[name='size']").eq(0).attr("checked",'checked');
+    })
+    $('body').on('change','.fileid',function(){
+        if($(this).val()){
+            $(this).parent().find('button').attr('disabled',false);
+        }
+    });
+    //图片选择
+    function formDataUpload(id,t){
+        var $this = $(t);
+        if(!$('#file'+id)[0].files[0]){
+            tipTopShow('请选择上传图片！');
+            return;
+        }
+        var formData = new FormData();
+        formData.append('file', $('#file'+id)[0].files[0]);
+        formData.append('sizeid',id);
+        /*var size = $('#file'+id)[0].files[0].size;
+        if(size >1024*2){ //不大于2kb
+            tipTopShow('图片大小不能大于2kb');
+            return;
+        }*/
+        $.ajax({
+            url: '/material/uploadFile',
+            type: 'POST',
+            cache: false,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                var rs = eval("("+data+")");
+                if(rs.state==1){
+                    tipTopShow('上传成功！');
+                    $('#file'+id).attr('_url',rs.url);
+                    $this.attr('disabled',true);
+                }else{
+                    tipTopShow(rs.msg);
+                }
+            },
+             error: function (data) {
+                alert("上传失败");
+            }
+        })
+    }
+    //跳转地址
+    $('#material_url').blur(function(){
+       var url = $.trim($('#material_url').val()),dataUrl;
+       if(/^https:\/\//i.test(url)){
+            dataUrl = 'https://' + url.replace(/^https?:\/\//i, '');
+       }else{
+            dataUrl = 'http://' + url.replace(/^https?:\/\//i, '');
+       }
+       $('#material_url').val(dataUrl);
+    })
+    //提交
+     function submit(){
+        var material_name = $.trim($('#material_name').val());
+        var material_url = $.trim($('#material_url').val());
+        var adgroup = $('input[name="adgroup"]:checked').val();
+        var adsize =  $('input[name="size"]:checked').attr('_id');
+        var urlDom = $('.size_box'+adgroup).find('input[type="file"]');
+        var urlData='';
+        if(!material_name){
+            tipTopShow("请输入素材名称！");
+            return;
+        }
+        if(!material_url){
+            tipTopShow("请输入跳转地址！");
+            return;
+        }
+        if(!checkUrl(material_url)){
+            tipTopShow("请输入正确的跳转地址！");
+            return;
+        }
+        urlDom.each(function(){
+            var thUrl = $(this).attr('_url')? $(this).attr('_url'):"";
+            var thSize = $(this).attr('_id')? $(this).attr('_id'):"";
+            if(adsize==thSize){
+                urlData = thUrl;
+            }
+        })
+        if(!urlData){
+            tipTopShow("请确认上传图片与规格是否相符！");
+            return;
+        }
+        var post_data ={'material_name':material_name,'material_url':material_url,'adgroup_id':adgroup,'adsize_id':adsize,'fileinfo':urlData};
+        $.ajax({
+            type : "POST",
+            url : "/material/add",
+            data : post_data,
+            dataType : 'json',
+            beforeSend : function() {
+                //禁用按钮防止重复提交
+                $("#submit_btn").attr('disabled','disabled');
+            },
+            success : function(rs) {
+                $("#submit_btn").removeAttr('disabled');
+                tipTopHide();
+                if (rs.state == 1) {
+                    tipTopShow("申请提交成功");
+                    if(type){
+                        location.href = backUrl;
+                    }else{
+                        location.href ='/material/index';
+                    }
+                }else{
+                    tipTopShow(rs.msg);
+                }
+            },
+            error : function(rs) {
+                $("#submit_btn").removeAttr('disabled');
+                tipTopShow("操作失败请重试！");
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>
+
+
+

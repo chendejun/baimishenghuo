@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 商圈分析 -->
+    <meta charset="UTF-8">
+    <title>百米DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=FsZTps2xmuGacVVGlxR3HhPb"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+    <style type="text/css">
+        .type_box{padding-top: 30px;}
+        .layui-form-radio i:hover, .layui-form-radioed i{color: #4aa6fc;}
+        .layui-form-checkbox[lay-skin=primary]:hover i{border-color:#4aa6fc;}
+        .layui-form-checked[lay-skin=primary] i{background-color:#4aa6fc}
+        .layui-form-label{width: auto;}
+        .form_box li{color:#999}
+        .form_box label{color: #333}
+        .form_box{margin: 30px 10px;}
+        .layui-form-checkbox[lay-skin=primary] span{color: #999}
+        #container{height:360px;width:50%;margin-left:20px;}
+        #crowd_table{width: 40%;margin-left: 5%;}
+        #crowd_table>ul li{float: left;background-color: #f5f5f5}
+        #crowd_table>ul li:nth-child(1){color: #f5f5f5;}
+        #crowd_table li{height: 40px;line-height: 40px;}
+        #crowd_table li:nth-child(1){width: 15%;}
+        #crowd_table li:nth-child(2){width: 20%}
+        #crowd_table li:nth-child(3){width: 65%}
+        #crowd_table li .layui-progress-bar{position: initial;background-color:#618cff;}
+        #crowd_table li .layui-progress{position: relative;top: 16px;margin-right:20%;height: 10px;border-radius:0;}
+        #crowd_table li .layui-progress-bar{height: 10px;border-radius:0;}
+        #crowd_table li span{position: absolute;right: -18%;top: -5px;}
+        .table_content{max-height: 320px;overflow-y: auto;}
+        .table_content ul{clear: both;overflow:hidden;zoom:1;width: 100%;color: #666}
+        .table_content ul li{float: left;}
+        .table_content ul li:nth-child(1){text-align: center}
+        .layui-form-radio i{font-size:17px;}
+        .layui-form-checked span{color: #009eff!important;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>百米DMP / 客流人群分析</span>
+        </div>
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="index.html">客流分析
+                    <p></p>
+                </a>
+                <a href="cus_propety.html">客户属性
+                    <p></p>
+                </a>
+                <a href="cus_prefrence.html">消费偏好
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">商圈分析
+                    <p></p>
+                </a>
+                <a href="cus_source.html">客流来源
+                    <p></p>
+                </a>
+                <a href="hot_search.html">搜索热点
+                    <p></p>
+                </a>
+                <a href="app_analysis.html">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="create_analysis.html" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        </div>
+
+        <div class="tip_box" style="display:none;">
+            <p class="tip_title">本功能为高级版本付费功能，费用
+                <span>3000元/年。</span>
+            </p>
+            <p class="tip_subtitle">点击下方“修改”按钮，进入本场景修改页面,选择开通“高级版”，完成支付后等待开通，预计完成需要1~2个工作日。</p>
+            <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="create_analysis.html">修改</a>
+        </div>
+
+        <div class="content">
+            <div class="type_box clearfix">
+                <select class="bm-select select_box fl" id="select_box">
+                    <option value="">昨日</option>
+                    <option value="1">近7天</option>
+                    <option value="2">近30天</option>
+                    <option value="3">指定日期</option>
+                </select>
+                <ul class="item_ul fl" id="item_ul">
+                    <li type="1" class="cur">全部</li>
+                    <li type="2">新访客</li>
+                    <li type="3">老访客</li>
+                </ul>
+                <p class="fl">商圈分析截止到昨日</p>
+            </div>
+
+            <div class="form_box layui-form layui-form-item">
+                <ul class="clearfix">
+                    <li class="fl">
+                        <label class="layui-form-label">性别:</label>
+                        <input type="radio" name="sex" value="男" title="男" checked>
+                        <input type="radio" name="sex" value="女" title="女">
+                    </li>
+                    <li class="fl">
+                        <label class="layui-form-label">年龄:</label>
+                        <input type="checkbox" name="" value="18岁以下" title="18岁以下" lay-skin="primary" checked>
+                        <input type="checkbox" name="" value="18-25岁" title="18-25岁" lay-skin="primary">
+                        <input type="checkbox" name="" value="26-35岁" title="26-35岁" lay-skin="primary">
+                        <input type="checkbox" name="" value="36-45岁" title="36-45岁" lay-skin="primary">
+                        <input type="checkbox" name="" value="46-55岁" title="46-55岁" lay-skin="primary">
+                        <input type="checkbox" name="" value="56-65岁" title="56-65岁" lay-skin="primary">
+                        <input type="checkbox" name="" value="66岁以上" title="66岁以上" lay-skin="primary">
+                    </li>
+                    <li class="fl">
+                        <label class="layui-form-label">来源:</label>
+                        <input type="checkbox" name="" value="居住地" title="居住地" lay-skin="primary" checked>
+                        <input type="checkbox" name="" value="办公地" title="办公地" lay-skin="primary">
+                    </li>
+                </ul>
+            </div>
+            <div class="clearfix">
+                <div id="container" class="fl"></div>
+                <div id="crowd_table" class="fl">
+                    <ul class="clearfix">
+                        <li>序号</li>
+                        <li>热门来源</li>
+                        <li>客流占比</li>
+                    </ul>
+                    <div class="table_content">
+                        <ul>
+                            <li>1</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>2</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>3</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>4</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>5</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>6</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>7</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>8</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>9</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+    </style>
+    <script type="text/javascript">
+        var map = new BMap.Map("container"); // 创建地图实例
+        var point = new BMap.Point(116.418261, 39.921984);
+        map.centerAndZoom(point, 13); // 初始化地图，设置中心点坐标和地图级别
+        map.enableScrollWheelZoom(); // 允许滚轮缩放
+        var points = [{
+                "lng": 116.418261,
+                "lat": 39.921984,
+                "count": 50
+            },
+            {
+                "lng": 116.218261,
+                "lat": 39.821984,
+                "count": 150
+            },
+            {
+                "lng": 116.318261,
+                "lat": 39.721984,
+                "count": 100
+            }
+        ];
+        if (!isSupportCanvas()) {
+            alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
+        }
+        heatmapOverlay = new BMapLib.HeatmapOverlay({
+            "radius": 20
+        });
+        map.addOverlay(heatmapOverlay);
+        heatmapOverlay.setDataSet({
+            data: points,
+            max: 100
+        });
+
+        function setGradient() {
+            var gradient = {};
+            var colors = document.querySelectorAll("input[type='color']");
+            colors = [].slice.call(colors, 0);
+            colors.forEach(function (ele) {
+                gradient[ele.getAttribute("data-key")] = ele.value;
+            });
+            heatmapOverlay.setOptions({
+                "gradient": gradient
+            });
+        }
+        //判断浏览区是否支持canvas
+        function isSupportCanvas() {
+            var elem = document.createElement('canvas');
+            return !!(elem.getContext && elem.getContext('2d'));
+        }
+
+
+
+
+
+
+
+
+
+
+
+        layui.use(['form', 'layer', 'element'], function () {
+            var form = layui.form(),
+                layer = layui.layer,
+                element = layui.element;
+
+            $("#item_ul li").on("click", function () {
+                $("#item_ul li").removeClass("cur");
+                $(this).addClass("cur");
+                var type = $(this).attr("type");
+            });
+
+
+
+
+
+
+
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+<table border="1">
+	<tr><td>日期</td><td>支出对象</td><td>支出金额</td></tr>
+	{{foreach from=$list  key=key item=val}}
+	<tr>
+		<td>{{$val.transfer_time}}</td>
+		<td>{{$val.comp_name}}</td>
+		<td>{{$val.amount}}</td>
+	</tr>
+	{{/foreach}}
+</table>

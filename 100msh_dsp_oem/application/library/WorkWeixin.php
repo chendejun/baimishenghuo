@@ -1,0 +1,80 @@
+<?php
+/**
+ * 企业微信
+ * skamon 2017/01/05
+ */
+class WorkWeixin{  
+	static private $corpid = 'WWcc9eabc352ca901c'; //企业ID
+	static private $agentid = '1000012'; //企业应用ID
+	static private $secret = 'vLDOmJy5NTK_3Rl9aAkbI7VZzIgzZGSwoSmt3r9XjzE'; //企业应用密钥
+	static private $access_token;
+	static private $path = LOG_PATH . DIRECTORY_SEPARATOR . 'access_token'; //access_token保存文件路径
+	static private $touser = 'yangyanliu|huaijun|liuganghui|yangxuelian|lijingta|wuzhongwen|wuyugui|Mee|zhangaile|xingxinwei|wangxuemin|lijianhui|dengwenhui|zhangmingfeng|keyanan|zhaoxiaoyong|zougengpeng'; //发送给谁 
+	/**
+	 * 获取应用access_token
+	 * @return [type] [description]
+	 */
+	static private function curlAccessToken(){
+		$result = DoNetwork::makeRequest("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=".self::$corpid."&corpsecret=".self::$secret);
+		if(!empty($result)){
+			$data = json_decode($result , true);
+			if(is_array($data) && isset($data['access_token'])){
+				file_put_contents(self::$path, json_encode(array('access_token' => $data['access_token'] , 'time_out' => time() + 5500) ));
+				self::$access_token = $data['access_token'];
+				return true;
+			}
+		}
+		return false;
+	}
+	/**
+	 * 设置应用access_token
+	 * @param [type] $access_token [description]
+	 */
+	static public function initAccessToken(){
+		if(!file_exists(self::$path)){ //access_token不存在
+			self::curlAccessToken();
+			return true;
+		}
+		$result = json_decode(file_get_contents(self::$path) , true);
+		if(time() > $result['time_out']){ //超时
+			self::curlAccessToken();
+			return true;
+		}
+		self::$access_token = $result['access_token'];
+	}
+	/**
+	 * 发送消息
+	 * @return [type] [description]
+	 */
+	static public function warning($msg , $type = 1){
+		self::initAccessToken();
+		//if($type == 0) self::$touser = 'yangyanliu|wuzhongwen|lijingta';
+        self::$touser = 'xuyao';
+		if(empty(self::$access_token)) return false;
+		$data = array('touser' => self::$touser , 'msgtype' => 'text' , 'agentid' => (int)self::$agentid , 'text' => array('content' => $msg));
+		$result = DoNetwork::makeRequest("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=".self::$access_token , "POST" , json_encode($data));
+		Helper::logger($msg , 'warning' , 'warning');
+	}
+    /**
+     * 创建菜单
+     * @return [type] [description]
+     */
+    static public function addMenu(){
+        self::initAccessToken();
+        if(empty(self::$access_token)) return false;
+        $data=array('button' => array(0=>array('type' => 'view','name' => '待办事件','url' => 'http://hezi.100msh.com/Api/index?type=1&login=1'),1=>array('type' => 'view','name' => '已办事件','url' => 'http://hezi.100msh.com/Api/index?type=2&login=1')));
+        $result = DoNetwork::makeRequest("https://qyapi.weixin.qq.com/cgi-bin/menu/create?access_token=".self::$access_token."&agentid=".(int)self::$agentid , "POST" , json_encode($data));
+       var_dump($result);
+    }
+    /**
+     * 删除菜单delMenu
+     * @return [type] [description]
+     */
+    static public function delMenu(){
+        self::initAccessToken();
+        if(empty(self::$access_token)) return false;
+        //$data=array('button' => array(0=>array('type' => 'click','name' => '待办事件','key' => 'BM001_PENGDING_EVENT'),1=>array('type' => 'click','name' => '已办事件','key' => 'BM001_RUN_EVENT')));
+        $result = DoNetwork::makeRequest("https://qyapi.weixin.qq.com/cgi-bin/menu/delete?access_token=".self::$access_token."&agentid=".(int)self::$agentid , "GET" );
+        var_dump($result);
+    }
+}

@@ -1,0 +1,542 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../public/css/tencent_ad.css">
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form mt20">
+        <div class="flow_steps gdt_create">
+            <ul class="clearfix">
+                <li class="current">广告计划</li>
+                <li>投放人群</li>
+                <li>创意和文案</li>
+                <li class="last">排期和出价</li>
+            </ul>
+        </div>
+        <div class="step_box">
+            <article class="step1 on">
+                <div class="from-row">
+                    <label>广告主：</label>
+                    <input type="text" id="ad_user" class="bm-select wd350" placeholder="请输入搜索广告主名称" value="" autocomplete="off">
+                    <div id="user_list" class="search_list" style="display: none"></div>
+                    <div class="user_recent">
+                        <p class="pat_nav">最近投放广告主<i></i></p>
+                        <ul id="user_recent_list" class="clearfix">
+                            <!-- <li class="recent_li cur" _id="1" _amount="2.00">
+                                <span>环球资源1</span>
+                                <b>账户余额￥5877</b>
+                            </li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="from-row">
+                    <label>广告计划：</label>
+                    <ul class="plan_type clearfix" id="new_plan">
+                        <li class="cur" _type="2">选择已有广告计划<i></i></li>
+                        <li _type="1">新建广告计划<i></i></li>
+                    </ul>
+                    <input type="text" id="ad_plan" class="bm-select wd300" placeholder="请输入搜索计划名称" value="" _type="2" autocomplete="off">
+                    <div id="plan_list" class="search_list" style="display: none"></div>
+                </div>
+                <div class="from-row">
+                    <label>推广目标：</label>
+                    <select id="campaign_type" class="bm-select wd300" minAmt="150" maxAmt="4000000">
+                        <option value="6">普通链接</option>
+                        <option value="3" disabled="disabled">电商推广</option>
+                        <option value="1" disabled="disabled">腾讯开放平台应用</option>
+                        <option value="2" disabled="disabled">苹果应用</option>
+                        <option value="4" id="wx_bind">微信品牌页</option>
+                    </select>
+                </div>
+                <div class="from-row">
+                    <label>日预算：</label>
+                    <input type="text" value="" id="budget" class="bm-input wd300" placeholder="￥" />
+                    <span class="input-tip gray" id="amount_tip">最低150元，最高400万元</span>
+                </div>
+                <div class="from-row">
+                    <label>投放形式：</label>
+                    <div class="ad_format">
+                        <label class="c-label gdt_label"><input type="radio" name="ad_format" value="1" checked="checked">&nbsp;&nbsp;标准投放</label>
+                        <label class="c-label gdt_label"><input type="radio" name="ad_format" value="2" >&nbsp;&nbsp;加速投放</label>
+                        <label class="c-label wx_label" style="display: none;"><input type="radio" name="ad_format" value="3" >&nbsp;&nbsp;根据曝光自动优化</label>
+                    </div>
+                </div>
+                <div class="commit-box">
+                    <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="nextStepPage1()">下一步</button>
+                </div>
+            </article>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../public/js/layer/layer.js"></script>
+    <script type="text/javascript">
+        var storageInfo1 = sessionStorage.getItem('storageInfo1') ? JSON.parse(sessionStorage.getItem('storageInfo1')) : '', //页面缓存
+            /*infoId = getUrlParams('id') ? getUrlParams('id') : null, //详情id*/
+            urlCompId = getUrlParams('comp_id') ? getUrlParams('comp_id') : null, //广告主id
+            urlAmount = getUrlParams('gdt_amount') ? getUrlParams('gdt_amount') : null, //广告主现金账户+赠送账户
+            urlStatus = getUrlParams('gdt_status') ? getUrlParams('gdt_status') : null; //广点通开通状态
+        var getUserTimer, //步骤1
+            domAdUser = $('#ad_user'),
+            domUserList = $('#user_list'),
+            domReUserList = $('#user_recent_list'),
+            getPlanTimer,
+            domAdPlan = $('#ad_plan'),
+            domPlanList = $('#plan_list'),
+            domNewPlan = $('#new_plan'),
+            domcType = $('#campaign_type'),//推广目标
+            domdBudge = $('#budget'),//日预算
+            domcMore = $('input[name="ad_format"]');//投放方式
+
+        //初始化
+        function init(){
+            getRecentUserList();
+            if(urlCompId){//广告主投放
+                getUseMoney(urlCompId);
+                domAdUser.attr('_amount',parseFloat(urlAmount));
+                if(urlStatus == 0){ //广点通开通状态(0未开通,1已申请,2申请被驳回,3已开通-新开,4已开通-关联,5已开通-授权过期)
+                    openGdtAd(urlCompId);
+                }
+                if( urlStatus == 1 || urlStatus == 2){
+                    tipGdtAd(urlStatus);
+                }
+                if(urlStatus == 5){
+                    overDate(urlCompId);
+                }
+            }
+            if(storageInfo1){ //缓存渲染
+                readPageInfo(storageInfo1);
+            }
+        }
+        init();
+        //广告主搜索
+        domAdUser.on('focus',function(e){
+            domUserList.show();
+        }).on('input click',function(e){
+            var keyword = $(this).val() ? $(this).val():'';
+            getUserTimer && clearTimeout(getUserTimer);
+            getUserTimer = setTimeout(function(){
+                getUserList(keyword,function(res){
+                    var html ='';
+                    if(!res){
+                        domUserList.html('');
+                        return;
+                    }
+                     $.each(res,function(k,v){
+                        html +='<li class="user_li" _id="'+v.comp_id+'" _amount="'+v.usable_amount+'" _title="'+v.comp_name+'" _wxbind="'+v.gdt_wx_bind+'" gdt_apply_status="'+v.gdt_apply_status+'">'+v.comp_name+'</li>'
+                    });
+                    domUserList.html('<ul>'+html+'</ul>');
+                });
+            })
+        })
+        //选择广告主搜索结果
+        domUserList.on('click','.user_li',function(e){
+            var th = $(this),
+                id = th.attr('_id'),
+                amount = th.attr('_amount'),
+                title = th.attr('_title'),
+                wxbind = th.attr('_wxbind'),//是否绑定微信 0否1是
+                s_status = th.attr('gdt_apply_status');
+            if(s_status == 0){ //gdt_apply_status 广点通开通状态(0未开通,1已申请,2申请被驳回,3已开通-新开,4已开通-关联,5已开通-授权过期)
+                openGdtAd(id);
+                return;
+            }
+            if( s_status == 1 || s_status == 2){
+                tipGdtAd(s_status);
+                return;
+            }
+            if(s_status == 5){
+                overDate(id);
+                return;
+            }
+            if(wxbind == 0){
+                $('#wx_bind').attr('disabled','disabled');
+            }else{
+                $('#wx_bind').removeAttr('disabled');
+            }
+            domAdUser.val(th.text()).attr('_id',th.attr("_id")).attr('_amount',amount).attr('_title',title).attr('_wxbind',wxbind);
+            domUserList.hide();
+            reNewInput();//广告计划重置
+            $('.recent_li').removeClass('cur');
+        })
+        //推广目标切换
+        domcType.change(function(){
+            var th = $(this),
+                thVal = th.val(),
+                amountTip = $('#amount_tip'),
+                setDayObj = {'6':['150','4000000'],'4':['1000','10000000']},
+                setdayTip = {'6':'日预算最低150元，最高400万元！','4':'日预算最低1000元，最高1千万元！'}
+            amountTip.html(setdayTip[thVal]);
+            th.attr('minAmt',setDayObj[thVal][0]).attr('maxAmt',setDayObj[thVal][1]);
+            if(thVal == 6){
+                $('.ad_format').find('.c-label').hide();
+                $('.gdt_label').show();
+                $('input[name="ad_format"]').eq(0).attr('checked',true);
+            }else if(thVal == 4){
+                $('input[name="ad_format"]').eq(2).attr('checked',true).parent().show().siblings('label').hide(); //投放方式
+            }
+        })
+        //获取广告主列表
+        function getUserList (keyword,fn){
+            var name = keyword ? ('/name/'+ keyword): '';
+            $.ajax({
+                type: "GET",
+                url: "/v1.2/Gdtdelivery/getCompList"+ name,
+                dataType:'json',
+                success: function(rs){
+                    var data = rs.data;
+                    if(rs.state == 1){
+                        fn.call(this,data);
+                    }else{
+                        domUserList.html('');
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+        //广告主校验
+        function getChoseUserId(){
+            var val = $.trim(domAdUser.val()),
+                title = $.trim(domAdUser.attr('_title')),
+                id = domAdUser.attr('_id');
+            if(!val){
+                return {"success":false,msg:"请选择广告主！"};
+            }
+            if(val != title){
+                return {"success":false,msg:"请选择正确的广告主！"};
+            }
+            return {"success":true,"data":id};
+        }
+        //广告计划搜索 校验
+        function getChosePlanId(){
+            var val = $.trim(domAdPlan.val()),
+                title = $.trim(domAdPlan.attr('_title')),
+                id = domAdPlan.attr('_id');
+            if(!val){
+                return {"success":false,msg:"请选择广告计划！"};
+            }
+            if(val != title){
+                return {"success":false,msg:"请选择正确的广告计划！"};
+            }
+            return {"success":true,"data":id};
+        }
+        //广告计划重置
+        function reNewInput(){
+            domAdPlan.val('').attr('_title','');
+            //domNewPlan.find('li[_type="2"]').click();
+            domcType.val('').attr('disabled',false);//推广目标
+            domdBudge.val('').attr('disabled',false);//日预算
+            domcMore.attr('disabled',false);//投放形式
+        }
+        //广告计划搜索
+        domAdPlan.on('focus',function(e){ // 1新增 2选择
+            var compId = getChoseUserId();
+            if(!compId.success){
+                tipTopShow(compId.msg);
+                return;
+            }
+            if($(this).attr('_type') !=2){
+                return false;
+            }
+            domPlanList.show();
+        }).on('input click',function(e){
+            var compId = getChoseUserId();
+            if(!compId.success){
+                tipTopShow(compId.msg);
+                return;
+            }
+            if($(this).attr('_type') !=2){
+                return false;
+            }
+            var keyword = $(this).val() ? $(this).val():'';
+            getPlanTimer && clearTimeout(getPlanTimer);
+            getPlanTimer = setTimeout(function(){
+                getPlanList(compId.data,keyword,function(res){
+                    var html ='';
+                    domPlanList.html('');
+                    if(!res){
+                        tipTopShow('暂无广告计划！');
+                        domPlanList.hide();
+                        return;
+                    }
+                     $.each(res.list,function(k,v){
+                        html +='<li class="plan_li" _id="'+v.campaign_id+'" p_type="'+v.product_type+'" c_type="'+v.campaign_type+'" d_budget="'+parseFloat(v.daily_budget/100) +'" c_more="'+v.campaign_more+'">'+v.campaign_name+'</li>'
+                    });
+                    domPlanList.html('<ul>'+html+'</ul>');
+                });
+            })
+        })
+        //获取广告计划列表
+        function getPlanList (compId,keyword,fn){
+            var name = keyword ? ('/name/'+ keyword): '';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/Gdtdelivery/index/page/1/platform_id/2/status/1/comp_id/'+ compId + name,
+                dataType:'json',
+                success: function(rs){
+                    var data = rs.data;
+                    if(rs.state == 1){
+                        fn.call(this,data);
+                    }else{
+                        domUserList.html('');
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+        //选择广告计划搜索结果
+        domPlanList.on('click','.plan_li',function(e){
+            var th = $(this),
+                id = th.attr('_id'),
+                dBudge = th.attr("d_budget"),//日预算
+                pType = th.attr("p_type"),//商品类型  1 腾讯平台应用，2苹果应用，3电商推广，4微信品牌页 ，5微信本地门店推广， 6 普通链接
+                cMore = th.attr("c_more"),//投放方式  标准投放2加速投放
+                cType = th.attr("c_type"),//值为3的话是朋友圈计划，只能一对一
+                wxbind = domAdUser.attr('_wxbind');//是否绑定微信 1是0否
+            if(cType ==3){
+                tipTopShow('该广告计划为朋友圈广告计划，无法绑定多个广告，请选择其他或新建计划');
+                return false;
+            }
+            domcType.val(pType).change().attr('disabled',true);//推广目标
+            domdBudge.val(dBudge).attr('disabled',true);//日预算
+            if(pType==4){
+                if(wxbind ==0){
+                    tipTopShow('该广告主暂未绑定公众号，无法选择此广告计划');
+                    return false;
+                }
+                $('input[name="ad_format"][value="3"]').attr('checked',true); //投放方式
+            }else{
+                $('input[name="ad_format"][value="'+cMore+'"]').attr('checked',true); //投放方式
+            }
+            domcMore.attr('disabled',true); //投放方式
+            domAdPlan.val(th.text()).attr('_id',th.attr("_id")).attr('_title',th.text());
+            domPlanList.hide();
+        })
+
+        $('#new_plan li').click(function(event){
+            var th = $(this),
+                type = th.attr('_type'),
+                placeholderTip = {'1':'请输入计划名称','2':'请输入搜索计划名称'}; //1新增，2不新增
+            th.addClass('cur').siblings('li').removeClass('cur');
+            domAdPlan.attr('_type',type).attr('placeholder',placeholderTip[type]).val('');
+            reNewInput();
+            domcType.change();
+        })
+
+        //获取近期广告主列表
+        function getRecentUserList(){
+            var html ='';
+            $.ajax({
+                type: "GET",
+                url: "/v1.2/Gdtdelivery/getCompList",
+                dataType:'json',
+                success: function(rs){
+                    var data = rs.data;
+                    if(rs.state == 1){
+                        if(!data){
+                            domReUserList.html('');
+                            return;
+                        }
+                         $.each(data,function(k,v){
+                            html +='<li class="recent_li" _id="'+v.comp_id+'" _amount="'+v.usable_amount+'" _title="'+v.comp_name+'" _wxbind="'+v.gdt_wx_bind+'"  gdt_apply_status="'+v.gdt_apply_status+'"><span>'+v.comp_name+'</span><b>账户余额￥'+v.usable_amount+'</b></li>'
+                        });
+                        domReUserList.html(html);
+                    }else{
+                        domReUserList.html('');
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+
+        //选择近期广告主搜索结果
+        domReUserList.on('click','.recent_li',function(e){
+            var th = $(this),
+                id = th.attr('_id'),
+                amount = th.attr("_amount"),
+                title = th.attr("_title"),
+                thName = th.find('span').text(),
+                wxbind = th.attr('_wxbind'),//是否绑定微信 0否1是
+                s_status = th.attr("gdt_apply_status");
+            if(s_status == 0){ //gdt_apply_status 广点通开通状态(0未开通,1已申请,2申请被驳回,3已开通-新开,4已开通-关联,5已开通-授权过期)
+                openGdtAd(id);
+                return;
+            }
+            if( s_status == 1 || s_status == 2){
+                tipGdtAd(s_status);
+                return;
+            }
+            if(s_status == 5){
+                overDate(id);
+                return;
+            }
+            if(wxbind == 0){
+                $('#wx_bind').attr('disabled','disabled');
+            }else{
+                $('#wx_bind').removeAttr('disabled');
+            }
+
+            th.addClass('cur').siblings().removeClass('cur');
+            domAdUser.val(thName).attr('_id',th.attr("_id")).attr('_amount',amount).attr('_title',title).attr('_wxbind',wxbind);
+            reNewInput();//广告计划重置
+        })
+
+        $(document).on('click',function(e){
+            if(e.target.id == 'user_list' || e.target.id == 'ad_user'){
+                return;
+            }
+            if(e.target.id == 'plan_list' || e.target.id == 'ad_plan'){
+                return;
+            }
+            domUserList.hide();
+            domPlanList.hide();
+        })
+        //授权过期
+        function overDate(id){
+            var html ='<p>当前广告主授权百米DSP代投广告权限已过期，请重新授权。请注意，每次授权有效期30天，到期需登录续授权。</p>'
+            layer.confirm(html, {
+                title:'授权过期',
+                btn: ["去授权","不了"] //按钮
+                }, function(){
+                    location.href="/V1.2/Api/gdtCallback?login=1&comp_id="+id;
+                },function(){
+                    clearUserInfo();
+                }
+            )
+        }
+        //未开通腾讯广告
+        function openGdtAd(id){
+            var html ='<p>当前选择的广告主还没有开通腾讯广告，请先开通再进行广告投放。</p>'
+            layer.confirm(html, {
+                title:'提示',
+                btn: ["去开通","不了"] //按钮
+                }, function(){
+                    location.href='/V1.2/Advertiser/view/comp_id/'+id+'?pageType=1';
+                },function(){
+                    clearUserInfo();
+                }
+            )
+        }
+        //腾讯广告开通状态提示
+        function tipGdtAd(status){
+            var tip_status = {'1':'申请中','2':'审核不通过'};
+            var html ='<p>当前选择的广告主通腾讯广告开通状态为'+tip_status[status]+'，需审核通过才能进行广告投放。</p>'
+            layer.confirm(html, {
+                title:'提示',
+                btn: ["知道了"] //按钮
+                },function(){
+                    clearUserInfo();
+                    layer.closeAll();
+                }
+            )
+        }
+        //根据广告主id获取剩余金额
+        function getUseMoney(id){
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/delivery/getUseMoney/comp_id/'+id,
+                dataType:'json',
+                success: function(rs){
+                    if(rs.state == 1){
+                        domAdUser.val(rs.name).attr('_id',id).attr('_title',rs.name);
+                    }
+                }
+            });
+        }
+        //清除选中广告主
+        function clearUserInfo(){
+            domAdUser.val('').attr('_id','').attr('_title','').attr('_amount','');
+        }
+
+        //页面校验
+        function checkDataStept1(){
+            var compId = getChoseUserId(),
+                planId = getChosePlanId(),
+                playType = domAdPlan.attr('_type'),//1新增 2选择
+                compAmount = domAdUser.attr('_amount'),
+                compName = domAdUser.val(),//广告名称
+                valAdPlan = $.trim(domAdPlan.val()),//计划名称
+                valcType = domcType.val(),//推广目标
+                valdBudge = domdBudge.val(),//日预算
+                minAmtNum = domcType.attr('minAmt'),
+                maxAmtNum = domcType.attr('maxAmt'),
+                userAmount = domAdUser.attr('_amount'),//账户余额
+                valcMore = $('input[name="ad_format"]:checked').val(),//投放方式
+                setdayTip = {'6':'日预算最低150元，最高400万元！','4':'日预算最低1000元，最高1千万元！'};
+
+            if(!compId.success){
+                return {"success":false,msg:compId.msg};
+            }
+            if(playType==2 && !planId.success){
+                return {"success":false,msg:planId.msg};
+            }
+            if(!valAdPlan){
+                return {"success":false,msg:"请输入计划名称"};
+            }
+            if(!valdBudge){
+                return {"success":false,msg:"请输入日预算"};
+            }
+            if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(valdBudge))){
+                return {"success":false,msg:"请输入正确日预算金额！"};
+            }
+            if(parseFloat(valdBudge)< parseFloat(minAmtNum) || parseFloat(valdBudge)>parseFloat(maxAmtNum)){
+                return {"success":false,msg:setdayTip[valcType]};
+            }
+            if(parseFloat(valdBudge) > parseFloat(userAmount)){
+                return {"success":false,msg:"当前广告主余额不足，请充值后再投放!"};
+            }
+            return {"success":true,"data":{"comp_id":compId.data,"comp_name":compName,"comp_amount":compAmount,"campaign_isadd":playType,"campaign_id":(playType==2 ? planId.data:''),"campaign_name":valAdPlan,"product_type":valcType,"campaign_more":valcMore,"day_money":valdBudge}};
+        }
+
+        function nextStepPage1(){
+            var res = checkDataStept1();
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            sessionStorage.setItem('storageInfo1',JSON.stringify(res.data));
+            console.log(res.data);
+            location.href='/v1.2/gdtdelivery/create2';
+        }
+        //渲染缓存数据
+        function readPageInfo(data){
+            domAdUser.val(data.comp_name).attr('_id',data.comp_id).attr('_amount',data.comp_amount).attr('_title',data.comp_name);
+            domAdPlan.val(data.campaign_name).attr('_type',data.campaign_isadd).attr('_title',data.campaign_name);
+            domcType.val(data.product_type);
+            domdBudge.val(data.day_money);
+            if(data.product_type==4){
+                $('.wx_label').show();
+                $('.gdt_label').hide();
+                $('input[name="ad_format"][value="3"]').attr('checked',true);
+            }else{
+                $('.wx_label').hide();
+                $('.gdt_label').show();
+                $('input[name="ad_format"][value="'+data.campaign_more+'"]').attr('checked',true);
+            }
+            domNewPlan.find('li[_type="'+data.campaign_isadd+'"]').addClass('cur').siblings().removeClass('cur');
+            if(data.campaign_isadd==2){
+                domAdPlan.attr('_id',data.campaign_id);
+                domcType.attr('disabled',true);//推广目标
+                domdBudge.attr('disabled',true);//日预算
+                domcMore.attr('disabled',true); //投放方式
+            }
+        }
+
+    </script>
+</body>
+</html>

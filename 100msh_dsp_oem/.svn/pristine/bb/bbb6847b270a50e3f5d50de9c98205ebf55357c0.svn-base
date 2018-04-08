@@ -1,0 +1,91 @@
+<?php
+class IndexController extends BasicController {
+	public function indexAction(){
+        $d = Helper::M('Delivery');
+        $accountModel = Helper::M('Account');
+        $account_ids=$accountModel->getComp_ids();
+        $where = '';
+        if(!empty($account_ids)) $where .=  " and comp_id in($account_ids)";
+        $count_delivery  = $d->getDliveryCount($where);
+        $count_comps = $d->getallcomp($where);
+        $this->getView()->assign('count_delivery',$count_delivery);
+        $this->getView()->assign('count_comps',$count_comps);
+        //广告消耗/服务商账户
+        $account['today_disburse'] = $account['yes_disburse'] = $account['week_disburse'] = $account['today_expend'] = $account['yes_expend'] = $account['week_expend'] ='0.00';
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        if($this->uinfo['user_group'] == ROLE_OPERATED){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        $result = BmDspApi::request('advertiser/indexStatInfo',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求代理商首页数据接口失败'));
+        }
+        if($result['api_code'] == 0) {
+            $account['today_disburse'] = Helper::transAmount($result['data']['today_disburse'], 1);
+            $account['yes_disburse'] = Helper::transAmount($result['data']['yes_disburse'], 1);
+            $account['week_disburse'] = Helper::transAmount($result['data']['week_disburse'], 1);
+            $account['today_expend'] = Helper::transAmount($result['data']['today_expend'], 1);
+            $account['yes_expend'] = Helper::transAmount($result['data']['yes_expend'], 1);
+            $account['week_expend'] = Helper::transAmount($result['data']['week_expend'], 1);
+        }
+        $this->getView()->assign('acc',$account);
+	}
+	public function mobileAction(){    
+		$p = isset($_GET['p'])?trim($_GET['p']):'';
+		if(strtolower($p) == 'index/mobile'){
+		 	$p = '';
+		}
+		$url = "https://dev-dspservice.100msh.com/{$p}";
+		if(!empty($this->uinfo['mobile_phone'])){
+			header("Location: {$url}");
+		}
+		$this->getView()->assign('url' , $url);
+	}
+	/**
+	 * skylon
+	 * 获取代理商投放统计信息
+	 * Enter description here ...
+	 */
+	public function  getCompAdStatAction(){
+        $access_token = $this->getTokenAction();
+        $comp_pid =  $this->uinfo['comp_id'];//投放ID
+        $day =  Helper::clean($this->getRequest()->getParam('start_date'));//查询日期
+        $url = $this->config['dsp']['url']."stat/GetCompAdStat?access_token=$access_token&comp_pid=$comp_pid&day=$day";
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>'请求失败'));
+        }
+
+    }
+	//获取token
+    public function getTokenAction(){
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+        return $access_token;
+
+    }
+    
+	public function setMobileAction(){
+		$mobile_phone = Helper::clean($_GET['mobile_phone']);
+		if(!preg_match('/^1[3|4|5|7|8][0-9]\d{8}$/', $mobile_phone) ){
+			Helper::outJson(array('state'=>0,'msg'=>'手机号码格式错误！'));
+		}
+		$m = Helper::M('Account');
+		$result = $m->setMobile($this->uinfo['comp_id'] , $mobile_phone);
+		if($result){
+			$_SESSION['uinfo']['mobile_phone'] = $mobile_phone;
+			Helper::outJson(array('state'=>1,'msg'=>'设置成功！'));
+		}elseif (!empty($this->uinfo['mobile_phone'])) {
+			Helper::outJson(array('state'=>1,'msg'=>'设置成功！'));
+		}
+		Helper::outJson(array('state'=>0,'msg'=>'手机号码设置失败，请稍后再试！'));
+	}
+}

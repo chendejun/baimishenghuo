@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>我的平台-首页</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+</head>
+<style>
+	body{background-color: #f2f3f8; position: relative;}
+	.page_box{width:730px; height: 340px; box-shadow: 0 1px 3px rgba(0,0,0,.3); padding: 80px 100px; position: absolute; top:120px; left: 50%; margin-left: -465px; background: #fafafc;}
+	.page_box h3{color: #333;font-size: 18px;}
+	.page_box p{color: #666;font-size: 16px; padding-left: 28px;}
+	.page_box .check_box{width: 300px; margin:70px auto 0;}
+	.page_box .check_box label{width: 100px;display: inline-block;}
+	.page_box .check_box input{width: 190px;}
+	.page_box .check_box a{width: 300px; height: 38px; line-height: 38px; margin-top: 20px;}
+</style>
+<body>
+	<div class="page_box">
+		<h3>尊敬的服务商：</h3>
+		<p>DSP平台可向您归下广告主进行充值操作，为安全起见，我们需要您补充填写服务商安全手机
+       号码，在充值操作时，系统向安全手机号发送验证码，验证通过才可充值，感谢您的理解与支持！</p>
+       <div class="check_box">
+       		<div class="from-row mb20">
+                <label>安全手机号码</label>
+                <input type="text" id="mobile_id" value="" class="bm-input" placeholder="请输入安全手机号码">
+            </div>
+            <div class="from-row mb20">
+                <label>确认手机号码</label>
+                <input type="text" id="check_id" value="" class="bm-input" placeholder="请输入确认手机号码">
+            </div>
+            <a href="javascript:;" class="bm-btn bm-btn-blue" onclick="submit()">确定</a>
+       </div>
+	</div>
+	<script>
+		function submit(){
+			var mobileId = $.trim($('#mobile_id').val()),
+                checkId = $.trim($('#check_id').val());
+            if(!mobileId){
+                tipTopShow('安全手机号码不能为空！');
+                return;
+            }
+            if(!(/^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(mobileId))){
+                tipTopShow("请输入正确的安全手机号码！");
+                return ;
+            }
+            if(!checkId){
+                tipTopShow('确认手机号码不能为空！');
+                return;
+            }
+            if(mobileId!=checkId){
+                tipTopShow('确认手机号码不一致！');
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/index/setMobile?mobile_phone='+ mobileId,
+                dataType:'json',
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.state == 1){
+                        tipTopShow(rs.msg);
+                        setTimeout(function(){
+                            location.href ="{{$url}}";
+                        },1000);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+		}
+	</script>
+</body>
+</html>

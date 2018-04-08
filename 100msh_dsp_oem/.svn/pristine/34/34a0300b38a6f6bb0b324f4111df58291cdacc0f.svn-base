@@ -1,0 +1,118 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class NoticeController extends BasicController {
+
+
+
+    /*
+     * 获取广告组列表
+     */
+    public function getCompanySiteAction(){
+
+        $comp_pid = $this->uinfo['comp_id'];//广告主id
+        $Notice = Helper::M('Notice');
+        $result=  $Notice->getCompanySite($comp_pid);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+       Helper::outJson($arr);
+
+    }
+    /*
+     * 添加网站风格
+     */
+    public function addSiteAction(){
+        $comp_pid = $this->uinfo['comp_id'];//广告主id
+        $par['comp_pid'] = $comp_pid;
+        $par['site_name'] = Helper::clean($this->getRequest()->getPost('site_name'));//广告主id
+        $par['site_logo'] =Helper::clean($this->getRequest()->getPost('site_logo'));//广告主id
+        $par['site_bottom_name'] =Helper::clean($this->getRequest()->getPost('site_bottom_name'));//广告主id
+        $par['site_color'] = Helper::clean($this->getRequest()->getPost('site_color'));//广告主id
+        $par['domain'] =Helper::clean($this->getRequest()->getPost('domain'));//广告主id
+        $par['domain_desc'] =Helper::clean($this->getRequest()->getPost('domain_desc'));//广告主id
+        $par['add_time'] = time();
+        $par['add_staff_id'] =$this->uinfo['staff_id'];
+        $Notice = Helper::M('Notice');
+        $sietinfo = $Notice->getCompanySite($comp_pid);
+        if($sietinfo){
+            $arr = array('api_code'=>0,'msg'=>'已存在');
+            Helper::outJson($arr);
+        }
+        $result=  $Notice->addSite($par);
+        if($result){
+            $arr = array('api_code'=>1,'msg'=>'success');
+            Helper::outJson($arr);
+        }else{
+            $arr = array('api_code'=>0,'msg'=>'file');
+            Helper::outJson($arr);
+        }
+
+
+    }
+    /*
+    * 修改网站风格
+    */
+    public function editSiteAction(){
+        $comp_pid = $this->uinfo['comp_id'];//广告主id
+        $Notice = Helper::M('Notice');
+        $siteInfo =  $Notice->getCompanySite($comp_pid);
+        $site_id =  Helper::clean($this->getRequest()->getPost('site_id'));//广告主id
+        $par['site_name'] = Helper::clean($this->getRequest()->getPost('site_name'));//广告主id
+        $par['site_logo'] =Helper::clean($this->getRequest()->getPost('site_logo'));//广告主id
+        $par['site_bottom_name'] =Helper::clean($this->getRequest()->getPost('site_bottom_name'));//广告主id
+        $par['site_color'] = Helper::clean($this->getRequest()->getPost('site_color'));//广告主id
+        if($siteInfo[0]['domain_status']==3){
+            $par['domain'] = Helper::clean($this->getRequest()->getPost('domain'));//广告主id
+        }
+        $par['domain_desc'] = Helper::clean($this->getRequest()->getPost('domain_desc'));//广告主id
+        $par['edit_time'] = time();
+        $par['edit_staff_id'] = $this->uinfo['staff_id'];
+        $par['comp_pid'] = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $result=  $Notice->editSite($site_id,$par);
+        if($result){
+            $arr = array('api_code'=>1,'msg'=>'success');
+            Helper::outJson($arr);
+        }else{
+            $arr = array('api_code'=>0,'msg'=>'file');
+            Helper::outJson($arr);
+        }
+
+    }
+    /*
+     * 获取网站未读消息
+     */
+    public function  getUserNoticeAction(){
+
+        Yaf_Dispatcher::getInstance()->disableView();
+        $user_id = $this->uinfo['staff_id'];
+        $Notice = Helper::M('Notice');
+        $result = $Notice->getUserNotice($user_id);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        $arr['data'] = $result;
+        echo $arr;
+
+    }
+    /*
+     * 设置已读
+     */
+    public function ReadAction(){
+
+        Yaf_Dispatcher::getInstance()->disableView();
+        $rid = Helper::clean($this->getRequest()->getPost('rid'));//广告主id
+        $user_id =$this->uinfo['staff_id'];;//y用户id
+        $par1['read_time'] = time();
+        $par1['read_status'] = 2;
+        $notice = new notice();
+        $par['rid'] = $rid;
+        $par['user_id'] = $user_id;
+        $Notice = Helper::M('Notice');
+        $result = $Notice->read($par,$par1);
+        $arr = array('api_code'=>0,'msg'=>'success');
+        echo $arr;
+    }
+}

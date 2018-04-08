@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增投放</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <style type="text/css">
+        .form{background-color: #FFF;padding:20px;}
+        .form .from-row-title{font-weight: bold; font-size: 15px;padding-left: 80px;}
+        .form .from-row{padding-left: 180px;margin-top: 20px;min-height: 40px;}
+        .form .from-row label{font-weight: normal; color: #333333;font-family: "微软雅黑";line-height: 40px;width: 150px;}
+        .form .from-row .bm-input{height: 40px;line-height: 40px;}
+        .form .from-row .bm-select{height: 40px;line-height: 40px;}
+        .wd300{width: 300px;}
+        .input-tip{color: #999999;margin-left: 10px;}
+        .a-option{color: #356bb7;text-decoration: underline;}
+        .form .from-row .c-label{position: static;display: inline-block;width: 150px;text-align: left;}
+        .up-btn{width: 150px;height: 42px;line-height: 42px;color: #FFF;display: inline-block;background-color: #5877a4;text-align: center;border-radius: 2px;position: relative;}
+        .up-btn.up-add-btn{padding-left: 18px;width: 132px;}
+        .up-btn .up-icon{font-size: 24px;font-weight: bold;position: absolute;left: 50px;top: -2px;}
+        .p-load-more{width: 100%;display: block;text-align: center;color: #356bb7;height: 45px;line-height: 45px;}
+        .commit-box{padding:20px;text-align: center;margin-top: 50px;}
+        .commit-box .bm-btn{width: 200px;height: 42px;line-height: 42px;}
+        .c_info_crowd span{line-height: 40px; display:inline-block;border: 1px solid #ddd; padding: 0 30px 0 10px; position:relative;}
+        .c_info_crowd span:hover{background-color: #f9d1c5;color:#e96840;border: 1px solid #f9d1c5;}
+        .c_info_crowd span i{position: absolute;width: 30px;text-align: center;right: 0;cursor: pointer;}
+        .c_info_matter{margin-top: 10px;}
+        .c_info_matter .pic{width: 300px; display:inline-block;margin:0 20px 20px 0;position: relative;}
+        .c_info_matter .pic img{width: 100%; vertical-align: top;}
+        .c_info_matter .pic span{position: absolute;width: 60px;height: 40px;line-height: 40px; text-align: center; color: #fff; text-decoration: underline; right: 0;bottom: 0;display: none; cursor: pointer;}
+        .c_info_matter .pic em{ position: absolute; top: 0;bottom: 0;left: 0;right: 0; background-color: rgba(1,1,1,0.3); display: none;}
+        .c_info_matter .pic:hover span,.c_info_matter .pic:hover em{display:block;}
+        .material_list .photo {min-height: auto;}
+        .material_list .mod_btns {margin-left: -40px;margin-top: -15px;}
+        .material_list .mod_btns span.btn_chose{margin-bottom: 0;}
+        .material_list .item.cur .mod_btns span.btn_chose{background: #f08519;color: #fff;}
+        .crowd_box {position: initial;padding-top: 45px;padding: 41px 0 0 196px;}
+        .crowd_box .box_list{position: initial; display: inline-block;}
+        .box_crow1{padding: 0;}
+        .box_crow2{width: 790px;border: 1px solid #ccc; border-radius: 3px;padding: 0 20px; margin-top: 10px;}
+        .box_crow2 .from-row{padding-left: 110px; margin: 20px 0;}
+        .box_crow2 .from-row .bm-select{width: 200px;}
+        .box_crow2 .from-row label{ width: 100px; }
+        .box_crow2 .from-row a{padding-left: 10px;color: #5877a4;}
+        .box_crow2 .pack_tit span{ height: 36px; line-height: 36px; display: inline-block;}
+        .box_crow2 .pack_tit span:last-child{color:#999;}
+        .box_crow2 .pack_tit span b{ font-weight: normal;}
+        .box_crow2 .base_table {margin-bottom: 20px;}
+        .box_crow2 .base_table th,.box_crow2 .base_table td{ color:#666; line-height: 20px;}
+        .box_crow2 .base_table td{padding: 8px 10px;}
+        .mod_material{margin-left: 80px;width: 970px;height: 500px;overflow: hidden;overflow-y: scroll;border: 1px solid #ccc;}
+        .pack_box{position: absolute;display: block;height: 200px;width:300px;z-index: 10;background: #fff;overflow-y: scroll;border: 1px solid #dddddd;margin: -1px;}
+        .pack_box ul{padding: 10px;}
+        .pack_box ul li{line-height: 30px; cursor: pointer;}
+        .mater_tit{width: 1050px; position: relative;}
+        .mater_tag .search_box{top: 0; margin:0;z-index: 3;}
+        .crowd_form{min-height: 44px;}
+        .mater_tag{position: relative;}
+        .mater_tag .from-row{margin-top: 10px;}
+        .mater_tag .from-row .bm-select{line-height: 32px; height: 32px;margin-top: 5px;}
+        .radio_div li{display: block; float: left;font-size: 14px; color: #666; height: 30px; line-height: 30px; padding: 0 30px; margin: 0 10px 10px 0; cursor: pointer; border: 1px solid #bbb;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+        .radio_div li.cur{color: #5877a4; border: 1px solid #5877a4;}
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/delivery/index">< 返回Wi-Fi广告</a></span>
+    </div>
+    <form id="putForm" class="form mt20">
+        <div class="flow_steps">
+            <ul class="clearfix">
+                <li class="current_pre">1. 广告计划</li>
+                <li class="current">2. 人群和素材</li>
+                <li class="last">3. 排期和出价</li>
+            </ul>
+        </div>
+        <h3 class="from-row-title">投放人群</h3>
+        <div class="from-row">
+            <label>人群范围：</label>
+            <div>
+                <label for="area_type" class="c-label"><input type="radio" id="area_type" name="crowdtype" value="1" checked="checked"/>&nbsp;&nbsp;区域投放</label>
+                <label for="default_type" class="c-label" id="default_box"><input type="radio" id="default_type" name="crowdtype" value="2" />&nbsp;&nbsp;自定义人群</label>
+            </div>
+            <div class="box_crow1 crowd_form">
+                <div class="crowd_nav fl">
+                    <span class="mr10 cur" id="crowd_default" _id="1">不限</span>
+                    <span id="crowd_id" _id="0">省市</span>
+                    <input type="hidden" id="area_set" value="1">
+                    <input type="hidden" id="area_default" value="0"><!-- 0不限制，1限制 -->
+                </div>
+                <div class="crowd_box">
+                    <div id="province_list" class="box_list" style="display: none"></div>
+                    <div id="city_list" class="box_list" style="display: none"></div>
+                    <div id="area_list" class="box_list" style="display: none"></div>
+                </div>
+            </div>
+            <div class="box_crow2" style="display: none">
+                <div class="from-row">
+                    <label>选择已有人群包</label>
+                    <input type="text" id="pack_id" class="bm-select wd300" placeholder="输入搜索" value="">
+                    <div id="pack_box" class="pack_box" style="display: none"></div>
+                    <a href="javascript:;" onclick="newPack(1)">新建人群包</a>
+                </div>
+                <div class="pack_tit">
+                    <span>人群名称：<b id="bag_name"></b></span>
+                    <span class="fr">创建时间：<b id="bag_time"></b></span>
+                </div>
+                <table id="pack_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th width="44px">序列</th>
+                            <th>用户标签</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <input type="hidden" id="personNo" />
+        </div>
+        <h3 class="from-row-title">选择素材</h3>
+        <div class="mater_tit">
+            <!-- <div class="c_box_matter">
+                <a href="javascript:;" class="up-btn up-add-btn" onclick="newMat(1)"><em class="up-icon">+</em>新建</a>
+            </div> -->
+            <!--隐藏input 存储素材值-->
+            <input type="hidden" id="matId" value="" />
+        </div>
+        <div class="mater_tag">
+            <div class="search_box">
+                <!-- <div class="radio_box fl">
+                    <label> <input type="radio" name="adgroup" value="0" checked="checked">所有</label>
+                </div> -->
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="素材名称搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+            </div>
+            <div class="from-row">
+                <label>筛选：</label>
+                <div class="posit_sel">
+                    <select class="bm-select" id="getgroup">
+                        <option value="">全部版位</option>
+                    </select>
+                    <select class="bm-select" id="getSizelist">
+                        <option value="">全部尺寸</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>标签：</label>
+                <div class="label_cont radio_div" id="label_cont">
+                    <ul class="clearfix">
+                        <li class="cur">全部</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="mod_material mt20">
+            <!-- 素材库start -->
+            <div id="materialLayer">
+                <div id="materialBox" class="material_list" style="padding:15px;overflow-x:hidden;">
+                   <p class="noMsg"></p>
+                    <div id="mod_waterfall" class="mod_waterfall waterfall">
+
+                    </div>
+                </div>
+            </div>
+            <!-- 素材库end -->
+        </div>
+
+        <div class="commit-box">
+            <button type="button" class="bm-btn bm-btn-white" id='commit_btn1' onclick="preStep()">上一步</button>
+            <button type="button" class="bm-btn bm-btn-blue" id='commit_btn2' onclick="next()">下一步</button>
+        </div>
+    </form>
+    </div>
+    <script type="text/javascript">
+        var pageType = '2';
+    </script>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/delivery.js"></script>
+    <script type="text/javascript" src="/public/js/crowd_default.js"></script>
+    <script src="/public/js/waterfall/waterfall.js"></script>
+    <script src="/public/js/waterfall/scroll-loading.js"></script>
+    <script type="text/javascript">
+        var limit=10,total,materialCacheDOM,mPage=1,mTotal,inputMad = $('#matId');
+        //素材搜索
+        var skeyWord ='',grouptype='';
+        function searchFn(th){
+            var t = $(th),
+                inputDom = t.parent().find('input[type="text"]').val();
+            //grouptype = t.parent().find('input[type="radio"]:checked').val();
+            skeyWord = encodeURIComponent(inputDom);
+            $('#set_btn').removeAttr('_id');
+            $('#mod_waterfall').empty();
+            mPage=1;
+            getList(1);
+        }
+        var areaDf = $('#area_default').val();//0不限制，1限制区
+        if(areaDf){
+            $('.box_crow1').show();
+            $('.box_crow2').hide();
+            $('input[name=crowdtype]').eq(0).attr('checked',true).change();
+            $('.crowd_box').css('padding-left','0');
+        }
+
+         //素材分组列表
+        function getGroupList(){
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getgroup',
+                dataType:'json',
+                async : false,
+                success: function(rs){
+                    tipTopHide();
+                    if(rs.api_code == 0){
+                        var str='';
+                        $.each(rs.data,function(k,v){
+                            if(v.adgroup_id<4){
+                                str += '<option value="'+v.adgroup_id+'">'+v.adgroup_name+'</option>'
+                            }
+                        });
+                        $('#getgroup').append(str);
+                    }
+                }
+            });
+        }
+        getGroupList();
+        //获取下拉框（全部全部尺寸）
+        function getSizelist(){
+            var adgroup_id = $('#getgroup').val();
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getSizelistwifi',
+                data:{'adgroup_id':adgroup_id},
+                dataType: 'json',
+                success: function (rs) {
+                    var str = '';
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<option value="'+rs.data[i].ad_size_id+'">'+rs.data[i].ad_size_name+'</option>'
+                    }
+                    $('#getSizelist').html(str);
+                },
+                error: function (rs) {
+                    $('#getSizelist').html('<option value="">全部尺寸</option>');
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        $('#getgroup').change(function(){
+            if($(this).val()==""){
+                $('#getSizelist').html('<option value="">全部尺寸</option>');
+                return;
+            }else{
+                getSizelist();
+            }
+        })
+        //获取标签
+        function getTags(){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getTags',
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<li data-id="'+rs.data[i].material_tag_id+'">'+rs.data[i].tag_name+'</li>';
+                    }
+                    $('#label_cont ul').append(str);
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getTags();
+        $('#label_cont').on('click','li',function(){
+            var _this = $(this),
+                val = _this.text();
+            _this.addClass('cur').siblings().removeClass('cur');
+            mPage = 1;
+            getList(1);
+        })
+        //加载素材数据
+        function getList(mPage){
+            var group_id = $.trim($('#getgroup').val()) || '',
+                size_id = $.trim($('#getSizelist').val()) || '',
+                tag_id = $('#label_cont .cur').attr('data-id') || '',
+                material_name = $.trim($('#s_material').val()) || '',
+                mPage = mPage ? mPage : 1,
+                platform_id = 1;
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/serach',
+                data:{'group_id': group_id,'size_id':size_id,'tag_id':tag_id,'material_name':material_name,'platform_id':platform_id},
+                dataType: 'json',
+                beforeSend:function(){
+                    tipTopHide("正在查询数据");    //显示提示框
+                },
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.api_code == 0){         //如果查询成功*/
+                        var data = rs.data;     //返回数据赋值
+                        mTotal = 1;
+                        render_table(data,1);     //渲染表格数据
+                        mPage++;
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染瀑布流数据
+        function render_table(data,totalPage){
+            var list_e = $("#mod_waterfall"),str="",no_msg = $(".noMsg"),
+                groupName = $("#getgroup").find("option:selected").text();
+            var images=[];
+            var grtamp ={'1':'底部banner','2':'全屏','3':'插屏'};
+            if(data.length == 0){
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return ;
+            }
+            no_msg.text("");
+            var mId = inputMad.val() || addSt2.material_id;
+            $.each(data,function(k,v){
+                images.push(v.img_url)
+                str += '<div class="item materialPage'+ mPage + (mId == v.material_id?" cur":"")+'"><em></em><div class="photo">';
+                str += '<img src="'+v.img_url+'" alt=""></div>';
+                str += '<div class="mod_btns"><span class="btn_chose" _id="'+v.material_id+'" name="'+grtamp[v.adgroup_id]+'" c_id="'+v.img_url+'" onclick="choiceThisMaterial(this)">选中</span></div>';
+                str += '<div class="info"><span>'+v.material_name+'</span>';
+                str += '<p>'+v.material_url+'</p>';
+                str += '<p>'+getLocalTime(v.add_time)+' by '+ v.staff_name+' 创建</p></div></div>';
+            });
+            if(mPage==1){
+                list_e.html(str);
+            }else{
+                list_e.append(str);
+            }
+            imageLoaded(images, function() {
+                list_e.waterfall();//瀑布流
+            });
+            if(mPage > 1) {
+                return
+            }
+            /*//滚动加载分页数据
+            $('.mod_material').scrollLoading({range: $(".mod_material").height(), maxNum: mTotal, callback: function(){
+                mPage = mPage+1;
+                getList(mPage);
+            }});*/
+        }
+        getList();
+        //判断图片是否加载完成
+        function imageLoaded(images, loaded) {
+            var imagesSize = images.length;
+            var onloadSize = 0, onerrorSize = 0;
+            for(var i = 0; i < imagesSize; i++) {
+                var img = document.createElement('img');
+                img.src = images[i];
+                img.onload = function() {
+                    onloadSize++;
+                    if(onerrorSize + onloadSize == imagesSize) {
+                        loaded.call(this);
+                    }
+                }
+                img.onerror = function() {
+                    onerrorSize++;
+                    if(onerrorSize + onloadSize == imagesSize) {
+                        loaded.call(this);
+                    }
+                }
+            }
+        }
+        //选中素材时处理
+        function choiceThisMaterial(th){
+            var $this = $(th);
+            var matterUrl = $this.attr("c_id");
+            $('.item').removeClass('cur');
+            $this.parent().parent().addClass("cur");
+            inputMad.val($this.attr("_id"));
+            inputMad.attr('name',$this.attr("name"));
+            sessionStorage.setItem('groupName',$this.attr("name"));
+        }
+        function getLocalTime(n){
+            var d = new Date(new Date(n*1000).getTime());
+            return (d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
+        }
+    </script>
+</body>
+</html>

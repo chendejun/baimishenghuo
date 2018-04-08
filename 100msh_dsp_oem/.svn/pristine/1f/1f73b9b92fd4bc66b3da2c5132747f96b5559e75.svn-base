@@ -1,0 +1,36 @@
+{
+    "api_code":1,
+    "msg":"success",
+    "data":[
+        {
+            "adx_Id":"1",
+            "adxId":"8",
+            "name":"聚告",
+            "logo":"adinall"
+        },
+        {
+            "adx_Id":"4",
+            "adxId":"15",
+            "name":"好耶",
+            "logo":"mediamax"
+        },
+        {
+            "adx_Id":"5",
+            "adxId":"27",
+            "name":"万流客",
+            "logo":"vamaker"
+        },
+        {
+            "adx_Id":"7",
+            "adxId":"32",
+            "name":"企创",
+            "logo":"qichuang"
+        },
+        {
+            "adx_Id":"15",
+            "adxId":"58",
+            "name":"网易有道",
+            "logo":"youdao"
+        }
+    ]
+}

@@ -1,0 +1,747 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/7/4
+ * Time: 12:00
+ */
+class NcrowdController extends BasicController{
+    /**
+     * 人群包列表
+     */
+    public function indexAction(){
+        $page = Helper::clean($this->getRequest()->getParam('page' , 0));
+        $crowdModel = Helper::M("Dcrowd");
+        if($page > 0){
+            //搜索
+            $where = "cri.comp_pid=" . $this->uinfo['comp_id']." AND cri.if_show = 1 AND label_info != '' AND direct_type IN (1,2)";
+            $audit_status = Helper::clean($this->getRequest()->getParam('audit_status' , -1));
+            if($audit_status != -1){
+                $where.=" AND cri.audit_status=".$audit_status;
+            }
+            $crowd_type = Helper::clean($this->getRequest()->getParam('crowd_type' , -1));
+            if($crowd_type != -1){
+                $where.=" AND cri.crowd_type=".$crowd_type;
+            }
+            $start_date = Helper::clean($this->getRequest()->getParam('start_date' , ''));
+            $end_date = Helper::clean($this->getRequest()->getParam('end_date' , ''));
+            if(!empty($start_date) && !empty($end_date)){
+                $where.=" AND cri.add_time >= ".strtotime($start_date." "."00:00:00")." AND cri.add_time <=".strtotime($end_date." "."23:59:59");
+            }
+            $keyword = Helper::clean($this->getRequest()->getParam('keyword' , ''));
+            if(!empty($keyword)){
+                $where.=" AND cri.crowd_name LIKE '%".$keyword."%'";
+            }
+            //分页
+            $numPerPage = Helper::clean($this->getRequest()->getParam('limit' , 10));//每页显示条数
+            $start = $page>0?($page-1)*$numPerPage:0;
+            $list = $crowdModel->getCrowdlList($where , $start , $numPerPage);
+            foreach ($list as $k=>$v){
+                if($v['audit_status'] == 2){
+                    $audit_info=$crowdModel->getCrowdAuditInfo($v['crowd_id']);
+                    $list[$k]['audit_remark']=$audit_info['audit_remark'];
+                }
+            }
+            $count = $crowdModel->getCrowdCount($where);
+            $pages = ceil($count/$numPerPage);
+            //统计数据
+            $stadata=array();
+            $stadata['count']=$crowdModel->getCrowdCount("cri.comp_pid=" . $this->uinfo['comp_id']." AND cri.if_show = 1 AND label_info != '' AND direct_type!=0");
+            $statics_data=$crowdModel->getStaticsData("comp_pid=" . $this->uinfo['comp_id']." AND if_show = 1 AND label_info != '' AND direct_type!=0");
+            $stadata['count_noAudit']=$stadata['count_succAudit']=$stadata['count_failAudit']=$stadata['count_succHandel']=0;
+            foreach ($statics_data as $k=>$v){
+                switch ($v['audit_status']){
+                    case 0:
+                        $stadata['count_noAudit']=$v['count'];
+                        break;
+                    case 1:
+                        $stadata['count_succAudit']=$v['count'];
+                        break;
+                    case 2:
+                        $stadata['count_failAudit']=$v['count'];
+                        break;
+                    case 3:
+                        $stadata['count_succHandel']=$v['count'];
+                        break;
+                }
+            }
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>array('pages' => $pages , 'stadata' => $stadata, 'list' => $list)));
+        }
+    }
+    /**
+     * 人群包用户覆盖数
+     * ``
+     */
+    public function getUserNumsAction(){
+        if(isset($_POST)&&!empty($_POST)){
+            $crowdModel = Helper::M("Dcrowd");
+            $data=$label_arr=$tag_arr=array();
+            //1.路由设备
+            $comp = Helper::clean($_POST['comp']);
+            $comp_arr=explode(':',$comp);
+            $comp_id = intval($comp_arr[0]);
+            $label_arr['comp']=array('type'=>$comp_arr[0],'val'=>$comp_arr[1]);
+            if($comp_arr[1]=='0'){
+                //根据comp_id获取公司下的设备mac
+                $tag_arr['route_id']=trim(implode(',',$crowdModel->getMacList($comp_id)),',');
+                //$tag_arr['route_id']='8482F4141D64,8482F415D43C';
+            }else{
+                $tag_arr['route_id']=$comp_arr[1];
+            }
+           // $tag_arr['route_id']='0C1DAF9F83C1';
+            //2.统计周期
+            $cycle = Helper::clean($_POST['cycle']);
+            if(empty($cycle)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'统计周期必选！'));
+            }
+            $cycle_arr=explode(':',$cycle);
+            $label_arr['cycle']=array('type'=>$cycle_arr[0],'val'=>$cycle_arr[1]);
+            $tag_arr['stat_date_interval']=$cycle_arr[1];
+            //3.用户属性
+            $attr = Helper::clean($_POST['attr']);
+            if(!empty($attr)){
+                $attr_arr= explode(':',$attr);
+                $label_arr['attr']=array('type'=>$attr_arr[0],'val'=>$attr_arr[1]);
+                if(intval($attr_arr[1]) > -1){
+                    $tag_arr['is_new']=$attr_arr[1];
+                }
+            }
+            //4.到访时间
+            $visit = Helper::clean($_POST['visit']);
+            if(!empty($visit)){
+                $visit_arr= explode('|',$visit);
+                $label_arr['visit']=array('type'=>$visit_arr[0],'val'=>$visit_arr[1]);
+                if(intval($visit_arr[1]) > -1){
+                    $tag_arr['first_in_interval']=$visit_arr[1];
+                }
+            }
+            //5.停留时长
+            $stay = Helper::clean($_POST['stay']);
+            if(!empty($stay)){
+                $stay_arr= explode(':',$stay);
+                $label_arr['stay']=array('type'=>$stay_arr[0],'val'=>$stay_arr[1]);
+                $stay_s=explode('_',$stay_arr[1]);
+                $tag_arr['stay_length_interval']=($stay_s[0]*60)."_".($stay_s[1]*60-1);
+            }
+            //6.周期频数
+            $frequency = Helper::clean($_POST['frequency']);
+            if(!empty($frequency)){
+                $cycle_date=explode('_',$cycle_arr[1]);
+                $max_f=Helper::diffDays($cycle_date[0],$cycle_date[1]);
+                $frequency_arr= explode(':',$frequency);
+                $remove=Helper::clean($_POST['remove']);
+                if(intval($frequency_arr[1]) == -1){
+                    if($remove){
+                        Helper::outJson(array('state'=>0 , 'msg' =>'周期频数不限与排除选中不可同时选择！'));
+                    }
+                    $tag_arr['stay_day_interval']="1_".$max_f;
+                }else{
+                    if($remove){//排除选中
+                        $tag_arr['stay_day_interval']="1_".($frequency_arr[1]-1);
+                    }else{
+                        $tag_arr['stay_day_interval']=$frequency_arr[1]."_".$max_f;
+                    }
+                }
+                $label_arr['frequency']=array('type'=>$frequency_arr[0],'val'=>$frequency_arr[1],'remove'=>$remove);
+            }
+            //7.人群包类型
+            if(!isset($_POST['virtual_type'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'统计周期必选！'));
+            }
+            $type=Helper::clean($_POST['virtual_type']);
+            if($type == 0){
+                $vrt='mac';
+            }else if($type == 1){
+                $vrt='imei';
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>'virtual_type错误！'));
+            }
+            $label_arr['type']=$type;
+            $tag_arr['virtual_type']=$vrt;
+            //请求DMP接口获取覆盖用户数
+            $this->config = Yaf_Registry::get('config');
+           // $this->redis->del('ndmp_access_token'.date('Ymd'));
+            //获取token
+            if(!$this->redis->exists('ndmp_access_token'.date('Ymd'))){
+                $this->setNdmpToken();
+            }
+            $tag_arr['token']=$this->redis->get('ndmp_access_token');
+            //var_dump($tag_arr);
+            $dmp_tagConditions=http_build_query($tag_arr);
+            //echo $dmp_tagConditions;
+            $users_result = DoNetwork::makeRequest($this->config['ndmp']['api_host'].'/api/getQueryCount.do?' . $dmp_tagConditions, 'GET','','','',500000 );
+           //var_dump($users_result);exit;
+            $users_result = json_decode($users_result , true);
+            //print_r($users_result);
+            if(empty($users_result)){
+                Helper::outJson(array('state'=>0 , 'msg' => 'ndmp请求人群覆盖数量失败'));
+            }
+            if($users_result['code'] == 10000){
+//                if($users_result['count'] == 0){
+//                    Helper::outJson(array('state'=>0 , 'msg' => '您选择的自定义人群人数为0，请重新选择用户属性!'));
+//                }
+                $cover_users=$users_result['count'];
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' => 'ndmp请求人群覆盖数量错误'.$users_result['content']['code']));
+            }
+            //添加操作日志
+            $log_content[] = "定向人群 :". "用户覆盖数";
+            $log_content_str = implode(" , ",$log_content);
+            $log_obj = Helper::M('Log');
+            $log_obj->create_log('人群包申请',$log_content_str,'LC005',"LOT001");
+            Helper::outJson(array('state'=>1 , 'msg' => '','data' => $cover_users));exit;
+        }
+    }
+    /**
+     * 申请人群包
+     * ``
+     */
+    public function applyAction(){
+        if(isset($_POST)&&!empty($_POST)){
+            $crowdModel = Helper::M("Dcrowd");
+            $data=$label_arr=$tag_arr=array();
+            //1.路由设备
+            $comp = Helper::clean($_POST['comp']);
+            $comp_arr=explode(':',$comp);
+            $comp_id = intval($comp_arr[0]);
+            $label_arr['comp']=array('type'=>$comp_arr[0],'val'=>$comp_arr[1]);
+            if($comp_arr[1]=='0'){
+                //根据comp_id获取公司下的设备mac
+                $tag_arr['route_id']=trim(implode(',',$crowdModel->getMacList($comp_id)),',');
+                //$tag_arr['route_id']='8482F4141D64,8482F415D43C';
+            }else{
+                $tag_arr['route_id']=$comp_arr[1];
+            }
+            //$tag_arr['route_id']='0C1DAF9F83C1';
+            //2.统计周期
+            $cycle = Helper::clean($_POST['cycle']);
+            if(empty($cycle)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'统计周期必选！'));
+            }
+            $cycle_arr=explode(':',$cycle);
+            $label_arr['cycle']=array('type'=>$cycle_arr[0],'val'=>$cycle_arr[1]);
+            $tag_arr['stat_date_interval']=$cycle_arr[1];
+            //3.用户属性
+            $attr = Helper::clean($_POST['attr']);
+            if(!empty($attr)){
+                $attr_arr= explode(':',$attr);
+                $label_arr['attr']=array('type'=>$attr_arr[0],'val'=>$attr_arr[1]);
+                if(intval($attr_arr[1]) > -1){
+                    $tag_arr['is_new']=$attr_arr[1];
+                }
+            }
+            //4.到访时间
+            $visit = Helper::clean($_POST['visit']);
+            if(!empty($visit)){
+                $visit_arr= explode('|',$visit);
+                $label_arr['visit']=array('type'=>$visit_arr[0],'val'=>$visit_arr[1]);
+                if(intval($visit_arr[1]) > -1){
+                    $tag_arr['first_in_interval']=$visit_arr[1];
+                }
+            }
+            //5.停留时长
+            $stay = Helper::clean($_POST['stay']);
+            if(!empty($stay)){
+                $stay_arr= explode(':',$stay);
+                $label_arr['stay']=array('type'=>$stay_arr[0],'val'=>$stay_arr[1]);
+                $stay_s=explode('_',$stay_arr[1]);
+                $tag_arr['stay_length_interval']=($stay_s[0]*60)."_".($stay_s[1]*60-1);
+            }
+            //6.周期频数
+            $frequency = Helper::clean($_POST['frequency']);
+            if(!empty($frequency)){
+                $cycle_date=explode('_',$cycle_arr[1]);
+                $max_f=Helper::diffDays($cycle_date[0],$cycle_date[1])+1;
+                $frequency_arr= explode(':',$frequency);
+                $remove=Helper::clean($_POST['remove']);
+                if(intval($frequency_arr[1]) == -1){
+                    if($remove){
+                        Helper::outJson(array('state'=>0 , 'msg' =>'周期频数不限与排除选中不可同时选择！'));
+                    }
+                    $tag_arr['stay_day_interval']="1_".$max_f;
+                }else{
+                    if($remove){//排除选中
+                        $tag_arr['stay_day_interval']="1_".($frequency_arr[1]-1);
+                    }else{
+                        $tag_arr['stay_day_interval']=$frequency_arr[1]."_".$max_f;
+                    }
+                }
+                $label_arr['frequency']=array('type'=>$frequency_arr[0],'val'=>$frequency_arr[1],'remove'=>$remove);
+            }
+            //7.人群包类型
+            if(!isset($_POST['virtual_type'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'统计周期必选！'));
+            }
+            $type=Helper::clean($_POST['virtual_type']);
+            if($type == 0){
+                $vrt='mac';
+            }else if($type == 1){
+                $vrt='imei';
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>'virtual_type错误！'));
+            }
+            $label_arr['type']=$type;
+            $tag_arr['virtual_type']=$vrt;
+            $crowdName = Helper::clean($_POST['crowd_name']);
+            if(empty($crowdName)){
+                Helper::outJson(array('state'=>0 , 'msg' => '人群包名称不能为空'));
+            }
+            $data['cover_users']=Helper::clean($_POST['cover_users']);
+            if(empty($data['cover_users'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '请求参数cover_users不可为空！'));
+            }
+            $data['crowd_name'] = $crowdName;
+            $data['direct_type'] = Helper::clean($_POST['direct_type']);
+            $data['comp_id'] =  0;//广告主ID
+            $data['comp_pid'] =  $this->uinfo['comp_id'];//服务商ID
+            $data['add_staff_id'] = $this->uinfo['staff_id'];//用户ID
+            $data['add_time'] = time();
+            $data['label_info'] = json_encode($label_arr);
+            $data['crowd_type'] = Helper::clean($_POST['virtual_type']);
+            if(empty($data['direct_type'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '请求参数direct_type不可为空！'));
+            }
+            //print_r($tag_arr);
+            //print_r($data);
+            //人群包信息入库
+            $this->db = Yaf_Registry::get('db');
+            $this->db->dsp->startTrans();
+            $res_crowd=$crowdModel->add($data);
+            if($res_crowd){
+                if($data['cover_users'] <= 10000){
+                    $audit_arr=array();
+                    $audit_arr['crowd_id']=$res_crowd;
+                    $audit_arr['audit_status']=1;
+                    $audit_arr['audit_staff_id']=0;
+                    $audit_arr['audit_time']=time();
+                    $audit_arr['audit_remark']='系统默认审核通过';
+                    $a_res=$crowdModel->addAudit($audit_arr);
+                    if($a_res){
+                        //覆盖用户小于10000不用审核，直接进入运算中
+                        $edit_data=array();
+                        $this->config = Yaf_Registry::get('config');
+                        //获取token
+                        if(!$this->redis->exists('ndmp_access_token'.date('Ymd'))){
+                            $this->setNdmpToken();
+                        }
+                        $tag_arr['token']=$this->redis->get('ndmp_access_token');
+                        $tag_arr['call_back_url']=$this->config['ndmp']['n_call_back_url'];
+                        $tagConditions=http_build_query($tag_arr);
+                        //echo $this->config['ndmp']['api_host'].'/api/getQueryList.do?' .$tagConditions;
+                        $crowd_apply=DoNetwork::makeRequest($this->config['ndmp']['api_host'].'/api/getQueryList.do?' .$tagConditions, 'GET','','','',500000 );
+                        $crowd_apply=json_decode($crowd_apply , true);
+                        if(!empty($crowd_apply) && $crowd_apply['code'] == 10000){
+                            $edit_data['crowd_taskid']=$crowd_apply['task_id'];
+                        }else{
+                            $this->db->dsp->rollback();
+                            Helper::outJson(array('state'=>0 , 'msg' => 'ndmp请求人群包失败'));
+                        }
+                        $edit_data['audit_status']=1;
+                        $e_res=$crowdModel->edit($res_crowd,$edit_data);
+
+                        if(!$e_res){
+                            $this->db->dsp->rollback();
+                            Helper::outJson(array('state'=>0 , 'msg' => '修改人群包状态失败'));
+                        }
+
+                    }else{
+                        $this->db->dsp->rollback();
+                        Helper::outJson(array('state'=>0 , 'msg' => '审核记录添加失败'));
+                    }
+                }
+                $this->db->dsp->commit();
+                //添加操作日志
+                $log_content[] = "人群包管理 :". "人群包申请";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('人群包申请',$log_content_str,'LC005',"LOT001");
+                Helper::outJson(array('state'=>1 , 'msg' => '申请人群包成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' => '人群包入库失败'));
+            }
+        }
+        $comp=trim($_GET['comp']);
+        $data=array();
+        if(!empty($comp)){
+            $comp_arr=explode(":",$comp);
+            if(!$comp_arr[0] || !$comp_arr[1]){
+                Helper::outJson(array('state'=>0 , 'msg' => '参数错误'));
+            }
+            $adv = Helper::M('Advertiser');
+            $comp_id=intval($comp_arr[0]);
+            $comp_info=$comp_info=$adv->getCompInfo($comp_id);
+            if(empty($comp_info)){
+                Helper::outJson(array('state'=>0 , 'msg' => '参数错误2'));
+            }
+            $data['comp_name']=$comp_info['comp_name'];
+            $data['comp_mac']=$comp_arr[1];
+            $data['comp']=$comp;
+        }
+        $this->getView()->assign('data',$data);
+    }
+    /**
+     * 获取广告主列表
+     */
+    public function getCompAction(){
+        $adv = Helper::M('Advertiser');
+        $accountModel = Helper::M('Account');
+     	$account_ids=$accountModel->getComp_ids();
+        $where = '';
+		if(!empty($account_ids) && $account_ids != '-100'){
+            $where =  ' and comp_id in('.$account_ids.')';
+        }
+        $data=array();
+        $tagList = $adv->getMacCompList("mac_status=1 and comp_pid={$this->uinfo['comp_id']}".$where);
+		if(!empty($tagList)){
+            foreach ($tagList as $k=>$v){
+                $ids_arr[]=$v['comp_id'];
+            }
+            $ids_arr=array_unique($ids_arr);
+            $comp_ids=trim(implode(',',$ids_arr),',');
+            $data=$adv->getCompList("comp_id in (".$comp_ids.")");
+        }
+
+        //var_dump($ids_arr);
+        Helper::outJson(array('state'=>1,'msg'=>'','data'=>$data));
+    }
+
+    public function getCompListAction(){
+       $adv = Helper::M('Advertiser');
+       $uinfo = $_SESSION['uinfo'];
+       $accountModel = Helper::M('Account');
+       $account_ids=$accountModel->getComp_ids();
+       $where = '';
+       if(!empty($account_ids)){
+           $where =  ' and comp_id in('.$account_ids.')';
+       }
+       $tagList = $adv->getCompList("comp_type=1 AND status=1 and comp_pid=".$uinfo['comp_id'].$where);
+       //print_r($tagList);
+       Helper::outJson(array('state'=>1,'msg'=>'','data'=>$tagList));
+    }
+    /**
+     * 获取统计周期日期区间列表
+     */
+    public function getCycleAction(){
+        $tagList=array(
+            'near_3' => date('Y-m-d',strtotime("-3 day"))."_".date('Y-m-d',strtotime("-1 day")),
+            'near_7' => date('Y-m-d',strtotime("-7 day"))."_".date('Y-m-d',strtotime("-1 day")),
+            'near_15' => date('Y-m-d',strtotime("-15 day"))."_".date('Y-m-d',strtotime("-1 day")),
+            'near_30' => date('Y-m-d',strtotime("-30 day"))."_".date('Y-m-d',strtotime("-1 day")),
+            'near_60' => date('Y-m-d',strtotime("-60 day"))."_".date('Y-m-d',strtotime("-1 day"))
+        );
+        Helper::outJson(array('state'=>1,'msg'=>'','data'=>$tagList));
+    }
+    /**
+     * 人群包详情
+     */
+    public function detailAction(){
+        $crowdModel = Helper::M("Dcrowd");
+        $crowd_id = Helper::clean($this->getRequest()->getParam('crowd_id' , 0));
+        if(empty($crowd_id)){
+            Helper::outJson(array('state'=>0 , 'msg' => '参数错误'));
+        }
+        $crowd_info=$crowdModel->getCrowdById($crowd_id);
+        $tag=$tag_list=array();
+        if($crowd_info['label_info']){
+            $tag['cycle']=array('最近3天','最近7天','最近15天','最近30天','最近60天','指定日期');
+            $tag['attr']=array('不限','新用户','老用户');
+            $tag['visit']=array('不限','上午','下午','指定到访时间');
+            $tag['stay']=array('10分钟以下','10-30分钟','30-60分钟','60分钟以上','指定停留时间');
+            $tag['frequency']=array('不限','大于1次/统计周期','大于3次/统计周期','大于指定次数');
+            $tag['type']=array('MAC地址包','IMEI号码包');
+            $label_info=json_decode($crowd_info['label_info'],true);
+            foreach ($label_info as $k => $v){
+                $t_name='';
+                switch ($k){
+                    case 'comp':
+                        $adv = Helper::M('Advertiser');
+                        $comp_id=$v['type'];
+                        $comp_info=$adv->getCompInfo($comp_id);
+                        if($v['val'] == '0'){
+                            $t_name=$comp_info['comp_name'];
+                        }else{
+                            $t_name=$comp_info['comp_name']."(".$v['val'].")";
+                        }
+                        break;
+                    case 'cycle':
+                        $t_name=$tag[$k][$v['type']]."(".$v['val'].")";
+                        break;
+                    case 'visit':
+                        if($v['type'] == 3){
+                            $t_name=$tag[$k][$v['type']]."(".$v['val'].")";
+                        }else{
+                            $t_name=$tag[$k][$v['type']];
+                        }
+                        break;
+                    case 'stay':
+                        if($v['type'] == 4){
+                            $t_name=$tag[$k][$v['type']]."(".$v['val'].")";
+                        }else{
+                            $t_name=$tag[$k][$v['type']];
+                        }
+                        break;
+                    case 'frequency':
+                        if($v['type'] == 3){
+                            $t_name=$tag[$k][$v['type']]."(大于".$v['val']."次/统计周期)";
+                        }else{
+                            $t_name=$tag[$k][$v['type']];
+                        }
+                        if($v['remove']){
+                            $t_name.=$t_name."--排除选中";
+                        }
+                        break;
+                    case 'type':
+                        $t_name=$tag[$k][$v];
+                        break;
+                    default:
+                        $t_name=$tag[$k][$v['type']];
+                        break;
+
+                }
+                if(!empty($t_name)){
+                    $tag_list[] =$this->config['tag'][$k]."：".$t_name;
+                }
+            }
+        }
+        $crowd_info['add_time']=date('Y-m-d H:i',$crowd_info['add_time']);
+        $crowd_info['tag_list']=$tag_list;
+        //print_r($crowd_info);
+        Helper::outJson(array('state'=>1,'msg'=>'','data'=>$crowd_info));
+    }
+    /**
+     * 人群包删除
+     */
+    public function delAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $crowdModel = Helper::M("Dcrowd");
+        $crowd_id = Helper::clean($this->getRequest()->getParam('crowd_id' , 0));
+        if(empty($crowd_id)){
+            Helper::outJson(array('state'=>0 , 'msg' => '参数错误'));
+        }
+        $res=$crowdModel->del($crowd_id);
+        if($res){
+            //添加操作日志
+            $log_content[] = "人群包管理 :". "人群包删除";
+            $log_content_str = implode(" , ",$log_content);
+            $log_obj = Helper::M('Log');
+            $log_obj->create_log('人群包删除',$log_content_str,'LC005',"LOT003");
+            Helper::outJson(array('state'=>1,'msg'=>'删除成功'));
+        }else{
+            Helper::outJson(array('state'=>2,'msg'=>'删除失败'));
+        }
+    }
+
+    /**
+     * 人群包重新申请
+     */
+    public function reapplyAction(){
+        if(isset($_POST)&&!empty($_POST)){
+            $crowdModel = Helper::M("Dcrowd");
+            $crowd_id = Helper::clean($_POST['crowd_id']);
+            if(empty($crowd_id)){
+                Helper::outJson(array('state'=>0 , 'msg' => '参数错误'));
+            }
+            $data=$label_arr=$tag_arr=array();
+            //1.路由设备
+            $comp = Helper::clean($_POST['comp']);
+            $comp_arr=explode(':',$comp);
+            $comp_id = intval($comp_arr[0]);
+            $label_arr['comp']=array('type'=>$comp_arr[0],'val'=>$comp_arr[1]);
+            if($comp_arr[1]=='0'){
+                //根据comp_id获取公司下的设备mac
+                $tag_arr['route_id']=trim(implode(',',$crowdModel->getMacList($comp_id)),',');
+                //$tag_arr['route_id']='0C1DAF9F83C1';
+            }else{
+                $tag_arr['route_id']=$comp_arr[1];
+            }
+            $tag_arr['route_id']='0C1DAF9F83C1';
+            //2.统计周期
+            $cycle = Helper::clean($_POST['cycle']);
+            if(empty($cycle)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'统计周期必选！'));
+            }
+            $cycle_arr=explode(':',$cycle);
+            $label_arr['cycle']=array('type'=>$cycle_arr[0],'val'=>$cycle_arr[1]);
+            $tag_arr['stat_date_interval']=$cycle_arr[1];
+            //3.用户属性
+            $attr = Helper::clean($_POST['attr']);
+            if(!empty($attr)){
+                $attr_arr= explode(':',$attr);
+                $label_arr['attr']=array('type'=>$attr_arr[0],'val'=>$attr_arr[1]);
+                $tag_arr['is_new']=$attr_arr[1];
+            }
+            //4.到访时间
+            $visit = Helper::clean($_POST['visit']);
+            if(!empty($visit)){
+                $visit_arr= explode('|',$visit);
+                $label_arr['visit']=array('type'=>$visit_arr[0],'val'=>$visit_arr[1]);
+                $tag_arr['first_in_interval']=$visit_arr[1];
+            }
+            //5.停留时长
+            $stay = Helper::clean($_POST['stay']);
+            if(!empty($stay)){
+                $stay_arr= explode(':',$stay);
+                $label_arr['stay']=array('type'=>$stay_arr[0],'val'=>$stay_arr[1]);
+                $stay_s=explode('_',$stay_arr[1]);
+                $tag_arr['stay_length_interval']=($stay_s[0]*60)."_".($stay_s[1]*60-1);
+            }
+            //6.周期频数
+            $frequency = Helper::clean($_POST['frequency']);
+            if(!empty($frequency)){
+                $cycle_date=explode('_',$cycle_arr[1]);
+                $max_f=Helper::diffDays($cycle_date[0],$cycle_date[1])+1;
+                $frequency_arr= explode(':',$frequency);
+                $remove=Helper::clean($_POST['remove']);
+                if($remove){//排除选中
+                    $tag_arr['stay_day_interval']="1_".($frequency_arr[1]-1);
+                }else{
+                    $tag_arr['stay_day_interval']=$frequency_arr[1]."_".$max_f;
+                }
+                $label_arr['frequency']=array('type'=>$frequency_arr[0],'val'=>$frequency_arr[1],'remove'=>$remove);
+            }
+            //7.人群包类型
+            if(!isset($_POST['virtual_type'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'统计周期必选！'));
+            }
+            $type=Helper::clean($_POST['virtual_type']);
+            if($type == 0){
+                $vrt='mac';
+            }else if($type == 1){
+                $vrt='imei';
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>'virtual_type错误！'));
+            }
+            $label_arr['type']=$type;
+            $tag_arr['virtual_type']=$vrt;
+            $crowdName = Helper::clean($_POST['crowd_name']);
+            if(empty($crowdName)){
+                Helper::outJson(array('state'=>0 , 'msg' => '人群包名称不能为空'));
+            }
+            $data['cover_users']=Helper::clean($_POST['cover_users']);
+            if(empty($data['cover_users'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '请求参数cover_users错误！'));
+            }
+            $data['crowd_name'] = $crowdName;
+            $data['direct_type'] = Helper::clean($_POST['direct_type']);
+            $data['comp_id'] =  0;//广告主ID
+            $data['comp_pid'] =  $this->uinfo['comp_id'];//服务商ID
+            $data['add_staff_id'] = $this->uinfo['staff_id'];//用户ID
+            $data['add_time'] = time();
+            $data['label_info'] = json_encode($label_arr);
+            $data['crowd_type'] = Helper::clean($_POST['crowd_type']);
+            //请求DMP接口获取覆盖用户数
+            //print_r($tag_arr);
+            //print_r($data);
+            //人群包信息入库
+            $this->db = Yaf_Registry::get('db');
+            $this->db->dsp->startTrans();
+            $data['audit_status']=0;
+            $res_crowd=$crowdModel->edit($crowd_id,$data);
+            if($res_crowd){
+                if($data['cover_users'] <= 10000){
+                    $audit_arr=array();
+                    $audit_arr['crowd_id']=$crowd_id;
+                    $audit_arr['audit_status']=1;
+                    $audit_arr['audit_staff_id']=0;
+                    $audit_arr['audit_time']=time();
+                    $audit_arr['audit_remark']='系统默认审核通过';
+                    $a_res=$crowdModel->addAudit($audit_arr);
+                    if($a_res){
+                        //覆盖用户小于10000不用审核，直接进入运算中
+                        $edit_data=array();
+                        $this->config = Yaf_Registry::get('config');
+                        //获取token
+                        if(!$this->redis->exists('ndmp_access_token'.date('Ymd'))){
+                            $this->setNdmpToken();
+                        }
+                        $tag_arr['token']=$this->redis->get('ndmp_access_token');
+                        $tag_arr['call_back_url']=$this->config['dmp']['n_call_back_url'];
+                        $tagConditions=http_build_query($tag_arr);
+                        $crowd_apply=DoNetwork::makeRequest($this->config['ndmp']['api_host'].'/api/getQueryList.do?' .$tagConditions, 'GET','','','',500000 );
+                        $crowd_apply=json_decode($crowd_apply , true);
+                        if(!empty($crowd_apply) && $crowd_apply['code'] == 10000){
+                            $edit_data['crowd_taskid']=$crowd_apply['task_id'];
+                        }else{
+                            $this->db->dsp->rollback();
+                            Helper::outJson(array('state'=>0 , 'msg' => 'ndmp请求人群包失败'));
+                        }
+                        $edit_data['audit_status']=1;
+                        $e_res=$crowdModel->edit($crowd_id,$edit_data);
+
+                        if(!$e_res){
+                            $this->db->dsp->rollback();
+                            Helper::outJson(array('state'=>0 , 'msg' => '修改人群包状态失败'));
+                        }
+
+                    }else{
+                        $this->db->dsp->rollback();
+                        Helper::outJson(array('state'=>0 , 'msg' => '审核记录添加失败'));
+                    }
+                }
+                $this->db->dsp->commit();
+                //添加操作日志
+                $log_content[] = "人群包管理 :". "人群包重新申请";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('人群包重新申请',$log_content_str,'LC005',"LOT002");
+                Helper::outJson(array('state'=>1 , 'msg' => '申请人群包成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' => '人群包入库失败'));
+            }
+        }
+
+    }
+    public function crowdInfoAction(){
+        $crowdModel = Helper::M("Dcrowd");
+        $crowd_id = Helper::clean($this->getRequest()->getParam('crowd_id' , 0));
+        if(empty($crowd_id)){
+            Helper::outJson(array('state'=>0 , 'msg' => '参数错误'));
+        }
+        $crowd_info=$crowdModel->getCrowdById($crowd_id);
+        $crowd_info['label_info']=json_decode($crowd_info['label_info'],true);
+        $crowd_info['if_mac']=0;
+        if($crowd_info['label_info']['comp']['val'] != '0'){
+            $crowd_info['if_mac']=1;
+            $comp_id=intval($crowd_info['label_info']['comp']['type']);
+            $adv = Helper::M('Advertiser');
+            $comp_info=$adv->getCompInfo($comp_id);
+            if(empty($comp_info)){
+                Helper::outJson(array('state'=>0 , 'msg' => '广告主错误'));
+            }
+            $crowd_info['comp_name']=$comp_info['comp_name'];
+        }
+        Helper::outJson(array('state'=>1,'msg'=>'','data'=>$crowd_info));
+    }
+    /**
+     * 人群包下载
+     */
+    public function downAction(){
+        $crowdModel = Helper::M("Dcrowd");
+        $crowd_id = Helper::clean($this->getRequest()->getParam('crowd_id' , 0));
+        if(empty($crowd_id)){
+            Helper::outJson(array('state'=>0 , 'msg' => '参数错误'));
+        }
+        $crowd_info=$crowdModel->getCrowdById($crowd_id);
+        if(empty($crowd_info) || $crowd_info['if_saved'] == 0){
+            Helper::outJson(array('state'=>0 , 'msg' => '下载错误'));
+        }
+        if($crowd_info['download_nums'] >= 3){
+            Helper::outJson(array('state'=>0 , 'msg' => '已超过下载限数，不可以再下载！'));
+        }
+//         /Helper::download_file($this->config['config']['ACCESSORY_URL']."dmp/".$crowd_info['crowd_taskid'].".zip");exit;
+        $up_data=array('download_nums'=>$crowd_info['download_nums']+1);
+        $down_data=array('crowd_id' => $crowd_id,'down_staff_id' => $this->uinfo['staff_id'],'down_time' =>time());
+        $res=$crowdModel->edit($crowd_id,$up_data);
+        if($res){
+            $crowdModel->addDown($down_data);
+            //添加操作日志
+            $log_content[] = "人群包管理 :". "人群包下载";
+            $log_content_str = implode(" , ",$log_content);
+            $log_obj = Helper::M('Log');
+            $log_obj->create_log('人群包下载',$log_content_str,'LC005',"LOT005");
+            Helper::outJson(array('state'=>1 , 'msg' => '111','data'=>$this->config['config']['ACCESSORY_URL']."dmp/".$crowd_info['crowd_taskid'].".zip"));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' => '下载失败'));
+        }
+    }
+}

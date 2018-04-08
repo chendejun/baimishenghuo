@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>短信营销</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+	<link rel="stylesheet" href="../../../../../public/css/common.css">
+</head>
+<style>
+	.temp_info{padding: 20px;}
+    .temp_info .row{line-height: 20px; min-height: 20px; padding:7px 0;position: relative;}
+    .temp_info .row .pn{ position: absolute; width: 72px; }
+    .temp_info .row .pv{ margin-left: 72px;word-break: break-all;}
+    .temp_info .send_notice{ font-size: 12px; color: #999;}
+    .temp_crowd p{line-height: 30px;}
+    .temp_crowd b{margin: 0 2px; color: red; font-weight: normal;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span>短信营销</span>
+        </div>
+        <div class="data_box delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" onClick="createFn()" style="width:100px;">发短信</a>
+            <div class="search_box">
+            	<select id="statu_id" class="bm-select">
+	                <option value="">全部状态</option>
+	                <option value="1">待审核</option>
+	                <option value="2">待发送</option>
+	                <option value="3">发送成功</option>
+	                <option value="4">审核不通过</option>
+	            </select>
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="关键字搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+            </div>
+            <div class="mt20">
+	            <table id="dmp_list" class="base_table">
+	                <thead>
+	                    <tr>
+	                        <th>短信名称</th>
+	                        <th>发送时间</th>
+	                        <th>覆盖总人数</th>
+	                        <th>冻结金额</th>
+							<th>发送失败人数</th>
+	                        <th>返还金额</th>
+	                        <th>发送人群</th>
+	                        <th>发送状态</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+	            <p class="noMsg"></p>
+	            <!--列表分页-->
+	            <div id="list_page" class="page"></div>
+	        </div>
+        </div>
+    </div>
+    <!--短信详情start-->
+    <script id="msgTemplate" type="text/html">
+	    <div class="temp_info">
+            <div class="row">
+                <div class="pn">短信内容：</div>
+                <div class="pv"><p><< d.content >></p></div>
+            </div>
+            <div class="row">
+                <div class="pn">提交时间：</div>
+                <div class="pv"> << d.add_time >></div>
+            </div>
+            <div class="row">
+                <div class="pn">发送时间：</div>
+                <div class="pv"> << d.send_time >></div>
+            </div>
+            <div class="row">
+                <div class="pn">覆盖总人数：</div>
+                <div class="pv"> << d.send_rq_num >> 人</div>
+            </div>
+            <div class="row">
+                <div class="pn">计费条数：</div>
+                <div class="pv"> << d.send_msg_num >> </div>
+            </div>
+            <div class="row">
+                <div class="pn">短信单价：</div>
+                <div class="pv"> << d.price >> </div>
+            </div>
+            <div class="row">
+                <div class="pn">总价：</div>
+                <div class="pv" style="color: red;"> << d.total_price >> </div>
+            </div>
+        </div>
+    </script>
+    <!--短信详情end-->
+    <!--人群详情start-->
+    <script id="infoTemplate" type="text/html">
+	    <div class="temp_info temp_crowd">
+            <<# if(d.crowd_type==2){ >>
+				<<# if(d.tag_list.length > 1){ >>
+				<div class="temp_box">
+			    	<p>人群名称：<< d.crowd_name >></p>
+				    <table class="base_table mt20">
+			            <thead>
+			                <tr>
+			                    <th width="44px">序列</th>
+			                    <th>用户标签</th>
+			                </tr>
+			            </thead>
+			            <tbody>
+			            	<<# for(var i in d.tag_list){ >>
+			        		<tr><td><< i*1+1 >> </td><td><< d.tag_list[i] >></td></tr>
+			        		<<# } >>
+			        	</tbody>
+			        </table>
+			    </div>
+			    <<# } >>
+            <<# } >>
+            <p>共导入<b><< d.market_file_num >></b> 个联系人</p>
+           	<p>（覆盖人群<b><< d.send_rq_num >></b>人，每人按<b><< d.send_rate >></b>条计费，发送成功<b><< d.send_success >></b>人，发送失败<b><< d.send_fail >></b>人）</p>
+        </div>
+    </script>
+    <!--人群详情end-->
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/laytpl/laytpl.js"></script>
+	<script type="text/javascript">
+		laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+		//搜索
+		var setStatu='',skeyWord='';
+	    function searchFn(th){
+	        var t = $(th),
+	            inputDom = t.parent().find('input[type="text"]').val();
+	        setStatu = $('#statu_id').val();
+	        skeyWord = encodeURIComponent(inputDom);
+	        getList();
+	    }
+		//获取数据
+	    var limit = 10, currNum = 1;
+	    function getList(curr){
+	    	var name = skeyWord ? ('/key_word/'+skeyWord) :'',
+	    		status = setStatu? ('/market_status/'+setStatu) :'';
+	        $.ajax({
+	            type: "GET",
+	            url: '/v1.2/Market/index/page/'+ (curr || 1)+'/pagecount/'+ limit + name + status,
+	            dataType:'json',
+	            success: function(rs){
+	                tipTopHide();       //隐藏提示框
+	                if(rs.state == 1){         //如果查询成功
+	                    render_table(rs,curr);     //渲染表格数据
+	                    renderPage(rs.total_page_count, curr);
+	                }else{
+	                    tipTopShow(rs.msg);
+	               	}
+	             },
+	            error:function(rs){
+	                tipTopShow("查询信息失败，请重试...");    //显示提示框
+	            }
+	        });
+	    }
+
+	    //渲染表格数据
+	    var market_status={'1':'待审核','2':'待发送','3':'发送成功','4':'审核不通过'};
+	    function render_table(res,curr){
+	    	var data = res.data;
+	    	var curr = curr ? curr : 1;
+	        var list_e = $("#dmp_list tbody"),str="",no_msg = $(".noMsg"),msgview='',crowdview='';
+	        if(res.total_page_count == 0){
+	            list_e.html("");
+	            no_msg.text("暂无记录");
+	            return ;
+	        }
+	        no_msg.text("");
+	        $.each(data,function(k,v){
+	        	msgview = '{"content":"","add_time":"'+v.add_time+'","send_time":"'+v.send_time+'","send_rq_num":"'+v.send_rq_num+'","send_msg_num":"'+v.send_msg_num+'","price":"'+v.price+'","total_price":"'+v.total_price+'"}';
+	        	crowdview = '{"send_rq_num":"'+v.send_rq_num+'","send_rate":"'+v.send_rate+'","send_success":"'+v.send_success+'","send_fail":"'+v.send_fail+'","send_msg_num":"'+v.send_msg_num+'","tag_list":"'+v.tag_list+'","crowd_type":"'+v.crowd_type+'","crowd_name":"'+v.crowd_name+'"}';
+	            str +='<tr>';
+	            str +='<td><a href="javascript:;" class="view_info table-option-btn" _id="'+v.market_id+'" cont="'+v.content+'" data=\''+msgview+'\'>'+ v.market_name +'</a></td>';
+	            str +='<td>'+ v.send_time +'</td>';
+	            str +='<td>'+ v.send_rq_num +'</td>';
+	            str +='<td>'+ v.freeze_money +'</td>';
+	            str +='<td>'+ v.send_fail +'</td>';
+	            str +='<td>'+ v.return_money +'</td>';
+	            str +='<td><a href="javascript:;" class="crowd_info table-option-btn" data=\''+crowdview+'\'>'+(v.crowd_type==1?'手动上传':v.crowd_name) +'</a></td>';
+	            if(v.market_status==4){
+	            	str +='<td>'+ market_status[v.market_status] +'<em class="status_tip" data="无理由")">？<em></td>';
+	            }else{
+	            	str +='<td>'+ market_status[v.market_status] +'</td>';
+	            }
+	            str +='<td>';
+	            if(v.market_status == 3){
+					str +='<a href="javascript:;" class="table-option-btn mr15" onclick="resubmit('+v.market_id+')">重新投放</a>';
+	            }else if(v.market_status == 4){
+				  	str +='<a href="javascript:;" class="table-option-btn mr15" onclick="editFn('+v.market_id+')">修改</a>';
+	            }else{
+				  	str +='--';
+	            }
+	            str +='</td></tr>';
+	        });
+	        list_e.html(str);
+	    }
+	    //分页
+	    function renderPage(pages,curr){
+	        //显示分页
+	        laypage({
+	            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+	            pages: pages, //通过后台拿到的总页数
+	            //skip: true, //是否开启跳页
+	            skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+	            curr: curr || 1, //当前页
+	            jump: function(obj, first){ //触发分页后的回调
+	            	currNum = obj.curr;
+	                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+	                    getList(obj.curr);
+	                }
+	            }
+	        });
+	    }
+	    getList();
+
+	    //短信详情
+        $('body').on('click','.view_info',function(){
+            var data = $(this).attr('data');
+            var cont = $(this).attr('cont');
+            console.log(cont);
+            var cacheDOM = $("#msgTemplate").html();
+            msgcacheDOM = JSON.parse(data);
+            msgcacheDOM.content = cont;
+            //laytpl异步渲染调用
+            laytpl(cacheDOM).render(msgcacheDOM, function(result){
+                //店铺详细信息弹框
+                layer.open({
+                    type: 1,
+                    title: "短信详情",
+                    area: ['600px', '400px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        });
+        //人群详情
+        $('body').on('click','.crowd_info',function(){
+            var data = $(this).attr('data');
+            var cacheDOM = $("#infoTemplate").html();
+            crowdcacheDOM = JSON.parse(data);
+            crowdcacheDOM.tag_list = crowdcacheDOM.tag_list.split(',');
+            //laytpl异步渲染调用
+            laytpl(cacheDOM).render(crowdcacheDOM, function(result){
+                //店铺详细信息弹框
+                layer.open({
+                    type: 1,
+                    title: "发送人群",
+                    area: ['680px', '500px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        });
+
+	    $('body').on('click','.status_tip',function(){
+        	layer.tips(this.getAttribute('data'), this);
+        })
+	    //重新提交
+	    function resubmit(id){
+	    	location.href = '/v1.2/market/addview?infoid='+id+'&isrenew=1';
+	    }
+	    //重新提交
+	    function editFn(id){
+	    	location.href = '/v1.2/market/addview?infoid='+id+'&isedit=1';
+	    }
+
+	    //新增
+	    function createFn(){
+	    	location.href = '/v1.2/market/addview';
+	    }
+	</script>
+	</body>
+</html>

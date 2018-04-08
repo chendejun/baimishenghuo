@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" />
+</head>
+<style>
+    .hidden_div{display: none;}
+    .bm-input.wd60{width:60px;}
+    .remove_label{line-height: 40px;}
+    .remove_label span{display: inline-block;vertical-align: top;margin-left: 5px;}
+    .layui-layer-content{border: 1px solid #e5e5e5;}
+    .layer_tip{padding-left: 10px;}
+    .layer_tip p{color: #333;line-height: 26px;}
+    .layer_tip span {line-height: 40px;color: #222;font-size: 16px;}
+    .label_form .mod_nav li p{margin: 0 20px;}
+</style>
+<body>
+	<div class="content_box">        
+        <div class="title_box">
+        	<span><a href="javascript:history.go(-1)">< 返回</a></span>
+        </div>
+        <form class="label_form layui-form" id="info_form">
+            <div class="mod_box">
+            <ul class="mod_nav clearfix mouser_ul">
+                    <li class="cur" type="1">
+                        <p data='指定广告主，精准寻找其探测范围内的人群包' title_tip="按广告主定向">按广告主定向</p>
+                    </li>
+                    <li class="" type="2">
+                        <p data='根据用户行为记录，精准寻找符合要求的人群包' title_tip="按用户行为定向">按用户行为定向</p>
+                    </li>
+                </ul>
+                <input class="data_input" type="hidden" name="direct_type" value="">
+                <div class="label_row">
+                    <label class="row_label"><em>*</em>人群定向名称：</label>
+                    <input type="text" value="" class="bm-input wd300" name="crowd_name" id="crowd_name" placeholder="请为本次新建创建一个名称">
+                    <input type="hidden" name="crowd_id" value="">
+                </div>
+            </div>
+            <div class="title1"><h4><i class="dcrowd_icon icon1"></i>按广告主定向</h4></div>
+            <div class="title2 hidden_div"><h4><i class="dcrowd_icon icon2"></i>用户行为</h4></div>
+            <div class="mod_box">
+                <div class="label_row">
+                    <label class="row_label"><em>*</em>广告主名称：</label>
+                    <select class="comp_select bm-select" name="comp" lay-ignore>
+                        <option id="0" value="">请选择广告主</option>
+                    </select>
+                </div>
+                <div class="label_row">
+                    <label class="row_label"><em>*</em>统计周期：</label>
+                    <ul class="row_ul clearfix cycle_ul">
+                        <li data="3" >最近3天</li>
+                        <li data="7">最近7天</li>
+                        <li data="15">最近15天</li>
+                        <li data="30">最近30天</li>
+                        <li data="60">最近60天</li>
+                        <li class="li_ipt big_inp" type="">
+                            <input type="text" class="bm-input layui-input" id="dataInput" placeholder="选择开始与截止日期">
+                        </li>
+                    </ul>
+                    <input class="data_input" type="hidden" name="cycle" value=" ">
+                </div>
+                <div class="label_row">
+                    <label class="row_label">用户属性：</label>
+                    <ul class="row_ul clearfix attr_ul">
+                        <li type="0:-1">不限</li>
+                        <li type="1:1">新用户</li>
+                        <li type="2:0">老用户</li>
+                        <i class="dcrowd_icon icon3 label_tip" title_tip="新老用户" data="新用户：指首次到访本区域人群。<br/>老用户：指曾经在本区域内到访过的人群。"></i>
+                    </ul>
+                    <input class="data_input" type="hidden" name='attr' value=" ">
+                </div>
+                <div class="hidden_div" id="yh_div" >
+                    <div class="label_row">
+                        <label class="row_label">到访时间：</label>
+                        <ul class="row_ul clearfix visit_ul">
+                            <li type="0|-1">不限</li>
+                            <li type="1|00:00:00_11:59:59">上午</li>
+                            <li type="2|12:00:00_23:59:59">下午</li>
+                            <li class="li_ipt" type="">
+                                <input type="text" class="bm-input layui-input" id="timeInput" placeholder="选择开始与截止时间">
+                            </li>
+                            <i class="dcrowd_icon icon3 label_tip"  title_tip="到访时间" data="指用户在统计周期内，每天被探测的最早的时间。<br/>如用户同1天内，上、下午均有探测记录的，则仅记为上午到访。"></i>
+                        </ul>
+                        <input class="data_input" type="hidden" name='visit' value=" ">
+                    </div>
+                    <div class="label_row" id="stay_div">
+                        <label class="row_label">停留时长：</label>
+                        <ul class="row_ul clearfix stay_ul">
+                            <li type="0:0_10" >10分钟以下</li>
+                            <li type="1:10_30">10~30分钟</li>
+                            <li type="2:30_60">30~60分钟</li>
+                            <li type="3:60_1440">60分钟以上</li>
+                            <li class="li_ipt big_inp" type="4">
+                                <input type="text" class="bm-input timeLonger wd60" id="log_st" placeholder="起始时长(分)"> -
+                                <input type="text" class="bm-input timeLonger wd60" id="log_ed" placeholder="结束时长(分)">
+                            </li>
+                            <i class="dcrowd_icon icon3 label_tip" title_tip="停留时长" data="统计每天用户在本区域的停留累计时长。<br/>用户每天的统计为累计值，不连续的探测时长均累计计算。"></i>
+                        </ul>
+                        <input class="data_input" type="hidden" name='stay' value="">
+                    </div>
+                </div>
+                <div class="label_row">
+                    <label class="row_label">周期频次：</label>
+                    <ul class="row_ul clearfix week_ul">
+                        <li type="0:-1" fq_data="0">不限</li>
+                        <li class="max_wd" type="1:1" fq_data="1">大于1次/统计周期</li>
+                        <li class="max_wd" type="2:2" fq_data="2">大于2次/统计周期</li>
+                        <li class="max_wd" type="3:3" fq_data="3">大于3次/统计周期</li>
+                        <li class="li_ipt sm_inp" type="4" fq_data="4" exp="num_type">
+                            <input type="text" class="bm-input timeLonger" id="frequenc_num" placeholder="输入指定大于次数">
+                        </li>
+                        <label class="remove_label"><input type="checkbox" value="0" name='remove' disabled="true" lay-ignore><span>排除选中</span></label>
+                        <i class="dcrowd_icon icon3 label_tip"  title_tip="周期" data="周期频次：统计周期内，每天到访的频次，同一天内多次到访计为1次。<br/>大于N次/周期：指大于和等于N次的探测记录。"></i>
+                    </ul>
+                    <input class="data_input" type="hidden" name='frequency' value="">
+                </div>
+                <div class="label_row layui-form-item">
+                    <label class="row_label"><em>*</em>生成类型：</label>
+                    <div class="row_radio">
+                        <label><input type="radio" name="virtual_type" lay-ignore value="0" title="MAC地址包"><span>MAC地址包</span></label>
+                        <label><input type="radio" name="virtual_type" lay-ignore value="1" title="IMEI号码包"><span>IMEI号码包</span></label>
+                        <label><input type="radio" name="virtual_type" lay-ignore value="2" title="手机号码包"><span>手机号码包</span></label>
+                    </div>
+                </div>
+                <div class="commit_box">
+                    <button type="button" class="bm-btn bm-btn-blue" id="commit_btn" onclick="postData()">提交生成人群</button>
+                    <span>预计覆盖人群：<b id="cover_num">0</b></span>
+                    <input type="hidden" name="cover_users" value="">
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/laydate/laydate.js"></script>
+    <script type="text/javascript" src="/public/layui/layui.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+    layui.use('form', function(){
+        var form = layui.form();
+    });
+    laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+        var crowd_id = getUrlParams('crowd_id') ? getUrlParams('crowd_id'):'';
+        if(crowd_id!=''){
+            get_infor(crowd_id);
+        }
+        //时间范围选择
+        laydate.render({
+            elem: '#dataInput',
+            range: true, //或 range: '~' 来自定义分割字符
+            done: function(value, date, endDate){
+                var dataVal = value.replace(' - ','_');
+                $('input[name="cycle"]').val('5:'+dataVal);
+                $('#dataInput').parent().attr('type','5:'+dataVal);
+            }
+
+        });
+        laydate.render({
+          elem: '#timeInput',
+          type: 'time',
+          range: true ,//或 range: '~' 来自定义分割字符
+          done: function(value, date, endDate){
+                var dataVal = value.replace(' - ','_');
+                $('input[name="visit"]').val('3|'+dataVal);
+                $('#timeInput').parent().attr('type','3|'+dataVal);
+            }
+        });
+
+        //类别选择
+        $('.mod_nav').on('click','li',function(){
+            var th = $(this),
+                type = th.attr('type');
+            th.addClass('cur').siblings().removeClass('cur');
+            if(type==1){
+                $('.hidden_div').hide();
+                $('.title1').show();
+            }else if(type==2){
+                $('.title1').hide();
+                $('.hidden_div').show();
+            }
+            $('input[name="direct_type"]').val(type);
+        })
+        //标签选择
+        $('.row_ul ').on('click','li',function(){
+            var th = $(this),
+                type = th.attr('type'),
+                fqData = th.attr('fq_data');
+            th.addClass('cur').siblings().removeClass('cur');
+            th.parent().siblings('.data_input').val(type);
+            if(fqData){
+                if(parseFloat(fqData)==4){
+                    fqData = $('#frequenc_num').val() ?$('#frequenc_num').val():'0';
+                }
+                if(parseFloat(fqData)>1){
+                    $('input[name=remove]').attr('disabled',false);
+                }else{
+                    $('input[name=remove]').attr('disabled',true).attr('checked',false);
+                }
+            }
+        })
+        $('.timeLonger').on('keyup',function(){
+            var keyVal = $(this).val();
+            if(/[^\d]/.test(keyVal)){//替换非数字字符
+               var v = keyVal.replace(/[^\d]/g,'');
+               $(this).val(v);
+            }
+        })
+        var getAmountTimer;
+        $('#frequenc_num').on('keyup',function(){
+            var keyVal = $(this).val();
+            if(/[^\d]/.test(keyVal)){//替换非数字字符
+               var v = keyVal.replace(/[^\d]/g,'');
+               $(this).val(v);
+            }
+        }).on('input',function(e){
+            var keyVal = $(this).val();
+            if(/[^\d]/.test(keyVal)){//替换非数字字符
+                return false;
+            }
+            var num = keyVal ? keyVal:'';
+            getAmountTimer && clearTimeout(getAmountTimer);
+            getAmountTimer = setTimeout(function(){
+                if(parseFloat(num)>1){
+                    $('input[name=remove]').attr('disabled',false);
+                }else{
+                    $('input[name=remove]').attr('disabled',true).attr('checked',false);
+                }
+            })
+        })
+        //获取人群包详情
+        function get_infor(crowd_id){
+            $.ajax({
+                type:'POST',
+                url: '/v1.2/Ncrowd/crowdInfo/crowd_id/'+crowd_id,
+                dataType: 'json',
+                //async:false,
+                beforeSend:function(){
+                    tipTopHide("正在查询数据");    //显示提示框
+                },
+                success: function(rs){
+                    getCompList();
+                    var data= rs.data;
+                    console.log('data==',data)
+                    $(".mod_nav li").each(function(){
+                        if(data.direct_type == $(this).attr('type')){
+                            $(this).addClass('cur').siblings().removeClass('cur');
+                            $(this).parent().siblings('.data_input').val(data.direct_type);
+                        }
+                    });
+                    $("#crowd_name").val(data.crowd_name);
+                    $('input[name="crowd_id"]').val(data.crowd_id);
+                    if(data.direct_type == 1){
+                        $('.title1').show();
+                        $('.hidden_div').hide();
+                    }else{
+                        $('.hidden_div').show();
+                        $('.title1').hide();
+                        $(".visit_ul li").each(function(k,v){
+                            if(data.label_info.visit){
+                                var sval = data.label_info.visit.type +'|'+data.label_info.visit.val;
+                                if(data.label_info.visit.type == k){
+                                    if (data.label_info.visit.type == 3) {
+                                        $(".visit_ul li").eq(3).attr('type',sval);
+                                        var dataVal = data.label_info.visit.val.replace('_',' - ');
+                                        $('#timeInput').val(dataVal);
+                                    }
+                                    $(v).addClass('cur').siblings().removeClass('cur');
+                                    $(v).parent().siblings('.data_input').val(sval);
+                                }
+                            }
+                            
+                        });
+                        $(".stay_ul li").each(function(k,v){
+                            if(data.label_info.stay){
+                                var sval = data.label_info.stay.type+':'+data.label_info.stay.val;
+                                if(data.label_info.stay.type == k){
+                                    if (data.label_info.stay.type == 4) {
+                                        $(".stay_ul li").eq(4).attr('type',sval);
+                                        var dataVal = data.label_info.stay.val.replace('_',' - ');
+                                        $('#timeInput').val(dataVal);
+                                    }
+                                    $(v).addClass('cur').siblings().removeClass('cur');
+                                    $(v).parent().siblings('.data_input').val(sval);
+                                }     
+                            }
+                            
+                        });
+                    }
+                    $(".comp_select option").each(function(){
+                        var sval = data.label_info.comp.type+':'+data.label_info.comp.val;
+                        //console.log(sval,$(this).attr('id'));
+                        if(data.label_info.comp.type == $(this).attr('id')){
+                            //console.log($(this).val());
+                            $(this).attr('selected','selected');
+                        }
+                    });
+                    $(".cycle_ul li").each(function(k,v){
+                        var sval = data.label_info.cycle.type+':'+data.label_info.cycle.val;
+                        if(data.label_info.cycle.type == k){
+                           // console.log($(v).text());
+                            if (data.label_info.cycle.type == 5) {
+                                $(".cycle_ul li").eq(5).attr('type',sval);
+                                var dataVal = data.label_info.cycle.val.replace('_',' - ');
+                                $('#dataInput').val(dataVal);
+                            }
+                            $(v).addClass('cur').siblings().removeClass('cur');
+                            $(v).parent().siblings('.data_input').val(sval);
+                        }
+                    });
+                    $(".attr_ul li").each(function(k,v){
+                        if(data.label_info.attr){
+                            var sval = data.label_info.attr.type+':'+data.label_info.attr.val;
+                            if(data.label_info.attr.type == k){
+                            // console.log($(v).text());
+                                $(v).addClass('cur').siblings().removeClass('cur');
+                                $(v).parent().siblings('.data_input').val(sval);
+                            }
+                        }
+                        
+                    });
+                    $(".week_ul li").each(function(k,v){
+                        if(data.label_info.frequency){
+                            var sval = data.label_info.frequency.type+':'+data.label_info.frequency.val;
+                            if(data.label_info.frequency.type == k){
+                                //console.log($(v).text());
+                                if (data.label_info.frequency.type == 5) {
+                                    $(".cycle_ul li").eq(5).attr('type',sval)
+                                }
+                                $(v).addClass('cur').siblings().removeClass('cur');
+                                $(v).parent().siblings('.data_input').val(sval);
+                            }
+                        }
+                        
+                    });
+                    $('#cover_num').text(data.cover_users);
+                    $('input[name="cover_users"]').val(data.cover_users);
+                    $('input[name="virtual_type"]').each(function(k,v){
+                        if(data.label_info.type == k){
+                           // console.log($(v).val());
+                            $(v).attr('checked','checked');
+                        }
+                    });
+                },
+                error:function(rs){
+                     layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                }
+            })
+        }
+        //广告主列表
+        function getCompList(){
+            $.ajax({
+                type:'POST',
+                url: '/v1.2/Ncrowd/getComp',
+                dataType: 'json',
+                async:false,
+                success: function(rs){
+                    var str ='',data= rs.data;
+                    if(rs.state == 1){
+                        $.each(data, function (k, v) {
+                           str+='<option id="'+v.comp_id+'" value="'+v.comp_id+':0">'+v.comp_name+'</option>';
+                        })
+                        $('.comp_select').append(str);
+                    }else{
+                        layui.layer.msg(rs.msg);
+                    }
+                },
+                error:function(rs){
+                     layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                }
+            })
+        }
+        //广告主列表
+        function getCycleDate(){
+            $.ajax({
+                type:'POST',
+                url: '/v1.2/Ncrowd/getCycle',
+                dataType: 'json',
+                success: function(rs){
+                    var str ='',data= rs.data;
+                    var numArr = [3,7,15,30,60];
+                    if (rs.state == 1) {
+                        $.each(numArr, function (k, v) {
+                           $('.cycle_ul li[data="'+v+'"]').attr('type',k+':'+data['near_'+v]);
+                        })
+                    }else{
+                         layui.layer.msg(rs.msg);
+                    }
+                },
+                error: function(rs){
+                     layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                }
+
+            })
+        }
+        getCycleDate();
+
+        //覆盖数
+        function getCoverNum(postData,fn){
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Ncrowd/getUserNums',
+                dataType:'json',
+                data : postData,
+                success: function(rs){
+                    if(rs.state == 1){         //如果查询成功
+                        $('#cover_num').text(rs.data);
+                        $('input[name="cover_users"]').val(rs.data);
+                        if(!rs.data){
+                            layui.layer.msg('定向包无覆盖人数，请重新选择后再创建！')
+                        }else{
+                            var html ='尊敬的用户，定向人群计划系统会随机抽取并提交到人工审核，是否确定提交。';
+                            layer.confirm(html, {
+                                title:'提示',
+                                area : ['400px', '180px'],
+                                btn: ["确定提交","返回修改"] //按钮
+                                }, function(){
+                                    fn.call(this,rs.data);
+                                }
+                            )
+                        }
+                    }else{
+                        layui.layer.msg(rs.msg);
+                    }
+                },
+                error:function(rs){
+                   layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        function postData(){
+            var crowd_name = $('input[name="crowd_name"]').val(),
+                comp = $('select[name="comp"]').val(),
+                cycle = $('input[name="cycle"]').val(),
+                vType = $('input[name="virtual_type"]:checked').val(),
+                directType = $('input[name="direct_type"]').val();
+
+            var stayTime = $('input[name="stay"]').val(),
+                visitTime = $('input[name="visit"]').val(),
+                timeIpt = $('#timeInput').val(),
+                fqTime = $('input[name="frequency"]').val(),
+                logSt = $('#log_st').val(),
+                logEd = $('#log_ed').val(),
+                fNum = $('#frequenc_num').val();
+            if(!crowd_name){
+                 layui.layer.msg('请输入人群定向名称');
+                return false;
+            }
+            if(!comp){
+                 layui.layer.msg('请选择广告主名称');
+                return false;
+            }
+            if(!cycle){
+                layui.layer.msg('请选择统计周期！')
+                return false;
+            }
+            if(directType==2){
+                if(visitTime==4 && !timeIpt){
+                    layui.layer.msg('请选择到访时间！')
+                    return false;
+                }
+                if(stayTime == 4){
+                    if(!logSt || !logEd || (parseFloat(logSt)>parseFloat(logEd))){
+                         layui.layer.msg('请输入正确的周期时长！');
+                        return false;
+                    }
+                    if(parseFloat(logSt)<1 || parseFloat(logEd)>1440){
+                         layui.layer.msg('请在1-1440分钟区间选择起始与结束时长！');
+                        return false;
+                    }
+                    $('input[name="stay"]').val('4:'+logSt+'_'+logEd);
+                }
+            }
+            if(fqTime == 4){
+                if(fNum && (parseFloat(fNum)<0)){
+                     layui.layer.msg('请输入正确周期频次！');
+                    return false;
+                }
+                $('input[name="frequency"]').val('4:'+fNum);
+            }
+            if(!vType){
+                 layui.layer.msg('请选择生成类型！')
+                return false;
+            }
+            /*var postData = $("form").serialize();*/
+            var dataArr = $("form").serializeArray(),
+                dataArrPost={};
+            $.each(dataArr, function(i,field){
+                if(field.name != 'cover_users' &&  field.name !='crowd_id'){
+                    if(directType==1){
+                        if(field.name !='stay' && field.name !='visit'){
+                            dataArrPost[field.name]= field.value;
+                        }
+                    }else{
+                        dataArrPost[field.name]= field.value;
+                    }
+                }
+            });
+            getCoverNum(dataArrPost,function(id){
+                var totalDataArr = $("form").serializeArray(),
+                    totalDataPost={};
+                $.each(totalDataArr,function(i,field){
+                    if(directType==1){
+                        if(field.name !='stay' && field.name !='visit'){
+                            totalDataPost[field.name]= field.value;
+                        }
+                    }else{
+                        totalDataPost[field.name]= field.value;
+                    }
+                });
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/v1.2/Ncrowd/reapply",
+                    data: totalDataPost,
+                    success: function(rs){
+                        if(rs.state==1){
+                            layui.layer.msg(rs.msg);
+                            location.href = "/v1.2/ncrowd/index";
+                            setTimeout("layer.closeAll()", 100);
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error: function(r){
+                        layui.layer.msg(r.msg);
+                        setTimeout("layer.closeAll()", 100);
+                    }
+                });
+            })
+        }
+         //提示
+        $('body').on('click', '.label_tip', function () {
+            var html = '<div class="layer_tip"><span>'+this.getAttribute('title_tip')+'</span><p>'+this.getAttribute('data')+'</p></div>';
+            layer.tips(html, this, {
+                skin: 'layui-layer-demo',
+                tips: [3, '#eeeff3'],
+                area: ['320px','130px'],
+                time: 0,
+                closeBtn:1
+            });
+        })
+        //提示
+        $('body').on('mouseover', '.mouser_ul p', function () {
+            var html = '<div class="layer_tip"><span>'+this.getAttribute('title_tip')+'</span><p>'+this.getAttribute('data')+'</p></div>';
+            layer.tips(html, this, {
+                skin: 'layui-layer-demo',
+                tips: [1, '#eeeff3'],
+                area: ['310px','85px'],
+                time: 2000,
+                closeBtn:0
+            });
+        })
+    </script>
+	</body>
+</html>

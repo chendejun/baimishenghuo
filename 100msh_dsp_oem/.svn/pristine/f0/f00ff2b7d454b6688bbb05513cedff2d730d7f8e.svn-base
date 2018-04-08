@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>广告管理-素材库</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+</head>
+<style type="text/css">
+	html,body{height: 100%;}
+	.delivery_list{min-height: 500px;}
+	.w1500{width: 1500px;}
+</style>
+<body>
+	<div class="content_box w1500">
+        <div class="title_box">
+        	<i class="info_icon icon1"></i>
+        	<span><a href="">广告管理</a> / 素材库</span>
+        </div>
+        <div class="data_box mt20 delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" href="/Material/add">新增素材</a>
+            <a class="big-btn bm-btn bm-btn-white" href="javascript:;" id="set_btn">开始投放</a>
+            <div class="search_box">
+            	<div class="radio_box fl">
+            		<label> <input type="radio" name="adgroup" value="0" checked="checked">所有</label>
+            	</div>
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="素材名称搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+            </div>
+        </div>
+        <div class="delivery_list" >
+    		<p class="noMsg"></p>
+    		<div id="mod_waterfall" class="mod_waterfall waterfall w1500">
+    		</div>
+        </div>
+    </div>
+   	<script src="/public/js/waterfall/waterfall.js"></script>
+   	<script src="/public/js/waterfall/scroll-loading.js"></script>
+   	    <script type="text/javascript">
+   	    	//sessionStorage.clear();//清除存储数据
+   	    	var limit = 10,page=1;
+   	    	//选择投放
+	        $('body').on('click','.btn_chose',function(){
+                var thisId = $(this).attr('_id');
+                $('.item').removeClass('cur')
+                $(this).parent().parent().addClass('cur');
+                $('#set_btn').attr('_id',thisId);
+                sessionStorage.setItem('groupName',$(this).attr("name"));
+            })
+            $('#set_btn').click(function(){
+                var id = $(this).attr('_id');
+                if(id){
+                    location.href = '/delivery/add?matId='+id;
+                }else{
+                    tipTopShow('请选择要投放的素材');
+                }
+             })
+            //选择投放
+            function editFn(id){
+               location.href ='/Material/edit?id='+id;
+            }
+   	    	//素材搜索
+	        var skeyWord ='',grouptype='';
+	        function searchFn(th){
+	            var t = $(th),
+	                inputDom = t.parent().find('input[type="text"]').val();
+	            grouptype = t.parent().find('input[type="radio"]:checked').val();
+	            skeyWord = encodeURIComponent(inputDom);
+                $('#set_btn').removeAttr('_id');
+                $('#mod_waterfall').empty();
+                page=1;
+                getList(1);
+	        }
+   	    	 //素材分组列表
+   		    function getGroupList(){
+	            $.ajax({
+	                type: "GET",
+	                url: '/material/getGroupList',
+	                dataType:'json',
+	                success: function(rs){
+	                    tipTopHide();
+	                    if(rs.state == 1){
+	                    	var str='';
+	                        $.each(rs.data,function(k,v){
+				            	str+='<label><input type="radio" name="adgroup" value="'+v.adgroup_id+'">'+v.adgroup_name+'</label>';
+				            });
+				            $('.radio_box').append(str);
+	                    }
+	                }
+	            });
+	        }
+	        getGroupList();
+   		    //素材列表
+   		    function getList(page){
+   		    	var name = skeyWord ? ('name/'+skeyWord) :'',
+   		    		groupid = grouptype ? ('/groupid/'+grouptype) :'',
+   		    		page = page ? page : 1;
+	            $.ajax({
+	                type: "GET",
+	                url: '/material/index/page/'+page+'/limit/'+limit+'/'+name+groupid,
+	                dataType:'json',
+	                async : true,
+	                success: function(rs){
+	                    tipTopHide();
+	                    if(rs.state == 1){         //如果查询成功
+	                        var data = rs.data;     //返回数据赋值
+	                        render_table(data, data.pages);     //渲染表格数据
+	                    }else{
+	                        tipTopShow(rs.msg);
+	                    }
+	                },
+	                error:function(rs){
+	                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+	                }
+	            });
+	        }
+	        //渲染数据
+	        function render_table(data, total){
+	            var list_e = $("#mod_waterfall"),str="",no_msg = $(".noMsg");
+	            if(total == 0){
+	                list_e.html("");
+	                no_msg.text("暂无记录");
+	                return ;
+	            }
+	            no_msg.text("");
+	            $.each(data.list,function(k,v){
+	            	str += '<div class="item"><em></em><div class="photo">';
+        			str += '<img src="'+v.img_url+'" alt=""></div>';
+        			str += '<div class="mod_btns"><span class="btn_chose" _id="'+v.material_id+'" name="'+v.adgroup_name+'">选中</span>';
+        			str += '<span class="btn_edit" onclick="editFn('+v.material_id+')">编辑</span></div>';
+        			str += '<div class="info"><span>'+v.material_name+'</span>';
+        			str += '<p>'+v.material_url+'</p>';
+        			str += '<p>'+v.add_time+' by '+ v.addstaff+' 创建</p></div></div>';
+	            });
+	            if(page==1){
+	           		list_e.html(str);
+	            }else{
+	           		list_e.append(str);
+	            }
+	            list_e.waterfall();
+	            //loadAllImg(list_e);//瀑布流
+	            if(page > 1) {
+	            	return
+	            }
+	            //滚动加载分页数据
+	            $(window).scrollLoading({range: list_e.data('waterfall').minTop, maxNum: total, callback: function() {
+			 		page = page+1;
+					getList(page);
+				}});
+	        }
+	        getList();
+	        //判断图片是否加载完成
+	        function loadAllImg(dom){
+	            //判断所有图片是否加载完成，完成后渲染瀑布流
+	            var imgdefereds=[];
+	            $('.item img').each(function(){
+	                 var dfd=$.Deferred();
+	                 $(this).bind('load',function(){
+	                    dfd.resolve();
+	                 }).bind('error',function(){
+	                    //图片加载错误，加入错误处理
+	                    dfd.resolve();
+	                 });
+	                 if(this.complete) setTimeout(function(){
+	                    dfd.resolve();
+	                 },1000);
+	                 imgdefereds.push(dfd);
+	            });
+	            $.when.apply(null,imgdefereds).done(function(){
+	                dom.waterfall();
+	            });
+	        }
+   	    </script>
+</body>
+</html>

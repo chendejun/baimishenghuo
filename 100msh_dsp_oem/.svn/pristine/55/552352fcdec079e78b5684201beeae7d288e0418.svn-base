@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>广告管理-腾讯广告</title>
+    <link rel="stylesheet" href="../../../public/css/base.css">
+	<link rel="stylesheet" href="../../../public/css/common.css">
+	<style type="text/css">
+		.base_table tr.inner_table >td{border: none}
+		.inner_table{display: none;}
+		.inner_table.on{display: table-row;}
+		.inner_list .tab_nav li{ color: #999;width: 80px;height: 30px;cursor: pointer;}
+		.inner_list .tab_nav li{ color: #999;width: 80px;height: 30px;cursor: pointer;}
+		.inner_list .tab_tip{position: relative;}
+		.inner_list .tab_tip p{ background: #fff8e7; line-height: 30px; height: 30px; color: #666; border: 1px solid #efd6b6; text-align: left; padding-left: 26px;}
+		.inner_list .tab_tip i{width: 16px; height: 16px;position: absolute; left: 0; margin: 7px; background: url(../../../public/img/tip_icon.png); background-repeat: no-repeat;}
+		.inner_list table td{position: relative;}
+		.inner_list .close_list{height: 30px;line-height: 30px;float: right;color: #356bb7;margin: 0;cursor: pointer;}
+		.select_box{box-sizing: content-box;vertical-align: top;}
+		.inner_table label {display: inline-block;width: 100%;cursor: pointer;}
+		.plan_list .edit_btn{width: 22px; height: 22px;background: url(../../../public/img/edit_icon.png) center no-repeat; display: inline-block; cursor: pointer; vertical-align: middle;}
+		.layer_pop  label{ padding-right: 15px;}
+	</style>
+</head>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span>广告管理 / 全网广告</span>
+        </div>
+        <div class="data_box delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" href="/v1.2/gdtdelivery/create1">新增投放</a>
+            <div class="search_box">
+        		<select class="bm-select select_box" id="select_box">
+                    <option value="">全部状态</option>
+                    <option value="1">有效</option>
+                    <option value="2">暂停</option>
+                    <option value="3">结束</option>
+                </select>
+            	<!-- <div class="radio_box fl">
+            		<label> <input type="radio" name="set_statu" value="4" checked="checked">所有</label>
+            		<label> <input type="radio" name="set_statu" value="0">待审核</label>
+            		<label> <input type="radio" name="set_statu" value="1">投放中</label>
+            		<label> <input type="radio" name="set_statu" value="2">审核失败</label>
+            		<label> <input type="radio" name="set_statu" value="3">投放结束</label>
+            	</div> -->
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="关键字搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+            </div>
+            <div class="mt20">
+	            <table id="plan_list" class="plan_list base_table">
+	                <thead>
+	                    <tr>
+	                        <th>广告(计划)名称</th>
+	                        <th>广告主</th>
+	                        <th>申请日期</th>
+	                        <th>广告状态</th>
+	                        <th>日预算</th>
+	                        <th>曝光次数</th>
+	                        <th>点击数</th>
+	                        <th>点击率</th>
+	                        <th>广告花费</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody></tbody>
+	                <!-- <tbody>
+	                	<tr>
+	                		<td><a href="javascript:;" _id="1" class="table-option-btn view_list">广告名称</a></td>
+	                		<td>张三的店</td>
+	                		<td>2017-18-19</td>
+	                		<td> 待审核</td>
+	                		<td>200</td>
+	                		<td>84563</td>
+	                		<td>845</td>
+	                		<td>5.0%</td>
+	                		<td>￥170</td>
+	                		<td><a href="" class="table-option-btn">暂停广告计划</a></td>
+	                	</tr>
+	                	<tr class="inner_table" id="1">
+			               	<td colspan="11">
+				               	<div class="inner_list" id="inner_list">
+					               	<div class="tab_tip">
+					               		<i></i>
+					               		<p>此推广计划共包括2条广告。 此推广计划已被系统暂停, 原因: 账户余额不足。</p>
+					               	</div>
+					               	<ul class="tab_nav">
+					               		<li class="cur" onclick="editAdDate()">修改日期</li>
+					               		<li>修改时间</li>
+					               		<li>修改出价</li>
+					               		<li>删除广告</li>
+					               	</ul>
+					               	<table width="100%">
+						                <thead>
+						                    <tr>
+						                        <th>选择</th>
+						                        <th>广告名称</th>
+						                        <th>出价</th>
+						                        <th>状态</th>
+												<th>曝光量</th>
+						                        <th>点击量</th>
+						                        <th>点击率</th>
+						                        <th>广告花费</th>
+						                        <th>点击均价</th>
+						                        <th>操作</th>
+						                    </tr>
+						                </thead>
+						                <tbody>
+						                	<tr>
+						                		<td><label><input type="checkbox" name="ad_info"></label></td>
+						                		<td><a href="javascript:;" class="table-option-btn view_info">678</a></td>
+						                		<td>cpc ￥200 <i class="edit_btn edit_money"></i></td>
+						                		<td>有效  <i class="edit_btn edit_state"></i></td>
+						                		<td>84563</td>
+						                		<td>200</td>
+						                		<td>5.0%</td>
+						                		<td>￥845</td>
+						                		<td>￥1.70</td>
+						                		<td><a href="" class="table-option-btn">暂停广告</a></td>
+						                	</tr>
+						                </tbody>
+						            </table>
+						           <p class="close_list">收起列表</p>
+						        </div>
+			               	</td>
+	                	</tr>
+	                </tbody> -->
+	            </table>
+	            <p class="noMsg"></p>
+	            <!--列表分页-->
+	            <div id="list_page" class="page"></div>
+	        </div>
+        </div>
+    </div>
+    <!--广告主详情start-->
+    <script id="infoTemplate" type="text/html">
+        <div class="info_box">
+	        <ul class="clearfix">
+	        	<li>广告名称：<< d.delivery_name >></li>
+	        	<li>广告主：<< d.comp_name >></li>
+	        	<li>所属服务商：<< d.comp_p_name >></li>
+	        	<li>投放方式：<< d.delivery_type_name >></li>
+	        	<li>广告出价：￥<< d.bid_money >> 元</li>
+				<!-- <li>投放类型：<< d.ad_type_name >></li> -->
+	        	<li>出价方式：<< d.bid_type_name >> </li>
+	        	<!-- <li>日预算：￥<< d.day_money >> 元</li> -->
+	        	<li>投放日期：<< d.delivery_date >></li>
+	        	<li>投放时间段：<< d.delivery_times >></li>
+	        </ul>
+	        <div class="dbox"><span>投放素材：</span><div class="info"><p><< d.material_info.material_name >></p> <img src="<< d.material_info.pic_purl >>"><p><< d.material_info.jump_url >></p></div></div>
+	    </div>
+    </script>
+    <!--广告主详情end-->
+    <script type="text/javascript" src="../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../public/js/common.js"></script>
+    <script src="../../../public/js/layer/layer.js"></script>
+    <script src="../../../public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="../../../public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript" src="../../../public/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+		sessionStorage.clear();//清除存储数据
+		laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+		//搜索
+	    var skeyWord ='',setStatu='',sDate='';
+	    function searchFn(th){
+	        var t = $(th),
+	            inputDom = t.parent().find('input[type="text"]').val();
+	        setStatu = t.parent().find('#select_box').val();
+	        skeyWord = encodeURIComponent(inputDom);
+	        getList();
+	    }
+		//获取数据
+	    var limit = 10;
+	    function getList(curr){
+	    	var name = skeyWord ? ('/name/'+skeyWord) :'',
+	    		status = setStatu ? ('/status/'+setStatu) :'',
+	    		date = sDate ? ('/date/'+sDate) :'';
+	        $.ajax({
+	            type: "GET",
+	            url: '/v1.2/Bhdelivery/getCampaignList',
+	            dataType:'json',
+	            success: function(rs){
+					//console.log(rs);
+	                tipTopHide();       //隐藏提示框
+	                if(rs.api_code == 1){         //如果查询成功
+	                    var data = rs.data;     //返回数据赋值
+	                    render_table(data);     //渲染表格数据
+	                    renderPage(data.page_total,curr);
+	                }else{
+	                    tipTopShow(rs.msg);
+	                }
+	            },
+	            error:function(rs){
+	                tipTopShow("查询信息失败，请重试...");    //显示提示框
+	            }
+	        });
+	    }
+
+	    //渲染表格数据
+	    var bid_type = { '1': 'CPM', '2': 'CPC' };
+	    function render_table(data){
+	        var list_e = $("#plan_list tbody"),str="",no_msg = $(".noMsg");
+	        if(data.list.length == 0){
+	            list_e.html("");
+	            no_msg.text("暂无记录");
+	            return ;
+	        }
+	        no_msg.text("");
+	        $.each(data.list,function(k,v){
+	            str +='<tr class="item'+k+'">';
+	            str +='<td><a href="javascript:;" class="table-option-btn view_list" onclick="getGdtAdList('+v.bh_campaign_id+","+k+','+v.comp_id+')">'+ v.bh_campaign_name +'</a><i class="edit_btn edit_cname" onclick="editCname('+v.bh_campaign_id+','+v.campaign_id+',1)"></i></td>';
+	            str +='<td>'+ v.comp_name +'</td>';
+	            str +='<td>'+ v.add_time +'</td>';
+	            str +='<td>'+ v.status_name +'</td>';
+	            str +='<td>￥'+ parseFloat(v.budget *0.01).toFixed(2) +'<i class="edit_btn edit_cname" onclick="editBudget('+v.comp_id+','+v.campaign_id+',2)"></i></td>';
+	            str +='<td>'+ v.cpm_num +'</td>';
+	            str +='<td>'+ v.cpc_num +'</td>';
+	            str +='<td>'+ v.clicking_rate +'</td>';//'+ parseFloat(v.con_rate)+'%
+	            str +='<td>'+ v.reportspend+'</td>';
+	            if(v.status == 2){   //投放中 ps:只有暂停的广告才能结束,只有投放中的广告才能暂停   （1 待投放 2投放中 3 已结束 4 暂停）
+					str +='<td><a href="javascript:;" class="table-option-btn" onclick="editCampStatus('+v.bh_campaign_id+','+v.comp_id+","+4+')">暂停广告</a></td>';
+	            }else if(v.status == 4){
+					str +='<td><a href="javascript:;" class="table-option-btn mr15" onclick="editCampStatus('+v.bh_campaign_id+','+v.comp_id+","+2+')">启用</a></td>';
+	            }else if(v.status==1){
+	            	str +='<td>待审核</td>';
+	            }else if(v.status==3){
+	            	str +='<td>投放结束</td>'
+	            }
+	            str +='</tr>';
+	        });
+	        list_e.html(str);
+	    }
+	    //分页
+	    function renderPage(pages,curr){
+	        //显示分页
+	        laypage({
+	            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+	            pages: pages, //通过后台拿到的总页数
+	            //skip: true, //是否开启跳页
+	            skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+	            curr: curr || 1, //当前页
+	            jump: function(obj, first){ //触发分页后的回调
+	                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+	                    getList(obj.curr);
+	                }
+	            }
+	        });
+	    }
+	    getList();
+	    //修改计划名
+	    function editCname(compId,id,type){
+	    	var id = id ? id : '';
+	    	var html = '<div class="layer_pop"><input type="text" class="bm-input wd300" placeholder="请输入新的计划名称" id="new_cname"/></div>';
+	    	layer.confirm(html, {
+                title:'修改名称',
+                area: ['400px', '250px'],
+                btn: ["确定","取消"] //按钮
+                }, function(){
+                    var val = $('#new_cname').val();
+                    if(!val){
+	            		tipTopShow('广告计划名称不能为空！');
+	            		return false;
+	        		}
+                    reNewCamp(compId,id,type,val);
+                }
+            )
+	    }
+	    //修改日预算
+	    function editBudget(compId,id,type){
+	    	var id = id ? id : '';
+	    	var html = '<div class="layer_pop"><input type="text" class="bm-input wd300" placeholder="请输入新的日预算" id="new_budget"/></div>';
+	    	layer.confirm(html, {
+                title:'修改日预算',
+                area: ['400px', '250px'],
+                btn: ["确定","取消"] //按钮
+                }, function(){
+                	var val = $('#new_budget').val();
+	        		if(!val){
+		                tipTopShow('请输入日预算!');
+		            }
+                	if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(val))){
+	            		tipTopShow('请输入正确日预算金额！');
+	            		return false;
+	        		}
+		            if(parseFloat(val)< 150 || parseFloat(val)>4000000){
+	            		tipTopShow('日预算最低150元，最高400万元！');
+	            		return false;
+		            }
+		            /*if(parseFloat(val) > parseFloat(userAmount)){
+		            	tipTopShow('日预算不能大于广告主账户余额！');
+	            		return false;
+		            }*/
+                    reNewCamp(compId,id,type,val);
+                }
+            )
+	    }
+	    //客户设置状态（1 启用，2  暂停 3结束）
+	    function editCampStatus(bh_campaign_id,comp_id,status){
+	    	var campStatus ={'2':'启用', '4':'暂停'};
+	    	var html = '是否'+campStatus[status]+'该广告计划？';
+	        layer.confirm(html, {
+	            btn: ["确定","取消"] //按钮
+	            }, function(){
+	             	reNewCamp(bh_campaign_id,comp_id,status);
+	        	}
+	        );
+	    }
+	    //广告计划修改
+	    function reNewCamp(bh_campaign_id,comp_id,status){
+	    	var postData ={'bh_campaign_id':bh_campaign_id,'comp_id':comp_id,'status':status};
+	    	$.ajax({
+                type: "POST",
+                url:'/v1.2/Bhdelivery/updateCampStatus',
+                dataType:"json",
+                data : postData,
+                success: function(rs){
+					console.log(rs)
+                    if(rs.api_code == 1){
+                        //关闭弹层
+                        getList();
+                    	setTimeout("layer.closeAll()", 100);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(data){
+                    tipTopShow("查询失败，请重试...");
+                    setTimeout("layer.closeAll()", 100);
+                }
+            });
+	    }
+
+	    //二级广告列表广告列表
+	    function getGdtAdList(bhid,id,compId){
+	    	if($('#'+id).length>0){
+	    		$('#'+id).toggleClass('on');
+	    	}else{
+	            $.ajax({
+					type: "POST",
+					url: '/v1.2/Bhdelivery/getDeliveryList',
+					dataType: 'json',
+					data:{
+						'bh_campaign_id':bhid
+					},
+					success: function (rs) {
+						console.log(rs);
+						tipTopHide();       //隐藏提示框
+						if (rs.api_code == 1) {         //如果查询成功
+							var data = rs.data;     //返回数据赋值
+								renderGdtAdList(bhid,data,id,compId);
+						} else {
+							tipTopShow(rs.msg);
+						}
+					},
+					error: function (rs) {
+						tipTopShow("查询信息失败，请重试...");    //显示提示框
+					}
+				});
+	    	}
+	    }
+	    var delivery_status ={'0':'待审核','1':'投放中','2':'审核失败', '3':'投放结束','4':'暂停'};
+        function renderGdtAdList(bhid,data,id,compId){
+        	var html='';
+        	html +='<tr class="inner_table on" id="'+ id +'"><td colspan="11"><div class="inner_list">';
+			html +='<div class="tab_tip"><i></i><p>此推广计划共包括'+ data.length +'条广告。</p></div>';
+			// html +='<ul class="tab_nav"><li>修改日期</li><li>修改时间</li><li>修改出价</li></ul>';
+			html +='<table width="100%"><thead><tr><th>选择</th><th>广告名称</th><th>出价</th><th>状态</th><th>曝光量</th>';
+			html +='<th>点击量</th><th>点击率</th><th>广告花费</th><th>操作</th></tr></thead>';
+	        if(data.length != 0){   //bid 出价
+		        html +='<tbody>';
+		        $.each(data,function(k,v){
+					html +='<tr><td><label><input type="radio" name="ad_info" value="'+v.bh_delivery_id+'"></label></td>';
+		    		html +='<td><a href="javascript:;" class="table-option-btn view_info" >'+ v.delivery_name +'</a></td>';
+		    		html +='<td>' + bid_type[v.bidTyp] + ' ￥' + v.bid;
+
+		    		html +='</td><td> '+v.status_name
+		    		html +='</td><td>' + v.cpm_num + '</td><td>' + v.cpc_num + '</td><td>' + v.clicking_rate + '</td>';
+		    		html +='<td>￥' + round(v.reportspend, 2) + '</td>';
+		    		if(v.status ==2){ //投放中 ps:只有暂停的广告才能结束,只有投放中的广告才能暂停   （1 待投放 2投放中 3 已结束 4 暂停）
+		    			html +='<td><a href="javascript:;" class="table-option-btn" onclick="editDelyStatus('+ v.bh_delivery_id +','+v.delivery_id+',4)">暂停广告</a></td></tr>';
+		    		}else if(v.status==4){
+		    			html +='<td><a href="javascript:;" class="table-option-btn" onclick="editDelyStatus('+ compId +','+v.delivery_id+',3)">结束广告</a></td></tr>';
+		    		}else{
+		    			html +='<td>-</td></tr>';
+		    		}
+		        })
+		        html +='</tbody></table>';
+		    }else{
+	        	html +='<tbody></tbody></table><p class="noMsg">暂无记录</p>';
+	        }
+	        html +='</div></td></tr>';
+	        $('.item'+ id).after(html);
+        }
+
+        //时间控件
+        function startDdate(){
+	         var ed=$dp.$('ed_text');
+	         WdatePicker({
+	         	onpicked:function(){
+	         		ed.focus();
+	         	},
+	         	minDate:'%y-%M-%d',
+	         	dateFmt:'yyyy-MM-dd',
+	         	startDate:'%y-%M-%d',
+	         	alwaysUseStartDate:true
+	         })
+	    }
+	    function endDdate(){
+	        WdatePicker({
+	        	minDate:'%y-%M-%d',
+	         	dateFmt:'yyyy-MM-dd',
+	         	startDate:'%y-%M-%d',
+	         	alwaysUseStartDate:true
+	        })
+	    }
+	    //渲染自定义时间
+		function reanderTimeAear(){
+		    var str1 ='',str2='',html='';
+		    for(var i=0; i<=24; i++){
+		        str1 += i !=24 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+		        str2 += i !=0 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+		    }
+		    html = '<span id="customTimeBox"><select id="timeAear1" class="bm-select" style="width: 80px;">'+str1+'</select><select id="timeAear2" class="bm-select" style="width: 80px;">'+str2+'</select></span>';
+		    return html;
+		}
+        //自定义时间变化
+		$("#timeAear1").bind("change",function(){
+		    var k = this.value,str = "",v=$("#timeAear1").val();
+		    for(var i = parseInt(k)+1; i<=24; i++){
+		        str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+		    }
+		    $("#timeAear2").html(str);
+		    if(k < v){
+		        $("#timeAear2").val(v);
+		    }
+		});
+		$("#timeAear2").bind("change",function(){
+		    var k = this.value,str = "",v=$("#timeAear1").val();
+		    for(var i = 0; i<k; i++){
+		        str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+		    }
+		    $("#timeAear1").html(str);
+		    $("#timeAear1").val(v);
+		});
+        //广告修改
+	    function reNewDelivery(compId,id,type,val){
+	    	var postData ={'update_type':type,'update_data':val,'delivery_id':id,'comp_id':compId};
+	    	$.ajax({
+                type: "POST",
+                url:'/v1.2/Gdtdelivery/updateDeliveyInfo',
+                dataType:"json",
+                data : postData,
+                success: function(rs){
+                    if(rs.state == 1){
+                        //关闭弹层
+                        getList();
+                    	layer.closeAll();
+                    }else{
+                        tipTopShow(rs.msg.error);
+                    }
+                },
+                error:function(data){
+                    tipTopShow("查询失败，请重试...");
+                    setTimeout("layer.closeAll()", 100);
+                }
+            });
+	    }
+	    //广告修改状态
+	    function editDelyStatus(compId,id){
+	    	if(type !=0){
+	    		var html ='是否确定将该广告状态设置'+delivery_status[type]+'？';
+	    	}else{
+	    		if(labelType==4){ //暂停
+	    			var html = '<div class="layer_pop"><label><input name="label_status" type="radio" value="4">暂停</label></div>';
+	    		}else if(labelType==3){ //结速
+	    			var html = '<div class="layer_pop"><label><input name="label_status" type="radio" value="3">投放结束</label><label></div>';
+	    		}
+	    	}
+	        layer.confirm(html, {
+	            title:'修改状态',
+	            area : ['400px', '180px'],
+	            btn: ["确定","取消"] //按钮
+	            }, function(){
+	            	if(type ==0){
+		            	var labelVal = $('input[name="label_status"]:checked').val();
+		            	if(!labelVal){
+		            		tipTopShow('请选择操作状态！');
+		            		return;
+		            	}
+		            	var status = labelVal;
+	            	}else{
+	            		var status = type;
+	            	}
+	             	var postData ={'status':status,'delivery_id':id,'comp_id':compId};
+			    	$.ajax({
+		                type: "POST",
+		                url:'/v1.2/Gdtdelivery/updateDeliveryStatus',
+		                dataType:"json",
+		                data : postData,
+		                success: function(rs){
+		                    if(rs.state == 1){
+		                        //关闭弹层
+		                        getList();
+		                    	layer.closeAll();
+		                    }else{
+		                        tipTopShow(rs.msg.error);
+		                    }
+		                },
+		                error:function(data){
+		                    tipTopShow("查询失败，请重试...");
+		                    setTimeout("layer.closeAll()", 100);
+		                }
+		            });
+	        	}
+	        );
+	    }
+
+        //保留两位小数（四舍五入）
+		function round(number, fractionDigits) {
+			with (Math) {
+				return round(number * pow(10, fractionDigits)) / pow(10, fractionDigits);
+			}
+		}
+	    //广告主详情
+        $('body').on('click','.view_info',function(){
+            var id = $(this).attr('_id');
+            var cacheDOM = $("#infoTemplate").html();
+            infocacheDOM = getUserInfo(id);
+            //laytpl异步渲染调用
+            laytpl(cacheDOM).render(infocacheDOM, function(result){
+                //店铺详细信息弹框
+                layer.open({
+                    type: 1,
+                    title: "广告详情",
+                    area: ['760px', '600px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        });
+
+        //广告主详情数据
+        function getUserInfo(id){
+            var data='';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/Gdtdelivery/deliveryInfo/delivery_id/' + id,
+                dataType:'json',
+                async : false,
+                beforeSend:function(){
+                    tipTopHide("正在查询数据");    //显示提示框
+                },
+                success: function(rs){
+                    tipTopHide();
+                    if(rs.state == 1){         //如果查询成功
+                        data = rs.data;     //返回数据赋值
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+            return data;
+        }
+
+	</script>
+	</body>
+</html>

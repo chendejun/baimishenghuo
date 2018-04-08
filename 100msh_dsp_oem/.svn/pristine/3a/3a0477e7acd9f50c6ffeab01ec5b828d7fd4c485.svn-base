@@ -1,0 +1,62 @@
+<div class="addperator_form">
+    <div class="form">
+    	<div class="title">修改操作员</div>
+        <div class="from-row">
+            <label>操作员账号：</label>
+            <input type="text" name="edit_mobile" class="bm-input wd300" value="{{$data.user_name}}" disabled="disabled">
+        </div>
+        <div class="from-row">
+            <label>操作员密码：</label>
+            <span class="gray" id="rePsw_tip">默认密码为账号后6位</span>
+            <a href="javascript:;" class="bm-btn bm-btn-blue rePsw_btn" _data='0' onclick="rePswFn(this,{{$data.staff_id}})">重置为默认密码</a>
+        </div>
+        <div class="from-row">
+            <label>操作员名称：</label>
+            <input type="text" name="edit_perator_name" class="bm-input wd300" placeholder="操作员名称不超过10个汉字的" value="{{$data.staff_name}}">
+        </div>
+        <div class="from-spec check_type">
+            <span>员工身份：</span>
+            {{foreach from=$user_group  key=key item=val}}
+	            <div class="regtype_wrap">
+	                <label class="regtype_span">
+	                    <i class="regicon"></i>
+	                    <input class="regType" type="radio" name="edit_perator_group" value="{{$key}}"/>{{$val}}
+	                </label>
+	            </div>
+			{{/foreach}}
+        </div>
+        <div class="from-spec regType_tip">
+            <p class="rgTip2">财务查询权限,包括查询广告主、账户中心、效果报告权限。</p>
+            <p class="rgTip3">仅投放权限,包括查询广告主、广告素材、WIFI广告、腾讯广告、DMP人群操作权限。</p>
+            <p class="rgTip4">拥有所有权限</p>
+        </div>
+        <div class="from-spec check_type">
+            <span>账户状态：</span>
+            <div class="regtype_wrap">
+                <label class="regtype_span">
+                    <i class="regicon"></i>
+                    <input class="status_inp" type="radio" name="perator_status" value="1"/>正常
+                </label>
+            </div>
+            <div class="regtype_wrap">
+                <label class="regtype_span">
+                    <i class="regicon"></i>
+                    <input class="status_inp" type="radio" name="perator_status" value="0"/>停用
+	                <div class="move_desc" style="display: none">
+	                	<b>该账号下所有的广告主信息（包括已投放广告)移交给</b>
+	                	<b id="mov_name" style="display: none">{{$data.move_staff_name}}</b>
+	                	<select class="bm-select" id="mov_select">
+	                		{{foreach from=$list  key=key item=val}}
+	                		<option value="{{$key}}" {{if $key == $staff_id}}selected{{/if}} >{{$val}}</option>
+							{{/foreach}}
+	                	</select>
+	                </div>
+                </label>
+            </div>
+        </div>
+        <div class="set_bottom mt20">
+            <a href="javascript:;" class="bm-btn cancel_btn" onclick="javascript:layer.closeAll();">取消</a>
+            <input type="button" class="bm-btn bm-btn-blue" value="保存修改" onclick="editPeratorPost({{$data.staff_id}})">
+        </div>
+    </div>
+</div>

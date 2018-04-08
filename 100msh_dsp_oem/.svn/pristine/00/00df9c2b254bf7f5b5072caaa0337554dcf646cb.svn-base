@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step4">
+            <div class="from-row">
+                <label>广告创意：</label>
+                <ul class="idea_change row_type clearfix" id="idea_change">
+                    <li class="cur" _type="1">新建创意<i></i></li>
+                    <li _type="2">素材库中选择创意<i></i></li>
+                </ul>
+            </div>
+            <div class="idea_box">
+                <article>
+                   <div class="from-row">
+                        <ul class="img_upload clearfix" id="img_upload">
+                            <!-- <li>
+                                <div class="file_input" data-resultsize="10240">
+                                    <img id="previewImg1_1">
+                                    <div class="file_text">
+                                        素材大小：600*120  <br>
+                                        <b>本地上传</b>
+                                    </div>
+                                    <input id="fileImg1_1" type="file" name="file" _width="600" _height="120" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg1_1')">
+                                </div>
+                            </li> -->
+                        </ul>
+                    </div>
+                </article>
+                <article style="display: none">
+                   <div class="from-row">
+                        <label>尺寸：</label>
+                        <div class="layui-input-inline" style="width: 150px;">
+                            <select name="size_sel" lay-verify="required" lay-filter="size_sel" lay-search="" id="size_sel" >
+                            </select>
+                        </div>
+                        <!-- <span class="ml10">标签：</span>
+                        <div class="layui-input-inline" style="width: 150px;">
+                            <select name="ad_tag" lay-verify="required">
+                                <option value="">全部</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                        <span class="ml10">创建时间：</span>
+                        <div class="layui-input-inline" style="width: 150px;">
+                            <select name="ad_time" lay-verify="required">
+                                <option value="2" selected="">全部</option>
+                                <option value="0">本月</option>
+                                <option value="1">上月</option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <div class="from-row">
+                        <!-- 素材库start -->
+                        <div class="mod_material mt20 scrollbar" style="height: 100px;padding:15px;overflow-x:hidden">
+                            <p class="noMsg no_matlist"></p>
+                            <div id="mat_lists" class="mat_lists waterfall" _id="">
+                                <!-- <div class="item materialPage1">
+                                    <div class="title">腾讯素材240x180</div>
+                                    <div class="photo">
+                                        <em></em><i></i>
+                                        <img src="http://d.100m.net/100msh_upload/201801/20180130/dsp/c497d087ded79dec5c9a9d8a1676a33e.jpg" alt="">
+                                        <div class="mod_btns">
+                                            <span class="btn_chose" _id="351" _url="https://www.baidu.com/?tn=39042058_15_oem_dg" _type="null">选中投放</span>
+                                        </div>
+                                    </div>
+                                    <div class="info">
+                                        <span>腾讯素材</span><span>240x180大小</span>
+                                        <p>https://www.baidu.com/?tn=39042058_15_oem_dg</p>
+                                        <p>2018-1-30 15:29:19 创建 by 小夏</p>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                        <!-- 素材库end -->
+                    </div>
+                </article>
+            </div>
+            <div class="from-row">
+                <label>落地页地址：</label>
+                <input type="text" class="bm-input layui-input" name="jump_url" lay-filter="jump_url" placeholder="输入广告目标页地址" value="" autocomplete="off">
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(3)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" data="5" id="stepBtnp4">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript">
+        var creativeArr=[],
+            standard={};
+        function initp4(scRes){
+            getSourcestype(scRes)
+        }
+
+        //创意规格展示
+        function getSourcestype(rsdata){
+            var str='';
+            $.each(rsdata.data,function(k,v){
+                str += '<li><div class="file_input">';
+                str += '<img id="previewImg'+v.app_size_id+'" _name="'+v.ad_size_name+'">';
+                str += '<div class="file_text">素材大小：'+v.ad_size_name+'<p>(JPG / PNG，小于2M)</p> <br><b>本地上传</b></div>';
+                str += '<input id="fileImg'+v.app_size_id+'" type="file" name="file" _width="'+v.ad_size_width+'" _height="'+v.ad_size_height+'" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,\'previewImg'+v.app_size_id+'\')">';
+                str += '</div></li>';
+            });
+            $('#img_upload').html(str);
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+
+            //广告计划类别选择
+            $('.idea_change').on('click','li',function(){
+                var th = $(this),
+                    idx = th.index(),
+                    type = th.attr('_type'),
+                    sizeSel = $('#size_sel').val();
+                th.addClass('cur').siblings('li').removeClass('cur');
+                $('.idea_box article').eq(idx).show().siblings().hide();
+                if(type==2){
+                    getSizesel(standard);
+                }
+            })
+            //规格渲染
+            function getSizesel(rsdata){
+                var str ='<option value>直接选择或搜索选择创意素材</option>';
+                $.each(rsdata.data,function(k,v){
+                    str += '<option value="'+v.ad_size_name+'">'+v.ad_size_name+'</option>';
+                });
+                $('#size_sel').html(str);
+                form.render();
+            }
+
+            //已有广告计划选择
+            form.on('select(size_sel)', function (data) {
+                var val = data.value;
+                var mediaType = stgbh3 ? stgbh3.mediaType:'1';
+                if(val){
+                    getCreative(compId,val,mediaType);//查创意列表
+                }
+            });
+            //
+            function getCreative(comp_id,size_name,type){
+                var postData ={'comp_id':comp_id,'size_name':size_name,'type':type};
+                $.ajax({
+                    type: "POST",
+                    url: '/v1.2/Bhdelivery/getCreative',
+                    data: postData,
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            var data = rs.data;
+                            var list_e = $("#mat_lists"),str="",no_msg = $(".no_matlist");
+                            if(data.length==0){
+                                list_e.html("");
+                                no_msg.text("暂无素材");
+                                $('.mod_material').css('height','100px');
+                                return false;
+                            }
+                            $('.mod_material').css('height','500px');
+                            no_msg.text("");
+                            $.each(data,function(k,v){
+                                str += '<div class="item" _id="'+v.creative_id+'" _src="'+v.img_url+'" _name="'+v.ad_size_name+'"><div class="title">'+ v.creative_name+'</div>';
+                                str += '<div class="photo"><em></em><i></i>';
+                                str += '<img src="'+v.img_url+'" alt="">';
+                                str += '<div class="mod_btns"><span class="btn_chose" _id="'+v.creative_id+'" _url="'+v.jump_url+'">选择创意</span></div></div>';
+                                str += '<div class="info"><span>'+v.creative_name+'</span><span>'+v.ad_size_name+'大小</span>';
+                                str += '<p>'+v.jump_url+'</p></div></div>';
+                            });
+                            list_e.html(str);
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });
+            }
+            //选择投放
+            $('#mat_lists').on('click','.btn_chose',function(){
+                var th = $(this),
+                    item = th.closest('.item');
+                if(item.hasClass('cur')){
+                    item.removeClass('cur');
+                }else{
+                    item.addClass('cur');
+                }
+            })
+
+        })
+        //下一步按钮检验
+        $('#stepBtnp4').on('click',function(e){
+            var th = $(this),
+                id = th.attr('data');
+            var res = checkDataStept4();
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            var advArr = res.data.advertData;
+            stgbh4.advertData = advArr ? advArr.join():'';
+            stepPage(id);
+        })
+        //页面校验
+        function checkDataStept4(){
+            var ideaTy = $('#idea_change .cur').attr('_type'),//1新建 2选择
+                jump_url = $.trim($('input[name=jump_url]').val()),
+                matData = getAdvertPic(),
+                returnData ={};
+            if(!jump_url){
+                return {"success":false,msg:"请输入落地页地址!"};
+            }
+            if(!checkUrl(jump_url)){
+                return {"success":false,msg:"请输入正确的落地页地址!"};
+            }
+            if(ideaTy==1 && matData[0].length==0){
+                return {"success":false,msg:"请上传素材!"};
+            }
+            if(ideaTy==2 && matData[0].length==0){
+                return {"success":false,msg:"请选择创意素材!"};
+            }
+            advertData = addCreativeSet(matData);
+            returnData = {
+                "success":true,
+                "data":{"advertData":advertData}
+            };
+            return returnData;
+        }
+        //素材库创意图片集合
+        function getAdvertPic(){
+            var ideaTy = $('#idea_change .cur').attr('_type'),//1新建 2选择
+                srcData=[],srcArr=[],nameArr=[];
+            if(ideaTy==1){
+                $('#img_upload img').each(function(){
+                    var src = $(this).attr('src'),
+                        name = $(this).attr('_name');
+                    if(src){
+                        srcArr.push(src);
+                        nameArr.push(name);
+                    }
+                })
+            }else if(ideaTy==2){
+                $('#mat_lists .cur').each(function(){
+                    var src = $(this).attr('_src'),
+                        name = $(this).attr('_name');
+                    if(src){
+                        srcArr.push(src);
+                        nameArr.push(name);
+                    }
+                })
+            }
+            srcData[0] = srcArr;
+            srcData[1] = nameArr;
+            return srcData;
+        }
+        //生成创意id集合
+        function addCreativeSet(srcData){
+            var imgclub = srcData[0],
+                nameclub = srcData[1],
+                type = stgbh3 ? stgbh3.mediaType:'',
+                compId = stgbh1 ? stgbh1.comp_id:'';
+            for(var i=0;i<imgclub.length;i++){
+                addCreative(nameclub[i],imgclub[i],type,compId,function(data){
+                    creativeArr = data;
+                });
+            }
+            return creativeArr;
+        }
+        //生成创意id
+        function addCreative(name,url,type,comp_id,fn){
+            var jump_url = $.trim($('input[name=jump_url]').val());
+            var postData = {'ad_size_name':name,'creative_name':name,'jump_url':jump_url,'img_url':url,'type':type,'comp_id':comp_id};
+            $.ajax({
+                type: "POST",
+                url: "/v1.2/Bhdelivery/addCreative",
+                data : postData,
+                dataType:'json',
+                async : false,
+                success: function(rs){
+                    var data = rs.data;
+                    if(rs.api_code == 1){
+                        creativeArr.push(data);
+                        fn.call(this,creativeArr);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");
+
+                }
+            });
+        }
+        //图片尺寸校验
+        function createReader(file, fn) {
+            var reader = new FileReader;
+            reader.onload = function (evt) {
+                var image = new Image();
+                image.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    fn.call(this,width,height);
+                };
+                image.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        //图片上传
+        function imgPreview(fileDom,el) {
+            var fileSize = 1024*1024*2;
+            var fwidth = $(fileDom).attr('_width');
+            var fheight = $(fileDom).attr('_height');
+            var width='',height='';
+            //判断是否支持FileReader
+            if(window.FileReader) {
+                var reader = new FileReader();
+            } else {
+                tipTopShow("您的设备不支持图片预览功能，如需该功能请升级您的设备！");
+            }
+            //获取文件
+            var file = fileDom.files[0];
+            var imageType = /^image\//;
+            //是否是图片
+            if(!imageType.test(file.type)) {
+                tipTopShow("请选择图片！");
+                $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+            var size = $(fileDom)[0].files[0].size;
+            if(size >fileSize){
+                tipTopShow('图片大小不能大于2M');
+                 $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+            createReader(file, function (w, h) {
+                if(w!= fwidth || h!=fheight){
+                    tipTopShow('图片尺寸不符合！');
+                    return;
+                }
+                var formData = new FormData();
+                var ids = $(fileDom).attr('id');
+                formData.append('file', $('#'+ids)[0].files[0]);
+                $.ajax({
+                    url: '/material/uploadBhFile',
+                    type: 'POST',
+                    cache: false,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        var rs = eval("("+data+")");
+                        if(rs.state==1){
+                            tipTopShow('上传成功！');
+                            document.getElementById(el).src = rs.url;
+                            $('#'+ids).attr('_url',rs.url);
+                        }else{
+                            $('#'+ids).removeAttr('_url');
+                            tipTopShow(rs.msg);
+                        }
+                        $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                    },
+                    error: function (data) {
+                        tipTopShow("上传失败");
+                        $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                    }
+                })
+            });
+        }
+    </script>
+</body>
+</html>

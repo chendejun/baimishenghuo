@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+</head>
+<style>
+	/* *{ -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-click-highlight-color:rgba(0,0,0,0);} */
+    .wd200{width: 200px;}
+    .white_list h4{line-height: 44px; text-align: center; color: #333;font-size: 18px;padding: 20px 0;}
+    .white_list table{padding: 15px; width:92%;margin: 0 auto;}
+    .white_list .base_table thead {background-color: #fff;color: #333;}
+    .white_list .base_table tbody tr:nth-child(odd){background-color:#fff}
+    .white_list .base_table tr th{font-weight: bold;}
+    .white_list .base_table tr td{color:#7b7b7b;padding: 3px 10px;}
+    .layer_tip{padding-left: 10px;}
+    .layer_tip p{color: #333;line-height: 26px;}
+    .layer_tip span {line-height: 40px;color: #222;font-size: 16px;}
+    .layer_label{font-size: 13px;text-align: center;vertical-align: top;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span><a href="/v1.2/headline/indexview">< 返回</a></span>
+        </div>
+        <form>
+            <div class="headline_form mb30">
+                <h3>广告组</h3>
+                <div class="from-row">
+                    <label>推广目的：</label>
+                    <div class="crowd_nav">
+                        <span class="cur" type="0">落地页</span>
+                    </div>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>广告组名称：</label>
+                    <input type="text" value="" class="bm-input" name="campaign_name" placeholder="广告组名称长度为1-50个字符">
+                </div>
+            </div>
+            <div class="headline_form mb30">
+                <h3>广告计划</h3>
+                <div class="box_name">投放条件</div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>链接地址：</label>
+                    <input type="text" value="" class="bm-input" name="delivery_url" placeholder="请输入链接地址">
+                    <a href="javascript:;" class="bm-btn bm-btn-blue" id="white_list_btn">白名单</a>
+                </div>
+                <div class="from-row" id="region">
+                    <label>地域：</label>
+                    <div class="crowd_nav">
+                    	<span class="cur" type="0">不限</span>
+                    	<span class="" type="1" id="crowd_id" _id='0'>自定义</span>
+                    </div>
+                    <div class="crowd_box crowd_area clearfix" style="display: none">
+    	            	<div id="province_list" class="box_list" style="display: none"></div>
+    			        <div id="city_list" class="box_list" style="display: none"></div>
+    			        <div id="area_list" class="box_list" style="display: none"></div>
+    	            </div>
+                </div>
+                <div class="from-row" id="sex">
+                    <label>性别：</label>
+                    <div class="crowd_nav">
+                        <span class="cur" data="0" type="2">不限</span>
+                        <span class="" data="1" type="2">男</span>
+                        <span class="" data="2" type="2">女</span>
+                    </div>
+                    <input type="hidden" id="sexInput" value="0">
+                </div>
+                <div class="from-row" id="age">
+                    <label>年龄：</label>
+                    <div class="crowd_nav">
+                    	<span class="cur" type="0">不限</span>
+                    	<span class="" type="3">自定义</span>
+                        <div class="crowd_box checkbox_box">
+                            <ul class="clearfix">
+                                <li class="" data="1"> &lt;18 </li>
+                                <li class="" data="2"> 18-23 </li>
+                                <li class="" data="3"> 24-30 </li>
+                                <li class="" data="4"> 31-40 </li>
+                                <li class="" data="5"> 41-49 </li>
+                                <li class="" data="6"> 50+ </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="box_name">预算和出价</div>
+                 <div class="from-row dom_input">
+                    <label><em class="emp">*</em>预算：</label>
+                    <select class="bm-select" name="money_type">
+                        <option value="2">日预算</option>
+                        <option value="1">总预算</option>
+                    </select>
+                    <input type="text" value="" class="bm-input" name="money" placeholder="预算金额100-9999999.99">
+                </div>
+                <div class="from-row">
+                    <label>投放时间：</label>
+                    <div class="crowd_nav mod_data">
+                        <span class="cur" data="1" type="0">长期投放</span>
+                        <span class="" data="2" type="4">自定义</span>
+                        <div class="crowd_box checkbox_box">
+                            <input type="text" value="" class="bm-input wd200" id="dateInput" placeholder="选择开始与截止日期">
+                        </div>
+                        <input type="hidden" value="" name="delivery_start_date">
+                        <input type="hidden" value="" name="delivery_end_date">
+                        <input type="hidden" value="1" name="delivery_time_type">
+                    </div>
+                </div>
+                <div class="from-row" >
+                    <label>投放时段：</label>
+                    <div class="crowd_nav mod_time">
+                    	<span class="cur" data="1" type="0">不限</span>
+                    	<span class="" data="2" type="5">自定义</span>
+                        <div class="crowd_box checkbox_box">
+                            <input type="text" value="" class="bm-input wd200" name="" id="timeInput" placeholder="选择开始与截止时间">
+                        </div>
+                    </div>
+                    <input type="hidden" value="00:00:00" name="delivery_start_time">
+                    <input type="hidden" value="23:59:59" name="delivery_end_time">
+                    <input type="hidden" value="1" id="timeType">
+                </div>
+                <div class="from-row" >
+                    <label>出价方式：</label>
+                    <div class="crowd_nav mod_bid">
+                        <span class="cur" data="2" cost="0.2">CPC</span>
+                        <span class="" data="1" cost="4">CPM</span>
+                    </div>
+                    <input type="hidden" name="bid_type" value="2">
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>出价：</label>
+                    <input type="text" value="" class="bm-input" name="bid_money" placeholder="出价金额0.2-100元"> <!-- cpc 0.2,cpm4 -->
+                </div>
+                <div class="from-row dom_input">
+                    <label>广告计划名称：</label>
+                    <input type="text" value="" class="bm-input" name="delivery_name" placeholder="广告计划名称长度为1-50个字符">
+                </div>
+            </div>
+            <div class="headline_form mb30">
+                <h3>广告创意</h3>
+                <div class="from-row" >
+                    <label>选择素材：</label>
+                    <div class="crowd_nav mod_mat">
+                        <span class="cur" data="1">小图</span>
+                        <span class="" data="2">大图</span>
+                        <span class="" data="3">组图</span>
+                    </div>
+                    <input type="hidden" name="img_type" value="1">
+                    <div class="mat_list">
+                        <ul>
+                            <li>
+                                <img class="exp_img" src="/public/img/headline_exp1.png" alt="">
+                                <div class="file_input">
+                                    <img id="previewImg1_1">
+                                    <div class="file_text">
+                                            素材大小：228*150  <br>
+                                            <b>点击上传</b>  <br>
+                                            (JPG / PNG，小于500KB)
+                                    </div>
+                                    <input id="fileImg1_1" type="file" name="file" _width="228" _height="150" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg1_1')">
+                                </div>
+                            </li>
+                            <li style="display: none">
+                                <img class="exp_img" src="/public/img/headline_exp2.png" alt="">
+                                <div class="file_radio">
+                                    <label><input type="radio" value="1" name="file_type" checked="checked">横版大图</label>
+                                    <label><input type="radio" value="2" name="file_type">竖版大图</label>
+                                </div>
+                                <div class="file_set">
+                                    <div class="file_input ip1">
+                                        <img id="previewImg2_1">
+                                        <div class="file_text">
+                                                素材大小：1280*720  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg2_1" type="file" name="file" _width="1280"  _height="720" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg2_1')">
+                                    </div>
+                                    <div class="file_input ip2" style="display: none">
+                                        <img id="previewImg2_2">
+                                        <div class="file_text">
+                                                素材大小：720*1280  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg2_2" type="file" name="file" _width="720" _height="1280" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg2_2')">
+                                    </div>
+                                </div>
+                            </li>
+                            <li style="display: none">
+                                <img class="exp_img" src="/public/img/headline_exp3.png" alt="">
+                                <div class="file_box box_sm clearfix">
+                                    <div class="file_input">
+                                        <img id="previewImg3_1">
+                                        <div class="file_text">
+                                                素材大小：228*150  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg3_1" type="file" name="file" _width="228" _height="150" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg3_1')">
+                                    </div>
+                                    <div class="file_input">
+                                        <img id="previewImg3_2">
+                                        <div class="file_text">
+                                                素材大小：228*150  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg3_2" type="file" name="file" _width="228" _height="150" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg3_2')">
+                                    </div>
+                                    <div class="file_input">
+                                        <img id="previewImg3_3">
+                                        <div class="file_text">
+                                                素材大小：228*150  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg3_3" type="file" name="file" _width="228" _height="150" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg3_3')">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>创意标签：</label>
+                    <input type="text" value="" class="bm-input" name="img_tag" placeholder="必填，符号、分割，总长度不超过100个字符">
+                    <em class="status_tip layer_label" data="请提供若干准确的词语，描述您的广告主针对的产品或服务的属性。长期将非常有助于提高广告预估点击率的准确性。<br/>例：金融保险、基金、中高风险、股票型。">?</em>
+                </div>
+            </div>
+             <div class="headline_commit">
+                <button type="button" class="bm-btn bm-btn-blue" id="commit_btn">提交申请</button>
+            </div>
+        </form>
+        <script id="listTemplate" type="text/html" >
+            <div class="white_list">
+                <h4>目前已开通白名单包含哪些？</h4>
+                <table id="index_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>地域名</th>
+                            <th></th>
+                            <th>名称</th>
+                            <th>地域名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>京东</td>
+                            <td>d.com </td>
+                            <td></td>
+                            <td>美团</td>
+                            <td>meituan.com </td>
+                        </tr>
+                        <tr>
+                            <td>天猫</td>
+                            <td>tmall.com</td>
+                            <td></td>
+                            <td>大众点评</td>
+                            <td>dianping.com</td>
+                        </tr>
+                        <tr>
+                            <td>天猫国际</td>
+                            <td>tmall.hk</td>
+                            <td></td>
+                            <td>饿了么</td>
+                            <td>ele.me</td>
+                        </tr>
+                        <tr>
+                            <td>淘宝</td>
+                            <td>taobao.com</td>
+                            <td></td>
+                            <td>百度地图</td>
+                            <td>api.map.baidu.com</td>
+                        </tr>
+                        <tr>
+                            <td>一号店</td>
+                            <td>yhd.com</td>
+                            <td></td>
+                            <td>百度外卖</td>
+                            <td>waimai.baidu.com</td>
+                        </tr>
+                        <tr>
+                            <td>苏宁</td>
+                            <td>suning.com</td>
+                            <td></td>
+                            <td>国美</td>
+                            <td>gome.com.cn</td>
+                        </tr>
+                        <tr>
+                            <td>1688</td>
+                            <td>1688.com</td>
+                            <td></td>
+                            <td>亚马逊</td>
+                            <td>amazon.cn</td>
+                        </tr>
+                        <tr>
+                            <td>当当</td>
+                            <td>dangdang.com</td>
+                            <td></td>
+                            <td>飞猪</td>
+                            <td>fliggy.com </td>
+                        </tr>
+                        <tr>
+                            <td>一淘</td>
+                            <td>etao.com</td>
+                            <td></td>
+                            <td>去哪儿</td>
+                            <td>qunar.com</td>
+                        </tr>
+                        <tr>
+                            <td>唯品会</td>
+                            <td>vip.com</td>
+                            <td></td>
+                            <td>携程</td>
+                            <td>ctrip.com</td>
+                        </tr>
+                        <tr>
+                            <td>糯米</td>
+                            <td>nuomi.com</td>
+                            <td></td>
+                            <td>艺龙</td>
+                            <td>elong.com</td>
+                        </tr>
+                        <tr>
+                            <td>有赞</td>
+                            <td>youzan.com</td>
+                            <td></td>
+                            <td>途牛</td>
+                            <td>tuniu.com</td>
+                        </tr>
+                        <tr>
+                            <td>微店</td>
+                            <td>weidian.com</td>
+                            <td></td>
+                            <td>同程</td>
+                            <td>ly.com</td>
+                        </tr>
+                        <tr>
+                            <td>53客服</td>
+                            <td>53kf.com</td>
+                            <td></td>
+                            <td>拼多多</td>
+                            <td>yangkeduo.com</td>
+                        </tr>
+                        <tr>
+                            <td>百度商桥</td>
+                            <td>qiao.baidu.com</td>
+                            <td></td>
+                            <td>头条</td>
+                            <td>toutiao.com</td>
+                        </tr>
+                        <tr>
+                            <td>美洽</td>
+                            <td>meiqia.com</td>
+                            <td></td>
+                            <td>微盟</td>
+                            <td>weimob.com</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </script>
+    </div>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/laydate/laydate.js"></script>
+    <script type="text/javascript" src="/public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript">
+        var todayDate = get_date(0);
+        $('input[name="delivery_start_date"]').val(todayDate);
+        //时间范围选择
+        laydate.render({
+            elem: '#dateInput',
+            range: true, //或 range: '~' 来自定义分割字符
+            min:todayDate,
+            done: function(value, date, endDate){
+                var dataVal = value.split(' - ');
+                $('input[name="delivery_start_date"]').val(dataVal[0]);
+                $('input[name="delivery_end_date"]').val(dataVal[1]);
+            }
+
+        });
+        laydate.render({
+          elem: '#timeInput',
+          type: 'time',
+          range: true ,//或 range: '~' 来自定义分割字符
+          done: function(value, date, endDate){
+                 var timeVal = value.split(' - ');
+                $('input[name="delivery_start_time"]').val(timeVal[0]);
+                $('input[name="delivery_end_time"]').val(timeVal[1]);
+            }
+        });
+        //白名单
+        $('body').on('click','#white_list_btn',function(){
+            var cacheDOM = $("#listTemplate").html();
+            //店铺详细信息弹框
+            layer.open({
+                type: 1,
+                title: "",
+                closeBtn:1,
+                area: ['580px', '630px'],
+                shadeClose: true, //点击遮罩关闭
+                content: cacheDOM
+            });
+        });
+        //说明
+        $('body').on('click', '.status_tip', function () {
+            var html = '<div class="layer_tip"><span>提示</span><p>'+this.getAttribute('data')+'</p></div>';
+            layer.tips(html, this, {
+                skin: 'layui-layer-demo',
+                tips: [3, '#eeeff3'],
+                area: ['320px','170px'],
+                time: 0,
+                closeBtn:1
+            });
+        })
+    </script>
+    <script type="text/javascript" src="/public/js/headline.js"></script>
+	</body>
+</html>

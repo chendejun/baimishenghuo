@@ -1,0 +1,105 @@
+<?php
+/**
+ * HTTP请求
+ * sakmon 2016/08/11
+ */
+class DoNetwork{
+	/**
+	 * [makeRequest description]
+	 * @param  string  $url        请求地址
+	 * @param  string  $method     请求方式
+	 * @param  array   $data       请求参数
+	 * @param  string  $cookie_res cookie文件路径
+	 * @param  array   $header     请求header
+	 * @param  integer $timeout    请求超时
+	 * @param  boolean $getheader  是否只返回请求及响应header
+	 * @return string              返回执行结果
+	 */
+	static function makeRequest( $url , $method =  'GET' , $data = [] , $cookie_res='' , $header = [] , $timeout = 50000 , $getheader = false) {
+	    if(strtoupper($method) == 'GET' && !empty($data)){
+	        if(strpos($url , '?') !== false){
+	            $url .= '&' . http_build_query($data);
+	        }else{
+	            $url .= '?' . http_build_query($data);
+	        }
+		}
+	    $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_URL, $url);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ch, CURLOPT_TIMEOUT_MS,$timeout); //超时设定
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+	    curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+		if (strtoupper($method) == 'POST') {
+	        curl_setopt($ch, CURLOPT_POST, 1);
+	        curl_setopt($ch, CURLOPT_POSTFIELDS,$data);
+	    }
+	    if(!empty($cookie_res)){
+			curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_res);
+			curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_res);
+		}
+	    if(!empty($header)) {
+	        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+	    }
+	    curl_setopt($ch, CURLOPT_HEADER, false);
+	    $result = curl_exec($ch);
+	    if($result === false){
+	    	// echo curl_error($ch);
+	    }
+	    if($getheader){
+	    	$result = curl_getinfo($ch);
+	    }
+	    curl_close($ch);
+	    return $result;
+	}
+static function get_content($url, $cookie){
+    $ch = curl_init(); //初始化curl模块
+    curl_setopt($ch, CURLOPT_URL, $url); //登录提交的地址
+    curl_setopt($ch, CURLOPT_HEADER, 0); //是否显示头信息
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //是否自动显示返回的信息
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);//设置cookie信息保存在指定的文件夹中
+    $rs = curl_exec($ch); //执行curl转去页面内容
+    curl_close($ch);
+    return $rs; //返回字符串
+}
+	/**
+	 * 异步请求
+	 * @param  [type]  $host [description]
+	 * @param  [type]  $path [description]
+	 * @param  integer $port [description]
+	 * @return [type]        [description]
+	 */
+	static public function fp($host , $path , $port = 80){
+        $fp = fsockopen($host, $port , $errno, $errstr, 30);
+        if (!$fp) {
+        	BmException::errorLog($errstr);
+        } else {
+            $out = "GET $path HTTP/1.1\r\n";
+            $out .= "Host: $host\r\n";
+            $out .= "Connection: Close\r\n\r\n";
+
+            fwrite($fp, $out);
+            fclose($fp);
+        }
+ 	}
+ 	/**
+ 	 * [gdt description]
+ 	 * @param  [type] $path   [description]
+ 	 * @param  array  $param  [description]
+ 	 * @param  array  $header [description]
+ 	 * @param  string $method [description]
+ 	 * @return [type]         [description]
+ 	 */
+ 	static public function gdt($path , $param = array(), $header=[] , $method = 'POST'){
+ 		if(empty($header)) $header = array('Content-Type: application/json');
+ 		$timestamp = time();
+ 		$nonce = md5(http_build_query($param).$timestamp);
+ 		$access_token = Yaf_Registry::get('gdt_access_token');
+ 		$url = "https://sandbox-api.e.qq.com/v1.0/{$path}?access_token={$access_token}&timestamp={$timestamp}&nonce={$nonce}";
+ 		if(strtoupper($method) == 'GET'){
+ 			$url .= '&' . http_build_query($param);
+ 		}
+ 		return json_decode(self::makeRequest($url , $method , $param , '' , $header) , true);
+ 	}
+}

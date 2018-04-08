@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 下级代理管理 -->
+
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-财务管理</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/js/laypage/skin/laypage.css" />
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script src="../../../../../public/js/laypage/laypage.js"></script>
+</head>
+<style>
+    .layui-tab-brief>.layui-tab-title .layui-this {color:#4c94f5;}
+    .layui-tab-brief>.layui-tab-more li.layui-this:after,.layui-tab-brief>.layui-tab-title .layui-this:after {border-bottom:3px solid #4c94f5;}
+    .layui-tab-content {height:100% !important;min-height: 500px;}
+    .layui-btn {width:120px;background-color:#4c94f5;position: absolute;right: 30px;}
+    .lower-title{height: 40px;}
+    .lower-title ul{position: absolute;border:1px solid #ddd;cursor: pointer;}
+    .lower-title ul li{height: 38px;line-height: 38px;width: auto;padding: 0 15px;}
+    .lower-title .cur{background-color:#4c94f5;color: #fff }
+    .layui-tab-content{padding: 30px 0}
+    .lower-box .modify{color:#4c94f5;padding-right: 20px;}
+    .lower-box .disable{color: #F56C6B;padding: 0 10px;}
+    .lower-box .enable{color: #4c94f5;padding: 0 10px;}
+    .table_style .base_table{margin-top:10px;}
+    .base_table tr td, .base_table tr th{text-align: left}
+    #transfer_list td span{color: #bababa;font-size: 13px;}
+    .layui-icon{background: url();position: relative;top: -5px;left: 40px;}
+    .haschildren{cursor: pointer;}
+    .lower-box h4{margin: 60px auto;text-align: center;display: none;}
+    .ischildren{display: none;}
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 财务管理</span>
+        </div>
+        <div class="data_box">
+
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li {{if $if_opear == 0}}class="layui-this"{{/if}}>财务报表</li>
+                    {{if $if_opear == 1}}<li class="layui-this">下级代理管理</li>{{/if}}
+                    <li>广告主开票管理</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div {{if $if_opear == 0}}class="layui-tab-item layui-show"{{else}}class="layui-tab-item"{{/if}}>正在努力实现中，敬请期待。</div>
+                {{if $if_opear == 1}}<div class="layui-tab-item layui-show">
+                        <div class="loweragent">
+                            <div class="lower-title">
+                                <ul>
+                                    <li class="cur">下级代理列表</li>
+                                    <li>下级代理结算</li>
+                                    <li>查询下级代理收益</li>
+                                </ul>
+                                <a href="/v1.2/agent/add" class="layui-btn">新建代理</a>
+                            </div>
+                            <div class="lower-box">
+                                <h4>正在努力实现中，敬请期待。</h4>
+                                <div class="table_style">
+                                    <table id="transfer_list" class="base_table">
+                                        <thead>
+                                            <tr>
+                                                <th width="10%">序列</th>
+                                                <th width="40%">代理公司</th>
+                                                <!-- <th width="15%">结算比例</th> -->
+                                                <th width="15%">当前状态</th>
+                                                <th width="20%">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                    <p class="noMsg"></p>
+                                    <!--列表分页-->
+                                    <div id="list_page" class="page"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>{{/if}}
+                    <div class="layui-tab-item">正在努力实现中，敬请期待。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        layui.use(['form', 'element','laypage','layer'], function () {
+            var form = layui.form(),
+                laypage = layui.laypage,
+                layer = layui.layer,
+                element = layui.element;
+
+
+            //下级代理商列表
+            function list(page) {
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/v1.2/Agent/list/page/" + page + "/limit/10",
+                    success: function (rs) {
+                        console.log(rs);
+                        var str = '',
+                            statu = ['停止', '正常'];
+                        for (var i = 0; i < rs.data.list.length; i++) {
+                            str += '<tr>';
+                            str += '<td>' + (i + 1) + '</td>';
+                            if(rs.data.list[i].child.length){
+                                str += '<td class="haschildren">' + rs.data.list[i].comp_name + '<i class="layui-icon"></i></td>';
+                            }else{
+                                str += '<td>' + rs.data.list[i].comp_name + '</td>';
+                            }
+                            // str += '<td>' + rs.data.list[i].ratio + '%</td>';
+                            str += '<td>' + statu[rs.data.list[i].status] + '</td>';
+                            str += '<td>';
+                            str += '<a href="/v1.2/agent/view/comp_id/'+rs.data.list[i].comp_id+'" class="modify">修改</a>';
+                            if(rs.data.list[i].status == 0){ 
+                                str += '<a comp_id="'+rs.data.list[i].comp_id+'" class="isable enable">启用</a>';
+                            }else{
+                                str += '<a comp_id="'+rs.data.list[i].comp_id+'" class="isable disable">停用</a>';
+                            }
+                            
+                            str += '</td>';
+                            if(rs.data.list[i].child.length){
+                                for (var j = 0; j < rs.data.list[i].child.length; j++) {
+                                    str += '<tr class="ischildren" par="' + (i + 1) + '">';
+                                    str += '<td comp_id="'+rs.data.list[i].child[j].comp_id+'"></td>';
+                                    str += '<td style="text-indent: 20px;">'+rs.data.list[i].child[j].comp_name+'</td>';
+                                    // str += '<td>'+rs.data.list[i].child[j].ratio+'%</td>';
+                                    str += '<td>'+statu[rs.data.list[i].child[j].status]+'</td>';
+                                    str += '<td>';
+                                    str += '<span>不提供直接对下级的下级管理</span>';
+                                    str += '</tr>';
+                                }
+                            }
+                        }
+                        $('#transfer_list tbody').html(str);
+                        renderPage(rs.data.pages, page);
+                    },
+                    error: function (rs) {
+                        layui.layer.msg(rs.msg);
+                    }
+                });
+            }
+            list(0)
+
+
+            $('#transfer_list').on('click','.haschildren',function(){
+                var par = $(this).prev().html();
+                $('.ischildren').each(function(){
+                    if($(this).attr('par') == par){
+                        $(this).toggle("fast");
+                    }
+                });
+            });
+
+            //停用启用
+            $('#transfer_list').on('click','.isable',function(){
+                var comp_id = $(this).attr('comp_id');
+                if($(this).text()=='启用'){
+                    isable("recover",comp_id);
+                }else{
+                    layer.open({
+                        type: 1,
+                        area: '300px;',
+                        shade: 0.8,
+                        id: 'LAY_layuipro', //设定一个id，防止重复弹出
+                        btn: ['确定停用', '不了'],
+                        btnAlign: 'r',
+                        moveType: 1, //拖拽模式，0或者1
+                        content: '<div style="padding:20px;">如停用后,该代理商及其下级代理所有账户将无法登录平台.已投放的广告不受影响。</div>',
+                        yes: function(layero){
+                            isable("stop",comp_id);
+                        }
+                    });
+                }
+            });
+            function isable(is,comp_id){
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/v1.2/Agent/"+is+"/comp_id/"+comp_id,
+                    success: function (rs) {
+                        layui.layer.msg(rs.msg);
+                        setTimeout(function(){
+                            location.reload();
+                        },2000)
+                    },
+                    error: function (rs) {
+                        layui.layer.msg(rs.msg);
+                    }
+                });
+            }
+
+
+            $('.lower-title li').on('click', function () {
+                $(this).addClass('cur').siblings().removeClass('cur');
+                if($(this).index()==0){
+                    $('.table_style').show();
+                    $('.lower-box h4').hide();
+                    list(0);
+                }else{
+                    $('.table_style').hide();
+                    $('.lower-box h4').show();
+                }
+            });
+
+
+            //分页
+            function renderPage(pages,curr){
+                //显示分页
+                laypage({
+                    cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                    pages: pages, //通过后台拿到的总页数
+                    //skip: true, //是否开启跳页
+                    skin: '#4c94f5',
+                    // prev: '<em class="layui-icon"></em>',
+                    // next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function(obj, first){ //触发分页后的回调
+                        if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                            list(obj.curr);
+                        }
+                    }
+                });
+            } 
+
+        });
+    </script>
+</body>
+
+</html>

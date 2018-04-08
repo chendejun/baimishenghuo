@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>支付成功</title>
+</head>
+<body>
+	<div style="text-align: center;position:absolute;left: 50%;top: 50%;width:200px;height:100px;margin-left:-100px;margin-top:-50px;">
+		<img src="/public/img/success.png">
+		<p>充值成功！</p>
+	</div>
+</body>
+</html>

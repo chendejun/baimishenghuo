@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告管理-人群管理-修改人群</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+</head>
+<style>
+	.crowd_box{position: absolute; left: 362px; top: 0}
+	.crowd_box .box_list{position: absolute;display: block;height: 300px;width: 180px;z-index: 10;background: #fff;overflow-y: scroll;border: 1px solid #dddddd}
+    .crowd_box .box_list ul{padding: 10px 0;;}
+    .crowd_box .box_list ul li{cursor: pointer;line-height: 30px;padding: 0 10px;height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+    .crowd_box .box_list ul li.cur{background: #dfecfc;}
+    .crowd_box .box_list ul li:hover{ background: #dfecfc;}
+	.crowd_box .box_list ul li.chose{ background: #dfecfc;}
+    .crowd_box .box_list.b1{left: 0;top:40px;}
+    .crowd_box .box_list.b2{left: 183px;height: 340px;}
+    .crowd_box .box_list.b3{left: 364px;height: 340px;}
+    .crowd_box .box_list li input[type="checkbox"]{display: none;}
+	.crowd_box .box_list li em.checkbox{ display: inline-block;margin: -3px 10px 0 0;vertical-align:middle; width: 30px; height: 100%; background: url(/public/img/checkbox.png) 8px 50% no-repeat;}
+	.crowd_box .box_list li em.checkbox.childchose{ background: url(/public/img/checkboxchildchose.png) 8px 50% no-repeat;}
+	.crowd_box .box_list li em.checkbox.chose{ background: url(/public/img/checkboxchose.png) 8px 50% no-repeat;}
+</style>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <i class="info_icon icon1"></i>
+        <span><a href="">广告管理</a> / 人群管理 / 修改人群</span>
+    </div>
+    <div class="crowd_form mt20">
+	    <div class="form">
+	        <div class="from-row">
+	            <label>人群名称：</label>
+	            <input type="text" value="" class="bm-input" name="name" id="name" placeholder="请输入人群名称" />
+	        </div>
+	        <div class="from-row clearfix tag_row">
+	            <label>人群标签：</label>
+	            <b class="fl">区域特征</b>
+	            <div class="crowd_nav fl ml20">
+		            <span class="mr10" id="crowd_default" _id="1">不限</span>
+		            <span id="crowd_id" _id="0">省市</span>
+		            <input type="hidden" id="crowd_type" value="">
+		            <input type="hidden" id="crowd_info"><!-- 储存编辑时人群信息的crowd_info 信息 -->
+	            </div>
+	            <div class="crowd_box">
+	            	<div id="province_list" class="box_list b1" style="display: none"></div>
+			        <div id="city_list" class="box_list b2" style="display: none"></div>
+			        <div id="area_list" class="box_list b3" style="display: none"></div>
+	            </div>
+	        </div>
+	        <button type="button" id="keep_btn" class="big-btn bm-btn bm-btn-blue">提交保存</a>
+	    </div>
+    </div>
+</div>
+<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/public/js/common.js"></script>
+<script type="text/javascript">
+(function () {
+	var infoId =getUrlParams('id'); //人群信息id
+	var crowdData,crowdDataArr,//储存原有ID数组
+		idArr=[];//定义数组添加选中checkbox的id元素
+	//获取信息详情
+	function getInfo(){
+		$.ajax({
+	        type: "GET",
+	        url: '/crowd/getInfo/id/'+infoId,
+	        dataType:'json',
+	        async : true,
+	        success: function(rs){
+	            var data = rs.data;
+	            if(rs.state == 1){
+	                $('#name').val(data.crowd_name);
+	                $('#crowd_info').val(data.crowd_info);
+	                crowdData = data.crowd_info;
+	                if(crowdData==0){//不限
+	                	$('#crowd_type').val('1');
+	                	$('#crowd_nav span').eq(0).addClass('cur');
+	                	$('#crowd_default').click();
+	                	crowdData='';
+		            	crowdDataArr = (crowdData || '').split(',');
+		            	idArr = [].concat(crowdDataArr);
+	                }else{
+	                	crowdDataArr = (crowdData || '').split(',');
+		            	idArr = [].concat(crowdDataArr);
+	                	$('#crowd_type').val('0');
+	                	$('#crowd_nav span').eq(1).addClass('cur');
+	                	$('#crowd_id').click(); //请求省市
+	               	}
+	            }
+	        }
+	    });
+	}
+	getInfo();
+	function getAreas(id, isChecked) {
+			var html = '';
+		    $.ajax({
+		        type: "GET",
+		        url: '/crowd/getTag/pid/'+id,
+		        dataType:'json',
+		        async : false,
+		        success: function(rs){
+		            var data = rs.data;
+					if(rs.state == 1){
+			            $.each(data,function(k,v){
+			            	var checked = false;
+			            	for(var j = 0; j < crowdDataArr.length; j++) {
+				                 if(crowdDataArr[j] == v.c_tag_id) {
+				                    checked = true;
+				                    crowdDataArr.splice(j, 1);
+				                    break;
+				                 }
+			                }
+			                html +='<li class="lists" id="'+v.c_tag_id+'"><em class="checkbox ' + (isChecked ? 'chose' : '') +(checked ? ' chose' : '') + '"></em>'+v.tag_name+'</li>';
+			            })
+			        }else{
+			            tipTopShow('获取失败！');
+			        }
+		        },
+		        error:function(rs){
+		            tipTopShow("操作失败请重试！");
+		        }
+		    });
+		    return html;
+	}
+
+	var pList = $('#province_list'),
+    	cList = $('#city_list'),
+    	aList = $('#area_list');
+	const OPEN = 'cur',
+    	CHOSE = 'chose',
+    	CHILDCHOSE = 'childchose';
+    //选择的区域类型 不限or选择省市
+	$('.crowd_nav span').bind('click',function(){
+		var th = $(this);
+			thisId = th.attr('_id');
+		th.parent().find('span').removeClass('cur');
+		th.addClass('cur');
+		$('#crowd_type').val(thisId);
+		if(thisId ==0){
+			$('.crowd_box').show();
+		}else{
+			$('.crowd_box').hide();
+		}
+	})
+	//选择省市标签
+	$('body').on('click','#crowd_id', function(e){ //点击选择框获取省份列表
+	    var tagId = $(this).attr('_id');
+	    if(pList.html() == '') {
+	    	var data = getAreas(tagId);
+	    	pList.show().html('<ul class="plist">'+ data +'</ul>');
+	    }
+	}).on('click','#province_list li', function(e){ //点击省份获取城市列表
+	    var tagId = $(this).attr('id'),
+        ul = cList.find('[pid="' + tagId + '"]'),
+        isChecked = $(this).find('.chose').length > 0;
+	    aList.hide();
+	    cList.show();
+		$(this).addClass('cur').siblings('li').removeClass('cur');
+	    if(ul.length > 0) {
+	    	ul.show().siblings('ul').hide();
+	    }else {
+	    	var data = getAreas(tagId, isChecked);
+	    	cList.children('ul').hide();
+	    	cList.append('<ul class="plist" pid="' + tagId + '">'+ data +'</ul>');
+	    	var cUl = cList.find('[pid="' + tagId + '"]').children('li'), //改变省份的选择状态
+	    		cUlChose = cUl.find('.chose');
+	    	if(!isChecked && cUlChose.length>0){
+	    		if(cUl.length == cUlChose.length){
+	    			$(this).find('.checkbox').addClass('chose');
+	    		}else{
+	    			$(this).find('.checkbox').addClass('childchose');
+	    		}
+	    	}
+	    }
+	}).on('click','#city_list li', function(e){ //点击城市获取区列表
+	    var tagId = $(this).attr('id'),
+	    	thParent = $(this).parent();
+	    	pId = thParent.attr('pid'),
+	        child = aList.children('[pid="' + pId + '"]'),
+	        parent =pList.find('[id="' + pId + '"]'),
+	        ul = child.children('[pid="' + tagId + '"]'),
+	        isChecked = $(this).find('.chose').length > 0;
+	    aList.show();
+	    $(this).addClass('cur').siblings('li').removeClass('cur').parent().siblings('ul').find('li').removeClass('cur');
+	    if(child.length > 0) {
+	    	child.show().siblings('div').hide();
+	    	if(ul.length > 0) {
+	    		ul.show().siblings('ul').hide();
+	    	}else {
+	    		var data = getAreas(tagId, isChecked);
+		    	child.children('ul').hide()
+		    	child.append('<ul class="plist" pid="' + tagId + '">'+ data +'</ul>');
+		    	var aUl = child.find('[pid="' + tagId + '"]').children('li'), //改变城市的选择状态
+		    		aUlChose = aUl.find('.chose');
+		    	if(!isChecked && aUlChose.length>0){
+		    		if(aUl.length == aUlChose.length){
+		    			$(this).find('.checkbox').addClass('chose');
+		    		}else{
+		    			$(this).find('.checkbox').addClass('childchose');
+		    		}
+		    	}
+	    	}
+	    }else {
+	    	var data = getAreas(tagId, isChecked);
+	    	aList.children('div').hide()
+	    	aList.append('<div pid="' + pId + '"><ul class="plist" pid="' + tagId + '">'+ data +'</ul></div>');
+	    	var child = aList.children('[pid="' + pId + '"]'),//改变省份的选择状态
+	    		aUl = child.find('[pid="' + tagId + '"]').children('li'),
+	    		aUlChose = aUl.find('.chose');
+	    	if(!isChecked && aUlChose.length>0){
+	    		if(aUl.length == aUlChose.length){
+	    			$(this).find('.checkbox').addClass('chose');
+	    		}else{
+	    			$(this).find('.checkbox').addClass('childchose');
+	    		}
+	    	}
+	    }
+	    var allLiLen = thParent.children('li').length,
+			chsLiLen = thParent.find('.chose').length,
+			childChsLiLen = thParent.find('.childchose').length;
+		if(chsLiLen + childChsLiLen ==0){
+			parent.children('em').removeClass('chose childchose');
+		}else if( chsLiLen == allLiLen){
+    		parent.children('em').removeClass('childchose').addClass('chose');
+		}else{
+    		parent.children('em').removeClass('chose').addClass('childchose');
+		}
+	}).on('click', '#area_list .checkbox', function(e) { //选中或取消区
+		e.stopPropagation()
+		var t = $(this),
+			plist = t.closest('.plist'),
+			pSize = plist.children().length,
+			pid = plist.attr('pid'),
+			ppid = t.closest('div').attr('pid'),
+			pplist = cList.children('[pid="' + ppid + '"]'),
+			ppSize = pplist.children().length,
+			cCheckbox = cList.find('#' + pid).children('.checkbox'),
+			pCheckbox = pList.find('#' + ppid).children('.checkbox');
+
+		if(t.hasClass('chose')) {
+			t.removeClass('chose');
+			cCheckbox.removeClass('chose');
+			if(plist.find('.chose').length == 0) {
+				cCheckbox.removeClass('childchose');
+			}else {
+				cCheckbox.addClass('childchose');
+			}
+
+			pCheckbox.removeClass('chose');
+			if(pplist.find('.chose').length == 0) {
+				if(pplist.find('.childchose').length == 0) {
+					pCheckbox.removeClass('childchose');
+				}else {
+					pCheckbox.addClass('childchose');
+				}
+			}else {
+				pCheckbox.addClass('childchose');
+			}
+		}else {
+			t.addClass('chose');
+			if(plist.find('.chose').length == pSize) {
+				cCheckbox.addClass('chose').removeClass('childchose');
+			}else {
+				cCheckbox.addClass('childchose');
+			}
+
+			if(pplist.find('.chose').length == ppSize) {
+				pCheckbox.addClass('chose').removeClass('childchose');
+			}else {
+				pCheckbox.addClass('childchose');
+			}
+		}
+	}).on('click', '#city_list .checkbox', function(e) { //选中或取消城市
+		e.stopPropagation();
+		var t = $(this),
+			id = t.parent().attr('id'),
+			plist = t.closest('.plist'),
+			pSize = plist.children().length,
+			pid = plist.attr('pid'),
+			aCheckbox = aList.find('[pid="' + id + '"]').find('.checkbox'),
+			pCheckbox = pList.find('#' + pid).children('.checkbox');
+
+		if(t.hasClass('chose')) {
+			t.removeClass('chose childchose');
+			aCheckbox.removeClass('chose');
+
+			pCheckbox.removeClass('chose');
+			if(plist.find('.chose').length == 0) {
+				if(plist.find('.childchose').length == 0) {
+					pCheckbox.removeClass('childchose');
+				}else {
+					pCheckbox.addClass('childchose');
+				}
+			}else {
+				pCheckbox.addClass('childchose');
+			}
+		}else {
+			t.removeClass('childchose').addClass('chose');
+			aCheckbox.addClass('chose');
+
+			if(plist.find('.chose').length == pSize) {
+				pCheckbox.addClass('chose').removeClass('childchose')
+			}else {
+				pCheckbox.addClass('childchose')
+			}
+		}
+	}).on('click', '#province_list .checkbox', function(e) { //选中或取消省份
+		e.stopPropagation();
+		var t = $(this),
+			id = t.parent().attr('id'),
+			cCheckbox = cList.find('[pid="' + id + '"]').find('.checkbox'),
+			aCheckbox = aList.children('[pid="' + id + '"]').find('.checkbox');
+
+		if(t.hasClass('chose')) {
+			t.removeClass('chose childchose');
+			cCheckbox.removeClass('chose');
+			aCheckbox.removeClass('chose');
+
+		}else {
+			t.removeClass('childchose').addClass('chose');
+			cCheckbox.addClass('chose').removeClass('childchose');
+			aCheckbox.addClass('chose');
+		}
+	}).on('click', '#keep_btn', function(e) { //提交
+		e.preventDefault();
+		var name = $('#name').val();
+	    	crowdType=  $('#crowd_type').val(),
+	    	areaId = [],result='';
+	    if(!name){
+	    	tipTopShow("人群名称不能为空！");
+	    	return;
+	    }
+	    if(crowdType==0){//选择省市
+	    	pList.find('.chose').each(function() {
+				var id = $(this).parent().attr('id');
+				areaId.push(id);
+			})
+			pList.find('.childchose').each(function() {
+				var pid = $(this).parent().attr('id');
+				var cListChose = cList.find('[pid="' + pid + '"]').find('.chose');
+
+				cListChose.each(function() {
+					var id = $(this).parent().attr('id');
+					areaId.push(id);
+				})
+			})
+			cList.find('.childchose').each(function() {
+				var pid = $(this).parent().attr('id');
+				var aListChose = aList.find('[pid="' + pid + '"]').find('.chose');
+
+				aListChose.each(function() {
+					var id = $(this).parent().attr('id');
+					areaId.push(id);
+				})
+			})
+		    result = areaId.concat(crowdDataArr).join(',');
+	    }else{//不限
+	    	result ='0';
+	    }
+	    if(result==''){
+	    	tipTopShow("人群标签不能为空！");
+	    	return;
+	    }
+	    var post_data ={'crowd_name':name,'crowd_info':result,'crowd_id':infoId};
+	    $.ajax({
+            type : "POST",
+            url : "/crowd/edit",
+            data : post_data,
+            dataType : 'json',
+            beforeSend : function() {
+            	//禁用按钮防止重复提交
+                $('#keep_btn').attr('disabled','disabled');
+            },
+            success : function(rs) {
+                tipTopHide();
+                if (rs.state == 1) {
+                    tipTopShow("人群修改成功");
+                    setTimeout(function(){
+                        location.href ='/crowd/index';
+                    },500);
+                }else{
+                    tipTopShow(rs.msg);
+                }
+                $('#keep_btn').removeAttr('disabled');
+            },
+            error : function(rs) {
+            	$('#keep_btn').removeAttr('disabled');
+                tipTopShow("操作失败请重试！");
+            }
+        });
+	})
+})();
+</script>
+</body>
+</html>
+

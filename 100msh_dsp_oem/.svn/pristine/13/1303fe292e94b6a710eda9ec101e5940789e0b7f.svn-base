@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <!-- <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/bhdelivery.css"> -->
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step2">
+            <ul class="mod_nav clearfix">
+                <li class="cur" type="1">基础条件定向</li>
+                <li class="" type="2">自定义人群包</li>
+            </ul>
+            <div class="from-row">
+                <label>投放区域：</label>
+                <input type="radio" name="user_area" value="0" title="不限" checked lay-filter="user_area">
+                <input type="radio" name="user_area" value="1" title="省市" lay-filter="user_area">
+                <input type="radio" name="user_area" value="2" title="商圈" lay-filter="user_area">
+            </div>
+            <div class="city_box" style="display: none">
+                <div class="mod_club crowd_club" id="crowd_club" style="display: none">
+                    <h3>已选择</h3>
+                    <div class="club_li label_list scrollbar clearfix">
+                    </div>
+                </div>
+                <div class="crowd_box crowd_area clearfix">
+                    <div id="pro_list" class="box_list scrollbar" style="display: none"></div>
+                    <div id="city_list" class="box_list scrollbar" style="display: none"></div>
+                </div>
+            </div>
+            <div class="zone_box" style="display: none">
+                <div class="from-row zone_sel">
+                    <label>选择城市：</label>
+                    <div class="layui-input-inline">
+                        <select name="zone_city" lay-verify="required" lay-filter="zone_city" lay-search="" id="zone_city">
+                        </select>
+                    </div>
+                </div>
+                <div class="zone_mod" style="display: none">
+                    <div class="mod_club" id="sq_club" style="display: none">
+                        <h3>已选择</h3>
+                        <div class="club_li label_list scrollbar clearfix">
+                        </div>
+                    </div>
+                    <div class="sq_area clearfix">
+                        <div id="first_list" class="item_box fbox scrollbar" style="display: none"></div>
+                        <div id="second_list" class="item_box sbox scrollbar" style="display: none"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="usre_box">
+                <article>
+                    <div class="from-row">
+                        <label>性别：</label>
+                        <input type="radio" name="user_sex" value="" title="不限" checked >
+                        <input type="radio" name="user_sex" value="10001" title="男" >
+                        <input type="radio" name="user_sex" value="10002" title="女" >
+                    </div>
+                    <div class="from-row">
+                        <label>年龄：</label>
+                        <input type="radio" name="user_age" value="" title="不限" checked >
+                        <input type="radio" name="user_age" value="10001" title="18岁以下" >
+                        <input type="radio" name="user_age" value="10002" title="18岁-24岁" >
+                        <input type="radio" name="user_age" value="10003" title="25岁-34岁" >
+                        <input type="radio" name="user_age" value="10004" title="35岁以上" >
+                    </div>
+                    <div class="from-row">
+                        <label>IP定向：</label>
+                        <input type="radio" name="user_ip" value="0" title="不限" checked lay-filter="user_ip">
+                        <input type="radio" name="user_ip" value="1" title="定向" lay-filter="user_ip">
+                    </div>
+                    <div class="from-row ip_box" style="display: none">
+                        从 <input type="text" class="bm-input layui-input">  至  <input type="text" class="bm-input layui-input">
+                    </div>
+                </article>
+                <article class="dmp_box" style="display: none">
+                    <div class="dmp_top">
+                        <span>选择自定义人群包</span>
+                        <a href="javascript:;" class="bm-btn bm-btn-white">新建人群包</a>
+                    </div>
+                    <div class="dmp_tab mt10">
+                        <table id="dmp_lists" class="base_table">
+                        <thead>
+                            <tr>
+                                <th>人群包名称</th>
+                                <th>覆盖人群数量/人</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="dmp_check" data-id="1" lay-skin="primary" title="111111">
+                                </td>
+                                <td>1258</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </article>
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(1)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="stepPage(3)">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <!-- <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>-->
+    <script type="text/javascript" src="../../../../../public/js/bhdelivery.js"></script> 
+    <script type="text/javascript">
+        function preStepPage(v){
+            var v = parseInt(v)-1
+            location.href ='./create'+v+'.html';
+        }
+        function nextStepPage(v){
+            var v = parseInt(v)+1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            var isfistCity = true, isfistSq = true;
+
+            function init(){
+                
+            }
+            init();
+            //广告计划类别选择
+            $('.mod_nav').on('click','li',function(){
+                var th = $(this),
+                    idx = th.index(),
+                    type = th.attr('_type');
+                th.addClass('cur').siblings('li').removeClass('cur');
+                $('.usre_box article').eq(idx).show().siblings().hide();
+            })
+
+            //区域
+            form.on('radio(user_area)', function (data) {
+                var val = data.value;
+                if(val==1){
+                    if(isfistCity){
+                        getBhCity(0);//请求省市
+                        isfistCity = false;
+                    }
+                    $('.city_box').show();
+                }else if(val==2){
+                    if(isfistSq){
+                        getBhCitySel();
+                        isfistSq = false;
+                    }
+                    $('.zone_box').show();
+                    $('.city_box').hide();
+                }else{
+                    $('.zone_box').hide();
+                    $('.city_box').hide();
+                }
+            })
+            //IP定向
+            form.on('radio(user_ip)', function (data) {
+                var val = data.value;
+                if(val==1){
+                    $('.ip_box').show();
+                }else{
+                    $('.ip_box').hide();
+                }
+            })
+            //商圈
+            form.on('select(zone_city)', function (data) {
+                var val = data.value;
+                var box = $('.zoneId'+val);
+                if(val){
+                    $('.zbox').hide();
+                    if(box.length>0){
+                        box.show();
+                    }else{
+                        getBhZoneList(val);
+                    }
+                }
+            })
+
+            //商圈选择城市
+            function getBhCitySel(){
+                /*var rs={
+                    "api_code":1,
+                    "msg":"",
+                    "data":[
+                        {
+                            "bh_area_id":"110000",
+                            "name":"北京市",
+                            "cityId":"110000",
+                            "latitude":"39.91101456",
+                            "longitude":"116.41355133",
+                            "pId":"0",
+                            "population":"0",
+                            "radius":"0",
+                            "type":"0"
+                        },
+                        {
+                            "bh_area_id":"120000",
+                            "name":"天津市",
+                            "cityId":"120000",
+                            "latitude":"39.09090805",
+                            "longitude":"117.20591736",
+                            "pId":"0",
+                            "population":"0",
+                            "radius":"0",
+                            "type":"0"
+                        },
+                        {
+                            "bh_area_id":"130100",
+                            "name":"石家庄市",
+                            "cityId":"130100",
+                            "latitude":"38.04868317",
+                            "longitude":"114.52082825",
+                            "pId":"0",
+                            "population":"0",
+                            "radius":"0",
+                            "type":"0"
+                        },
+                        {
+                            "bh_area_id":"130200",
+                            "name":"唐山市",
+                            "cityId":"130200",
+                            "latitude":"39.63667297",
+                            "longitude":"118.18703461",
+                            "pId":"0",
+                            "population":"0",
+                            "radius":"0",
+                            "type":"0"
+                        },
+                        {
+                            "bh_area_id":"130300",
+                            "name":"秦皇岛市",
+                            "cityId":"130300",
+                            "latitude":"39.94125748",
+                            "longitude":"119.60618591",
+                            "pId":"0",
+                            "population":"0",
+                            "radius":"0",
+                            "type":"0"
+                        },
+                        {
+                            "bh_area_id":"131000",
+                            "name":"廊坊市",
+                            "cityId":"131000",
+                            "latitude":"39.54352188",
+                            "longitude":"116.69033813",
+                            "pId":"0",
+                            "population":"0",
+                            "radius":"0",
+                            "type":"0"
+                        }
+                    ]
+                }*/
+                var postData ={'type':'1','cityId':''};
+                $.ajax({
+                    type: "POST",
+                    url: 'v1.2/BhDelivery/getBhCityArea',
+                    data: postData,
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            var data = rs.data;
+                            var str ='<option value>请输入搜索选择城市</option>';
+                            if(!data){
+                                $('#zone_city').html('');
+                                return;
+                            }
+                            $.each(data,function(k,v){
+                                str += '<option value="'+v.cityId+'">'+v.name+'</option>';
+                            });
+                            $('#zone_city').html(str);
+                        }else{
+                            $('#zone_city').html('');
+                        }
+                        form.render();
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?php
+
+/**
+ *
+ */
+class BhDeliveryAchieved extends Model
+{
+
+    public function getAdvertisedList($where)
+    {
+        $rel = $this->db->bh->table('bh_ad_stat')
+        ->field('sum(click) as click,sum(view) as view, sum(reportSpend) as reportSpend, the_date')
+        ->where($where)
+        ->group('the_date')
+        ->select();
+        return $rel;
+    }
+}

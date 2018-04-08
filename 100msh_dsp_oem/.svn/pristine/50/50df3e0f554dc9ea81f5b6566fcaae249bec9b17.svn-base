@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>短信营销</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+	<link rel="stylesheet" href="../../../../../public/css/common.css">
+</head>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span>短信营销</span>
+        </div>
+        <div class="data_box delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" onClick="createFn()" style="width:100px;">发短信</a>
+            <div class="search_box">
+            	<select id="statu_id" class="bm-select">
+	                <option value="">全部状态</option>
+	               
+	            </select>
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="关键字搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+            </div>
+            <div class="mt20">
+	            <table id="dmp_list" class="base_table">
+	                <thead>
+	                    <tr>
+	                        <th>短信名称</th>
+	                        <th>发送时间</th>
+	                        <th>发送数量</th>
+	                        <th>金额</th>
+							<th>发送人群</th>
+	                        <th>发送状态</th>
+	                        <th>发送内容</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+	            <p class="noMsg"></p>
+	            <!--列表分页-->
+	            <div id="list_page" class="page"></div>
+	        </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="../../../../..//public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../..//public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../..//public/js/laypage/laypage.js"></script>
+	<script type="text/javascript">
+		//搜索
+		var setStatu='',skeyWord='';
+	    function searchFn(th){
+	        var t = $(th),
+	            inputDom = t.parent().find('input[type="text"]').val();
+	        setStatu = $('#statu_id').val();
+	        skeyWord = encodeURIComponent(inputDom);
+	        getList();
+	    }
+		//获取数据
+	    var limit = 10, currNum = 1;
+	    function getList(curr){
+	    	var name = skeyWord ? ('/keyword/'+skeyWord) :'',
+	    		status = setStatu? ('/audit_status/'+setStatu) :'';
+	        $.ajax({
+	            type: "GET",
+	            url: '/v1.2/market/index/page/'+ (curr || 1)+'/limit/'+ limit + name + status,
+	            dataType:'json',
+	            success: function(rs){
+	                tipTopHide();       //隐藏提示框
+	                if(rs.state == 1){         //如果查询成功
+	                    var data = rs.data;     //返回数据赋值
+	                    render_table(data,curr);     //渲染表格数据
+	                    renderPage(data.pages, curr);
+	                }else{
+	                    tipTopShow(rs.msg);
+	               	}
+	             },
+	            error:function(rs){
+	                tipTopShow("查询信息失败，请重试...");    //显示提示框
+	            }
+	        });
+	    }
+
+	    //渲染表格数据
+	    var audit_status={'0':'审核中','1':'正在运算','2':'审核失败','3':'运算完成'};
+	    function render_table(data,curr){
+	    	var curr = curr ? curr : 1;
+	        var list_e = $("#dmp_list tbody"),str="",no_msg = $(".noMsg");
+	        if(data.list.length == 0){
+	            list_e.html("");
+	            no_msg.text("暂无记录");
+	            return ;
+	        }
+	        no_msg.text("");
+	        $.each(data.list,function(k,v){
+	            str +='<tr>';
+	            str +='<td>'+ (limit*(curr-1)+k+1) +'</td>';
+	            str +='<td>'+ v.add_time +'</td>';
+	            str +='<td><a href="javascript:;" class="view_info table-option-btn" _id="'+v.crowd_id+'">'+ v.crowd_name +'</a></td>';
+	            str +='<td>'+ v.staff_name +'</td>';
+	            if(v.audit_status==2){
+	            	str +='<td>'+ audit_status[v.audit_status] +'<em class="status_tip" data="'+(v.audit_remark?v.audit_remark:"无理由")+'">？<em></td>';
+	            }else{
+	            	str +='<td>'+ audit_status[v.audit_status] +'</td>';
+	            }
+	            str +='<td>'+ v.finish_time +'</td>';
+	            str +='<td>'+ v.cover_users +'</td><td>';
+	            if(v.audit_status == 2){
+				 	str +='<a href="javascript:;" class="table-option-btn mr15" onclick="delFn('+v.crowd_id+')">删除</a>';
+					str +='<a href="javascript:;" class="table-option-btn mr15" onclick="resubmit('+v.crowd_id+')">重新提交</a>';
+	            }else if(v.audit_status == 3){
+				  	str +='<a href="javascript:;" class="table-option-btn mr15" onclick="delFn('+v.crowd_id+')">删除</a>';
+	            }else{
+				  	str +='--';
+	            }
+	            str +='</td></tr>';
+	        });
+	        list_e.html(str);
+	    }
+	    //分页
+	    function renderPage(pages,curr){
+	        //显示分页
+	        laypage({
+	            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+	            pages: pages, //通过后台拿到的总页数
+	            //skip: true, //是否开启跳页
+	            skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+	            curr: curr || 1, //当前页
+	            jump: function(obj, first){ //触发分页后的回调
+	            	currNum = obj.curr;
+	                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+	                    getList(obj.curr);
+	                }
+	            }
+	        });
+	    }
+	    getList();
+
+	    $('body').on('click','.status_tip',function(){
+        	layer.tips(this.getAttribute('data'), this);
+        })
+	    //重新提交
+	    function resubmit(id){
+	    	location.href = '/v1.2/market/addview?id='+id;
+	    }
+
+	    //新增
+	    function createFn(){
+	    	location.href = '/v1.2/market/addview';
+	    }
+	</script>
+	</body>
+</html>

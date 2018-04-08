@@ -1,0 +1,16 @@
+<?php
+
+/**
+ *
+ */
+class PortraitsController extends AnotherClass
+{
+
+    public function indexAction()
+    {
+        echo 'ok';        
+    }
+
+
+
+}

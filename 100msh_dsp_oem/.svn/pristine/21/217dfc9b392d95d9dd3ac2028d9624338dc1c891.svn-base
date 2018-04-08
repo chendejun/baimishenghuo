@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>代理商基本资料</title>
+    <link rel="stylesheet" href="../../../../..//public/css/base.css">
+    <link rel="stylesheet" href="../../../../..//public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js?1"></script>
+</head>
+<style>
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .info_box {
+        width: 100%;
+        overflow: hidden;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .agentinfolist {
+        width: 100% !important;
+        overflow: hidden;
+        display: block;
+        position: relative !important;
+        left: 0;
+        top: 0;
+        padding-left: 0 !important;
+        padding-bottom: 15px !important;
+        border-bottom: 1px solid #f2f4f5;
+    }
+
+    .infolist li {
+        width: 100%;
+        padding: 23px 0 0 66px;
+        box-sizing: border-box;
+    }
+
+    .linetitle {
+        color: #666666;
+        font-size: 15px;
+        float: left;
+        width: 200px;
+        text-align: right;
+        margin-right: 12px;
+    }
+
+    .agentdata,
+    .editinputinfo {
+        color: #5d5d5d;
+        font-size: 15px;
+        float: left;
+    }
+
+    .bm-btn {
+        padding: 0 10px;
+        width: auto;
+        box-sizing: border-box;
+        margin-right: 10px;
+    }
+
+    .agentdata span {
+        margin-right: 15px !important;
+    }
+
+    .adcount {
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
+        color: #666666;
+    }
+
+    .adcount div {
+        margin-right: 96px;
+        padding-right: 8px;
+        float: left;
+    }
+
+    #userList {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+        margin-bottom: 49px;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 15px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+
+    #edituserinfo {
+        widows: 120px;
+        height: 40px;
+        margin: 0 auto;
+    }
+
+    .userinfo_wrapper {
+        text-align: center;
+    }
+
+    .resetadminTip {
+        color: #f56c6c;
+        padding-left: 327px;
+        height: 22px;
+        line-height: 22px;
+        display: none;
+        overflow: hidden;
+    }
+
+    .setphonebox,
+    .adinfobox {
+        width: auto;
+        overflow: hidden;
+    }
+
+    .setphonebox {
+        display: none;
+    }
+
+    .setphone,
+    .setname,
+    .setuserphone,
+    .setusername {
+        width: 148px;
+        height: 38px;
+        line-height: 38px;
+        border: 1px solid #ddd;
+        padding: 0 10px;
+        margin-right: 9px;
+        font-size: 12px;
+    }
+
+    .setphoneTip {
+        padding-left: 212px;
+        height: 22px;
+        line-height: 22px;
+        color: #c4c4c4;
+        display: none;
+        overflow: hidden;
+    }
+
+    #saveInfo,
+    .editinputinfo {
+        display: none;
+    }
+    .province,.city,.district{
+        width: 130px !important;
+    }
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Settle/index?isreturn=1">
+                    <i class="backlist"></i>返回代理商列表</a>
+            </span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <a href="javascript:;" class="cur">基本资料</a>
+                <a href="/v1.2/agent/accountdetails">账户详情</a>
+                <a href="/v1.2/agent/consume">消耗查询</a>
+                <a href="/v1.2/agent/crowdportrait">人群画像开通记录</a>
+            </div>
+            <div class="info_box">
+                <div class="box_title">基础信息</div>
+                <ul class="agentinfolist">
+                    <li style="width:100%;">
+                        <div class="linetitle">服务商名称：</div>
+                        <div class="showbaseinfo agentdata">{{$data.comp_info.comp_name}}</div>
+                        <div class="editinputinfo">
+                            <input type="text" class="setname" value="{{$data.comp_info.comp_name}}" />
+                        </div>
+                    </li>
+                    <li style="width:60%;">
+                        <div class="linetitle">所在地区：</div>
+                        <div class="showbaseinfo agentdata location"></div>
+                        <div class="editinputinfo"> 
+                            <select class="bm-select province" name="province" onchange="getCity()">
+                                <!-- <option>请选择省</option> -->
+                            </select>
+                            <select class="bm-select city" name="city">
+                                <!-- <option>请选择市</option> -->
+                            </select>
+                            <select class="bm-select district" name="district">
+                                    <!-- <option>请选择市</option> -->
+                            </select>
+                        </div>
+                    </li>
+                    <li style="width:39%;">
+                        <div class="linetitle" style="width:100px">状态：</div>
+                        {{if $data.comp_info.status = 0}}
+                        <div class="showbaseinfo agentdata">停用</div>
+                        {{elseif $data.comp_info.status ==""}}
+                        <div class="showbaseinfo agentdata">正常</div>
+                        {{/if}}
+                        <div class="editinputinfo">
+                            <select class="bm-select status">
+                                <option value="1">正常</option>
+                                <option value="0">停用</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li style="width:60%;">
+                        <div class="linetitle">联系人：</div>
+                        <div class="showbaseinfo agentdata">{{$data.comp_info.contacts}}</div>
+                        <div class="editinputinfo">
+                            <input type="text" class="setusername" value="{{$data.comp_info.contacts}}" />
+                        </div>
+                    </li>
+                    <li style="width:40%;">
+                        <div class="linetitle"  style="width:100px">联系电话：</div>
+                        <div class="showbaseinfo agentdata">{{$data.comp_info.mobile_phone}}</div>
+                        <div class="editinputinfo">
+                            <input type="text" class="setuserphone" value="{{$data.comp_info.mobile_phone}}" />
+                        </div>
+                    </li>
+                    <li style="width:100%;height:100px;">
+                        <div class="linetitle">管理员账号：</div>
+                        <div class="agentdata" style="width:70%;">
+                            <div class="adinfobox">
+                                <span>{{$data.comp_info.user_name}}</span>
+                                <button class="btn_link bm-btn bm-btn-blue" id="resetpassword" onclick="resetPasswordFn()">重置管理员密码</button>
+                                <button class="btn_link bm-btn bm-btn-blue" id="editNumber" onclick="EditNumberFn()">修改管理员账号</button>
+                            </div>
+                            <div class="setphonebox">
+                                <input type="text" class="setphone" placeholder="请输入新的手机账号" />新账号密码为账号后六位</div>
+                        </div>
+                        <div class="resetadminTip">重置后密码为账号后6位，保存修改后将生效。</div>
+                        <div class="setphoneTip">注意：保存生效后，系统会自动下发短信给原、新账号提示调整。</div>
+                    </li>
+                </ul>
+                <div class="box_title">客户信息</div>
+                <div class="userinfo_wrapper">
+                    <div class="adcount">
+                        <div class="adnum">广告主数：{{$data.comp_info.adv_nums}}</div>
+                        <div class="nextagent">下级代理商数：{{$data.comp_info.agent_nums}}</div>
+                    </div>
+                    <div id="userList">
+                        <table id="dmp_list" class="base_table">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>开通时间</th>
+                                    <th>广告主数</th>
+                                    <th>投放广告数</th>
+                                    <th>广告消耗金额</th>
+                                    <th>投放短信数</th>
+                                    <th>短信消耗金额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{foreach from=$data.next_data key=k item=next}}
+                                <tr>
+                                    <td>{{$next.comp_name}}</td>
+                                    <td>{{$next.add_time}}</td>
+                                    <td>{{$next.adv_nums}}</td>
+                                    <td>{{$next.deli_nums}}</td>
+                                    <td>{{$next.disbure_nums}}</td>
+                                    <td>{{$next.msg_nums}}</td>
+                                    <td>{{$next.msg_disbure}}</td>
+                                </tr>
+                                {{/foreach}}
+                            </tbody>
+                        </table>
+                        <p class="noMsg"></p>
+                        <!--列表分页-->
+                        <div id="list_page" class="page"></div>
+                    </div>
+                    <button class="btn_link bm-btn bm-btn-blue" id="edituserinfo">修改基础信息</button>
+                    <button class="btn_link bm-btn bm-btn-blue" id="saveInfo">保存修改</button>
+                </div>
+            </div>
+        </div>
+        </script>
+        <!--人群详情end-->
+        <script type="text/javascript" src="../../../../..//public/js/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="../../../../..//public/js/common.js"></script>
+        <script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+        <script type="text/javascript">  
+            var url = window.location.href,
+                Id = url.substring(url.lastIndexOf('/') + 1),
+                isEditAdim = 1;
+            cookie.set({ 'id': Id });   //保存ID；
+
+
+            var sc_pro = "{{$data.comp_info.sc_pro}}",  //省ID
+                sc_pid = "{{$data.comp_info.sc_pid}}",  //市ID
+                staffId = "{{$data.comp_info.staff_id}}"; // 被重置密码的操作员ID
+            //根据省返回市
+            function getCity() {
+                var cityId = $('.province').val();
+                if (cityId == "") {
+                    $('.city').html('<option value="">请选择</option>');
+                } else {
+                    getProvince(cityId);
+                }
+            }
+            //获取所在地区数据
+            var getfirstcity = 1;
+            function getProvince(type) {
+                $.ajax({
+                    type: "GET",
+                    url: "/V1.2/Advertiser/getScList/sc_id/" + type,
+                    dataType: 'json',
+                    success: function (res) {
+                        //  console.log(res)
+                        if (res.state == 1) {
+                            renderCityList(res.sc_list, type)
+                        } else {
+                            layui.layer.msg('获取所在地区列表失败！');
+                        }
+
+                    },
+                    error: function (err) {
+                        layui.layer.msg('获取所在地区列表失败！');
+                    }
+                })
+            }
+            function renderCityList(data, type) {
+                var str = '<option value="">请选择</option>'
+                $.each(data, function (k, v) {
+                    str += '<option value="' + v.sc_id + '">' + v.sc_name + '</option>';
+                })
+                if (type == 0) {
+                    $('.province').html(str);
+                    $('.province').val(sc_pro);
+                    if (getfirstcity == 1) {
+                        getfirstcity = 2;
+                        getProvince($('.province').val())
+                    }
+                }else{
+                    $('.city').html(str)
+                    $('.city').val(sc_pid)
+                }
+                $('.location').text($(".province").find("option:selected").text() + "  " + $(".city").find("option:selected").text())
+            }
+            getProvince(0); //初始化默认传0，获取所有省份；
+
+
+            //重置管理员密码
+            function resetPasswordFn() {
+                $('.resetadminTip').show();
+                $.ajax({
+                    type: "POST",
+                    url: "/v1.2/Agent/reset",
+                    dataType: 'json',
+                    data: {
+                        'staff_id': staffId
+                    },
+                    success: function (res) {
+                        // console.log(res)
+                        layui.layer.msg(res.msg);
+                    },
+                    error: function (err) {
+                        layui.layer.msg('网络出错，请稍后重试！');
+                    }
+                })
+            }
+
+            //修改管理员账号
+            function EditNumberFn() {
+                $('.adinfobox').hide();
+                $('.resetadminTip').hide();
+                $('.setphonebox').show();
+                $('.setphoneTip').show();
+                isEditAdim = 2;
+            }
+            //修改基础资料，显示输入框；
+            $('#edituserinfo').on('click', function () {
+                $(this).hide();
+                $('#saveInfo').show();
+                $('.showbaseinfo').hide();
+                $('.editinputinfo').show();
+            })
+            layui.use(['form', 'layer'], function () {
+                var form = layui.form(),
+                    layer = layui.layer;
+                $('#saveInfo').on('click', function () {
+                    var agentName = $.trim($('.setname').val()),   //代理商名称
+                        province = $.trim($('.province').val()),   //省
+                        city = $.trim($('.city').val()),    //市
+                        status = $.trim($('.status').val()),   //状态
+                        username = $.trim($('.setusername').val()),   //联系人
+                        phone = $.trim($('.setuserphone').val()),     //联系电话
+                        adminnum = $.trim($('.setphone').val()),  //管理员账号（手机号）
+                        comp_name_reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,32}$/,   //代理商名称正则
+                        contacts_reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,10}$/,  //联系人正则
+                        mobile_phone_reg = /^((0\d{2,3}-\d{7,8})|(1[3456789]\d{9}))$/,   //联系电话正则
+                        staff_acc_reg = /^1[3|4|5|6|7|8|9]\d{9}$/;   //管理员正则
+
+                    if (!comp_name_reg.test(agentName)) {
+                        layui.layer.msg('请输入正确的代理商名称');
+                        return false;
+                    }
+                    if (province == '' || city == '') {
+                        layui.layer.msg('请选择所在区域');
+                        return false;
+                    }
+                    if (username.length > 10) {
+                        layui.layer.msg('代理商联系人最长不超过10个字符');
+                        return false;
+                    }
+                    if (!contacts_reg.test(username)) {
+                        layui.layer.msg('请输入正确的代理商联系人');
+                        return false;
+                    }
+                    if (!mobile_phone_reg.test(phone)) {
+                        layui.layer.msg('请输入正确的联系电话！');
+                        return false;
+                    }
+                    if (isEditAdim == 2) {
+                        if (!staff_acc_reg.test(adminnum)) {
+                            layui.layer.msg('请输入正确的管理员账号！');
+                            return false;
+                        }
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "/v1.2/Agent/edit/comp_id/"+Id,
+                        dataType: 'json',
+                        data: {
+                            'comp_name': staffId,   //代理商名称
+                            'contacts': staffId,  //联系人
+                            'mobile_phone': staffId,   //联系电话
+                            'sc_pro': staffId,   //省
+                            'sc_pid': staffId,  //市
+                            'staff_acc': staffId,   //管理员账号
+                            'status': staffId,      //状态
+                        },
+                        success: function (res) {
+                            console.log(res)
+
+                        },
+                        error: function (err) {
+                            layui.layer.msg('网络出错，请稍后重试！');
+                        }
+                    })
+
+
+                })
+            })
+        </script>
+</body>
+
+</html>

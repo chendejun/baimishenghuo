@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>系统公告</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all" />
+    <style>
+     .news_nav{display: block;}
+    .news_nav li{display:inline-block;margin-bottom:15px;float: none;height:auto;position: relative;border-bottom:1px dashed #ccc;text-align:left;width:100%;color:#4c94f5;line-height:45px;}
+    .news_nav li i{color:#4c94f5; font-size:20px;border:0;width:28px;height: 28px;background:none;position: static;}
+    .news_nav li span,.news_nav li p{display: inline-block;margin-left:6px;color:#4c94f5;font-size:14px;}
+    .news_nav li.read,.news_nav li.read span,.news_nav li.read p{color:#999;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box sitebox">
+        <div class="title_box">
+            <span>公告</span>
+        </div>
+        <div class="data_box">
+            <ul class="news_nav" id="news_nav">
+                
+            </ul>
+                
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/layui/layui.js"></script>
+    <script type="text/javascript" src="/public/js/index.js"></script>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        get_notice();
+       
+    });
+    //获取网站皮肤数据
+    function get_notice() {            
+              $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/v1.2/Notice/getUserNotice",
+                data: '',
+                success: function(rs) {                   
+                    console.log(rs);
+                    var str = '';
+                    if(rs.api_code==1){                        
+                        if(rs.data.length == 0){
+                            str = '<li>暂无消息</li>';
+                            $("#news_nav").html(str);
+                            return ;
+                        }else{
+                            for(var i=0;i<rs.data.length;i++){                                
+                                if (rs.data[i].notice_status == 0) {
+                                    str += '<li id="'+rs.data[i].notice_id+'" onclick="read_notice('+rs.data[i].rid+')" ><i class="layui-icon">&#xe645;</i><span>【'+rs.data[i].notice_title+'】</span><p class="pcont">'+rs.data[i].notice_content+'</p></li>';
+                                } else {
+                                    str += '<li id="'+rs.data[i].notice_id+'" class="read" data-rid="'+rs.data[i].rid+'"><i class="layui-icon">&#xe645;</i><span >【'+rs.data[i].notice_title+'】</span><p class="pcont">'+rs.data[i].notice_content+'</p></li>';
+                                }
+                               
+                            }
+                            $("#news_nav").html(str);
+                        }
+                                             	
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(r) {
+                    tipTopShow(r);
+                }
+            });
+        }
+
+        //获取网站皮肤数据
+    function read_notice(rid) {            
+              $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/v1.2/Notice/Read",
+                data: {rid:rid},
+                success: function(rs) {                   
+                    console.log(rs); 
+                    get_notice();                   
+                },
+                error: function(r) {
+                    tipTopShow(r);
+                }
+            });
+        }
+     
+        
+    </script>
+</body>
+
+</html>

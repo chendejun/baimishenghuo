@@ -1,0 +1,57 @@
+<?php
+class AgentController extends BasicController {
+	public function indexAction(){
+        $this->getView();
+	}
+    public function listAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        $data['agent_level']=$this->uinfo['agent_level'];
+        $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+        $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+        $result = BmDspApi::request('agent/advList',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取代理商列表接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function addAction(){
+        if(isset($_POST)&&!empty($_POST)) {
+            $data['comp_pid'] = $this->uinfo['comp_id'];
+            $data['staff_id'] = $this->uinfo['staff_id'];
+            $data['comp_name'] = Helper::clean($this->getRequest()->getPost('comp_name'));
+            $data['contacts'] = Helper::clean($this->getRequest()->getPost('contacts'));
+            $data['mobile_phone'] = Helper::clean($this->getRequest()->getPost('mobile_phone'));
+            $data['sc_pro'] = intval($this->getRequest()->getPost('sc_pro'));
+            $data['sc_pid'] = intval($this->getRequest()->getPost('sc_pid'));
+            $data['sc_id'] = intval($this->getRequest()->getPost('sc_id'));
+            $data['staff_acc'] = Helper::clean($this->getRequest()->getPost('staff_acc'));
+            $data['ratio'] = Helper::clean($this->getRequest()->getPost('ratio'));
+            if(empty(trim($data['comp_name']))){
+                Helper::outJson(array('state'=>0 , 'msg' =>'代理商名称不可为空'));
+            }
+            if(empty($data['contacts'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'联系人不可为空'));
+            }
+            $result = BmDspApi::request('agent/add',$data,'POST');
+            //var_dump($result);
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求api新增代理商接口失败'));
+            }
+            if($result['api_code'] == 0){
+                //添加操作日志
+                $log_content[] = "下级代理商管理 :". "代理商添加";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('代理商添加',$log_content_str,'LC008',"LOT001");
+                Helper::outJson(array('state' => 1, 'msg' => '添加成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }
+    }
+}

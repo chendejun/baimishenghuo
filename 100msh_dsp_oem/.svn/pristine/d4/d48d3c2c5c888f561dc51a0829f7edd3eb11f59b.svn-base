@@ -1,0 +1,10 @@
+<?php
+
+/**
+ *
+ */
+class PortraitsController extends AnotherClass
+{
+
+
+}

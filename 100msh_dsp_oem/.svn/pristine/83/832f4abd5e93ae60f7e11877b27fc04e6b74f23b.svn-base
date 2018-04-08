@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/css/layui.css" >
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <style type="text/css">
+        .content {
+            background-color: #fff;
+            min-height: 500px;
+        }
+        /*.type_box {*/
+            /*padding-left: 20px;*/
+            /*min-width: 900px;*/
+            /*background-color: #fff;*/
+        /*}*/
+
+        /*.type_box .item_ul {*/
+            /*margin-left: 10px;*/
+            /*position: relative;*/
+            /*top: 2px;*/
+            /*left: 0;*/
+
+        /*}*/
+        /*.type_box li {*/
+            /*float: left;*/
+            /*width: 50px;*/
+            /*height: 30px;*/
+            /*line-height: 30px;*/
+            /*display: block;*/
+            /*background-color: #fff;*/
+            /*text-align: center;*/
+            /*color: #999;*/
+            /*font-size: 13px;*/
+            /*!*border:1px solid #ccc;*!*/
+            /*border-top:1px solid #ccc;*/
+            /*border-bottom:1px solid #ccc;*/
+            /*cursor: pointer;*/
+        /*}*/
+
+        /*.type_box .item_ul li:first-child,.type_box .item_ul li:last-child {*/
+            /*border-left:1px solid #ccc;;*/
+            /*border-right:1px solid #ccc;;*/
+        /*}*/
+
+        /*.type_box .item_ul li.cur{*/
+            /*background-color: #009eff;*/
+            /*color: #fff;*/
+        /*}*/
+
+        /*.type_box  p {*/
+            /*font-size: 12px;*/
+            /*color: #999;*/
+            /*display: block;*/
+            /*margin-left: 5px;*/
+            /*position: relative;*/
+            /*top: 10px;*/
+            /*left: 0;*/
+        /*}*/
+        /*.select_box {*/
+            /*height: 35px;*/
+            /*line-height: 35px;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box"><span>百米DMP / 客流人群分析</span></div>
+    <div class="tab_box clearfix " >
+        <div class="menu_box fl ">
+            <a href="index.html">客流分析<p></p></a>
+            <a href="javascript:;" class="cur">客户属性<p></p></a>
+            <a href="cus_prefrence.html">消费偏好<p></p></a>
+            <a href="trade_analysis.html">商圈分析<p></p></a>
+            <a href="cus_source.html">客流来源<p></p></a>
+            <a href="hot_search.html">搜索热点<p></p></a>
+            <a href="app_analysis.html">常用APP分析<p></p></a>
+            <div class="menu_bottom"></div>
+        </div>
+        <a href="create_analysis.html" class="btn_link bm-btn bm-btn-blue fr" >修改场景</a>
+
+    </div>
+
+    <div class="content">
+        <div class="type_box">
+            <select class="bm-select select_box fl" id="select_box">
+                    <option value="">昨日</option>
+                    <option value="1">近7天</option>
+                    <option value="2">近30天</option>
+                    <option value="3">指定日期</option>
+            </select>
+            <ul class="item_ul fl" id="item_ul">
+                <li type="1" class="cur">全部</li>
+                <li type="2" >新访客</li>
+                <li type="3" >老访客</li>
+            </ul>
+            <p class="fl">客群属性分析截止到昨日</p>
+        </div>
+
+    </div>
+
+
+    <div class="tip_box" style="display: none">
+        <p class="tip_title">本功能为高级版本付费功能，费用<span>3000元/年。</span></p>
+        <p class="tip_subtitle">点击下方“修改”按钮，进入本场景修改页面,选择开通“高级版”，完成支付后等待开通，预计完成需要1~2个工作日。</p>
+        <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="create_analysis.html">修改</a>
+    </div>
+</div>
+<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+
+<script>
+
+
+    $("#item_ul li").bind("click",function(){
+        $("#item_ul li").removeClass("cur");
+        $(this).addClass("cur");
+        var type = $(this).attr("type");
+    });
+
+</script>
+</body>
+</html>

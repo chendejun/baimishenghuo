@@ -1,0 +1,568 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <style type="text/css">
+    	.media .m1 .item.choose:after{content: "";background-image: url(../../../../../public/img/haschoose.png);background-size: 100% 100%;width: 34px;height: 34px;
+    		position: absolute;left: 0;top: 0;}
+        .media .m1 .item.nochoose:after{content: "";background-image: url(../../../../../public/img/nochoose.png);background-size: 100% 100%;width: 34px;height: 34px;
+            position: absolute;left: 0;top: 0;}
+    	.media .m1 .item:after{ position: relative;}
+    	.media .choose-buttons span{height:40px; cursor: pointer; color: #4c94f5; display: inline-block;padding: 0 10px;text-decoration:underline;}
+        .media .choose-buttons span:last-child{float: right;margin-right: 50px;}
+    	.app-list{margin-top: 30px;overflow: hidden;}
+    	.media .m1 .nomedia{width: 117px;height: 109px;background-image: url(../../../../../public/img/nomedia.png);background-size: 100% 100%;margin: 0 auto;}
+    	.app-list .select{float: left;height:430px;border: 1px solid #E1E5EC;overflow-y: auto;}
+    	.app-list .arrow{float: left;width: 30px;height: 30px;border: 1px solid #E1E5EC;text-align: center;line-height: 30px;margin: 200px 10px 0 10px;}
+    	.app-list .select-left{width: 456px;}
+    	.app-list .select-left .noapp{width: 101px;height: 35px;background-image: url(../../../../../public/img/noAPP.png);background-size: 100% 100%;margin: 0 auto;}
+    	.app-list .select-right{width: 286px;}
+    	.app-list .title{height: 40px;line-height: 40px;padding-left: 20px;border-bottom: 1px solid #E1E5EC;background: #f5f9fc;}
+    	.app-list .select-left li{height: 40px;line-height: 40px;padding-left: 20px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;
+    		border-bottom:1px solid #E1E5EC ;}
+    	.app-list .clear-all{cursor: pointer;color: #4c94f5;padding: 0 10px;text-decoration: underline;float: right;padding-right: 20px;}
+    	.app-list .tags li{float: left;height: 30px;padding: 0px 4px;line-height: 30px; background:#d9ecf5; text-align: center; color: #499dd2;margin: 10px;}
+    	.app-list .tags li .icon{display: inline-block;cursor: pointer;}
+    
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <section class="form layui-form">
+        <div class="step_box step3">
+            <div class="from-row">
+                <label>广告行为：</label>
+                <input type="radio" name="ad_active" value="1" title="跳转网页" checked lay-filter="behavior_type">
+                <input type="radio" name="ad_active" value="2" title="下载应用" lay-filter="behavior_type">
+            </div>
+            <div class="from-row">
+                <label>创意形式：</label>
+                <input type="radio" name="ad_style" value="1" title="横幅" checked lay-filter="action_type">
+                <!--<input type="radio" name="ad_style" value="1" title="视频贴片" lay-filter="action_type">
+                <input type="radio" name="ad_style" value="2" title="原生信息流" lay-filter="action_type">-->
+                <input type="radio" name="ad_style" value="5" title="开屏" lay-filter="action_type">
+            </div>
+            <div class="from-row">
+                <label>媒体选择：</label>
+                <input type="radio" name="user_media" value="1" title="全网自动选择" checked lay-filter='user_media'> 
+                <input type="radio" name="user_media" value="2" title="指定应用" lay-filter='user_media'>
+            </div>
+            <div class="from-row media">
+            	<div class="media_box m1">
+                    <div class="choose-buttons"><span class="allChoose">全选</span><span class="invertChoose">反选</span><span class="noChoose">全部清空</span></div>
+            		<div class="nomedia" style="display: none;"></div>
+                    <ul class="clearfix contain">
+               		
+               		</ul>
+                </div>
+                <div class="media_box m2" style="display: none;">
+                    <ul class="clearfix contain">
+                        
+                    </ul>
+                    
+                 	<div class="app-list clearfix">
+                 		<div class="select-left select">
+                 			<div class="select-contain">
+                 				<div class="title">可选项目</div>
+                 				<div class="noapp" style="display: none;"></div>
+	                 			<ul class="apps">
+	         
+	                 				<!--<li id='1'><input type="checkbox" value="1" title="发呆1" lay-skin="primary" lay-filter='app'> </li>-->
+	                 			
+	                 			</ul>
+                 			</div>
+                 		</div>
+                 		<div class="arrow">
+                 			<i class="layui-icon">&#xe65b;</i>   
+                 		</div>
+                 		<div class="select-right select">
+                 			<div class="select-contain" id="result_sel">
+                 				<div class="title">已选项目
+                 					<!--span class="clear-all">清空所有</span>-->
+                 				</div>
+	                 			<ul class="tags">
+	                 			</ul>
+                 			</div>
+                 		</div>
+                 	</div>
+                </div>
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(2)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next"  data="4" id="stepBtnp3">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/underscore-min.js"></script>
+    <script type="text/javascript">
+        var stgbh3= {}, //数据存储
+            standard = {};//规格 json
+		var MediaID = [];//已经选择的媒体id
+    	var hasChooseApp = [];// 已选择的app
+        var allMediaID = [];//全部媒体ID
+		var user_media = 1;//媒体选择的类型
+        //各请求参数
+		var behavior_type_t = 1,behavior_type_x=0,action_type_h=1,
+			action_type_s=0,action_type_y=0,action_type_k=0,source_type_q=1,source_type_z=0;
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+	            var form = layui.form,
+	                layer = layui.layer,
+	                $=layui.jquery,
+	                layedit = layui.layedit,
+	                element = layui.element,
+	                laydate = layui.laydate;
+//	     	广告行为
+    	    form.on('radio(behavior_type)',function(data){
+    	    	if(data.value == 1){
+    	    		 behavior_type_t = 1;
+    	    		 behavior_type_x = 0;
+    	    	}else if(data.value == 2){
+    	    		 behavior_type_t = 0;
+    	    		 behavior_type_x = 1;
+    	    	}
+    	    	if(user_media == 1){
+    	    		getAdxs(user_media);
+    	    	}else if(user_media == 2){
+    	    		getAlladx(user_media);
+    	    	}
+    	    	
+    	    	if(user_media==2 && MediaID.length>0){
+    		  		getApp(MediaID[0]);
+    		  	}else{
+    		  		hasChooseApp = [];
+    		  		$('.select-right .tags').empty();
+    		  	}
+    	    })
+
+            //创意形式：
+    		form.on('radio(action_type)',function(data){
+    	    	 if(data.value == 1){
+    	    		 action_type_h = 1;
+    	    		 action_type_s = 0;
+    	    		 action_type_y = 0;
+    	    		 action_type_k = 0;
+    	    	}else if(data.value == 5){
+    	    		 action_type_h = 0;
+    	    		 action_type_s = 0;
+    	    		 action_type_y = 0;
+    	    		 action_type_k = 1;
+    	    	}
+    	    	if(user_media == 1){
+    	    		getAdxs(user_media);
+    	    	}else if(user_media == 2){
+    	    		getAlladx(user_media);
+    	    	}
+    	    	if(user_media==2 && MediaID.length>0){
+    		  		getApp(MediaID[0]);
+    		  	}else{
+    		  		hasChooseApp = [];
+    		  		$('.select-right .tags').empty();
+    		  	}
+    	    })
+
+            form.on('radio(user_media)', function(data){
+            	user_media = data.value;
+    		  if(data.value == 1){
+    		  	$('.media .m1').show(200);
+    		  	$('.media .m2').hide(100);
+    		  	source_type_q = 1;
+    		  	source_type_z = 0;
+    		  	getAdxs(user_media);
+                hasChooseApp = [];
+                $('.select-right .tags').empty();
+    		  }else if(data.value == 2){
+    		  	$('.media .m2').show(200);
+    		  	$('.media .m1').hide(100);
+    		  	source_type_q = 0;
+    		  	source_type_z = 1;
+    //		  	console.log(MediaID)
+    		  	getAlladx(user_media);
+                $('.select-left .apps').empty();
+    		  	if(MediaID.length>0){
+    		  		getApp(MediaID[0]);
+    		  	}else{
+    		  		hasChooseApp = [];
+    		  		$('.select-right .tags').empty();
+    		  	}
+    		  }
+    		});
+
+    		 form.on('checkbox(app)', function(data){
+    		 	var app = {};
+    //		 		console.log(data.elem);
+    			 	app.name = data.elem.title;
+    			 	app.value = data.value;
+    			 	app.adx_Id = data.elem.getAttribute('data-adx_Id');
+    			 	app.aid = data.elem.getAttribute('data-aid');
+    			 	console.log(app)
+
+    		 	if(data.elem.checked){
+    		 		var has = _.find(hasChooseApp,function(item){
+    		 			return item.value == app.value;
+    		 		})
+    //		 		判断app是否存在,不存在就添加
+    			 	if(!has){
+    				 	hasChooseApp.push(app);
+    //				 	console.log(hasChooseApp);
+    					renderAppTag(hasChooseApp[hasChooseApp.length-1]);
+    			 	}
+    				form.render();
+    		 	}else{
+                //删除当前的app
+    		 		hasChooseApp = _.filter(hasChooseApp, function(item){ return item.value !== app.value  });
+    		 		//删掉tag
+    		 		$('#'+app.name).remove();
+    		 		form.render();
+    		 		console.log(hasChooseApp)
+    		 	}
+    		 })
+
+    		$('body').on('click','.media .m1 .contain li',function(){
+    			// $(this).toggleClass('choose');
+    			var adx_Id = $(this).attr('data-id');
+    	 		if($(this).hasClass('choose')){
+    	 		    $(this).addClass('nochoose').removeClass('choose');
+    				MediaID = _.filter(MediaID,function(item){
+    					return item != adx_Id
+    				})
+    			}else{
+                    $(this).addClass('choose').removeClass('nochoose');
+    				MediaID.push(adx_Id);
+    				// console.log('MediaID'+MediaID);
+    			}
+    	 	})
+
+    		//点击媒体获取媒体的id
+    		$('body').on('click','.media .m2 .contain li',function(){
+    	 		$(this).addClass('on').siblings().removeClass('on');
+    	 		var adx_Id = $(this).attr('data-id');
+    	 		getApp(adx_Id);
+    	 	})
+
+        	$('body').on('click','.app-list .select-right .tags li .icon',function(){
+    	 		var id = $(this).parent().attr('data-id');
+    	 		$(this).parent().remove();
+    	 		hasChooseApp = _.filter(hasChooseApp, function(item){ return item.value !== id  });
+    			$('#'+id).children().removeClass('layui-form-checked');
+    			$('#'+id).find('input[type=checkbox]').attr('checked',false);
+    	 	})
+
+            //点击下一步,获取规格
+    		$('#stepBtnp3').on('click',function(e){
+                var th = $(this),
+                    dataid = th.attr('data'),
+                    ad_active = $('input[name=ad_active]:checked').val(),
+                    ad_style = $('input[name=ad_style]:checked').val(),
+                    ad_media = $('input[name=user_media]:checked').val();
+                    id = MediaID.join(),
+                    dataJson={},
+                    appid = _.map(hasChooseApp,function(item){
+                        return item.value;
+                    })
+                appid = appid.join();
+                console.log(id,appid);
+                if(ad_media == 1){
+                    getSourcestypeq(id,function(data){
+                        standard = data;
+                        initp4(standard);
+                    });
+                }else if(ad_media == 2){
+                    getAppSize(appid,function(data){
+                        standard = data;
+                        initp4(standard);
+                    });
+                    $('#result_sel li').each(function(){
+                        var th = $(this),
+                            adx_Id = th.attr('adx_Id'),
+                            thId = th.attr('data-id'),
+                            aid = th.attr('aid'),
+                            thName = th.attr('id');
+                        if(dataJson[adx_Id]===undefined){
+                            dataJson[adx_Id] =[];
+                        }
+                        dataJson[adx_Id].push(JSON.parse('{"'+thId+'":"'+thName+'"}'));
+                    })
+                }
+                stgbh3 = {'behaviorType':ad_active,'creativeType':ad_style,'mediaType':ad_media,'adxType':id,'appIn':JSON.stringify(dataJson)};
+                // console.log(stgbh3);
+                if(MediaID.length==0 && user_media==1){
+                	tipTopShow("请选择媒体！");
+                }else if(hasChooseApp.length==0 && user_media==2){
+                	tipTopShow("请选择媒体！");
+                } else{
+                	stepPage(dataid);
+                }
+            })
+
+    //全选媒体
+    		$('.choose-buttons .allChoose').click(function(){
+    			$('.media .m1 .contain li').each(function(){
+    				$(this).addClass('choose').removeClass('nochoose');
+    			})
+    			MediaID = allMediaID;
+    			console.log('MediaID='+MediaID);
+    		})
+    //反选媒体
+
+           $('.choose-buttons .invertChoose').click(function(){
+    			$('.media .m1 .contain li').each(function(){
+    				if($(this).hasClass('choose')){
+                        $(this).removeClass('choose').addClass('nochoose');
+                    }else {
+                        $(this).removeClass('nochoose').addClass('choose');
+                    }
+    			})
+    			MediaID = _.difference(allMediaID,MediaID);
+    		})
+    //全部清空
+            $('.choose-buttons .noChoose').click(function(){
+                $('.media .m1 .contain li').each(function(){
+                    $(this).removeClass('choose').addClass('nochoose');
+                })
+                MediaID = [];
+            })
+    		//     	获取指定应用的媒体列表
+    		function getAlladx(type){
+    			var mediaType = type;
+    			$.ajax({
+                    type: "POST",
+                    url:'/v1.2/Bhdelivery/getAlladx',
+                    dataType:"json",
+                    success: function(rs){
+                        if(rs.api_code == 1){
+    //                    获取所有的媒体id:adx_Id
+    					 MediaID = _.map(rs.data,function(item){
+    					 	return item.adx_Id
+    					 })
+    					 console.log(MediaID);
+    					 allMediaID = MediaID;
+    					 renderMedia_box(rs.data,mediaType);
+                        }else{
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error:function(data){
+                        tipTopShow("查询失败，请重试...");
+                    }
+                });
+    		}
+
+    		//获取媒体下面的规格
+    		function getSourcestypeq(id,fn){
+    		     if(id == ''){
+                     tipTopShow("请选择媒体！");
+                     return
+                 }
+                var osType_o = stgbh1.osType==1 ? 1:0;
+                var osType_i = stgbh1.osType==2 ? 1:0;
+    			$.ajax({
+                    type: "POST",
+                    url:'/v1.2/Bhdelivery/getSourcestypeq',
+                    dataType:"json",
+                    data : {
+                    	'adx_ids':id,
+                    	'osType_o':osType_o,
+                    	'osType_i':osType_i,
+                    	'behavior_type_t':behavior_type_t,
+                    	'behavior_type_x':behavior_type_x,
+                    	'action_type_h':action_type_h,
+                    	'action_type_s':action_type_s,
+                    	'action_type_y':action_type_y,
+    					'action_type_k':action_type_k,
+                    	'source_type_q':source_type_q,
+                    	'source_type_z':source_type_z
+                    },
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            // console.log('规格1'+rs)
+                            fn.call(this,rs);
+    					    /*standard = _.map(rs.data,function(item){
+        					  	return item.ad_size_name;
+        					})
+    						console.log('全网规格'+standard)*/
+                        }else{
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error:function(data){
+                        tipTopShow("查询失败，请重试...");
+                    }
+                });
+    		}
+
+
+    		//获取APP下面的规格
+    		function getAppSize(id,fn){
+                var osType_o = stgbh1.osType==1 ? 1:0;
+                var osType_i = stgbh1.osType==2 ? 1:0;
+    			$.ajax({
+                    type: "POST",
+                    url:'/v1.2/Bhdelivery/getAppSizes',
+                    dataType:"json",
+                    data : {
+                    	'ap_id':id,
+                    	'osType_o':osType_o,
+                    	'osType_i':osType_i,
+                    	'behavior_type_t':behavior_type_t,
+                    	'behavior_type_x':behavior_type_x,
+                    	'action_type_h':action_type_h,
+    					'action_type_k':action_type_k
+                    },
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            // console.log('规格2'+rs)
+                            fn.call(this,rs);
+    					    /*standard = _.map(rs.data,function(item){
+    					  	    return item.ad_size_name;
+    					    })
+    						console.log('app下规格'+standard)*/
+                        }else{
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error:function(data){
+                        tipTopShow("查询失败，请重试...");
+                    }
+                });
+    		}
+
+    		//		获取媒体下面的app列表
+    		function getApp(id){
+    			$.ajax({
+                    type: "POST",
+                    url:'/v1.2/Bhdelivery/getApp',
+                    dataType:"json",
+                    data : {
+                    	'adx_Id':id
+                    },
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                        	if(rs.data.length>0){
+                        		renderAppList(rs.data);
+                        		$('.select-left .select-contain .noapp').hide();
+                        	}else{
+    //                  		清空当前的列表
+    							$('.select-left .apps').empty();
+                        		$('.select-left .select-contain .noapp').show();
+    //					  		hasChooseApp = [];
+    //					  		$('.select-right .tags').empty();
+                        	}
+                        }else{
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error:function(data){
+                        tipTopShow("查询失败，请重试...");
+                    }
+                });
+    		}
+    		function renderAppList(data){
+    			var content =$('.select-left .apps');
+    			var str = '';
+    			$.each(data, function (k, v) {
+    					str += '<li id='+v.ap_id+'>'
+    					str += "<input type='checkbox' value="+v.ap_id+' title='+v.name+' lay-skin="primary" lay-filter="app" data-adx_Id="'+v.adx_Id+'" data-aid="'+v.aid+'">'
+    					str += '</li>'
+    				})
+    			content.html(str);
+    			var appid = _.map(data,function(item){
+    				return item.ap_id;
+    			})
+    			var hasChooseAppID = _.map(hasChooseApp,function(item){
+    				return item.value;
+    			})
+    			var choose = _.intersection(appid,hasChooseAppID);
+    //			console.log(choose);
+    //			给已经选中的app打钩
+    			_.map(choose,function(id){
+    				$('#'+id).children().addClass('layui-form-checked');
+    				$('#'+id).find('input[type=checkbox]').attr('checked',true);
+    			})
+    			form.render();
+    		}
+
+    		function renderAppTag(data){
+    			var content = $('.select-right .tags');
+    			var str = '';
+    			str += '<li class="col" data-id="'+data.value+'" id="'+data.name+'" adx_Id="'+data.adx_Id+'" aid="'+data.aid+'">';
+    			str += '<span>'+data.name+'</span>';
+    			str += '<span class="icon"><i class="layui-icon">&#x1006;</i></span>';
+    			str += '</li>';
+    			content.append(str);
+    			form.render();
+    		}
+    	})
+    //获取对应选择的媒体列表
+    function getAdxs(type){
+        var mediaType = type;
+        var osType_o = stgbh1.osType==1 ? 1:0;
+        var osType_i = stgbh1.osType==2 ? 1:0;
+        $.ajax({
+            type: "POST",
+            url:'/v1.2/Bhdelivery/getAdxs',
+            dataType:"json",
+            data : {
+                'osType_o':osType_o,
+                'osType_i':osType_i,
+                'behavior_type_t':behavior_type_t,
+                'behavior_type_x':behavior_type_x,
+                'action_type_h':action_type_h,
+                'action_type_s':action_type_s,
+                'action_type_y':action_type_y,
+                'action_type_k':action_type_k,
+                'source_type_q':source_type_q,
+                'source_type_z':source_type_z,
+            },
+            success: function(rs){
+                if(rs.api_code == 1){// 获取所有的媒体id:adx_Id
+                 MediaID = _.map(rs.data,function(item){
+                    return item.adx_Id
+                 })
+                 console.log(MediaID);
+                 allMediaID = MediaID;
+                 renderMedia_box(rs.data,mediaType);
+                }else{
+                    tipTopShow(rs.msg);
+                }
+            },
+            error:function(data){
+                tipTopShow("查询失败，请重试...");
+            }
+        });
+    }
+    function renderMedia_box(data,type){
+        // 0为全网,1为指定
+        var contentA = $('.media .m1 .contain');
+        var contentB = $('.media .m2 .contain');
+        var mediaType = type;
+        var str = '';
+        if(mediaType == 1){
+            $('.media .m1 .nomedia').hide();
+            if(data.length>0){
+                $('.media_box  .choose-buttons').show();
+                    $.each(data, function (k, v) {
+                    str += '<li class="item choose" data-id='+v.adx_Id+'>';
+                    str += '<img src="../../../../../public/adxs/'+v.logo+' ">';
+                    str += '</li>';
+                })
+                contentA.html(str);
+            }else{
+                $('.media .m1 .nomedia').show();
+                $('.media_box  .choose-buttons').hide();
+                contentA.empty();
+            }
+        }else if(mediaType == 2){
+            $.each(data, function (k, v) {
+                str += '<li class="item" data-id='+v.adx_Id+'>';
+                str += '<img src="../../../../../public/adxs/'+v.logo+' ">';
+                str += '</li>';
+            })
+            contentB.html(str)
+            $('.media .m2 .contain li:first-child').addClass('on')
+        }
+    }
+    </script>
+</body>
+</html>

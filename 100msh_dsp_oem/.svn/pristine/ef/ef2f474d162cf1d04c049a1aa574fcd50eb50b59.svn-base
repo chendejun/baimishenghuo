@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 账户中心-充值流水 -->
+<head>
+	<meta charset="UTF-8">
+	<title>账户中心-账户信息</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <style>
+        .box_title{height: 40px;line-height:40px;border: 1px solid #ccc;border-radius: 4px;display: inline-block;color: #ccc;cursor: pointer;font-size: 14px;}
+        .box_title span{height: 39px;display: inline-block;padding: 0 10px;width: 150px;text-align: center;}
+        .box_title span.cur{background-color: #4c94f5;color: #fff;border: 1px solid #4c94f5;}
+        #recharge_list1{display: none;margin-top: 24px;}
+        .noMsg1 {width:100%;text-align:center;padding-top:25px;color:#f08519;}
+    </style>
+</head>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 我的账户</span>
+        </div>
+        <div class="percent_box">
+            <div class="nav_box">
+                <a href="/v1.2/account/index">账户信息</a>
+                <a href="javascrip:;" class="cur">充值流水</a>
+                <a href="/v1.2/account/invoice">发票开具</a>
+                {{if $sh eq 1}}
+                <a href="/index/operatormanage">操作员管理</a>
+                {{/if}}
+            </div>
+            <div class="box_table table_style">
+                <div class="box_title">
+                    <span class="cur">账户充值记录</span>
+                    <span status='1'>人群画像充值记录</span>
+                </div>
+                <div class="search_box">
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <!-- 账户充值记录 -->
+                <table id="recharge_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>金额/元</th>
+                            <th>充值方式</th>
+                            <th>充入账户</th>
+                            <th>充值操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+
+                <!-- 人群画像充值记录 -->
+                <table id="recharge_list1" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>充值次数</th>
+                            <th>充值账户</th>
+                            <th>充值操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg1"></p>
+                <!--列表分页-->
+                <div id="list_page1" class="page"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+    	var dateTimer='',
+            thisMonth = get_date(0).substr(0,7);
+        $('#date_id').bind('focus',function(){
+            WdatePicker({
+                dateFmt:'yyyy-MM',
+                minDate:'2017-07',
+                maxDate: thisMonth
+            })
+        })
+
+        $('.box_title').on('click','span',function(){
+            var status = $(this).attr('status') ? 1 : '';
+            $(this).addClass('cur').siblings().removeClass('cur');
+            $('.noMsg,.noMsg1').html('');
+            if(status){
+                $('#recharge_list1,#list_page1').show();
+                $('#recharge_list,#list_page').hide();
+            }else{
+                $('#recharge_list,#list_page').show();
+                $('#recharge_list1,#list_page1').hide();         
+            }
+            getRechargeList(1,status);
+            console.log(status);
+        })
+
+        //搜索
+        function searchFn(){
+            var s = $('.box_title').find('.cur').attr('status') ? 1 : '';
+            dateTimer= $('#date_id').val();
+            getRechargeList(1,s);
+        }
+        //获取数据
+        function getRechargeList(curr,s){
+            var s = s || '',date = dateTimer ? ('/date/'+dateTimer) :'',urls;
+            if(s){//人群画像充值记录
+                urls = '/v1.2/SceneExtension/getTransferResourceRecord/transfer_type/2/page/'+ (curr || 1)+date;
+            }else{//账户充值记录
+                urls = '/v1.2/account/rechargeList/page/'+ (curr || 1)+date;
+            }
+            $.ajax({
+                type: "GET",
+                url: urls,
+                dataType:'json',
+                beforeSend: function(){
+                    tipTopShow('正在查询！');
+                },
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.state == 1){         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data,s);     //渲染表格数据
+                        renderPage(data.pages, curr,s);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function render_table(data,s){
+            var s = s || '',list_e = $("#recharge_list"+s+" tbody"),str="",no_msg = $(".noMsg"+s);
+            if(data.length == 0 || data.list.length == 0){
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return ;
+            }
+            no_msg.text("");
+            $.each(data.list,function(k,v){
+                var poster = {'2':'高级版','3':'app分析版'}
+                if(s){//人群画像充值记录
+                    str +='<tr>',
+                    str +='<td>'+ v.add_time +'</td>';
+                    str +='<td>'+ v.record_num +'</td>';
+                    str +='<td>'+ poster[v.poster_type] +'</td>';
+                    str +='<td>'+ v.staff_name +'</td>';
+                    str +='<td>'+ v.record_no +'</td>';
+                    str +='</tr>';
+                }else{//账户充值记录
+                    str +='<tr>',
+                    str +='<td>'+ v.trade_time +'</td>';
+                    str +='<td>'+ v.trade_amount +'</td>';
+                    str +='<td>'+ v.cate_name +'</td>';
+                    str +='<td>'+ v.acc_type +'</td>';
+                    str +='<td>'+ v.staff_name +'</td>';
+                    str +='<td>'+ v.trade_no +'</td>';
+                    str +='</tr>';
+                }
+
+            });
+            list_e.html(str);
+        }
+
+        //分页
+        function renderPage(pages,curr,s){
+            //显示分页
+            laypage({
+                cont: $('#list_page'+s), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function(obj, first){ //触发分页后的回调
+                    if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getRechargeList(obj.curr,s);
+                    }
+                }
+            });
+        }
+        getRechargeList();
+    </script>
+</body>
+</html>

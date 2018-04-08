@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>我的平台-首页</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+</head>
+<style>
+    .mod_echarts{width: 100%;height:450px;}
+</style>
+<body>
+	<div class="content_box">
+	   <!-- <li><p>虚拟：￥{{$acc.virtual_amount}}现金：￥{{$acc.cash_amount}}赠送：￥{{$acc.give_amount}}</p><span>账户余额</span></li> -->
+        <div class="index_box mt10">
+            <h4><i class="club_icons icon3"></i>数据概况</h4>
+            <ul class="block_box clearfix">
+                <li class="cur">广告信息</li>
+                <li>广告主</li>
+                <li>广告消耗</li>
+                <li>服务商账户支出</li>
+            </ul>
+            <div class="menu_box">
+                <ul class="mpart clearfix">
+                    <li>
+                        <i class="rgb_blue r_icons icon1"></i>
+                        <div class="mod_info">
+                            <p>待审核</p>
+                            <span>{{$count_delivery.zero}}</span><b>条</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_yell r_icons icon2"></i>
+                        <div class="mod_info">
+                            <p>投放中</p>
+                            <span>{{$count_delivery.one}}</span><b>条</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_red r_icons icon3"></i>
+                        <div class="mod_info">
+                            <p>已结束</p>
+                            <span>{{$count_delivery.three}}</span><b>条</b>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="mpart clearfix" style="display: none;">
+                    <li>
+                        <i class="rgb_blue r_icons icon4"></i>
+                        <div class="mod_info">
+                            <p>投放中</p>
+                            <span>{{$count_delivery.comping}}</span><b>户</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_yell r_icons icon5"></i>
+                        <div class="mod_info">
+                            <p>有消耗</p>
+                            <span>{{$count_delivery.comphave}}</span><b>户</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_red r_icons icon6"></i>
+                        <div class="mod_info">
+                            <p>总数</p>
+                            <span>{{$count_comps}}</span><b>户</b>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="mpart clearfix" style="display: none;">
+                    <li>
+                        <i class="rgb_blue r_icons icon7"></i>
+                        <div class="mod_info">
+                            <p>今日消耗</p>
+                            <span>{{$acc.today_disburse}}</span><b>元</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_yell r_icons icon8"></i>
+                        <div class="mod_info">
+                            <p>昨日消耗 <i class="tips"></i></p>
+                            <span>{{$acc.yes_disburse}}</span><b>元</b>
+                            <div class="tips_btxt" style="display:none">
+                                当日数据计算有存在延迟现象，仅作参考。<br>昨日消耗计算为下一日上午10点，10点前后数据可能存在变化，敬请理解。
+                            </div>
+                        </div>                        
+                    </li>
+                    <li>
+                        <i class="rgb_red r_icons icon9"></i>
+                        <div class="mod_info">
+                            <p>本周消耗</p>
+                            <span>{{$acc.week_disburse}}</span><b>元</b>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="mpart clearfix" style="display: none;">
+                    <li>
+                        <i class="rgb_blue r_icons icon7"></i>
+                        <div class="mod_info">
+                            <p>今日支出</p>
+                            <span>{{$acc.today_expend}}</span><b>元</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_yell r_icons icon8"></i>
+                        <div class="mod_info">
+                            <p>昨日支出</p>
+                            <span>{{$acc.yes_expend}}</span><b>元</b>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="rgb_red r_icons icon9"></i>
+                        <div class="mod_info">
+                            <p>本周支出</p>
+                            <span>{{$acc.week_expend}}</span><b>元</b>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="index_box mt20">
+            <div class="title">
+                <h4><i class="club_icons icon4"></i>投放中广告</h4>
+                <select class="bm-select type_row" id="ad_select">
+                    <option value="1">WIFI广告</option>
+                    <option value="2">腾讯广告</option>
+                </select>
+            </div>
+            <table id="plan_list" class="base_table">
+                <thead>
+                    <tr>
+                        <th>广告(计划)名称</th>
+                        <th>投放平台</th>
+                        <th>广告主</th>
+                        <th>申请日期</th>
+                        <th>广告状态</th>
+                        <th>日预算</th>
+                        <th>曝光次数</th>
+                        <th>点击量</th>
+                        <th>点击率</th>
+                        <th>广告花费</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p class="noMsg"></p>
+            <!--列表分页-->
+            <div id="list_page" class="page"></div>
+        </div>
+        <div class="index_box mt20">
+            <div class="title">
+                <h4><i class="club_icons icon5"></i>广告效果日报表</h4>
+                <div class="type_row">
+                    <input type="text" id="sd_text" class="bm-input Wdate" value="" placeholder="选择日期" />
+                    <button type="button" class="bm-btn bm-btn-blue" style="width: 50px;" id="search_btn">搜索</button>
+                </div>
+            </div>
+            <div class="charts_box">
+                <div id="mod_echarts" class="mod_echarts"></div>
+            </div>
+            <p class="chart_tip"></p>
+        </div>
+    </div>
+    <!--广告主详情start-->
+    <script id="infoTemplate" type="text/html">
+        <div class="info_box">
+            <ul class="clearfix">
+                <li>广告名称：<< d.delivery_name >></li>
+                <li>广告主：<< d.comp_name >></li>
+                <li>所属服务商：<< d.comp_p_name >></li>
+                <li>投放方式：<< d.delivery_type_name >></li>
+                <li>广告出价：￥<< d.bid_money >> 元</li>
+                <<# if(d.platform_id==1){ >>
+                    <li>总预算：￥<< d.z_money >> 元</li>
+                    <li>投放类型：<< d.ad_type_name >></li>
+                    <li>日预算：￥<< d.day_money >> 元</li>
+                <<# } >>
+                <li>出价方式：<< d.bid_type_name >> </li>
+                <li>投放日期：<< d.delivery_date >></li>
+                <li>投放时间段：<< d.delivery_times >></li>
+            </ul>
+            <<# if(d.platform_id==1){ >>
+                <div class="dbox"><span>投放素材：</span><div class="info"><img src="<< d.material_info[0].img_url >>"><p><< d.material_info[0].material_url >></p></div></div>
+            <<# } >>
+            <<# if(d.platform_id==2){ >>
+                <div class="dbox"><span>投放素材：</span><div class="info"><p><< d.material_info.material_name >></p> <img src="<< d.material_info.pic_purl >>"><p><< d.material_info.jump_url >></p></div></div>
+            <<# } >>
+            
+        </div>
+    </script>
+    <!--广告主详情end-->
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript" src="/public/js/echarts.common.min.js"></script>
+    <script type="text/javascript">
+        laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+        $('.block_box').on('click','li',function(){
+            var th = $(this),
+                idx = th.index();
+            th.addClass('cur').siblings('li').removeClass('cur');
+            $('.menu_box').find('ul').eq(idx).show().siblings().hide();
+        });
+        $('.tips').on('click',function(){
+            $('.tips_btxt').toggle();
+        });
+        //图表
+        var modEcharts = echarts.init(document.getElementById('mod_echarts'));
+        //平台数据切换
+        var navType = 1,limit = 5;
+        function SetNavStyle() {
+            $('#ad_select').change(function(){
+                var th = $(this);
+                navType = th.val();
+                console.log(navType);
+                getPlanList();
+            })
+        }
+        SetNavStyle()
+        //获取数据
+        function getPlanList(curr){
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/Gdtdelivery/index/page/' + (curr || 1) + '/limit/' + limit + '/platform_id/' + navType,
+                dataType:'json',
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.state == 1){         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.total_page, curr);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据（一级）
+        var delivery_status={'0':'待审核','1':'投放中','2':'审核失败','3':'投放结束'},
+            configured_status={'1':'有效','2':'暂停','3':'结束'},
+            bid_type={'1':'CPM', '2':'CPC'};
+        function render_table(data){
+            var list_e = $("#plan_list tbody"),str="",no_msg = $(".noMsg");
+            if(data.list.length == 0){
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return ;
+            }
+            no_msg.text("");
+            $.each(data.list,function(k,v){
+                var stateText = "",   //投放状态
+                        adName = "",  //广告名称
+                        platform_name = "",   //平台类型
+                        openList = "",   //查看列表
+                        dayMoney = "";   //日预算
+                    //腾讯广告  2   wifi广告   1
+                    if (navType == 1) {
+                        adName = '<a href="javascript:;" _id="' + v.delivery_id + '" class="table-option-btn view_info">' + v.delivery_name + '</a>';
+                        stateText = delivery_status[v.delivery_status];
+                        platform_name = v.platform_name;
+                        day_money = v.day_money;
+                        platform_name = 'WIFI广告';
+                    } else if (navType == 2) {
+                        adName = '<a href="javascript:;" _id="' + v.campaign_id + '" class="table-option-btn view_list" onclick="getDevertiserData(' + v.campaign_id + "," + v.configured_status + "," + k + ')">' + v.campaign_name + '</a>';
+                        stateText = configured_status[v.configured_status];
+                        day_money = v.daily_budget / 100
+                        platform_name = '腾讯广告';
+                    }
+                    str += '<tr class="plan' + k + '">'
+                    str += '<td>'
+                    str += adName
+                    str += '</td>'
+                    str += '<td>' + platform_name + '</td>'   //投放平台
+                    str += '<td>' + v.comp_name + '</td>'   //广告主
+                    str += '<td>' + v.create_time + '</td>'   //申请日期
+                    str += '<td>' + stateText + '</td>'
+                    str += '<td>' + day_money + '</td>'
+                    str += '<td>' + v.z_cpm_num + '</td>'
+                    str += '<td>' + v.z_cpc_num + '</td>'
+                    str += '<td>' + v.clicking_rate + '</td>'
+                    str += '<td>￥' + round(v.ad_pay, 2) + '</td>'
+                    str += '</tr>'
+                });
+                list_e.html(str);
+        }
+        //广告投放列表（二级）
+        function getDevertiserData(id, status, parentId) {
+            var TrNode = $(".plan" + parentId);
+            if (TrNode.hasClass('active') == false) {
+                TrNode.addClass('active');
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/Gdtdelivery/getgdtAdList/campaign_id/' + id + '/camp_status/' + status,
+                    dataType: 'json',
+                    success: function (rs) {
+                        tipTopHide();       //隐藏提示框
+                        console.log(rs)
+                        if (rs.state == 1) {
+                            var data = rs.data;
+                            if (data.length == 0) {
+                                tipTopShow('暂无投放记录！');
+                                TrNode.removeClass('active');
+
+                                return;
+                            } else {
+                                renderadList(data, TrNode);     //渲染表格数据        
+                            }
+                        } else {
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error: function (rs) {
+                        tipTopShow("查询信息失败，请重试...");    //显示提示框
+                    }
+                });
+            } else {
+                TrNode.removeClass('active');
+                TrNode.next('.inner_table').remove();
+            }
+
+        }
+        //渲染广告投放（二级）
+        function renderadList(data, TrNode) {
+            var str = "",
+                table1 = '<tr class="inner_table" id="1"><td colspan="11" style="padding-right:0px !important;"><div class="inner_list" id="inner_list" style="margin-left:20px"><div class="tab_tip" style="height:40px;">'
+            table1 += '<i></i><p>此推广计划共包括'+data.length+'条广告。 </p></div><table width="100%"><thead>'
+            table1 += '<tr><th>广告名称</th><th>出价</th><th>状态</th><th>曝光量</th><th>点击量</th><th>点击率</th><th>广告花费</th></tr>'
+            table1 += "</thead><tbody>",
+                table2 = '</tbody></table></div></td></tr>'
+
+            $.each(data, function (k, v) {
+                str += '<tr>'
+                str += '<td><a href="javascript:;" class="table-option-btn view_info" _id="' + v.delivery_id + '">' + v.delivery_name + '</a></td>'
+                str += '<td>' + bid_type[v.bid_type] + ' ￥' + v.bid_money + '</td>'
+                str += '<td>' + (v.camp_status == 1 ? delivery_status[v.delivery_status] :configured_status[v.camp_status]) + '</td>'
+                str += '<td>' + v.cpm_num + '</td>'
+                str += '<td>' + v.cpc_num + '</td>'
+                str += '<td>' + v.clicking_rate + '</td>'
+                str += '<td>￥' + round(v.ad_pay, 2) + '</td>'
+                str += '</tr>'
+            })
+            TrNode.after(table1 + str + table2);
+        }
+        //分页
+        function renderPage(pages,curr){
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function(obj, first){ //触发分页后的回调
+                    if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getPlanList(obj.curr);
+                    }
+                }
+            });
+        }
+        getPlanList();
+        //保留两位小数（四舍五入）
+        function round(number, fractionDigits) {
+            with (Math) {
+                return round(number * pow(10, fractionDigits)) / pow(10, fractionDigits);
+            }
+        }
+        //审核失败理由
+        $('body').on('click','.status_tip',function(){
+            layer.tips(this.title, this);
+        })
+        //时间搜索
+        var faultdate = get_date(1);
+        $('#sd_text').attr('placeholder',faultdate);
+        $('#sd_text').bind('focus',function(){
+            WdatePicker({
+                maxDate:faultdate,
+                dateFmt:'yyyy-MM-dd',
+                alwaysUseStartDate:true,
+                isShowClear:false,
+                readOnly:true
+            })
+        })
+        $('#search_btn').bind('click',function(){
+            var timer = $('#sd_text').val();
+            getData(timer);
+        })
+
+        //广告主详情
+        $('body').on("click",".view_info",function(){
+            var id = $(this).attr('_id');
+            var cacheDOM = $("#infoTemplate").html();
+            var infocacheDOM = getUserInfo(id);
+            //laytpl异步渲染调用
+            laytpl(cacheDOM).render(infocacheDOM, function(result){
+                //店铺详细信息弹框
+                layer.open({
+                    type: 1,
+                    title: "广告详情",
+                    area: ['760px', '600px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        });
+        //广告主详情数据
+        function getUserInfo(id){
+            var data='';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/Gdtdelivery/deliveryInfo/delivery_id/'+id,
+                dataType:'json',
+                async : false,
+                beforeSend:function(){
+                    tipTopHide("正在查询数据");    //显示提示框
+                },
+                success: function(rs){
+                    tipTopHide();
+                    if(rs.state == 1){         //如果查询成功
+                        data = rs.data;     //返回数据赋值
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+            return data;
+        }
+
+        //请求图表数据
+        function getData(timer){
+            var timer = timer?timer:faultdate;
+            $.ajax({
+                type: "GET",
+                url: 'getCompAdStat/start_date/'+timer,
+                dataType:'json',
+                success: function(rs){
+                    if(rs.state == 1){
+                        var data = rs.data;
+                        renderChart(data);
+                    }else{
+                        //tipTopShow(rs.msg);
+                        //tipTopShow('暂无图表数据！');
+                        renderChart([]);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        function renderChart(data){
+            if(data.lenght==0){
+                $('.chart_tip').html('暂无图表数据！')
+            }
+            var xData=[],xValue1=[],xValue2=[],xValue3=[],i=0;
+            for ( var p in data ){
+                xData[i] = data[p].stat_time<10?('0'+data[p].stat_time+':00'):data[p].stat_time+':00';
+                xValue1[i] = data[p].cpm_num;
+                xValue2[i] = data[p].cpc_num;
+                xValue3[i] = parseFloat(data[p].con_rate);
+                i++;
+            }
+            option = {
+                tooltip : {
+                    trigger: 'axis',
+                    axisPointer : {
+                        type : 'shadow'
+                    },
+                    formatter: function(params){
+                        var content='';
+                        for(var i = 0; i < params.length; i++){
+                            if(params[i].name){
+                                content += "时间："+ params[i].name +"<br />";
+                                break;
+                            }
+                        }for(var i = 0, key = {}; i < params.length; i++){
+                            key = params[i];
+                            if(key.seriesName=='点击率' && (typeof key.value!='undefined')){
+                                key.value = key.value +' %';
+                            }
+                            if( typeof key.value==='undefined' || key.value === '-'){
+                                key.value = '暂无';
+                            }
+                            content += key.seriesName+"："+ key.value +"<br />";
+                        }
+                        return content;
+                    }
+                },
+                grid: {
+                    left: '2%',
+                    right: '4%',
+                    bottom: 60,
+                    top:30,
+                    containLabel: true
+                },
+                legend: {
+                    x : 'center',
+                    y : 'bottom',
+                    data:['浏览量','点击量','点击率'],
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : xData,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value',
+                        minInterval: 1,
+                        axisLine : {
+                            show : true,
+                            lineStyle : {
+                                color : '#888888',
+                                type : 'solid',
+                                width : 1
+                            }
+                        },
+                        axisTick : {
+                            show : true,
+                            length : 1,
+                            lineStyle : {
+                                type : 'solid',
+                                width : 0
+                            }
+                        },
+                        axisLabel : {
+                            formatter: '{value}'
+                        }
+
+                    }
+                ],
+                series : [
+                    {
+                        name:'浏览量',
+                        type:'line',
+                        smooth: true,
+                        itemStyle: {
+                            normal:{
+                                color:'#21b100'
+                            }
+                        },
+                        data:xValue1
+                    },
+                    {
+
+                        name:'点击量',
+                        type:'line',
+                        smooth: true,
+                        itemStyle: {
+                            normal:{
+                                color:'#36b1ff'
+                            }
+                        },
+                        data:xValue2
+                    },
+                    {
+                        name:'点击率',
+                        type:'line',
+                        smooth: true,
+                        itemStyle: {
+                            normal:{
+                                color:'#f56c6c'
+                            }
+                        },
+                        data:xValue3
+                    }
+                ]
+            };
+            modEcharts.setOption(option);
+        };
+        getData();
+    </script>
+</body>
+</html>
+
+

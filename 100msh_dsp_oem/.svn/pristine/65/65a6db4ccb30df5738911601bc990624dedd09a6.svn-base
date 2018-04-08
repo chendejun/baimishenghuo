@@ -1,0 +1,235 @@
+<?php
+class Bhadver extends Model
+{
+    function getBhTask(){
+        $res= $this->db->dsp->query("SELECT * FROM bh_comp_sync WHERE sync_status=0 AND sync_type IN (1,2,3) ORDER BY ID ASC LIMIT 1");
+        if(empty($res)) return array();
+        return $res[0];
+    }
+    function getCateN($cate_id){
+        $res  = $this->db->dsp->table("dsp_comp_category",false)->where('cate_id='.$cate_id)->find();
+        return $res['cate_name'];
+    }
+    function getScN($sc_id){
+        $res  = $this->db->dsp->table("dsp_statecity",false)->where('sc_id='.$sc_id)->find();
+        return $res['sc_name'];
+    }
+    function editBhTask($id,$data){
+        return $this->db->dsp->table('bh_comp_sync',false)->data($data)->where('id ='.$id)->update();
+    }
+    function addBhComp($data){
+        return $this->db->dsp->table('bh_company',false)->data($data)->insert();
+    }
+    function editBhComp($id,$data){
+        return $this->db->dsp->table('bh_company',false)->data($data)->where('id ='.$id)->update();
+    }
+    function getBhCompInfo($comp_id){
+        return $res  = $this->db->dsp->table("bh_company")->where('comp_id='.$comp_id)->find();
+    }
+    function exeTask($task){
+        $comp_id=$task['comp_id'];
+        $type=$task['sync_type'];
+        $comp_info=$this->db->dsp->query("SELECT a.comp_pid,a.comp_name,a.contacts,a.mobile_phone,a.cate_pid,a.cate_id,a.website_url,a.comp_addr,a.sc_pro,a.sc_pid,a.sc_id,a.business_name,a.business_code,a.brank_name,c.trademark_img,c.business_img,c.front_card,c.back_card,icp_img,c.industry_img,c.apt_more FROM dsp_company a LEFT JOIN dsp_comp_img c ON a.comp_id=c.comp_id WHERE a.comp_id=".$comp_id);
+        if(empty($comp_info)){
+            return false;
+        }
+        $compInfo=$comp_info[0];
+        $web_url=parse_url($compInfo['website_url']);
+        $compInfo['website_url']=$web_url['scheme']."://".$web_url['host']."/";
+        $compInfo['pro_name']=$this->getScN($compInfo['sc_pro']);
+        $compInfo['city_name']=$this->getScN($compInfo['sc_pid']);
+        $compInfo['region_name']=$this->getScN($compInfo['sc_id']);
+        var_dump($compInfo);
+        if($type == 1){//新建广告主
+            //1.新增广告主基础信息
+            $base_data=array();
+            $base_data['userName']=$compInfo['mobile_phone']."@100msh.com";
+            $base_data['realName']=$compInfo['contacts'];
+            $base_data['mobile']=$compInfo['mobile_phone'];
+            $base_data['accountType']=2;
+            $base_data['companyCateId']=$compInfo['cate_pid'];
+            $base_data['companySubCateId']=$compInfo['cate_id'];
+            $base_data['passWord']=substr(str_shuffle('0123456789'),0,6);
+            $base_data['rePassword']=$base_data['passWord'];
+            $base_data['groupId']=3778;
+            $base_data['companyName']=$compInfo['comp_name'];
+            $base_data['accountAptitude']='';
+            $base_data['companyUrl']=$compInfo['website_url'];
+            $base_data['companyAddress']=$compInfo['pro_name'].$compInfo['city_name'].$compInfo['region_name'].$compInfo['comp_addr'];
+            $base_data['v']=mt_rand(10000000000000000,99999999999999999);
+            $base_res=json_decode(BhDspApi::addAccount($base_data),true);
+            if(empty($base_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求新增广告主接口失败'));
+                return false;
+            }
+            if($base_res['code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>$base_res['message']));
+                return false;
+            }
+            $bh_data=array();
+            $bh_data['comp_id']=$comp_id;
+            $bh_data['comp_pid']=$compInfo['comp_pid'];
+            $bh_data['bh_account_id']=$base_res['datas']['accountId'];
+            $bh_data['user_name']=$base_data['userName'];
+            $bh_data['passwd']=$base_data['passWord'];
+            $bh_data['add_time']=date('Y-m-d H:i:s');
+            $bh_data['edit_time']=date('Y-m-d H:i:s');
+            $bh_comp_id=$this->addBhComp($bh_data);//behe公司信息入库
+            //2.新增广告主资质图片上传（营业执照）
+            $img_data=array();
+            $this->config = Yaf_Registry::get('config');
+            if(strpos($compInfo['business_img'], $this->config['config']['ACCESSORY_URL']) !== false){
+                $business_img=substr($compInfo['business_img'],strlen($this->config['config']['ACCESSORY_URL']));
+            }else{
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'营业执照图链接错误'));
+                return false;
+            }
+            $img_data['files[]']=new curlFile($this->config['config']['ACCESSORY_FOLDER'].$business_img);
+            $img_res=json_decode(BhDspApi::upload($img_data),true);
+            if(empty($img_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求图片上传接口失败'));
+                return false;
+            }
+            if($img_res['Resopnse']['result-code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>'图片上传失败'));
+                return false;
+            }
+            //3.0新增广告主资质信息添加
+            $apt_data=array();
+            $apt_data['accountId']=$bh_data['bh_account_id'];
+            $apt_data['userName']='';
+            $apt_data['companyName']=$compInfo['comp_name'];
+            $apt_data['subjectName']=$compInfo['business_name'];
+            $apt_data['brandName']=$compInfo['brank_name'];
+            $apt_data['licenseCode']=$compInfo['business_code'];
+            $apt_data['icpCard']='';
+            $apt_data['brandInfo']='';
+            $apt_data['institutionals']='';
+            $apt_data['businessLicense']=$img_res['Resopnse']['files']['path'];
+            $apt_data['cyberCulture']='';
+            $apt_data['practices']='';
+            $apt_data['investigates']='';
+            $apt_data['aptitudeName']='';
+            $apt_data['aptitudeImg']='';
+            $apt_data['IdCard']='';
+            $apt_data['ICP']='';
+            $apt_data['dutyPaid']='';
+            $apt_data['v']=mt_rand(10000000000000000,99999999999999999);
+            $apt_res=json_decode(BhDspApi::fileUp($img_data),true);
+            if(empty($apt_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求资质上传接口失败'));
+                return false;
+            }
+            if($apt_res['code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>$apt_res['message']));
+                return false;
+            }
+            //4.0设置利润率
+            $pre_data=array();
+            $pre_data['premium']=80;
+            $pre_data['premiumType']='account';
+            $pre_data['accountId']=$bh_data['bh_account_id'];
+            $pre_res=json_decode(BhDspApi::fileUp($img_data),true);
+            if(empty($pre_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求设置利润率接口失败'));
+                return false;
+            }
+            if($pre_res['code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>$pre_res['message']));
+                return false;
+            }
+            //任务顺利完成
+            $this->editBhTask($task['id'],array('sync_status' => 1,'sync_msg'=>'成功','complete_time'=>date('Y-m-d H:i:s')));
+            $this->editBhComp($bh_comp_id,array('status' => 1));
+            return true;
+        }else if($type == 2){//广告主基本资料修改
+            $bh_accInfo=$this->getBhCompInfo($comp_id);
+            if(empty($bh_accInfo)) return false;
+            $base_data=array();
+            $base_data['accountId']=$bh_accInfo['bh_account_id'];
+            $base_data['userName']=$compInfo['mobile_phone']."@100msh.com";
+            $base_data['companyName']=$compInfo['comp_name'];
+            $base_data['companyUrl']=$compInfo['website_url'];
+            $base_data['accountAptitude']='';
+            $base_data['companyAddress']=$compInfo['pro_name'].$compInfo['city_name'].$compInfo['region_name'].$compInfo['comp_addr'];
+            $base_data['realName']=$compInfo['contacts'];
+            $base_data['mobile']=$compInfo['mobile_phone'];
+            $base_data['companyPhone']=$compInfo['mobile_phone'];
+            $base_data['qq']='';
+            $base_data['companyCateId']=$compInfo['cate_pid'];
+            $base_data['companySubCateId']=$compInfo['cate_id'];
+            $base_data['v']=mt_rand(10000000000000000,99999999999999999);
+            $base_res=json_decode(BhDspApi::editAccount($base_data),true);
+            if(empty($base_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求修改广告主接口失败'));
+                return false;
+            }
+            if($base_res['code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>$base_res['message']));
+                return false;
+            }
+            //任务顺利完成
+            $this->editBhTask($task['id'],array('sync_status' => 1,'sync_msg'=>'成功','complete_time'=>date('Y-m-d H:i:s')));
+            $this->editBhComp($bh_accInfo['id'],array('edit_time' => date('Y-m-d H:i:s'),'aptitude_times' => 0));
+            return true;
+        }else if($type == 3){//广告主资质资料修改
+            $bh_accInfo=$this->getBhCompInfo($comp_id);
+            if(empty($bh_accInfo)) return false;
+            $img_data=array();
+            $this->config = Yaf_Registry::get('config');
+            if(strpos($compInfo['business_img'], $this->config['config']['ACCESSORY_URL']) !== false){
+                $business_img=substr($compInfo['business_img'],strlen($this->config['config']['ACCESSORY_URL']));
+            }else{
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'营业执照图链接错误'));
+                return false;
+            }
+            var_dump($business_img);
+            $img_data['files[]']=new curlFile($this->config['config']['ACCESSORY_FOLDER'].$business_img);
+            var_dump($img_data);
+            $img_res=json_decode(BhDspApi::upload($img_data),true);
+            var_dump($img_res);
+            if(empty($img_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求图片上传接口失败'));
+                return false;
+            }
+            if($img_res['Resopnse']['result-code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>'图片上传失败'));
+                return false;
+            }
+            $apt_data=array();
+            $apt_data['accountId']=$bh_accInfo['bh_account_id'];
+            $apt_data['userName']='';
+            $apt_data['companyName']=$compInfo['comp_name'];
+            $apt_data['subjectName']=$compInfo['business_name'];
+            $apt_data['brandName']=$compInfo['brank_name'];
+            $apt_data['licenseCode']=$compInfo['business_code'];
+            $apt_data['icpCard']='';
+            $apt_data['brandInfo']='';
+            $apt_data['institutionals']='';
+            $apt_data['businessLicense']=$img_res['Resopnse']['files'][0]['path'];
+            $apt_data['cyberCulture']='';
+            $apt_data['practices']='';
+            $apt_data['investigates']='';
+            $apt_data['aptitudeName']='';
+            $apt_data['aptitudeImg']='';
+            $apt_data['IdCard']='';
+            $apt_data['ICP']='';
+            $apt_data['dutyPaid']='';
+            $apt_data['v']=mt_rand(10000000000000000,99999999999999999);
+            $apt_res=json_decode(BhDspApi::fileUp($img_data),true);
+            if(empty($apt_res)){
+                $this->editBhTask($task['id'],array('sync_status' => -1,'sync_msg'=>'请求资质上传接口失败'));
+                return false;
+            }
+            if($apt_res['code'] != 0){
+                $this->editBhTask($task['id'],array('sync_status' => 2,'sync_msg'=>$apt_res['message']));
+                return false;
+            }
+            //任务顺利完成
+            $this->editBhTask($task['id'],array('sync_status' => 1,'sync_msg'=>'成功','complete_time'=>date('Y-m-d H:i:s')));
+            $this->editBhComp($bh_accInfo['id'],array('status'=>1,'edit_time' => date('Y-m-d H:i:s'),'aptitude_times' => 0));
+            return true;
+        }
+    }
+
+}

@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>我的广告主-广告主详情</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+	<link rel="stylesheet" href="/public/font/iconfont.css">
+	<link rel="stylesheet" href="/public/css/advertiser.css">
+	<link rel="stylesheet" href="/public/js/layui/css/layui.css">
+	<style>
+		.content_box {
+			/* min-width: 1504px; */
+		}
+
+		.layui-layer-dialog {
+			width: 399px;
+		}
+
+		.layui-layer-btn0 {
+			border: 1px solid #cccccc !important;
+			color: #999999 !important;
+			background: #fff !important;
+			border-radius: 4px;
+		}
+
+		.layui-layer-content {
+			padding: 10px 20px !important;
+		}
+
+		.layui-layer-btn1 {
+			border: 1px solid #5877a4 !important;
+			color: #fff !important;
+			background: #5877a4 !important;
+			border-radius: 4px;
+		}
+
+		.layer_tip p {
+			color: #5b5a5a;
+		}
+
+		.layer_tip span {
+			color: #333;
+		}
+
+		.trn_select {
+			height: 38px;
+			border: 1px solid #dddddd;
+			border-radius: 5px;
+			padding: 5px;
+			color: #666666;
+		}
+
+		.adv_tip p {
+			height: 38px;
+			line-height: 38px;
+			font-size: 12px;
+			color: #ecb976;
+		}
+
+		.adv_tip i {
+			margin-top: 12px;
+		}
+
+		.photosMore_div img {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+		}
+
+		.photosMore_div h4 {
+			line-height: 44px;
+			font-weight: bold;
+			position: absolute;
+			bottom: 18px;
+			text-align: center;
+			width: 100%;
+		}
+
+		.add_bg {
+			width: 36px;
+			height: 36px;
+			background: url(/public/img/addimg_icon.png) no-repeat center;
+			margin: 30px auto;
+			margin-bottom: 0px;
+		}
+
+		.radio_wrap {
+			float: right;
+			width: 600px;
+			height: 44px;
+			line-height: 44px;
+		}
+
+		.layui-form-radio i:hover,
+		.layui-form-radioed i {
+			color: #4c94f5;
+		}
+
+		.layui-form-radio i {
+			font-size: 18px;
+		}
+
+		.layui-input-block {
+			text-align: right;
+		}
+
+		.layui-form-radio span {
+			color: #999;
+		}
+
+		.base_table tr th {
+			background: #fff;
+			height: 40px;
+			line-height: 40px;
+		}
+
+		.base_table {
+			border: 1px solid #f2f4f5;
+		}
+
+		.advertr_view .line .add_title {
+			width: 106px;
+			text-align: right;
+			margin-right: 18px;
+		}
+
+		.advertr_view .edit_input {
+			width: 200px;
+		}
+
+		.tr_select {
+			width: 160px;
+		}
+	</style>
+	<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="/public/js/common.js"></script>
+	<script src="/public/js/layer/layer.js"></script>
+	<script src="/public/js/layui/layui.js?1"></script>
+</head>
+
+<body>
+	<div class="content_box">
+		<div class="title_box">
+			<span>
+				<a href="/v1.2/advertiser/index?isreturn=1">
+					< 返回我的广告主</a>
+			</span>
+		</div>
+		<div class="advertr_view">
+			<div class="adv_tip" id="adv_tip">
+				<i></i>
+				<p>请注意：小牛广告主申请已被拒绝。原因：缺少行业资质文件资料，请上传后重新提起开户申请。</p>
+			</div>
+			<h4>基础资料</h4>
+			<div class="addinput_box">
+				<div class="line h80">
+					<div class="add_linel">
+						<div class="add_title">广告主名称：</div>
+						<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+						<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+					</div>
+					<div class="add_liner">
+						<div class="add_title">联系人：</div>
+						<div class="add_info setedit set_person">{{$data.comp_info.contacts}}</div>
+						<input type="text" class="edit_input edit_person" value={{$data.comp_info.contacts}}>
+					</div>
+				</div>
+				<div class="line">
+					<div class="add_linel">
+						<div class="add_title">所属行业：</div>
+						<div class="add_info setedit industryname">
+							<!-- {{$data.comp_info.cate_name}} -->
+						</div>
+						<select class="tr_select bm_right seleindust add_industry" onchange="getSecondIndustryValue('.add_industry')"></select>
+						<select class="tr_select bm_right seleindust add_indeatils"></select>
+					</div>
+					<div class="add_liner">
+						<div class="add_title">广告主网址：</div>
+						<div class="add_info setedit set_url">{{$data.comp_info.hd_url}}{{$data.comp_info.website_url}}</div>
+						<select class="trn_select bm_right seleindust hd_url">
+							<option {{if $data.comp_info.hd_url=='http://' }}selected{{/if}}>http://</option>
+							<option {{if $data.comp_info.hd_url=='https://' }}selected{{/if}}>https://</option>
+						</select>
+						<input type="text" class="edit_input edit_url" value={{$data.comp_info.website_url}}>
+					</div>
+				</div>
+				<div class="line">
+					<div class="add_linel">
+						<div class="add_title">所属服务商：</div>
+						<div class="add_info set_facilitator">{{$data.comp_info.dls_comp_name}}</div>
+						<!-- <input type="text" class="edit_input edit_facilitator" value={{$data.comp_info.dls_comp_name}}> -->
+					</div>
+					<div class="add_liner">
+						<div class="add_title">联系手机号：</div>
+						<div class="add_info set_phone">{{$data.comp_info.mobile_phone}}</div>
+					</div>
+				</div>
+				<div class="line">
+					<div class="add_linel">
+						<div class="add_title">已投放广告：</div>
+						<div class="add_info set_deliveryad">{{$data.comp_info.delivery_num}}</div>
+					</div>
+					<div class="add_liner">
+						<div class="add_title">已消耗金额：</div>
+						<div class="add_info set_consumeMoney">{{$data.comp_info.total_disburse}}</div>
+					</div>
+				</div>
+				<div class="line h80">
+					<div class="add_linel">
+						<div class="add_title">营业执照名称：</div>
+						<div class="add_info setedit set_businessname">{{$data.comp_info.business_name}}</div>
+						<input type="text" class="edit_input editinput_businessname" value={{$data.comp_info.business_name}}>
+					</div>
+					<div class="add_liner">
+						<div class="add_title">营业执照号码：</div>
+						<div class="add_info setedit set_businesscode">{{$data.comp_info.business_code}}</div>
+						<input type="text" class="edit_input edit_businesscode" value={{$data.comp_info.business_code}}>
+					</div>
+				</div>
+				<div class="line h80">
+					<div class="add_linel">
+						<div class="add_title">品牌名称：</div>
+						<div class="add_info setedit setbrankname">{{$data.comp_info.brank_name}}</div>
+						<input type="text" class="edit_input editinput_brank" value={{$data.comp_info.brank_name}}>
+					</div>
+				</div>
+				<div class="line clearfix">
+					<div class="add_linel" style="position:relative;z-index:2;margin-bottom:2px;">
+						<div class="add_title">所在区域：</div>
+						<div class="add_info setedit set_address">{{$data.comp_info.pro_name}}　{{$data.comp_info.city_name}}　{{$data.comp_info.region_name}}</div>
+						<div class="add_info setedit set_detailsaddress" style="margin-left:123px;">{{$data.comp_info.comp_addr}}</div>
+						<div class="editaddress">
+							<div class="select_wrap">
+								<div class="tr_selectdiv add_provincetitle" data-value="">请选择</div>
+								<ul class="tr_selectlist add_province" onchange="getSecondRegionValue('.add_province')">
+									<li data-value="">请选择</li>
+								</ul>
+							</div>
+							<div class="select_wrap">
+								<div class="tr_selectdiv add_citystitle" data-value="">请选择</div>
+								<ul class="tr_selectlist add_citys" onchange="getSecondRegionValue('.add_citys')">
+									<li data-value="">请选择</li>
+								</ul>
+							</div>
+							<div class="select_wrap">
+								<div class="tr_selectdiv add_countytitle" data-value="">请选择</div>
+								<ul class="tr_selectlist add_county">
+									<li data-value="">请选择</li>
+								</ul>
+							</div>
+						</div>
+						<input type="text" class="edit_input add_detailsaddress" value="{{$data.comp_info.comp_addr}}" placeholder="详细地址,如广东路135号成花大厦"
+						 style="width:575px;margin-left:123px;margin-top:5px" />
+					</div>
+				</div>
+				<div class="line_btn">
+					<button class="bm-btn bm-btn-blue" id="btn_editinfo">修改资料</button>
+					<button class="bm-btn bm-btn-blue" id="pushData" onclick="editInfoFn()">确定</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="advertr_view mt30">
+			<h4>广告主资质</h4>
+			<div class="line photos_box add_photoswrapper" comp-id="{{$data.comp_info.comp_id}}">
+				<div class="photos_div">
+					{{if $data.comp_info.trademark_img !=""}}
+					<img src="{{$data.comp_info.up_dir}}{{$data.comp_info.trademark_img}}" /> {{elseif $data.comp_info.trademark_img ==""}}
+					<span>
+						<h4>企业商标</h4>(JPG\PNG，512*512像素，大小不超过400k)
+
+					</span> {{/if}}
+					<input type="file" class="pushImg" id="logo" name="logo" onchange="AjaxUploadImg('logo','#logo')" />
+				</div>
+				<div class="photos_div">
+					{{if $data.comp_info.business_img !=""}}
+					<img src="{{$data.comp_info.up_dir}}{{$data.comp_info.business_img}}" /> {{elseif $data.comp_info.business_img ==""}}
+					<span>
+						<h4>店铺营业执照图片</h4>
+					</span> {{/if}}
+					<input type="file" class="pushImg" name="business" id="business" onchange="AjaxUploadImg('business','#business')" />
+				</div>
+				<div class="photos_div">
+					{{if $data.comp_info.front_card !=""}}
+					<img src="{{$data.comp_info.up_dir}}{{$data.comp_info.front_card}}" /> {{elseif $data.comp_info.front_card ==""}}
+					<span>
+						<h4>法人证件（正面）</h4>
+					</span> {{/if}}
+					<input type="file" class="pushImg" name="personID1" id="personID1" onchange="AjaxUploadImg('personID1','#personID1')" />
+				</div>
+				<div class="photos_div">
+					{{if $data.comp_info.back_card !=""}}
+					<img src="{{$data.comp_info.up_dir}}{{$data.comp_info.back_card}}" /> {{elseif $data.comp_info.back_card ==""}}
+					<span>
+						<h4>法人证件（反面）</h4>
+					</span> {{/if}}
+					<input type="file" class="pushImg" name="personID2" id="personID2" onchange="AjaxUploadImg('personID2','#personID2')" />
+				</div>
+				<div class="photos_div">
+					{{if $data.comp_info.industry_img !=""}}
+					<img src="{{$data.comp_info.up_dir}}{{$data.comp_info.industry_img}}" /> {{elseif $data.comp_info.industry_img ==""}}
+					<span>
+						<h4>点击上传行业资质</h4>(JPG\PNG，大小不超过2M) 开通腾讯广告时必须要上传</h4>
+					</span> {{/if}}
+					<input type="file" class="pushImg" id="aptitude" name="aptitude" onchange="AjaxUploadImg('aptitude','#aptitude')" />
+				</div>
+				<div class="photos_div">
+					{{if $data.comp_info.icp_img !=""}}
+					<img src="{{$data.comp_info.up_dir}}{{$data.comp_info.icp_img}}" /> {{elseif $data.comp_info.icp_img ==""}}
+					<span>
+						<h4>点击上传ICP站点备案证明</h4>(JPG\PNG=，大小不超过2M) 开通腾讯广告时必须要上传</h4>
+					</span> {{/if}}
+					<input type="file" class="pushImg" id="icpImg" name="icpImg" onchange="AjaxUploadImg('icpImg','#icpImg')" />
+				</div>
+				<!-- 遍历更多资质 -->
+				{{foreach from=$data.comp_info.apt_more key=k item=apt}}
+				<div class="photosMore_div">
+					<img src="{{$data.comp_info.up_dir}}{{$apt}}" />
+					<input type="file" class="pushmoreImg" name="morePushImg{{$k}}" id="morePushImg{{$k}}" onchange="AjaxUploadImg('morePushImg{{$k}}','#morePushImg{{$k}}')"
+					/>
+				</div>
+				{{/foreach}} {{if count($data.comp_info.apt_more)
+				< 5}} <div class="photosMore_div">
+					<span class="show add_bg"></span>
+					<span style="display:block;height:25px;line-height:25px;text-align:center;padding-top:0;">点击上传更多资质照片</span>
+					<input type="file" class="pushmoreImg morePushImg" name="morePushImg" id="morePushImg" onchange="AjaxUploadImg('morePushImg','#morePushImg',1)"
+					/>
+			</div>
+			{{/if}}
+		</div>
+	</div>
+	<div class="advertr_view mt30">
+		<h4 style="float:left;width:auto;">资质审核</h4>
+		<div class="layui-form layui-form-item radio_wrap" style="clear:none;">
+			<div class="layui-input-block">
+				<input type="radio" name="audit" value="" lay-filter="audit" title="全部" checked>
+				<input type="radio" name="audit" value="0" lay-filter="audit" title="待审核">
+				<input type="radio" name="audit" value="1" lay-filter="audit" title="已审核">
+				<input type="radio" name="audit" value="-1" lay-filter="audit" title="审核不通过">
+			</div>
+		</div>
+		<table class="base_table">
+			<thead>
+				<tr>
+					<th>序列</th>
+					<th>名称</th>
+					<th>开户情况</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- <tr>
+					<td>1</td>
+					<td>WIFI广告</td>
+					<td>已开户</td>
+					<td>--</td>
+				</tr> -->
+			</tbody>
+	</table>
+
+	</div>
+	<div id="mask"></div>
+	</div>
+	<script src="/public/js/ajaxfileupload.js"></script>
+	<script src="/public/js/advertiser.js"></script>
+	<script type="text/javascript">
+		var industry1 = "{{$data.comp_info.cate_pid}}",
+			industry2 = "{{$data.comp_info.cate_id}}",
+			provincetitleId = "{{$data.comp_info.sc_pro}}", //13
+			add_citystitleId = "{{$data.comp_info.sc_pid}}", //1302
+			add_countytitleId = "{{$data.comp_info.sc_id}}", // 130202
+			Id = "{{$data.comp_info.comp_id}}",
+			pageType = getUrlParams('pageType') ? getUrlParams('pageType') : '';
+		isEdit = false;
+		var add_industryStr = "",
+			add_industryDetailStr = "",
+			provincetitleStr = "",
+			add_citystitleStr = "",
+			add_countytitleStr = "";
+
+			layui.use(['form', 'layer', 'element'], function () {
+			var form = layui.form(),
+				layer = layui.layer,
+				element = layui.element;
+			var radioVal = '';  //筛选审核状态的单选框的值
+			form.on('radio(audit)', function (data) {
+				radioVal = data.value;
+				getListData();
+			})
+
+			function getListData(curr) {
+				var statusVal=radioVal==''?'':'/status/'+radioVal
+				$.ajax({
+					type: "GET",
+					url: '/v1.2/Advertiser/aptList/comp_id/' + Id + '/page/' + (curr||1) + '/limit/10'+statusVal,
+					dataType: 'json',
+					success: function (res) {
+						console.log(res)
+						if(res.state==1){
+							RenderList(res.data);
+						}else{
+							tipTopShow(res.msg);
+							$('.base_table').find('tbody').html('<tr><td colspan="4" style="text-align:center;color:orange;">暂无数据！</td></tr>');
+						}
+					},
+					error: function (err) {
+						tipTopShow("查询信息失败，请重试...");
+					}
+				});
+			}
+
+			function RenderList(data){
+				if(data.list.length==0){
+					$('.base_table').find('tbody').html('<tr><td colspan="4" style="text-align:center;color:orange;">暂无数据！</td></tr>');
+					return;
+				}
+				var str ='';
+				$.each(data.list,function(k,v){
+					var statusStr='';
+					str += '<tr>';
+					str += '<td>'+(Number(k)+1)+'</td>';
+					str += '<td><img src="'+v.aptitude_img+'" alt="">'+v.aptitude_name+'</td>';
+					if(v.status==0){
+						statusStr='待审核'
+					}else if(v.status==1){
+						statusStr='已审核通过'
+					}else if(v.status==-1){
+						statusStr='审核失败'
+					}else if(v.status==-2){
+						statusStr='未开通'
+					}
+					str += '<td>'+statusStr+'</td>';
+					str += '<td>--</td>';
+					str += '</tr>';
+				})
+				$('.base_table').find('tbody').html(str);
+			}
+			getListData();
+		})
+
+
+		//刷新腾讯广告账户余额
+		function refreshaccount() {
+			$.ajax({
+				type: "GET",
+				url: "/v1.2/Advertiser/getZkBalance/comp_id/" + Id + "/gdt_account_id/" + "{{$data.comp_info.gdt_account_id}}",
+				dataType: 'json',
+				success: function (res) {
+					if (res.state == 1) {
+						tipTopShow(res.msg);
+						$('.set_tencentaccount').html("￥" + res.data)
+					} else {
+						tipTopShow(res.msg)
+					}
+				},
+				error: function (err) {
+					tipTopShow("请求失败，请稍后再试！");
+				}
+			});
+		}
+		//新开户
+		function newAcctountFn() {
+			layer.confirm('', {
+				btn: ['我再想想', '确定'],
+				title: "    ",
+				content: "<div class='tip_title'>请确认</div><p class='tip_content'>以当前资料提交到腾讯开通广告主账户,<br/>审核周期为1个工作日，请留意站内通知。</p>"
+			}, function (index) {
+				layer.close(index);
+			}, function () {
+				var name = "",
+					ids = "",
+					pids = "",
+					person = "",
+					address = "",
+					hd_url = "",
+					url = "",
+					province = "",
+					city = "",
+					county = "",
+					businessImg = "",
+					newbusinessImg = "",
+					aptitudeImg = "",
+					icpImg = "",
+					logoImg = "",
+					personID1 = "",
+					personID2 = "";
+				if (isEdit == false) {
+					name = $('.set_name').text();
+					pids = $('.industryname').attr('data-id1');
+					ids = $('.industryname').attr('data-id2');
+					person = $('.set_person').text();
+					address = $('.set_detailsaddress').text();
+					url = $('.set_url').text();
+				} else {
+					name = $('.editinput_name').val();
+					pids = $('.add_industry').val()
+					ids = $('.add_indeatils').val();
+					person = $('.edit_person').val();
+					address = $('.add_detailsaddress').val(); //详细地址
+					hd_url = $('.hd_url').val();
+					url = $('.edit_url').val();
+					urlsplit = $('.edit_url').val().substr($('.edit_url').val().length - 1) == "/" ? $('.edit_url').val().substring(0, $('.edit_url').val().length - 1) : $('.edit_url').val();
+					url = hd_url + url;
+					urlsplit = hd_url + urlsplit;
+					if (name.length == 0) {
+						tipTopShow('广告主名称不能为空');
+						return;
+					}
+					if (name.length > 60) {
+						tipTopShow('广告主名称最长不超过60个字');
+						return;
+					}
+					if (ids == "") {
+						tipTopShow('所属行业不能为空');
+						return;
+					}
+					//网址正则
+					var reg2 = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/){1}(www.|[a-zA-Z].)[a-zA-Z0-9\-\.]+\.(com|edu|gov|mil|net|cn|org|biz|info|name|museum|us|ca|uk)(\:[0-9]+)*(\/[a-zA-Z0-9._\=\%\&\,\;\?\'\"\$\#\-]+)*$/g;
+					if (urlsplit == "" || reg2.test(urlsplit) == false) {
+						tipTopShow('请输入正确的网址');
+						return;
+					}
+				}
+				province = $('.add_provincetitle').attr('data-value'); //省
+				city = $('.add_citystitle').attr('data-value'); //市
+				county = $('.add_countytitle').attr('data-value');
+				businessImg = $('#business').siblings().attr('src');
+				logoImg = $('#logo').siblings().attr('src');
+				newbusinessImg = splitSrc(businessImg);
+				aptitudeImg = $('#aptitude').siblings().attr('src');
+				icpImg = $('#icpImg').siblings().attr('src');
+				personID1 = $('#personID1').siblings('img').attr('src');
+				personID2 = $('#personID2').siblings('img').attr('src');
+				//更多图片
+				var moreimg = $('.photosMore_div').find('img');
+				var ImgArr = []
+				for (var i = 0, len = moreimg.length; i < len; i++) {
+					ImgArr.push(splitSrc(moreimg[i].src))
+				}
+				if (!logoImg) {
+					tipTopShow('请上传商标图！');
+					return;
+				}
+				if (!businessImg) {
+					tipTopShow('请上传营业执照图！');
+					return;
+				}
+				if (!aptitudeImg) {
+					tipTopShow('请上传行业资质图！');
+					return;
+				}
+				if (!icpImg) {
+					tipTopShow('请上传ICP备案图！');
+					return;
+				}
+				if (province == "") {
+					tipTopShow('所在省份不能为空！');
+					return;
+				}
+				if (city == "") {
+					tipTopShow('所在城市不能为空！');
+					return;
+				}
+				if (county == "") {
+					tipTopShow('所在区县不能为空！');
+					return;
+				}
+				if (address == "") {
+					tipTopShow('详细地址不能为空！');
+					return;
+				}
+				$.ajax({
+					type: "POST",
+					url: "/V1.2/Advertiser/edit/comp_id/" + Id,
+					dataType: 'json',
+					data: {
+						"comp_name": name,
+						"cate_pid": pids,
+						"cate_id": ids,
+						"contacts": person,
+						"website_url": url,
+						"sc_pro": province,
+						"sc_pid": city,
+						"sc_id": county,
+						"comp_addr": address,
+						"trademark_img": logoImg,
+						"business_img": businessImg,
+						"front_card": personID1,
+						"back_card": personID2,
+						"industry_img": aptitudeImg,
+						"icp_img": icpImg,
+						"apt_more": JSON.stringify(ImgArr)
+					},
+					success: function (res) {
+						if (res.state == 1) {
+							$.ajax({
+								type: "POST",
+								url: "/v1.2/Advertiser/openGdt/comp_id/" + Id,
+								dataType: 'json',
+								data: {
+								},
+								success: function (res) {
+									if (res.state == 1) {
+										tipTopShow("申请提交成功，请耐心等待审核结果。");
+									} else {
+										tipTopShow(res.msg);
+									}
+								},
+								error: function (err) {
+									tipTopShow("请求失败，请稍后再试！");
+								}
+							});
+						} else {
+							tipTopShow(res.msg);
+						}
+					},
+					error: function (err) {
+						tipTopShow(err.msg);
+					}
+				});
+
+			});
+
+		}
+		//
+		//子商户授权提示
+		function commissionTip() {
+			layer.confirm('', {
+				btn: ['确定'],
+				title: " ",
+				content: "<div class='tip_title'>提示</div><p class='tip_content'>本账号为子商户，请联系您的运营对接人员重新进行授权。</p>"
+			}, function (index) {
+				layer.close(index);
+			})
+		}
+		//授权判断
+		function commissionFn(type) {
+			if (type == 0) {
+				commissionTip();
+			} else {
+				location.href = "/V1.2/Api/gdtCallback?login=1&comp_id={{$data.comp_info.comp_id}}";
+			}
+		}
+		//跳转绑定公众号
+		function bindWx(id, state) {
+			if (state != 3 && state != 4) {
+				layer.confirm('', {
+					btn: ['确定'],
+					title: " ",
+					content: "<div class='tip_title'>提示</div><p class='tip_content'>腾讯广告功能未开通或者授权已过期，请先确认腾讯广告功能正常</p>"
+				}, function (index) {
+					layer.close(index);
+				})
+			} else {
+				layer.confirm('', {
+					btn: ['我再想想', '确定'],
+					title: "    ",
+					content: "<div class='tip_title'>尊敬的用户:</div><p class='tip_content'>成功绑定公众号后，还需1个工作日完成授权。<br/>授权成功才可以进行朋友圈广告。</p>"
+				}, function (index) {
+					layer.close(index);
+				}, function () {
+					window.open("/V1.2/Api/gdtWxCallback?login=1&comp_id=" + id);
+				})
+			}
+		}
+
+		//提示
+		$('body').on('click', '.status_tip', function () {
+			var html = '<div class="layer_tip"><span>提示</span><p>' + this.getAttribute('data') + '</p></div>';
+			layer.tips(html, this, {
+				skin: 'layui-layer-demo',
+				tips: [3, '#eeeff3'],
+				area: ['300px', '130px'],
+				time: 0,
+				closeBtn: 1
+			});
+		})
+		//获取所在地区  (初始化的时候必须根据后台返回的id显示出来)
+		function getRegionData1(type, selector) {
+			$.ajax({
+				type: "GET",
+				url: "/V1.2/Advertiser/getScList/sc_id/" + type,
+				dataType: 'json',
+				success: function (res) {
+					if (res.state == 1) {
+						$.each(res.sc_list, function (k, v) {
+							if (v.sc_id == provincetitleId) {
+								$('.add_provincetitle').html(v.sc_name)
+								$('.add_provincetitle').attr('data-value', v.sc_id)
+								getRegionData1(v.sc_id, '.add_citys');
+								var list = res.sc_list;
+								SetRegionValue(list, selector, v.sc_name)
+								return;
+							}
+							if (v.sc_id == add_citystitleId) {
+								$('.add_citystitle').html(v.sc_name)
+								$('.add_citystitle').attr('data-value', v.sc_id)
+								getRegionData1(v.sc_id, '.add_county');
+								var list = res.sc_list;
+								SetRegionValue(list, selector, v.sc_name)
+								return;
+							}
+							if (v.sc_id == add_countytitleId) {
+								$('.add_countytitle').html(v.sc_name)
+								$('.add_countytitle').attr('data-value', v.sc_id)
+								var list = res.sc_list;
+								SetRegionValue(list, selector, v.sc_name)
+								return;
+							}
+						})
+					} else {
+						tipTopShow("获取区域分类失败！");
+					}
+				},
+				error: function (err) {
+					tipTopShow("获取区域分类失败！");
+				}
+			});
+		}
+		//给所在地区分类赋值
+		function SetRegionValue(list, selector, flag) {
+			var str = "<li data-value=''>请选择</li>";
+			var citys = ".add_citys"
+
+			$.each(list, function (key, value) {
+				str += "<li data-value='" + value.sc_id + "'>" + value.sc_name + "</li>"
+			})
+			$(selector).html(str)
+		}
+		getRegionData1(0, '.add_province')
+
+		//获取所属行业分类    (初始化的时候必须根据后台返回的id显示出来)
+		function getIndustryData1(type) {
+			var firstIndustry = "",
+				secondIndustry = "",
+				add_industryid = "",
+				add_industryDetailid = "",
+				Id1 = "",
+				Id2 = "";
+			$.ajax({
+				type: "GET",
+				url: "/V1.2/Advertiser/getCate/cate_id/" + type,
+				dataType: 'json',
+				async: false,
+				success: function (res) {
+					if (res.state == 1) {
+						$.each(res.cate_list, function (k, v) {
+							if (v.cate_id == industry1) {
+								add_industryStr = '<option value="' + v.cate_id + '">' + v.cate_name + '</option>'
+								add_industryid = v.cate_id
+								getSecondIndustryValue1(v.cate_id)
+								var list = res.cate_list;
+								SetIndustryValue1(list, type, add_industryid, add_industryStr);
+								firstIndustry = v.cate_name
+								Id1 = v.cate_id
+								return;
+							}
+							if (v.cate_id == industry2) {
+								add_industryDetailStr = '<option value="' + v.cate_id + '">' + v.cate_name + '</option>'
+								add_industryDetailid = v.cate_id;
+								var list = res.cate_list;
+								SetIndustryValue1(list, type, add_industryDetailid, add_industryDetailStr);
+								secondIndustry = v.cate_name;
+								Id2 = v.cate_id;
+								$('.industryname').html(firstIndustry + " " + secondIndustry);
+								$('.industryname').attr("data-id1", Id1);
+								$('.industryname').attr("data-id2", Id2);
+							}
+
+						})
+					}
+				},
+				error: function (err) {
+					tipTopShow("获取行业分类失败！");
+				}
+			});
+		}
+		//给行业分类赋值
+		function SetIndustryValue1(list, type, add_industryid, add_industryStr) {
+			var str = ""
+			$.each(list, function (key, value) {
+				if (value.cate_id != add_industryid) {
+					str += "<option value='" + value.cate_id + "'>" + value.cate_name + "</option>"
+				}
+			})
+			if (type == 0) {
+				$('.add_industry').html(str)
+				$('.add_industry').prepend(add_industryStr);
+				$('.add_industry').children().eq(0).attr("selected", true);
+			} else {
+				$('.add_indeatils').html(str)
+				$('.add_indeatils').prepend(add_industryStr);
+				$('.add_indeatils').children().eq(0).attr("selected", true);
+			}
+		}
+
+		function getSecondIndustryValue1(selector) {
+			getIndustryData1(selector)
+		}
+		getIndustryData1(0)
+
+		var getUrl = location.href;
+		var url1 = getUrl.split('comp_id/')[1].split('/status/')
+		var ID = url1[0];
+		var status = url1[1];
+		$('#btn_editinfo').on({
+			click: function () {
+				isEdit = true;
+				if (status == 0 || status == 2 || status == 1) { //广点通开通状态(0未开通,1已申请,2申请被驳回,3已开通-新开,4已开通-关联,5已开通-授权过期)
+					hideShowFn();
+				} else {
+					layer.confirm('', {
+						btn: ['取消', '我已了解风险'],
+						title: "    ",
+						content: "<div class='tip_title'>请确认</div><p class='tip_content'>修改资料会触发重新审核机制，审核周期1个工作日。期间所有广告将暂停，直至审核通过。</p>"
+					}, function (index) {
+						layer.close(index);
+					}, function () {
+						hideShowFn();
+					});
+				}
+			}
+		})
+
+		function hideShowFn() {
+			$('.box_table').find('.line').eq(1).addClass('.h_2');
+			$('.box_table').find('.line').eq(2).addClass('.h_2');
+			$('.box_table').find('.line').eq(3).addClass('.h_2');
+			$('.setedit').hide();
+			$('.setedit').hide();
+			$("#btn_editinfo").hide();
+			$('.edit_input').show();
+			$("#btn_saveinfo").show();
+			$('.editaddress').show();
+			$('.seleindust').show();
+			$('#btn_editinfo').hide();
+			$('#pushData').show();
+		}
+
+		function splitSrc(src) {
+			return src
+		}
+
+		function editInfoFn() {
+			var editinput_name = $('.editinput_name').val(),
+				hd_url = $('.hd_url').val(),
+				url = $('.edit_url').val(),
+				edit_url = $('.edit_url').val().substr($('.edit_url').val().length - 1) == "/" ? $('.edit_url').val().substring(0, $('.edit_url').val().length - 1) : $('.edit_url').val(),
+				//edit_facilitator = $('.edit_facilitator').val(), //所属服务商
+				edit_person = $('.edit_person').val(), //联系人
+				add_industry = $('.add_industry').val(), //行业分类一级
+				add_indeatils = $('.add_indeatils').val(), //行业分类二级
+				logo = $('#logo').siblings('img').attr('src'),
+				business = $('#business').siblings('img').attr('src'),
+				personID1 = $('#personID1').siblings('img').attr('src'),
+				personID2 = $('#personID2').siblings('img').attr('src'),
+				aptitude = $('#aptitude').siblings('img').attr('src'),
+				icpImg = $('#icpImg').siblings('img').attr('src'),
+				province = $('.add_provincetitle').attr('data-value'), //省
+				city = $('.add_citystitle').attr('data-value'), //市
+				county = $('.add_countytitle').attr('data-value'),
+				edit_address = $.trim($('.add_detailsaddress').val()), //详细地址
+				businesname = $.trim($('.editinput_businessname').val()),  //营业执照名称
+				businescode = $.trim($('.edit_businesscode').val()),	//营业执照号码
+				brank = $.trim($('.editinput_brank').val());	//品牌名称
+			url = hd_url + url;
+			edit_url = hd_url + edit_url;
+			//更多图片
+			var moreimg = $('.photosMore_div').find('img');
+			var ImgArr = []
+			for (var i = 0, len = moreimg.length; i < len; i++) {
+				ImgArr.push(splitSrc(moreimg[i].src))
+			}
+			var reg = /^1[3|4|5|7|8][0-9]{9}$/; //电话号码正则
+			//网址正则
+			var reg2 = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/){1}(www.|[a-zA-Z].)[a-zA-Z0-9\-\.]+\.(com|edu|gov|mil|net|cn|org|biz|info|name|museum|us|ca|uk)(\:[0-9]+)*(\/[a-zA-Z0-9._\=\%\&\,\;\?\'\"\$\#\-]+)*$/g;
+			var pat1 = /[^_IOZSVa-z\W]{2}\d{6}[^_IOZSVa-z\W]{10}/g;  //信用代码
+			var pat2 = /^[0-9]{15}$/g  //注册号
+
+			if (businesname == "") {
+				tipTopShow('营业执照名称不能为空！');
+				return;
+			}
+			if (businescode == "") {
+				tipTopShow('营业执照号码不能为空！');
+				return;
+			}
+
+			if (businescode.length == 15) {
+				if (pat2.test(businescode) == false) {
+					tipTopShow('营业执照号码错误！');
+					return;
+				}
+			} else if (businescode.length == 18) {
+				if (pat1.test(businescode) == false) {
+					tipTopShow('营业执照号码错误！');
+					return;
+				}
+			} else {
+				tipTopShow('营业执照号码错误！');
+				return;
+			}
+
+			if (brank == "") {
+				tipTopShow('品牌名称不能为空！');
+				return;
+			}
+
+
+			if (editinput_name.length == 0) {
+				tipTopShow('广告主名称不能为空');
+				return;
+			}
+			if (editinput_name.length > 60) {
+				tipTopShow('广告主名称最长不超过60个字');
+				return;
+			}
+			if (add_industry == "" || add_indeatils == "") {
+				tipTopShow('所属行业不能为空');
+				return;
+			}
+			if (edit_person.length == 0 || edit_person.length > 10) {
+				tipTopShow('联系人不能为空，且最长不超过10个汉字');
+				return;
+			}
+			if (edit_url == "" || reg2.test(edit_url) == false) {
+				tipTopShow('请输入正确的网址');
+				return;
+			}
+			if (province == "") {
+				tipTopShow('所在省份不能为空！');
+				return;
+			}
+			if (city == "") {
+				tipTopShow('所在城市不能为空！');
+				return;
+			}
+			if (county == "") {
+				tipTopShow('所在区县不能为空！');
+				return;
+			}
+			if (edit_address == "") {
+				tipTopShow('详细地址不能为空！');
+				return;
+			}
+
+			var logoImg = "",
+				businessImg = "",
+				personID1Img = "",
+				personID2Img = "",
+				aptitudeImg = "",
+				icpImgs = "";
+
+			if (logo) {
+				logoImg = splitSrc(logo);
+			}
+			if (business) {
+				businessImg = splitSrc(business)
+			}
+			if (personID1) {
+				personID1Img = splitSrc(personID1)
+			}
+			if (personID2) {
+				personID2Img = splitSrc(personID2)
+			}
+			if (aptitude) {
+				aptitudeImg = splitSrc(aptitude)
+			}
+			if (icpImg) {
+				icpImgs = splitSrc(icpImg)
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "/V1.2/Advertiser/edit/comp_id/" + Id,
+				dataType: 'json',
+				data: {
+					"comp_name": editinput_name,
+					"cate_pid": add_industry,
+					"cate_id": add_indeatils,
+					"contacts": edit_person,
+					"website_url": url,
+					"sc_pro": province,
+					"sc_pid": city,
+					"sc_id": county,
+					"comp_addr": edit_address,
+					"trademark_img": logoImg,
+					"business_img": businessImg,
+					"front_card": personID1Img,
+					"back_card": personID2Img,
+					"industry_img": aptitudeImg,
+					"icp_img": icpImgs,
+					"apt_more": JSON.stringify(ImgArr),
+					"business_name": businesname,
+					"business_code": businescode,
+					"brank_name": brank
+				},
+				success: function (res) {
+					if (res.state == 1) {
+						tipTopShow(res.msg);
+						setTimeout(() => {
+							if (pageType == 1) {
+								location.href = "/v1.2/gdtdelivery/create1";
+							} else {
+								location.href = "/v1.2/Advertiser/index";
+							}
+						}, 1000);
+					} else {
+						tipTopShow(res.msg);
+					}
+				},
+				error: function (err) {
+					tipTopShow(err.msg);
+				}
+			});
+
+		}
+
+		function getBoxTableWH() {
+			var w = $('.box_table').css('width')
+			var h = $('.box_table').css('height');
+			$('#mask').css({
+				width: w,
+				height: h
+			})
+		}
+		getBoxTableWH()
+
+		checkedBg('.synchroT');
+		checkedBg('.pushmore');
+	</script>
+</body>
+
+</html>

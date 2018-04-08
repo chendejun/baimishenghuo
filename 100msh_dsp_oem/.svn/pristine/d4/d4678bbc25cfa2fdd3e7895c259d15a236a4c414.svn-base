@@ -1,0 +1,173 @@
+﻿//.p-load-more{width: 100%;display: block;text-align: center;color: #356bb7;height: 45px;line-height: 45px;}
+/* 表单 */
+.form{background-color: #FFF;padding:20px;}
+.form .from-row{padding-left: 160px;margin-top: 20px;min-height: 40px;}
+.form .from-row label{font-weight: normal; color: #333333;font-family: "微软雅黑";line-height: 40px;width: 150px;}
+.form .from-row .bm-input{height: 40px;line-height: 40px;}
+.form .from-row .bm-select{height: 40px;line-height: 40px;}
+.form .from-row .c-label {position: static;display: inline-block;text-align: left;}
+.form .from-row-title {font-weight: bold;font-size: 15px;padding-left: 80px;margin: 20px 0 10px 0;}
+/* 搜索下拉列表 */
+.search_list{position: absolute;display: block;height: 200px;width:300px;z-index: 10;background: #fff;overflow-y: scroll;border: 1px solid #dddddd;margin: -1px;}
+.search_list ul{padding: 10px;}
+.search_list ul li{line-height: 30px; cursor: pointer;}
+
+/* 下一步按钮 */
+.commit-box{padding:20px;margin-top: 50px;padding-left: 80px;}
+.commit-box .bm-btn{width: 150px;height: 42px;line-height: 42px; margin-right: 15px}
+
+/* 滚动条 */
+.scrollbar::-webkit-scrollbar {width:5px;height:5px;}
+.scrollbar::-webkit-scrollbar-thumb{background:rgba(1,1,1,0.1);border-radius:4px; }
+.scrollbar::-webkit-scrollbar-track{ width:10px; background:none;}
+
+/* 腾讯自有定向 —— 年龄段选择 */
+.age_cont i{float: left; color: #dbdee4; margin: 10px 10px;}
+.age_cont .sel_box{display: block; float: left;width:300px;}
+.age_cont .sel_box ul{height: 200px;width:300px;background: #fff;overflow-y: scroll;border: 1px solid #dddddd;margin: -1px;padding: 10px 0; display: none;position: absolute;z-index: 10;}
+.age_cont .sel_box ul.on{display: block;}
+.age_cont .sel_box ul li{line-height: 30px; cursor: pointer;padding: 0 10px;}
+.age_cont .sel_box ul li:hover{background: #f8f9fa;}
+.age_cont .sel_box ul li.disabled{color: #ccc}
+.age_cont .sel_box ul li.disabled:hover{background: none}
+.age_cont .sel_box .sel_title {line-height: 15px;width: 100%;text-indent: 20px; padding-top: 10px;cursor: pointer;position: relative;}
+.age_cont .sel_box .sel_title:after{content: '';border:1px solid #dbdee4; height: 10px; width: 100%;display: block;border-top: none;}
+.age_cont .sel_box .sel_title:before{content: '';position: absolute;background: url(../../public/img/sel_down.png) no-repeat center;width: 30px;height: 30px;right:0;top: 5px;display: inline-block;vertical-align: middle;}
+
+/* 腾讯自有定向 —— 性别选择 */
+.sex_cont label{margin-right: 40px;display: inline-block; cursor: pointer;}
+.sex_cont label input{margin-right: 10px;vertical-align: middle;-webkit-appearance: none;outline: none;width: 52px;height: 52px; cursor: pointer;}
+.sex_cont label input.sex_man{ background: url(../../public/img/sex_man.png); }
+.sex_cont label input.sex_lady{background: url(../../public/img/sex_lady.png);}
+.sex_cont label input[type=radio]{background-position: 0 -89px;}
+.sex_cont label input[type=radio]:checked{background-position: 0 0;}
+
+/* 腾讯自有定向 —— 关键字 */
+.keyword_cont .keyword_input .mod_ipt{width: 540px;}
+.keyword_cont .keyword_input .mod_ipt input {line-height: 20px; width:500px;padding: 0 20px;cursor: pointer;position: relative;border: none;background: transparent;}
+.keyword_cont .keyword_input .mod_ipt:after{content: '';border:1px solid #dbdee4; height: 10px; display: block;border-top: none;}
+.keyword_cont .keyword_input .mod_ipt:hover:after{border: 1px solid #1ba3f4;border-top: none;}
+.keyword_cont .crowd_club a.clear_key{vertical-align: middle;line-height: 32px;color: #008fe4;}
+
+/* 腾讯自有定向 —— checkbox类选择 */
+.checkbox_div li{ display: block; float: left;font-size: 14px; color: #adaeae; height: 32px; line-height: 32px; padding: 0 20px; margin: 0 10px 10px 0; cursor: pointer; -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.checkbox_div li.active{ background: #adaeae;border-radius: 15px; color: #fff; }
+
+/* 腾讯自有定向 —— 城市选择 */
+.mod_club {position: relative;display: none;}
+.mod_club h3{position: absolute;height: 34px;line-height: 34px;padding: 0;margin: 0;}
+.mod_club .club_li{ padding-left: 70px; margin-right: 30px; margin-bottom: 20px; max-height: 148px;overflow-y: scroll;}
+.mod_club .club_li span{ display: block; float: left; background: #f0f3f6; border: 1px solid #dfe1e7; border-radius: 15px; font-size: 14px; color: #686868; height: 32px; line-height: 32px; padding: 0 20px; margin: 0 10px 10px 0; position: relative;}
+.mod_club .club_li a.clear_btn{vertical-align: middle;line-height: 32px;color: #008fe4;}
+.mod_club .club_li span:hover{ background: #e1e7f1;padding: 0 30px 0 10px;-webkit-transition-duration: 0.4s;}
+.mod_club .club_li span i{display: none}
+.mod_club .club_li span:hover i{position: absolute;background: url(../../public/img/close_icon.png) no-repeat center;width: 16px;height: 16px;background-size: 0.8rem auto;right: 10px;top: 10px;display: inline-block;vertical-align: middle;}
+
+.crowd_box{position: initial;width: 720px;border: 1px solid #ddd;padding: 10px;}
+.crowd_box ul{padding: 0;margin:0;}
+.crowd_box ul li{cursor: pointer;line-height: 30px;padding: 0 10px 0 0; height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; width: auto;display: inline-block;}
+.crowd_box .box_list ul li.cur{background: #f8f9fa;}
+.crowd_box .box_list ul li:hover{ background: #f8f9fa;}
+.crowd_box .box_list ul li.chose{ background: #f8f9fa;}
+.crowd_box li input[type="checkbox"]{display: none;}
+.crowd_box li em.checkbox{ display: inline-block;margin: -3px 10px 0 0;vertical-align:middle; width: 30px; height: 100%; background: url(../../../public/img/checkbox.png) 8px 50% no-repeat;}
+.crowd_box li em.checkbox.childchose{ background: url(../../public/img/checkboxchildchose.png) 8px 50% no-repeat;}
+.crowd_box li em.checkbox.chose{ background: url(../../public/img/checkboxchose.png) 8px 50% no-repeat;}
+.crowd_box .box_list{position: initial;display: inline-block; float: left;border:none;border-right: 1px solid #dddddd; width: 239px;}
+.crowd_box .box_list li{width: 208px;text-align: left;}
+.crowd_area{padding: 0;background: #fff;}
+.crowd_area ul li{cursor: pointer;line-height: 30px;padding: 0 10px; height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.crowd_type {margin: 0 0 10px 50px;}
+.crowd_type label{height: 30px; line-height: 30px; margin-right: 10px; margin-top: 10px; display: inline-block;}
+/* 腾讯自有定向 —— 整体展开收起 */
+.mod_box{border-bottom: 1px solid #dbdee4; height: 50px; overflow: hidden;}
+.mod_box .box_tit{position: relative;line-height:50px;height: 50px;padding: 0 20px;}
+.mod_box .box_tit:hover{background-color: #f8f9fa;}
+.mod_box.on{height:auto;background-color: #f8f9fa;box-shadow: 0 4px 5px -3px rgba(1,1,1,0.1) inset;-webkit-transition-duration: 0.4s;}
+.mod_box.on .box_tit:hover{background: none;}
+.mod_box .box_tit label{display:inline-block;line-height: 50px;position: absolute;}
+.mod_box .box_tit span.mui_switch{width: 40px;height: 25px;position: relative;border: 1px solid #dfdfdf;background-color: #f1f3f5;box-shadow: #dfdfdf 0 0 0 0 inset;border-radius: 20px;border-top-left-radius: 20px;border-top-right-radius: 20px;border-bottom-left-radius: 20px;border-bottom-right-radius: 20px;background-clip: content-box;display: inline-block;-webkit-appearance: none;user-select: none;outline: none; padding: 0; position: absolute;right:20px; top: 12px;-webkit-transition-duration: 0.4s;}
+.mod_box .box_tit span.mui_switch:before{content: '';width: 25px;height: 25px;position: absolute;top: 0px;left: 0;border-radius: 20px;border-top-left-radius: 20px;border-top-right-radius: 20px;border-bottom-left-radius: 20px;border-bottom-right-radius: 20px;background-color: #fff;box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);-webkit-transition-duration: 0.4s;}
+.mod_box .box_tit span.mui_switch.cur {border-color: #1ba3f4;box-shadow: #1ba3f4 0 0 0 16px inset;background-color: #1ba3f4;-webkit-transition-duration: 0.4s;}
+.mod_box .box_tit span.mui_switch.cur:before{left: 16px;}
+.mod_box .box_cont{margin: 0 0 15px 50px;}
+
+/* step1 */
+.step1,.step2,.step3,.step4{display: none;}
+.step1.on,.step2.on,.step3.on,.step4.on{display: block;}
+.gdt_create.flow_steps ul{width: 932px;}
+.plan_type li {float: left;height: 40px;line-height: 40px;width: 120px;margin-right: 20px;cursor: pointer;margin-bottom: 10px;text-align: center; position: relative;}
+.plan_type li.cur i{    width: 30px;height: 2px;background: #f08519;display: block;position: absolute;left: 45px;right: 0;bottom: 0;}
+.step1 .user_recent{background: #eee;padding: 10px; width: 332px;}
+.step1 .user_recent p{height:30px; line-height: 30px; background: #fff; border:1px solid #ddd; border-bottom:none;border-radius: 5px 5px 0 0;padding: 0 10px; margin: 0;position: relative;}
+.step1 .user_recent p i{position: absolute;background: url(../../public/img/sel_icon.png) no-repeat center;width: 30px;height: 30px;right: 0;top:0;display: inline-block;vertical-align: middle;}
+.step1 .user_recent ul{background: #fff;border:1px solid #ddd;border-radius:0 0 5px 5px;}
+.step1 .user_recent ul li{height: 30px; line-height: 30px; position: relative;cursor: pointer;padding: 0 5px 0 10px; }
+.step1 .user_recent ul li.cur,.step1 .user_recent ul li:hover{background:#f2f4f8; color:#5877a4;}
+.step1 .user_recent ul span{float: left;  overflow: hidden; white-space: nowrap;text-overflow: ellipsis;display: block; width: 55%;}
+.step1 .user_recent ul b{width: 135px; position: absolute; right: 0; overflow: hidden; white-space: nowrap;text-overflow: ellipsis; font-weight: normal;}
+.step1 .new_plan{display: inline-block; cursor: pointer;line-height: 40px;}
+.step1 #user_list{width: 350px;}
+
+/* step2 */
+.step2 .gdt_pack_new{display: inline-block; cursor: pointer;line-height: 40px;}
+.step2 .crow_part{width: 790px;border-radius: 3px;margin-top: 10px;margin-left: 80px;}
+.step2 .crow_part .from-row{padding-left: 95px; margin: 20px 0;}
+.step2 .crow_part .from-row label{ width: 90px; }
+.step2 .crow_part .from-row a{padding-left: 10px;color: #5877a4;}
+.step2 .crow_part.part1 .from-row label{ width: 70px; }
+.step2 .crow_part.part1 .from-row{padding-left: 80px;}
+.step2 .crow_part.part1 .pack_tit span{position: absolute; right: 0;}
+.step2 .crow_part.part2 .pack_tit{margin-top: 10px;}
+.step2 .crow_part.part2 .pack_tit span{ height: 30px; line-height: 30px; display: block;}
+.step2 .crow_part.part2 .pack_tit span b{ font-weight: normal;}
+.step2 .crow_part.part2 .base_table {margin-bottom: 20px;}
+.step2 .crow_part.part2 .base_table th,.step2 .crow_part.part2 .base_table td{ color:#666; line-height: 20px;font-weight: normal;}
+.step2 .crow_part.part2 .base_table td{padding: 8px 10px;}
+.step2 .crow_part.part1 .pack_form{border:1px solid #dbdee4; border-bottom: none;}
+
+/* step3 */
+.step3 .mod_part {margin-bottom: 30px; padding: 20px 0;}
+.step3 .box_height{ height:30px;background-color: #f2f3f8;position: absolute;left: 0;right: 0; margin: 20px 0;}
+.step3 .posit_part{padding:0 80px;}
+.step3 .posit_part .from-row-title{padding-left: 0;}
+.step3 .posit_sel{margin-bottom: 10px;}
+.step3 .posit_sel select{height: 40px; line-height: 40px;}
+.step3 .posit_show p.posit_more{height:30px; line-height: 30px; float: right; color: #5877a4; margin: 0; cursor: pointer;}
+.step3 .radio_div li{display: block; float: left;font-size: 14px; color: #666; height: 30px; line-height: 30px; padding: 0 30px; margin: 0 10px 10px 0; cursor: pointer; border: 1px solid #bbb;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.step3 .radio_div li.active{color: #5877a4; border: 1px solid #5877a4;}
+.step3 .timer_cont li{padding: 0 10px;}
+.step3 .timer_cont li.active{color: #fff;background: #5877a4;}
+.step3 .posit_show .ptr{cursor: pointer;}
+.step3 .posit_show .ptr.cur,.step3 .posit_show .ptr:hover{background:#f2f4f8;}
+.step3 .base_table tr.cur td,.step3 .base_table tr.cur:hover td{ color:#5877a4;}
+.mat_lists{/* padding-left:80px;margin-top: 20px; */}
+.mat_lists ul{width: 1110px; max-height: 750px; overflow: scroll;border: 1px solid #ddd;padding-top: 15px;padding-left: 15px;}
+/* 素材列表 */
+.mat_lists .item{background: #ccc; width: 186px;padding: 10px;margin-bottom: 15px; margin-right: 15px; float: left; position: absolute; background-color: #fff;box-shadow: 0 1px 3px rgba(0,0,0,.3);-webkit-transition: all 0.3s;-moz-transition: all 0.3s;-o-transition: all 0.3s;-ms-transition: all 0.3s;transition: all 0.3s;}
+.mat_lists .item .title{line-height: 16px; color: #666; word-spacing: normal;padding-bottom: 10px;}
+.mat_lists .item .photo{position: relative; height: 235px;width: 186px; background: #f8f8f8;display: table-cell;vertical-align: middle;}
+.mat_lists .item .photo img{ width: 100%; max-height:100%;vertical-align: top;}
+.mat_lists .item .photo i{position: absolute;background: url(../../public/img/club_icon.png) no-repeat center;width: 25px;height: 25px;right: 0;top:0;display: inline-block;}
+.mat_lists .item .mod_btns{position: absolute;top:50%;margin-top: -15px;left: 50%; margin-left: -50px;z-index: 101;display: none;}
+.mat_lists .item .mod_btns span{ width: 100px; height: 30px; line-height: 30px; background: #fff; text-align: center; color: #666; margin: 0 auto;  border-radius: 5px;box-shadow: 0 1px 3px rgba(0,0,0,.3);display: block;cursor: pointer;}
+.mat_lists .item .info{padding: 10px 0 0 0 ;}
+.mat_lists .item .info span{color:#597caf;font-size: 14px; line-height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; display: block;}
+.mat_lists .item .info p{color:#999999; font-size: 12px; word-break: break-all; line-height: 20px; margin-bottom: 5px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; display: block;}
+.mat_lists .item:hover .mod_btns,.mat_lists .item.cur .mod_btns{display: block;}
+.mat_lists .item.cur .mod_btns span.btn_chose{background: #f08519; color: #fff;}
+.mat_lists .item:hover em, .delivery_list .item.cur em{position: absolute; top: 0; bottom: 0;left: 0;right: 0; background-color: rgba(0,0,0,0.3);z-index: 100;}
+/* 微信朋友圈地区选择 */
+.wx_region h3{line-height: 40px; height: 40px; padding: 0 15px; font-weight: normal; font-size: 14px;}
+.wx_region .wx_lists{line-height: 40px; font-size: 14px; color:#252525;padding-right: 44px;position: relative;border-bottom: 1px solid #eee;cursor: pointer;}
+.wx_region .wx_plist.cur{background:#ebebeb;}
+.wx_region .wx_clist.cur{background:#f6f6f6;}
+.wx_region .wx_lists em.checkbox{display: inline-block;vertical-align: middle;width: 40px;height: 40px;background: url(../../public/img/checkbox.png)center no-repeat;background-size: 16px auto;position: absolute;right: 0;}
+.wx_region .wx_lists em.checkbox.chose{background: url(../../public/img/checkboxchose.png)center no-repeat;background-size: 16px auto;}
+.wx_region .wx_lists em.checkbox.childchose{background: url(../../public/img/checkboxchildchose.png)center no-repeat;background-size: 16px auto;}
+.wx_region .wx_lists i{display: inline-block;vertical-align: middle;width: 16px;height: 16px;background: url(../../public/img/menu_icon2.png)center no-repeat;background-size: 16px auto; margin-right: 0.5rem;}
+.wx_region .wx_lists.cur i{background: url(../../public/img/menu_icon1.png)center no-repeat;background-size: 16px auto;}
+.wx_region .wx_plist{padding-left: 15px; background: #fff;}
+.wx_region .wx_clist{padding-left: 30px; /* background: #f6f6f6; */}
+.wx_region .wx_alist{padding-left: 30px; /* background: #ebebeb; */}
+.wx_region .wx_locate_box{width: 720px;height: 300px;overflow-y: auto;border: 1px solid #ddd;}

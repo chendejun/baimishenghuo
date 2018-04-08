@@ -1,0 +1,23 @@
+<?php
+/**
+ * restful 短信营销类
+ * @author :cdj
+ **/
+class Market extends  Model{
+
+    /*
+     * 获取签名
+     */
+    public function  getSign($comp_pid){
+        $data = $this->db->sms->query("select * from dsp_market_sign WHERE  comp_pid=".$comp_pid." and sign_status=1");
+        return $data;
+    }
+  /*
+   * 添加签名
+   *
+   */
+    public function  addSign($data){
+        $sign_id = $this->db->sms->table( 'dsp_market_sign')->data ( $data )->insert ();
+        return $sign_id;
+    }
+}

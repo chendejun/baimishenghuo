@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>效果报告-投放效果报告</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+	<link rel="stylesheet" href="/public/css/dateRange.css">
+	<script type="text/javascript" src="/public/js/dateRange.js"></script>
+</head>
+<style>
+	.content_box {
+		min-width: 1500px;
+		overflow: hidden;
+	}
+
+	.box_table {
+		padding-bottom: 10px;
+	}
+
+	.tr_select {
+		width: 150px;
+		height: 32px;
+		border: 1px solid #dddddd;
+		border-radius: 3px;
+		padding: 5px;
+		color: #666666;
+		margin-right: 9px;
+	}
+
+	.searchTypebox {
+		color: #999;
+		font-size: 13px;
+	}
+
+	.data_box {
+		overflow: hidden;
+	}
+
+	.databox_nav {
+		width: 401px;
+		height: 289px;
+		border: 1px solid #cccccc;
+		margin-right: 40px;
+		float: left;
+	}
+
+	.databox_nav h4 {
+		height: 42px;
+		line-height: 42px;
+		color: #666666;
+		padding: 0 20px;
+		font-size: 13px;
+		font-weight: 900;
+	}
+
+	.databox_nav>h4 {
+		background: #f5f5f5;
+		border-bottom: 1px solid #cccccc;
+	}
+
+	.databox_nav>.content {
+		margin: 21px;
+	}
+
+	.databox_nav>.content .top {
+		width: 100%;
+		overflow: hidden;
+		border-bottom: 1px solid #cccccc;
+	}
+
+	.databox_nav>.content .top .deliverynum_left,
+	.databox_nav>.content .top .deliverynum_right {
+		width: 40%;
+		height: 83px;
+		float: left;
+		padding-left: 10%;
+	}
+
+	.databox_nav>.content .title {
+		height: 32px;
+		line-height: 32px;
+		font-size: 14px;
+		color: #666666;
+	}
+
+	.databox_nav>.content .num {
+		font-size: 24px;
+		color: #ef7269;
+		font-weight: 900;
+		margin-top: 7px;
+	}
+
+	.m_unit {
+		font-size: 14px;
+		color: #ef7269;
+		margin-left: 5px;
+	}
+
+	.databox_nav>.content .bottom {
+		padding-top: 9px;
+
+	}
+
+	.companyList {
+		width: 53%;
+		padding-left: 10%;
+		float: left;
+	}
+
+	.companyList>li {
+		height: 28px;
+		line-height: 28px;
+		color: #666666;
+		font-size: 14px;
+		text-align: left;
+	}
+
+	.datamoney {
+		width: 34%;
+		float: left;
+		font-size: 18px;
+		color: #666666;
+		font-weight: 900;
+		margin-left: 3%;
+		height: 80px;
+		line-height: 138px;
+		position: relative;
+	}
+	.datamoney::after{
+		content: "元";
+		display:inline-block;
+		position:relative;
+		right: 0;
+		top:0;
+	}
+	.chartbox {
+		width: 100%;
+		height: 434px;
+	}
+
+	table {
+		width: 100%;
+		border: 1px solid #eeecec;
+		height: 100%;
+	}
+
+	thead,
+	tbody {
+		width: 100%;
+	}
+
+	thead>tr {
+		color: #323232;
+		background: #f1f1f1;
+	}
+
+	tbody>tr {
+		border-top: 1px solid #eeecec;
+	}
+
+	tr {
+		width: 100%;
+		height: 40px;
+		line-height: 40px;
+		text-align: center;
+		border-bottom: 1px solid #eeecec;
+	}
+	td,
+	th {
+		width: 33.33%;
+	}
+</style>
+
+<body>
+	<div class="content_box">
+		<div class="title_box">
+			<span>数据报表 / 消耗列表</span>
+		</div>
+		<div class="box_table">
+			<div class="searchTypebox">
+				<select class="tr_select platformType" onchange="getPlatformType()">
+					<option value="0">所有平台</option>
+					<option value="1">WI-Fi平台</option>
+					<option value="2">腾讯平台</option>
+				</select>
+				因数据统计存在延迟性，今日数据仅为参考，精确数据请隔日查看。
+			</div>
+		</div>
+		<div class="data_box">
+			<div class="databox_nav today">
+				<h4>今日数据（上次统计时间）
+					<span class="Tcount_time">17:02</span>
+				</h4>
+				<div class="content">
+					<div class="top">
+						<div class="deliverynum_left">
+							<div class="title">投放中广告数</div>
+							<div class="num today_num">36</div>
+						</div>
+						<div class="deliverynum_right">
+							<div class="title">消耗广告费</div>
+							<div class="num today_allcost">11897.23
+								<span class="m_unit">元</span>
+							</div>
+						</div>
+					</div>
+					<div class="bottom">
+						<h4>今日数据之星</h4>
+						<ul class="companyList today_list">
+							<li>无</li>
+							<li>无</li>
+							<li>消耗了广告费</li>
+						</ul>
+						<div class="datamoney tlist_cost">0.00</div>
+					</div>
+				</div>
+			</div>
+			<div class="databox_nav yestoday">
+				<h4>昨日数据（上次统计时间）
+					<span class="ycount_time">17:02</span>
+				</h4>
+				<div class="content">
+					<div class="top">
+						<div class="deliverynum_left">
+							<div class="title">投放中广告数</div>
+							<div class="num yestoday_num">36</div>
+						</div>
+						<div class="deliverynum_right">
+							<div class="title">消耗广告费</div>
+							<div class="num yestoday_allcost">2315.4
+								<span class="m_unit">元</span>
+							</div>
+						</div>
+					</div>
+					<div class="bottom">
+						<h4>昨日数据之星</h4>
+						<ul class="companyList yestoday_list">
+							<li>无</li>
+							<li>无</li>
+							<li>消耗了广告费</li>
+						</ul>
+						<div class="datamoney ylist_cost">0.00</div>
+					</div>
+				</div>
+			</div>
+			<div class="databox_nav bfyestoday">
+				<h4>前日数据（上次统计时间）
+					<span class="bfycount_time">17:02</span>
+				</h4>
+				<div class="content">
+					<div class="top">
+						<div class="deliverynum_left">
+							<div class="title">投放中广告数</div>
+							<div class="num bfyestoday_num">36</div>
+						</div>
+						<div class="deliverynum_right">
+							<div class="title">消耗广告费</div>
+							<div class="num bfyestoday_allcost">2315.4
+								<span class="m_unit">元</span>
+							</div>
+						</div>
+					</div>
+					<div class="bottom">
+						<h4>前日数据之星</h4>
+						<ul class="companyList bfyestoday_list">
+							<li>无</li>
+							<li>无</li>
+							<li>消耗了广告费</li>
+						</ul>
+						<div class="datamoney bfylist_cost">0.00</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="data_box mt20">
+			<div class="searchTypebox">
+				<select class="tr_select optiondataType" onchange="getEchartsData()">
+					<option value="1">今日数据</option>
+					<option value="2">昨日数据</option>
+					<option value="3">近7日</option>
+					<option value="4">近15日</option>
+				</select>
+				因数据统计存在延迟性，今日数据仅为参考，精确数据请隔日查看。
+			</div>
+			<div class="chartbox mt20" id="chartbox">
+				<!-- 渲染echarts图表 -->
+			</div>
+			<table class="mt20">
+				<thead>
+					<tr>
+						<td>时间</td>
+						<td>消耗金额</td>
+						<td>投放广告</td>
+					</tr>
+				</thead>
+				<tbody class="listtype">
+					<!-- <tr>
+						<td>0点</td>
+						<td>12</td>
+						<td>12</td>
+					</tr> -->
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/public/js/common.js"></script>
+<script type="text/javascript" src="/public/js/echarts.common.min.js"></script>
+<script src="/public/js/laypage/laypage.js"></script>
+<script type="text/javascript">
+	//根据平台类型筛选数据
+	function getPlatformType() {
+		var value = $('.platformType').val()  //平台类型
+		var dataType = $('.optiondataType').val();   //日期
+		getCountData(value);
+		getListData(value,dataType);
+	}
+
+	//根据日期筛选数据
+	function getEchartsData() {
+		var value = $('.platformType').val()  //平台类型
+		var dataType = $('.optiondataType').val();   //日期
+		getListData(value,dataType);
+	}
+
+	//获取消耗数据统计
+	function getCountData(type) {
+		$.ajax({
+			type: "GET",
+			url: "/V1.2/consume/countData/platform_id/" + type,
+			dataType: 'json',
+			success: function (res) {
+				//console.log(res)
+				var data = res.data.data;
+				//------------今日数据
+				$('.Tcount_time').html(data.today.date_time)
+				$('.today_num').html(data.today.delivery_nums);
+				$('.today_allcost').html(data.today.total_consm);
+				if(data.today.start_info.campaign_name){
+					$('.today_list').find('li').eq(0).html(data.today.start_info.campaign_name);	
+				}
+				if(data.today.start_info.comp_name){
+					$('.today_list').find('li').eq(1).html(data.today.start_info.comp_name);	
+				}
+				if(data.today.start_info.consume_amount){
+					$('.tlist_cost').text(data.today.start_info.consume_amount);	
+				}
+				//------------昨日数据
+				$('.ycount_time').html(data.yestoday.date_time)
+				$('.yestoday_num').html(data.yestoday.delivery_nums);
+				$('.yestoday_allcost').html(data.yestoday.total_consm);
+				if(data.yestoday.start_info.campaign_name){
+					$('.yestoday_list').find('li').eq(0).html(data.yestoday.start_info.campaign_name);	
+				}
+				if(data.yestoday.start_info.comp_name){
+					$('.yestoday_list').find('li').eq(1).html(data.yestoday.start_info.comp_name);	
+				}
+				if(data.yestoday.start_info.consume_amount){
+					$('.ylist_cost').text(data.yestoday.start_info.consume_amount);	
+				}
+				//------------前日数据
+				$('.bfycount_time').html(data.bfyestoday.date_time)
+				$('.bfyestoday_num').html(data.bfyestoday.delivery_nums);
+				$('.bfyestoday_allcost').html(data.bfyestoday.total_consm);
+				if(data.bfyestoday.start_info.campaign_name){
+					$('.bfyestoday_list').find('li').eq(0).html(data.bfyestoday.start_info.campaign_name);	
+				}
+				if(data.bfyestoday.start_info.comp_name){
+					$('.bfyestoday_list').find('li').eq(1).html(data.bfyestoday.start_info.comp_name);	
+				}
+				if(data.bfyestoday.start_info.consume_amount){
+					$('.bfylist_cost').text(data.bfyestoday.start_info.consume_amount);	
+				}
+			},
+			error: function (err) {
+				console.log(err)
+			}
+		})
+	}
+	//获取列表数据
+	function getListData(platform,type){
+		$.ajax({
+			type: "GET",
+			url: "/V1.2/consume/tbDateList/platform_id/" + platform+"/type/"+type,
+			dataType: 'json',
+			success: function (res) {
+				var list = res.data.data;
+				console.log(list)
+				renderHTML(list,type)
+			},
+			error:function(err){
+				console.log('err');
+			}
+		})
+	}
+	//渲染列表
+	function renderHTML(list,type){
+		var str = "",
+			timeArr = [],
+			consumeArr = [],  //消耗
+			deliverynumArr = [];  //投放
+		$.each(list,function(key,value){			
+				str+="<tr>"
+				if(type==3 || type==4){  //3、4 日期
+					str+="<td>"+value.stat_day+"</td>"
+					timeArr.push(value.stat_day)
+				}else{
+					str+="<td>"+value.stat_hour+"点</td>"
+					timeArr.push(value.stat_hour+"点")
+				}
+				str+="<td>"+value.total_consume+"</td>"
+				str+="<td>"+value.delivery_nums+"</td>"
+				str+="</tr>"
+				consumeArr.push(value.total_consume)
+				deliverynumArr.push(value.delivery_nums)
+		})
+		$('.listtype').html(str);
+		renderChart(timeArr,consumeArr,deliverynumArr)
+	}
+	//获取消耗数据统计
+	getCountData(0);
+	//获取列表数据
+	getListData(0,1);
+
+	//渲染图表
+	function renderChart(timeArr,consumeArr,deliverynumArr) {
+		var myChart = echarts.init(document.getElementById('chartbox'));
+		option = {
+			tooltip: {
+				trigger: 'axis'
+			},
+			legend: {
+				x: "center",
+				y: "bottom",
+				data: ['消耗金额', '投放广告']
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					dataZoom: {
+						yAxisIndex: 'none'
+					},
+					dataView: { readOnly: false },
+					magicType: { type: ['line', 'bar'] },
+					restore: {},
+					saveAsImage: {}
+				}
+			},
+			grid: {
+				left: 25,
+				right: 25,
+				bottom: 40,
+				top: 30,
+				containLabel: true,
+			},
+			xAxis: {
+				type: 'category',
+				boundaryGap: false,
+				data:timeArr  //日期或者时间点
+			},
+			yAxis: {
+				name: "数据",
+				type: 'value',
+				axisLabel: {
+					formatter: '{value}'
+				}
+			},
+			series: [
+				{
+					name: '消耗金额',
+					type: 'line',
+					data:consumeArr,   //消耗金额的数据
+					itemStyle: {
+						normal: {
+							color: "#f0c236"
+						}
+					},
+					markPoint: {
+						data: [
+							{ type: 'max', name: '最大值' },
+							{ type: 'min', name: '最小值' }
+						]
+					},
+					markLine: {
+						data: [
+							{ type: 'average', name: '平均值' }
+						]
+					}
+				},
+				{
+					name: '投放广告',
+					type: 'line',
+					data: deliverynumArr,   //投放广告的数据
+					itemStyle: {
+						normal: {
+							color: "#5a93ce"
+						}
+					},
+					markPoint: {
+						data: [
+							{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }
+						]
+					},
+					markLine: {
+						data: [
+							{ type: 'average', name: '平均值' },
+							[{
+								symbol: 'none',
+								x: '90%',
+								yAxis: 'max'
+							}, {
+								symbol: 'circle',
+								label: {
+									normal: {
+										position: 'start',
+										formatter: '最大值'
+									}
+								},
+								type: 'max',
+								name: '最高点'
+							}]
+						]
+					}
+				}
+			]
+		};
+		myChart.setOption(option)
+	}
+
+</script>
+
+</html>

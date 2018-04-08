@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 下级代理管理 -->
+
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-财务管理</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/js/laypage/skin/laypage.css" />
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script src="../../../../../public/js/laypage/laypage.js"></script>
+</head>
+<style>
+    .layui-tab-brief>.layui-tab-title .layui-this {color:#4c94f5;}
+    .layui-tab-brief>.layui-tab-more li.layui-this:after,.layui-tab-brief>.layui-tab-title .layui-this:after {border-bottom:3px solid #4c94f5;}
+    .layui-tab-content {height:100% !important;min-height: 500px;}
+    .layui-btn {width:120px;background-color:#4c94f5;position: absolute;right: 30px;}
+    .lower-title{height: 40px;}
+    .lower-title ul{position: absolute;border:1px solid #ddd;cursor: pointer;}
+    .lower-title ul li{height: 38px;line-height: 38px;width: auto;padding: 0 15px;}
+    .lower-title .cur{background-color:#4c94f5;color: #fff }
+    .layui-tab-content{padding: 30px 0}
+    .lower-box .modify{color:#4c94f5;padding: 0 10px;}
+    .lower-box .disable{color: #F56C6B;padding: 0 10px;}
+    .table_style .base_table{margin-top:10px;}
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 财务管理</span>
+        </div>
+        <div class="data_box">
+
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li>财务报表</li>
+                    <li class="layui-this">下级代理管理</li>
+                    <li>广告主开票管理</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item">正在努力实现中，敬请期待。</div>
+                    <div class="layui-tab-item layui-show">
+                        <div class="loweragent">
+                            <div class="lower-title">
+                                <ul>
+                                    <li class="cur">下级代理列表</li>
+                                    <li>下级代理结算</li>
+                                    <li>查询下级代理收益</li>
+                                </ul>
+                                <a href="" class="layui-btn">新建代理</a>
+                            </div>
+                            <div class="lower-box">
+                                <div class="table_style">
+                                    <table id="transfer_list" class="base_table">
+                                        <thead>
+                                            <tr>
+                                                <th>序列</th>
+                                                <th>代理公司</th>
+                                                <th>结算比例</th>
+                                                <th>当前状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>公司</td>
+                                                <td>10%</td>
+                                                <td>正常</td>
+                                                <td>
+                                                    <a class="modify">修改</a>
+                                                    <a class="disable">停用</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p class="noMsg"></p>
+                                    <!--列表分页-->
+                                    <div id="list_page" class="page">
+                                        <div name="laypage1.3" class="laypage_main laypageskin_molv" id="laypage_0">
+                                            <span class="laypage_curr" style="background-color:#4c94f5">1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">正在努力实现中，敬请期待。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        layui.use(['form', 'element'], function () {
+            var form = layui.form(),
+                element = layui.element;
+
+
+            $('.lower-title li').on('click', function () {
+                $(this).addClass('cur').siblings().removeClass('cur');
+            });
+
+
+        });
+    </script>
+</body>
+
+</html>

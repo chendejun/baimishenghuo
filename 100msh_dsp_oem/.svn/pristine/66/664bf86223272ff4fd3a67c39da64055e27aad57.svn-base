@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+    <body>
+        <form class="" action="https://dev-dspoem.100msh.com/v1.2/Scenes/updateScenesApi" method="post">
+
+            <div class="">
+                <label for="">场景名称</label>
+                <input type="text" name="scene_name" value="{{APP_PATH}}">
+            </div>
+            <div class="">
+                <label for="">验证码</label>
+                <input type="text" name="code" value="4964">
+            </div>
+            <div class="">
+                <label for="">场景id</label>
+                <input type="text" name="scene_id" value="18">
+            </div>
+            <div class="">
+                <label for="">行业id</label>
+                <input type="text" name="industry_id" value="18">
+            </div>
+            <div class="">
+                <label for="">广告主</label>
+                <select class="" name="comp_id">
+                    <option value="206088">marie111</option>
+                    <option value="206089">www</option>
+                    <option value="206127">aa</option>
+                </select>
+            </div>
+            <div class="">
+                <label for="">设备mac</label>
+                <input type="text" name="mac_id_array[]" value="7">
+                <input type="text" name="mac_id_array[]" value="8">
+            </div>
+            <div class="">
+                <label for="">停留时间</label>
+                <input type="text" name="stop_time" value="10">
+            </div>
+            <div class="">
+                <label for="">探测半径</label>
+                <input type="text" name="detection_radius" value="10">
+            </div>
+            <div class="">
+                <label for="">邮箱</label>
+                <input type="text" name="email" value="10">
+            </div>
+            <div class="">
+                <label for="">营业开始时间</label>
+                <input type="text" name="business_start_time" value="10:00">
+            </div>
+            <div class="">
+                <label for="">营业结束时间</label>
+                <input type="text" name="business_start_time" value="21:00">
+            </div>
+            <div class="">
+                <label for="">建筑面积</label>
+                <input type="text" name="area" value="200">
+            </div>
+            <div class="">
+                <label for="">楼层</label>
+                <input type="text" name="floor_number" value="20">
+            </div>
+            <div class="">
+                <label for="">服务年限</label>
+                <select class="" name="term">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+            <div class="">
+                <label for="">场景类型</label>
+                <input type="radio" name="scenes_type" value="1">普通版
+                <input type="radio" name="scenes_type" value="2">高级版
+            </div>
+            <div class="">
+                <label for="">场景状态</label>
+                <input type="radio" name="scenes_state" value="1">草稿
+                <input type="radio" name="scenes_state" value="2">非草稿
+            </div>
+            <button type="submit" name="button">submit</button>
+        </form>
+    </body>
+</html>

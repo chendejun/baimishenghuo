@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP / 客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=FsZTps2xmuGacVVGlxR3HhPb"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <!--<script type="text/javascript" src="../../../../../public/js/laydate/laydate.js"></script>-->
+
+    <style>
+        .content_box .goback{margin: 20px;display: block;font-size: 15px;color: #666;}
+        .data_box {
+            padding: 20px;
+            background-color: #fff;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .data_box .layui-form-label {
+            width: 100px;
+
+        }
+
+        .data_box .tip_box {
+            background-color: #FAEBD7;
+            border: 1px solid #FFE4C4;
+            color: #FFA500;
+            height: 40px;
+            line-height: 40px;
+
+        }
+
+        .data_box .tip_box i {
+            background: url("../../../../../public/img/tip_icon.png") no-repeat top center;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            top: 12px;
+            left: 10px;
+        }
+
+        .data_box .tip_box p {
+            padding-left: 15px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 12px;
+            float: left;
+        }
+
+        .data_box .tip_box a {
+            margin-right: 10px;
+        }
+
+        .data_box .btn {
+            position: relative;
+            left: 35%;
+        }
+        .data_box .btn a{
+            margin-right: 15px;
+            font-size: 14px;
+            width: 120px;
+        }
+
+        .w350 {
+            width: 350px;
+        }
+        .tip_text {
+            float: left;
+            margin-left: 160px;
+            display: block;
+            padding: 8px 0;
+            margin-right: 10px;
+            line-height: 20px;
+            position: relative;
+            font-size: 13px;
+        }
+
+        #bmmap {
+            width: 750px;
+            height: 300px;
+            margin-left: 130px;
+        }
+
+        #type_txt {
+            font-size: 10px;
+
+        }
+
+        .layui-form-select dl dd.layui-this {background-color:#4c94f5;}
+        .layui-form-radio i:hover, .layui-form-radioed i{color: #4aa6fc;}
+        .layui-form-checkbox[lay-skin=primary]:hover i{border-color:#4aa6fc;}
+        .layui-form-checked[lay-skin=primary] i{background-color:#4aa6fc}
+        .layui-form-checked span{color: #009eff!important;}
+
+        #alert_bg {
+            width: 100%;
+            height: 1000px;
+            background-color: rgba(0,0,0,0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .alert {
+            width: 250px;
+            height: 200px;
+            border:1px solid #ccc;
+            background-color: #fff;
+            padding-left: 30px;
+            font-size: 14px;
+            position: absolute;
+            top: 80%;
+            left: 40%;
+        }
+
+        .alert h3 {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .alert_body #close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            /*width: 30px;*/
+            /*height: 30px;*/
+        }
+
+        .alert_body p {
+            height: 25px;
+            line-height: 25px;
+            font-size: 12px;
+        }
+        .alert_body input {
+            width: 100px;
+            height: 30px;
+            font-size: 12px;
+            text-align: center;
+            margin: 5px;
+            margin-left: 0;
+        }
+
+        .alert_body .time_txt {
+            position: relative;
+            top: 10px;
+            left: 0;
+        }
+
+        .alert_btn {
+            width: 150px;
+            height: 30px;
+            text-align: center;
+            display: block;
+            font-size: 12px;
+            line-height: 30px;
+            position: absolute;
+            bottom: 10px;
+            left: 20%;
+        }
+    </style>
+
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span>百米DMP / 客流人群分析</span>
+    </div>
+    <div class="data_box">
+        <div class="tip_box" id="tip_box">
+            <i class="fl"></i><p>温馨提示: 提交开通够,首次开通到生成数据分析报表需要1~2个工作日,不便之处敬请谅解。</p>
+            <a class="fr" href="javascript:" id="closeTip">关闭</a>
+        </div>
+
+        <form action="" class="layui-form mt30">
+            <div class="layui-form-item">
+                <label class="layui-form-label">场景名称：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="title" required  lay-verify="required" placeholder="请输入场景名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form">
+                <label class="layui-form-label">选择广告组：</label>
+                <div class="layui-input-inline">
+                    <select name="city" lay-verify="required">
+                        <option value=""></option>
+                        <option value="0">广告主1</option>
+                        <option value="1">广告主2</option>
+                        <option value="2">广告主3</option>
+                        <option value="3">广告主4</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数据邮箱：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="email" required  lay-verify="required" placeholder="请填写邮箱,数据/通知等将定期发送到该邮箱" autocomplete="off" class="layui-input w350">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">营业时间：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="date" id="start_date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">至</div>
+                <div class="layui-input-inline">
+                    <input type="text" name="date" id="end_date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">营业面积：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" lay-verify="required" placeholder="填写数字" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">平方米</div>
+                <div class="layui-form-mid">共</div>
+                <div class="layui-input-inline">
+                    <select name="interest" lay-filter="aihao">
+                        <option value=""></option>
+                        <option value="0" selected>一层</option>
+                        <option value="1" >二层</option>
+                        <option value="2">三层</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">所在地址：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="title" required  lay-verify="required" placeholder="请输入店铺地址" autocomplete="off" class="layui-input w350">
+                </div>
+                <div class="tip_text">地址对兴趣偏好等画像数据的准确性有重要意义,请确保正确的地址。</div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <div class="bmmap" id="bmmap"></div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">服务期限：</label>
+                <div class="layui-form-mid"> <span>2018/01/31 ~ 2019/1/30</span></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">数据画像：</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="基础版" title="基础版" id="basic">
+                    <input type="radio" name="sex" value="高级版" title="高级版" id="vip">
+                    <p id="type_chose" style="display: none">当前广告主为VIP用户,本次费用¥0.00 (人群画像查询年费用 3000/年) <span></span></p>
+                </div>
+            </div>
+        </form>
+
+        <div class="btn">
+            <a href="" class="btn_link bm-btn bm-btn-white">保存为草稿</a>
+            <a href="javascript:;" class="btn_link bm-btn bm-btn-blue" id="pay">立即支付</a>
+        </div>
+    </div>
+
+
+    <!--<div id="alert_bg"></div>-->
+    <!--<div class="alert" id="alert">-->
+    <!--<div class="alert_title"></div>-->
+    <!--<div class="alert_body">-->
+    <!--<h3>支付确认</h3><a id="close" href="javascript:;">关闭</a>-->
+    <!--<p>本次费用将从服务商账户账户中扣除支付。</p>-->
+    <!--<p class="sub_title">您的余额不足.</p>-->
+    <!--<p>请输入服务商管理员收到的确认短信验证码。</p>-->
+    <!--&lt;!&ndash;您可以先保存为草稿,待充值后再重新支付开通。&ndash;&gt;-->
+    <!--<input type="text" placeholder="短信支付验证码" class="fl"> <span class="time_txt"><span id="time_txt">90</span>秒后重新获取</span>-->
+    <!--<div class="clearfix"></div>-->
+    <!--<a href="javascript:;" class="btn_link bm-btn bm-btn-blue alert_btn" id="comfirpay">保存草稿并跳转到账户充值</a>-->
+    <!--</div>-->
+    <!--</div>-->
+
+</div>
+
+
+
+<script>
+
+    layui.use(['form', 'layer', 'element'], function () {
+        var form = layui.form(),
+                layer = layui.layer,
+                element = layui.element;
+
+
+        });
+
+
+
+    var  adress = '';
+    // 百度地图API功能
+    var map = new BMap.Map("bmmap");
+    var point = new BMap.Point();
+    map.centerAndZoom(point,12);
+    // 创建地址解析器实例
+    var myGeo = new BMap.Geocoder();
+    // 将地址解析结果显示在地图上,并调整地图视野
+    myGeo.getPoint("深圳北火车站", function(point){
+        if (point) {
+            map.centerAndZoom(point, 16);
+            map.addOverlay(new BMap.Marker(point));
+        }else{
+            alert("您选择地址没有解析到结果!");
+        }
+    }, "北京市");
+
+    //支付
+    $('#pay').bind('click',function () {
+
+        //场景1
+        alert('123');
+
+        //场景2
+
+    });
+
+
+    //获取场景详情数据
+    function getScenesData(id) {
+        $.ajax({
+            type: "GET",
+            url: '/v1.2/Scemes/getAppointScene/scene_id='+id,
+            dataType:'json',
+            success: function(rs){
+                tipTopHide();       //隐藏提示框
+                if(rs.state == 1){         //如果查询成功
+                    var data = rs.data;     //返回数据赋值
+                    console.log(data);
+                    render_table(data,curr);     //渲染表格数据
+                    renderPage(data.pages, curr);
+                }else{
+                    tipTopShow(rs.msg);
+
+                }
+            },
+            error:function(rs){
+                tipTopShow("查询信息失败，请重试...");    //显示提示框
+
+            }
+        });
+    }
+
+
+    getScenesData(1);
+
+    //关闭弹框
+    //支付
+    $('#close').bind('click',function () {
+        $('#alert').remove();
+        $('#alert_bg').remove();
+    });
+
+    //确认支付
+    $('#comfirpay').bind('click',function () {
+        $('#alert').remove();
+        $('#alert_bg').remove();
+    });
+
+
+    //关闭提示
+    $('#closeTip').bind('click',function () {
+        $('#tip_box').toggle();
+    });
+
+</script>
+
+</body>
+</html>

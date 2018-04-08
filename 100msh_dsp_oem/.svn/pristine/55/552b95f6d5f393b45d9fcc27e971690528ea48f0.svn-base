@@ -1,0 +1,180 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class MaterialdController extends BasicController {
+
+
+
+    /**
+     * 素材列表(按月排序)
+     */
+    public function indexAction(){
+
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+       $comp_id = $this->uinfo['comp_id'];
+       $url = $this->config['dsp']['url']."material/getMlists?access_token=".$access_token."&comp_id=".$comp_id;
+       $doNet = new DoNetwork();
+       $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+      echo $result;
+
+    }
+    /**
+     * 素材详情
+     */
+    public function infoAction(){
+
+    }
+    /*
+     * 获取广告组列表
+     */
+    public function getgroupAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getAdgroup?access_token=".$access_token;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取规格
+     * @param  adgroup_id
+     */
+    public function getSizelistAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));
+        $access_token = $result['data']['access_token'];
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getSizelist?access_token=".$access_token."&adgroup_id=".$adgroup_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取详细规格
+     * @param size_id
+     *
+     */
+    public function getSizeInfoAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));
+        $access_token = $result['data']['access_token'];
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getSizeInfo?access_token=".$access_token."&size_id=".$size_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取标签
+     * getTags
+     */
+    public function getTagsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+        $comp_pid = $this->uinfo['comp_pid'];
+        $url = $this->config['dsp']['url']."material/getTags?access_token=".$access_token."&comp_pid=".$comp_pid;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 获取月份详细列表
+     * getlists
+     */
+    public function getlistsAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $time = Helper::clean($this->getRequest()->getPost('time'));
+        $access_token = $result['data']['access_token'];
+        $comp_id = $this->uinfo['comp_id'];
+        $url = $this->config['dsp']['url']."material/getlists?access_token=".$access_token."&comp_id=".$comp_id."&time=".$time;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+       // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 搜索素材
+     *
+     */
+    public function serachAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $group_id =  Helper::clean($this->getRequest()->getPost('group_id'));
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));
+        $tag_id =  Helper::clean($this->getRequest()->getPost('tag_id'));
+        $material_name =  Helper::clean($this->getRequest()->getPost('material_name'));
+        $time =  Helper::clean($this->getRequest()->getPost('time'));
+        $platform_id =  Helper::clean($this->getRequest()->getPost('platform_id'));
+        $access_token = $result['data']['access_token'];
+        $comp_id = $this->uinfo['comp_id'];
+        $comp_pid = $this->uinfo['comp_pid'];
+        $url = $this->config['dsp']['url']."material/serach?access_token=".$access_token."&comp_id=".$comp_id."&comp_pid".$comp_pid."&group_id=".$group_id."&size_id=".$size_id."&tag_id=".$tag_id."&material_name=".$material_name."&time=".$time."&platform_id=".$platform_id;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        // $result  = file_get_contents($url);
+        echo $result;
+
+    }
+    /*
+     * 添加素材
+     *
+     */
+    public function addAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $adgroup_id =  Helper::clean($this->getRequest()->getPost('adgroup_id'));
+        $size_id =  Helper::clean($this->getRequest()->getPost('size_id'));
+        $tag_id =  Helper::clean($this->getRequest()->getPost('tag_id'));
+        $material_name =  Helper::clean($this->getRequest()->getPost('material_name'));
+        $access_token = $result['data']['access_token'];
+        $comp_id = $this->uinfo['comp_id'];
+        $comp_pid =  $this->uinfo['comp_pid'];
+        $add_time = time();
+        $source_type = 1;
+        $img_info  = Helper::clean($this->getRequest()->getPost('img_url'));
+        $url = $this->config['dsp']['url']."material/add?access_token=".$access_token."&comp_id=".$comp_id."&adgroup_id=".$adgroup_id."&size_id=".$size_id."&tag_id=".$tag_id."&material_name=".$material_name."&comp_pid=".$comp_pid."&add_time=".$add_time."&source_type=".$source_type."&img_info=".$img_info;
+        $doNet = new DoNetwork();
+        $result =$doNet->makeRequest($url);
+        //$result  = file_get_contents($url);
+        echo $result;
+    }
+}

@@ -1,0 +1,8 @@
+<?php
+class Agent extends Model
+{
+    function getMonthAmt($date_start,$date_end){
+        $res= $this->db->account->query("SELECT count(1) as recharge_num,sum(real_pay_amount) as deliver_amount,sum(amount) as transfer_amount FROM dsp_boss_recharge WHERE status=1 AND transfer_time >= '{$date_start}' AND transfer_time <= '{$date_end} 23:59:59'");
+        return $res[0];
+    }
+}

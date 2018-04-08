@@ -1,0 +1,485 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step1">
+            <div class="from-row">
+                <label>广告主：</label>
+                <div class="layui-input-inline">
+                    <select name="ad_user" lay-verify="required" lay-filter="ad_user" lay-search="" id="ad_user">
+                        <option value="">请输入搜索广告主名称</option>
+                    </select>
+                </div>
+                <div class="user_recent">
+                    <p class="pat_nav">最近投放广告主<i></i></p>
+                    <ul id="user_recent_list" class="clearfix">
+                    </ul>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>广告计划：</label>
+                <ul class="row_type clearfix" id="new_plan">
+                    <li class="cur" _type="2">选择已有广告计划<i></i></li>
+                    <li _type="1">新建广告计划<i></i></li>
+                </ul>
+                <div class="plan_box">
+                    <article class="layui-input-inline">
+                        <select name="ad_plan" lay-verify="required" lay-filter="ad_plan" lay-search="" id="ad_plan" >
+                            <option value="">请输入搜索计划名称</option>
+                        </select>
+                    </article>
+                    <article style="display: none">
+                        <input type="text" class="bm-input layui-input" id="ad_plan_ipt" placeholder="请输入长度为0-30位的计划名称" value="" autocomplete="off">
+                    </article>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>计划日期：</label>
+                <input type="text" class="bm-input layui-input mid_ipt" name="startDate" id="startDate" value="2" placeholder="请选择开始日期"/> <b>至</b>
+                <input type="text" class="bm-input layui-input mid_ipt" name="endDate" id="endDate" value="" placeholder="请选择结束日期"/>
+                <div class="row_check" style="display: none">
+                    <input type="checkbox" name="sw_time" value="" lay-filter="sw_time" id="sw_time" lay-skin="primary" title="长期投放"/>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>日预算：</label>
+                <input type="text" value="" name="budget" id="budget" class="bm-input layui-input" placeholder="请填写日预算金额" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"/>
+                <!-- <div class="row_check">
+                    <input type="checkbox" name="budgetSwitch" lay-filter="budgetSwitch" id="budgetSwitch" value="0" lay-skin="primary" title="无限制"/>
+                </div> -->
+            </div>
+            <div class="from-row">
+                <label>总预算：</label>
+                <input type="text" value="" name="totalBudget" id="totalBudget" class="bm-input layui-input" placeholder="请填写总预算金额" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"/>
+                <!-- <div class="row_check">
+                    <input type="checkbox" name="totalBudgetSwitch" value="0" lay-skin="primary" title="无限制"/>
+                </div> -->
+            </div>
+            <div class="from-row">
+                <label>投放目标：</label>
+                <div class="row_ipt">
+                    <!-- <input type="radio" name="ad_device" value="1" title="PC端" checked lay-filter="edition"> -->
+                    <input type="radio" name="ad_device" value="2" title="移动端" checked>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>移动端系统：</label>
+                <div class="row_ipt">
+                    <input type="radio" name="ad_sys" value="2" title="IOS" lay-filter="edition" checked>
+                    <input type="radio" name="ad_sys" value="1" title="安卓" lay-filter="edition">
+                </div>
+            </div>
+            <div class="from-row">
+                <label>投放速度：</label>
+                <div class="row_ipt">
+                    <input type="radio" name="ad_rate" value="0" lay-filter="ad_rate" title="按花费控制" checked >
+                    <input type="radio" name="ad_rate" value="1" lay-filter="ad_rate" title="按展示量控制" >
+                    <ul class="box_rate">
+                        <li>
+                            <div class="layui-input-inline">
+                                <select name="rate_sel" lay-filter="rate_sel" id="rate_sel">
+                                    <option value="2" selected>匀速</option>
+                                    <option value="1">加速</option>
+                                </select>
+                            </div>
+                            <input type="text" name="rate_cost" class="bm-input layui-input sm_ipt" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">元/天
+                        </li>
+                        <li style="display: none">
+                            <input type="text" name="rate_num" class="bm-input layui-input sm_ipt" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"> 千次/天
+                        </li>
+                    </ul>
+                    <div class="box_count mt20">
+                        单用户每日展示上限 <input type="text" name="day_max" value="3" class="bm-input layui-input sm_ipt" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"> 次/天
+                    </div>
+                </div>
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-blue btn_next" data="2" id="stepBtnp1">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript">
+        var stgbh1= {};//信息存储
+        var newCamp={};// 计划新建参数
+        var camp_name='',camp_id='',old_comp_id='';//存储计划名称，用于返回操作，计划是否需重新创建
+        var domUserList = $('#ad_user'),
+            domReUserList = $('#user_recent_list'),
+            domNewPlan = $('#new_plan'),
+            domAdPlan = $('#ad_plan'),
+            domAdPlanIpt = $('#ad_plan_ipt'),
+            domdBudge = $('#budget'),//日预算
+            domdBudgeTt = $('#totalBudget');//总预算
+
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            var today = get_date(0);
+            $('#startDate').val(today);
+             //日期
+            laydate.render({
+                elem: '#startDate',
+                type: 'date',
+                min: today
+            });
+            //日期
+            laydate.render({
+                elem: '#endDate',
+                type: 'date',
+                min: today
+            });
+
+            //初始化
+            function init(){
+                getUserList();
+            }
+            init();
+
+            //获取广告主列表&近期广告主列表
+            function getUserList (){
+                $.ajax({
+                    type: "GET",
+                    url: "/v1.2/Bhdelivery/getCompList",
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                        var data = rs.data,
+                            str ='<option value>直接选择或搜索选择广告主</option>',
+                            html='';
+                            if(!data){
+                                domUserList.html('');
+                                domReUserList.html('');
+                                return;
+                            }
+                            $.each(data,function(k,v){
+                                str += '<option value="'+v.comp_id+'" _amount="'+v.usable_amount+'">' + v.comp_name + '</option>';
+                                html +='<li class="recent_li" _id="'+v.comp_id+'" _amount="'+v.usable_amount+'"><span>'+v.comp_name+'</span><b>账户余额￥'+v.usable_amount+'</b></li>';
+                            });
+                            domUserList.html(str);
+                            domReUserList.html(html);
+                            form.render();
+                            $('#user_recent_list').find('li[_id='+urlCompId+']').click();
+                        }else{
+                            domUserList.html('');
+                            domReUserList.html('');
+                        }
+                        form.render();
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });
+            }
+
+            //获取广告计划列表
+            function getPlanList (compId){
+                $.ajax({
+                    type: "POST",
+                    url: '/v1.2/Bhdelivery/getCompCampaignList',
+                    data:{comp_id:compId},
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            var data = rs.data;
+                            var str ='<option value>直接选择或搜索选择广告计划</option>';
+                            $.each(data,function(k,v){
+                                str += '<option value="'+v.bh_campaign_id+'" budget="'+v.budget +'" totalBudget="'+v.totalBudget +'" sDate="'+v.startDate+'" eDate="'+v.endDate+'">'+v.bh_campaign_name+'</option>';
+                            });
+                            domAdPlan.html(str);
+                        }else{
+                            domAdPlan.html('');
+                        }
+                        form.render();
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });
+            }
+
+            //选择近期广告主搜索结果
+            domReUserList.on('click','.recent_li',function(e){
+                var th = $(this),
+                    id = th.attr('_id'),
+                    amount = th.attr("_amount"),
+                    playType = $('#new_plan .cur').attr('_type');//1新增 2选择
+                th.addClass('cur').siblings().removeClass('cur');
+                domUserList.val(id).attr('_amount',amount);
+                getPlanList(id);
+                form.render();
+                if(playType==2){
+                    reNewInput();//广告计划重置
+                }
+            })
+
+            //广告主选择
+            form.on('select(ad_user)', function (data) {
+                var amount='',
+                    playType = $('#new_plan .cur').attr('_type');//1新增 2选择
+                if(data.value){
+                    amount = data.elem[data.elem.selectedIndex].getAttribute('_amount');
+                    domUserList.attr('_amount',amount);
+                    getPlanList(data.value);
+                    form.render();
+                    $('.recent_li').removeClass('cur');
+                    if(playType==2){
+                        reNewInput();//广告计划重置
+                    }
+                }
+            });
+
+            //广告计划类别选择
+            domNewPlan.on('click','li',function(){
+                var th = $(this),
+                    idx = th.index(),
+                    type = th.attr('_type');
+                th.addClass('cur').siblings('li').removeClass('cur');
+                $('.plan_box article').eq(idx).show().siblings().hide();
+                if(type==1){
+                    domAdPlan.val('');
+                    form.render();
+                }
+                reNewInput();//广告计划重置
+
+            })
+
+            //已有广告计划选择
+            form.on('select(ad_plan)', function (data) {
+                var val = data.value,
+                    elem = data.elem[data.elem.selectedIndex],
+                    budget = elem.getAttribute("budget"),//日预算
+                    totalBudget = elem.getAttribute("totalBudget"),
+                    sDate = elem.getAttribute("sDate"),
+                    eDate = elem.getAttribute("eDate");
+                if(val){
+                    domdBudge.val(budget).attr('disabled',true);//日预算
+                    domdBudgeTt.val(totalBudget).attr('disabled',true);//日预算
+                    $('#startDate').val(sDate).attr('disabled',true);
+                    $('#endDate').val(eDate).attr('disabled',true);
+                    /*if(!eDate){
+                        $('input[name="sw_time"]').click();
+                    }
+                    $('input[name="sw_time"]').attr('disabled',true);*/
+                    form.render();
+                }
+            });
+
+            //长期投放
+            form.on('checkbox(sw_time)', function (data) {
+                //是否被选中，true或者false
+                if (data.elem.checked == true) {
+                    $('#startDate').val(today).attr('disabled',true);
+                    $('#endDate').val('').attr('disabled',true);
+                }else{
+                    $('#startDate').removeAttr('disabled');;
+                    $('#endDate').removeAttr('disabled');;
+                }
+            })
+            //无限制
+            form.on('checkbox(budgetSwitch)', function (data) {
+                //是否被选中，true或者false
+                if (data.elem.checked == true) {
+                    domdBudge.val('').attr('disabled',true);
+                }else{
+                    domdBudge.removeAttr('disabled');
+                }
+            })
+            //投放速度
+            form.on('radio(ad_rate)', function (data) {
+                var val = data.value;
+                $('.box_rate li').eq(val).show().siblings().hide();
+            })
+            //广告计划重置
+            function reNewInput(){
+                domAdPlan.val('');
+                domAdPlanIpt.val('');
+                domdBudge.val('').attr('disabled',false);//日预算
+                domdBudgeTt.val('').attr('disabled',false);//日预算
+                $('#startDate').val('').attr('disabled',false);
+                $('#endDate').val('').attr('disabled',false);
+                $('input[name="sw_time"]').attr('disabled',false);
+                form.render();
+            }
+        })
+
+        //下一步按钮检验
+        $('#stepBtnp1').on('click',function(e){
+            var th = $(this),
+                id = th.attr('data');
+            var res = checkDataStept1();
+            newCamp = res.campData;
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            if(res.data.campaign_isadd==1 && ((camp_name!=newCamp.bh_campaign_name) || (old_comp_id != res.data.comp_id))){
+                var ckn = checkname();
+                if( !ckn.success){
+                    tipTopShow(ckn.msg);
+                    return;
+                }
+                addCamp(newCamp,function(cp_id){
+                    res.data.bh_campaign_id = cp_id;
+                    camp_id = cp_id;
+                    camp_name = newCamp.bh_campaign_name;
+                    old_comp_id = res.data.comp_id;
+                })
+            }
+            stgbh1 = res.data;
+            compId = stgbh1.comp_id;
+            stepPage(id);
+        })
+        //广告计划新建
+        function addCamp(data,fn){
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Bhdelivery/addCamp',
+                dataType:'json',
+                data : data,
+                success: function(rs){
+                    if(rs.api_code == 1){         //如果查询成功
+                        fn.call(this,rs.data);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+              },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        //页面校验
+        function checkDataStept1(){
+            var compId = domUserList.val(),
+                planId = domAdPlan.val(),
+                valAdPlan = $.trim(domAdPlanIpt.val()),//计划名称
+                playType = $('#new_plan .cur').attr('_type'),//1新增 2选择
+                valdBudge = $.trim(domdBudge.val()),//日预算
+                valdBudgeTt = $.trim(domdBudgeTt.val()),//总预算
+                userAmount = domUserList.attr('_amount'),//账户余额
+                sDate = $('#startDate').val(),
+                eDate = $('#endDate').val(),
+                ad_device = $('input[name="ad_device"]:checked').val(),//目标
+                ad_sys = $('input[name="ad_sys"]:checked').val(),//系统
+                ad_rate = $('input[name="ad_rate"]:checked').val(),//速度
+                rate_sel = $('select[name="rate_sel"]').val(),
+                rate_cost = $('input[name="rate_cost"]').val(),
+                rate_num = $('input[name="rate_num"]').val(),
+                day_max = $('input[name="day_max"]').val(),
+                returnData = {};
+
+            if(!compId){
+                return {"success":false,msg:"请选择广告主！"};
+            }
+            if(playType==2 && !planId){
+                return {"success":false,msg:"请选择广告计划！"};
+            }
+            if(playType==1 && !valAdPlan){
+                return {"success":false,msg:"请输入计划名称！"};
+            }
+            if(playType==1 && (valAdPlan.length > 30)){
+                return {"success":false,msg:"请输入长度为0-30位的计划名称！"};
+            }
+            if(!sDate){
+                return {"success":false,msg:"请选择开始日期！"};
+            }
+            if(!eDate){
+                return {"success":false,msg:"请选择结束日期！"};
+            }
+            if(eDate && (sDate > eDate)){
+                return {"success":false,msg:"结束日期应大于开始日期！"};
+            }
+            if(!valdBudge){
+                return {"success":false,msg:"请输入日预算！"};
+            }
+            if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(valdBudge))){
+                return {"success":false,msg:"请输入正确日预算金额！"};
+            }
+            if(!valdBudgeTt){
+                return {"success":false,msg:"请输入总预算"};
+            }
+            if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(valdBudgeTt))){
+                return {"success":false,msg:"请输入正确总预算金额！"};
+            }
+            if(parseFloat(valdBudge) > parseFloat(valdBudgeTt)){
+                return {"success":false,msg:"日预算不能大于总预算!"};
+            }
+            if(playType==1 && (parseFloat(valdBudgeTt) > parseFloat(userAmount))){
+                return {"success":false,msg:"当前广告主余额不足，请充值后再投放!"};
+            }
+            if(ad_rate == 0){
+                if(!rate_cost){
+                    return {"success":false,msg:"请输入花费金额！"};
+                }
+                if(parseFloat(rate_cost) >= parseFloat(1000000)){
+                    return {"success":false,msg:"花费金额应小于100万！"};
+                }
+                if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(parseFloat(rate_cost)))){
+                    return {"success":false,msg:"请输入正确花费金额！"};
+                }
+            }
+            if(ad_rate == 1){
+                if(!rate_num){
+                    return {"success":false,msg:"请输入展示量！"};
+                }
+                if(parseFloat(rate_num) >= parseFloat(1000000)){
+                    return {"success":false,msg:"展示量应小于100万！"};
+                }
+                if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(parseFloat(rate_num)))){
+                    return {"success":false,msg:"请输入正确展示量！"};
+                }
+            }
+            if(!day_max){
+                return {"success":false,msg:"请设置每日展示上限！"};
+            }
+            var bh_camp_id = (playType==2 ? planId :camp_id);
+            returnData = {
+                "success":true,
+                "campData":{"bh_campaign_name":valAdPlan,"startDate":sDate,"endDate":eDate,"budgetSwitch":0,"budget":valdBudge,"totalBudgetSwitch":0,"totalBudget":valdBudgeTt,"comp_id":compId},
+                "data":{"bh_campaign_id":bh_camp_id,"type":ad_device,"osType":ad_sys,"budgetControlType":ad_rate,"budgetAllocationType":rate_sel,"budgetAllocationMoney":rate_cost,"budgetAllocationCycle":2,"budgetControlVal":rate_num,"budgetAllocationDisplay":2,"frequencyNum":day_max,"frequencyCycle":2,"campaign_isadd":playType,"comp_id":compId}
+            };
+            return returnData;
+        }
+        function checkname(){
+            var compId = domUserList.val(),
+                valAdPlan = $.trim(domAdPlanIpt.val()),//计划名称
+                playType = $('#new_plan .cur').attr('_type'),//1新增 2选择
+                ck_type;
+
+            if (valAdPlan && playType==1) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/v1.2/Bhdelivery/checkCam',
+                    dataType:'json',
+                    data:{comp_id:compId,bh_campaign_name:valAdPlan},
+                    async:false,
+                    success: function(rs){
+                        if (rs.api_code == 1) {
+                            ck_type = 1;
+                        } else {
+                            ck_type = 0;
+                        }
+                    },
+                    error: function(rs){
+                        return {"success":false,msg:"广告计划失败!"};
+                    }
+                });
+                if (ck_type ==1) {
+                    return {"success":true,msg:""};
+                } else {
+                    return {"success":false,msg:"计划名称已存在!"};
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>

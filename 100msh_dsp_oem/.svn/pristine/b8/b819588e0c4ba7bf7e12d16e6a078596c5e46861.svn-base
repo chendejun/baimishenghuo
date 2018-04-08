@@ -1,0 +1,167 @@
+<?php
+class IndexController extends BasicController {
+	public function indexAction(){
+        $m = Helper::M('Nav');
+        $list = $m->getNavByGroup($this->uinfo['user_group']);
+        $this->getView()->assign('uinfo' , $this->uinfo);
+        $this->getView()->assign('role_root' , ROLE_ROOT);
+        $this->getView()->assign('list' , json_encode(array_values($list)));
+
+        $css = array(1 => 'default' , 2 => 'bkgreen' , 3 => 'darkblue' , 4 => 'mountain' , 5 => 'starsky');
+        $default_skin = array('site_color' => 'default' , 'site_logo' => '/public/img/logo1.png' , 'site_bottom_name' => 'Copyright     2018 深圳市百米生活股份有限公司' , 'site_name' => '晓客营销系统');
+		$skin = $m->getSkin($this->uinfo['comp_id']);
+		if(empty($skin)){
+			$skin = $default_skin;
+		}else{
+			$skin['site_color'] = $css[$skin['site_color']];
+		}
+		$this->getView()->assign('skin' , $skin);
+	}
+	/**
+	 * 修改密码
+	 * @return [type] [description]
+	 */
+	public function editPwdAction(){
+		if($this->getRequest()->isPost()){
+			Yaf_Dispatcher::getInstance()->disableView();
+			$pwd = Helper::clean($this->getRequest()->getPost('pwd'));
+			if(empty($pwd)){
+				Helper::outJson(array('state' => 0 , 'msg' => '密码不能为空！'));
+			}
+			$m = Helper::M('U');
+			$result = $m->editPwd($pwd , $this->uinfo['staff_id']);
+			if($result){
+				Helper::outJson(array('state' => 1 , 'msg' => '修改成功！'));
+			}else{
+				Helper::outJson(array('state' => 0 , 'msg' => '登录异常！'));
+			}
+		}
+	}
+	/**
+	 * 操作管理
+	 * @return [type] [description]
+	 */
+	public function operatorManageAction(){
+		$this->getView()->assign('user_group' , array('0' => '员工身份' , '2' => '财务组' , '3' => '投放组' , '4' => '管理组'));
+	}
+	/**
+	 * [userListAction description]
+	 * @return [type] [description]
+	 */
+	public function userListAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+		$page = Helper::clean($this->getRequest()->getPost('page' , 1)); //页数
+		$limit = Helper::clean($this->getRequest()->getPost('limit' , 10)); //行数
+		$staff_name = Helper::clean($this->getRequest()->getPost('staff_name' , '')); //操作员名称
+		$user_group = Helper::clean($this->getRequest()->getPost('user_group' , 0)); //所属用户组
+		$step = ($page - 1) * $limit;
+		$m = Helper::M('U');
+		$data = $m->getlist($step , $limit , $staff_name , $user_group , 1);
+		Helper::outJson(array('state' => 1 , 'data' => $data));
+	}
+	/**
+	 * 添加操作员
+	 */
+	public function addPeratorAction(){
+		if($this->getRequest()->isPost()){
+			Yaf_Dispatcher::getInstance()->disableView();
+			$data['user_name'] = Helper::clean($this->getRequest()->getPost('mobile' , '')); //手机号码
+			if(!preg_match('/^1[3|4|5|6|7|8|9][0-9]\d{8}$/', $data['user_name'])){
+				Helper::outJson(array('state' => 0 , 'msg' => '手机号码格式错误！'));
+			}
+			$data['staff_name'] = Helper::clean($this->getRequest()->getPost('staff_name' , '')); //操作员名称
+			if(empty($data['staff_name']) || mb_strlen($data['staff_name']) > 10){
+				Helper::outJson(array('state' => 0 , 'msg' => '操作员名称不能为空且不能超过10个字符！'));
+			}
+			$data['user_group'] = Helper::clean($this->getRequest()->getPost('user_group' , 0)); //所属用户组
+			if(!in_array($data['user_group'], array(2,3,4))){
+				Helper::outJson(array('state' => 0 , 'msg' => '用户组选择错误！'));
+			}
+			
+			$m = Helper::M('U');
+			$result = $m->get($data['user_name']);
+			if(!empty($result)){
+				Helper::outJson(array('state' => 0 , 'msg' => '用户已存在，请勿重复添加!'));
+			}
+			$data['pwd'] = md5(substr($data['user_name'] , -6));
+			$data['add_time'] = date('Y-m-d H:i:s');
+			$data['add_staff_id'] = $this->uinfo['staff_id'];
+			$data['source'] = 4;
+			$data['status'] = 1;
+			$result = $m->addPerator($data);
+			if($result){
+				Helper::outJson(array('state' => 1 , 'msg' => '成功添加用户！'));
+			}else{
+				Helper::outJson(array('state' => 0 , 'msg' => '添加用户失败'));
+			}
+		}
+		$this->getView()->assign('user_group' , array('2' => '财务组' , '3' => '投放组' , '4' => '管理组'));
+	}
+	/**
+	 * 编辑操作员信息
+	 * @return [type] [description]
+	 */
+	public function editPeratorAction(){
+		$m = Helper::M('U');
+		if($this->getRequest()->isPost()){
+			Yaf_Dispatcher::getInstance()->disableView();
+			$is_trunPwd = Helper::clean($this->getRequest()->getPost('trun_pwd' , 0));
+			$staff_id = Helper::clean($this->getRequest()->getPost('staff_id' , 0));
+			$result = $m->checkStaff($this->uinfo['comp_id'] , $staff_id);
+			if(empty($result)){
+				Helper::outJson(array('state' => 0 , 'msg' => '用户不存在！'));
+			}
+			if($is_trunPwd == 1){
+				$pwd = md5(substr($result['user_name'] , -6));
+				$ef = $m->editPwd($pwd , $staff_id);
+				Helper::outJson(array('state' => 1 , 'msg' => '已重置密码！'));
+			}else{
+				$data['staff_name'] = Helper::clean($this->getRequest()->getPost('staff_name' , '')); //操作员名称
+				if(empty($data['staff_name']) || mb_strlen($data['staff_name']) > 10){
+					Helper::outJson(array('state' => 0 , 'msg' => '操作员名称不能为空且不能超过10个字符！'));
+				}
+				$data['user_group'] = Helper::clean($this->getRequest()->getPost('user_group' , 0)); //所属用户组
+				if(!in_array($data['user_group'], array(2,3,4))){
+					Helper::outJson(array('state' => 0 , 'msg' => '用户组选择错误！'));
+				}
+				$data['status'] = Helper::clean($this->getRequest()->getPost('status' , 0)); //用户状态
+				if(!in_array($data['status'], array(0,1))){
+					Helper::outJson(array('state' => 0 , 'msg' => '用户状态错误！'));
+				}
+				$data['move_staff_id'] = Helper::clean($this->getRequest()->getPost('move_staff_id' , 0)); //用户状态
+				$result = $m->update($data , $staff_id);
+				if($data['status']==0 && $data['move_staff_id'] > 0) $m->move_staff($staff_id , $data['move_staff_id'] , $this->uinfo['staff_id']);
+				Helper::outJson(array('state' => 1 , 'msg' => '修改成功！'));
+			}
+		}
+		$staff_id = (int)$_GET['staff_id'];
+		$data = $m->checkStaff($this->uinfo['comp_id'] , $staff_id);
+		if(!empty($data)){
+			$data['move_staff_name'] = '';
+			if($data['status'] == 0){ //
+				$row = $m->get('' , $data['move_staff_id']);
+				$data['move_staff_name'] = $row['staff_name'];
+			}
+		}
+		$result = $m->getlist(0 , 100 , '' , ROLE_OPERATED);
+		$list = array();
+		foreach ($result as $key => $val) {
+			$list[$val['staff_id']] = $val['staff_name'];
+		}
+		$this->getView()->assign('staff_id' , $staff_id);
+		$this->getView()->assign('data' , $data);
+		$this->getView()->assign('list' , $list);
+		$this->getView()->assign('user_group' , array('2' => '财务组' , '3' => '投放组' , '4' => '管理组'));
+	}
+		/**
+	 * 退出
+	 * @return [type] [description]
+	 */
+	public function loginoutAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+		$m = Helper::M('U');
+		$m->loginout();
+		header("Location: {$this->url}/login/index"); exit;
+		//echo '<script type="text/javascript">top.location.href="{$this->url}/login/index";</script>';
+	}
+}

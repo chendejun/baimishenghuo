@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+</head>
+<style>
+	*{ -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-click-highlight-color:rgba(0,0,0,0);}
+	.pack_form.data_box{position: initial;}
+	.pack_form .from-row{margin:20px 0; position: relative;}
+	.pack_form .dom_input label{ position: initial; width: 100px;}
+	.pack_form .dom_input input{ width:300px; height: 38px; line-height: 38px;}
+	.pack_form h3{background: #f4f4f5; padding-left: 10px; color: #666; font-weight: bold; font-size: 14px; line-height: 30px; margin:0;}
+	.pack_form label{display:inline-block;line-height: 38px;height: 38px; position: absolute; padding-left: 10px;}
+	.pack_form .crowd_nav{display:inline-block;vertical-align: middle; padding-left: 100px;}
+	.pack_form .crowd_nav span{line-height: 38px; height: 38px; border: 1px solid #ddd;width: 145px; text-align: center; display: inline-block; cursor: pointer;float: left;}
+	.pack_form .crowd_nav span:first-child{border-radius: 5px 0 0 5px; }
+	.pack_form .crowd_nav span:last-child{border-radius:0 5px 5px 0; }
+	.pack_form .crowd_nav span.cur{border: 1px solid #1e90ff; color: #1e90ff;}
+	.commit-box{padding:30px 0 ;text-align: center;}
+	.commit-box .bm-btn{width: 200px;height: 42px;line-height: 42px;}
+    .crowd_box{position: initial;width: 720px;border: 1px solid #ddd;padding: 10px;margin-left: 246px; margin-top: 10px;display: none;}
+    .crowd_box ul{padding: 0;margin:0;}
+    .crowd_box ul li{cursor: pointer;line-height: 30px;padding: 0 10px 0 0; height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; width: auto;display: inline-block;}
+	.crowd_box ul li.cur{background: #dfecfc;}
+	.crowd_box ul li:hover{ background: #dfecfc;}
+	.crowd_box ul li.chose{ background: #dfecfc;}
+	.crowd_box li input[type="checkbox"]{display: none;}
+	.crowd_box li em.checkbox{ display: inline-block;margin: -3px 10px 0 0;vertical-align:middle; width: 30px; height: 100%; background: url(/public/img/checkbox.png) 8px 50% no-repeat;}
+	.crowd_box li em.checkbox.childchose{ background: url(/public/img/checkboxchildchose.png) 8px 50% no-repeat;}
+	.crowd_box li em.checkbox.chose{ background: url(/public/img/checkboxchose.png) 8px 50% no-repeat;}
+	.crowd_box .box_list{position: initial;display: inline-block; float: left;}
+	.crowd_box .box_list li{width: 142px;text-align: left;}
+	.crowd_area{border: none;padding: 0;}
+    .crowd_area ul li{cursor: pointer;line-height: 30px;padding: 0 10px; height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<i class="info_icon icon1"></i>
+        	<span><a href="/v1.2/dcrowd/index">百米DMP</a> / 自定义人群 / 新建定向人群</span>
+        </div>
+        <div class="data_box pack_form mt20">
+            <h3>基础信息</h3>
+            <div class="from-row" id="region">
+                <label>区域</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="1" id="crowd_id" _id='0'>省市</span>
+                </div>
+                <div class="crowd_box crowd_area clearfix" style="display: none">
+	            	<div id="province_list" class="box_list" style="display: none"></div>
+			        <div id="city_list" class="box_list" style="display:none"></div>
+			        <div id="area_list" class="box_list" style="display: none"></div>
+	            </div>
+            </div>
+            <div class="from-row" id="age">
+                <label>年龄</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="2">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="sex">
+                <label>性别</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                </div>
+            </div>
+            <div class="from-row" id="education">
+                <label>受教育水平</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="3">指定</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="industry">
+                <label>从业行业</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="4">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <h3>用户偏好</h3>
+            <div class="from-row" id="house">
+                <label>房产情况</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="5">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="car">
+                <label>汽车爱好</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="6">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="home">
+                <label>建材家居</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="7">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="digital">
+                <label>家电数码</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="8">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="service">
+                <label>生活服务</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="9">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="hobby">
+                <label>休闲爱好</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="10">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="music">
+                <label>影视音乐</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="11">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="game">
+                <label>游戏</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="12">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="dress">
+                <label>服饰鞋包</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="13">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="health">
+                <label>医疗健康</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="14">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="beauty">
+                <label>个护美容</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="15">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="train">
+                <label>教育培训</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="16">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="tourism">
+                <label>旅游酒店</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="17">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="baby">
+                <label>母婴亲子</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="18">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="sports">
+                <label>体育健身</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="19">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row" id="shopping">
+                <label>网络购物</label>
+                <div class="crowd_nav">
+                	<span class="cur" type="0">不限</span>
+                	<span class="" type="20">自定义选择</span>
+                </div>
+                <div class="crowd_box"><ul class="clearfix"></ul></div>
+            </div>
+            <div class="from-row dom_input">
+                <label>人群定向名称</label>
+                <input type="text" value="" class="bm-input" name="name" id="name" placeholder="请输入人群定向名称">
+            </div>
+		    <div class="commit-box">
+		        <button type="button" class="bm-btn bm-btn-blue" id="commit_btn">提交申请</button>
+		    </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/dcrowd.js"></script>
+	</body>
+</html>

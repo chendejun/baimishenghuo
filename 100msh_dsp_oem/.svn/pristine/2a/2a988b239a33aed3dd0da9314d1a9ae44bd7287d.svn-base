@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>自定义换肤</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all" />
+    <style>
+     .upload_lg{width: 90px;height: 30px;border:1px solid #4c94f5;color:#4c94f5;font-size:14px;line-height: 30px;text-align: center;background:#fff;}
+     .morlogo{display: inline-block;width: 100px;height: 28px;border:1px solid #f2f4f5;vertical-align: top;margin-right: 15px;overflow:hidden;}
+     .morlogo img{width:100px;height:30px;}
+     #logodata{opacity: 0;margin-right: 6px;margin-left:-95px;}
+     .from-row .layui-form-select{width:150px;display:none;}
+     .from-row .layui-form-select .layui-input{height:32px;border: #ddd solid 1px;}
+     .status1{display: inline-block;} .status1 .textred{font-size: 12px;}
+     .data_box .bm-select{display: inline-block;margin-left:8px;margin-right: 5px;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box sitebox">
+        <div class="title_box">
+            <span>自定义皮肤</span>
+        </div>
+        <div class="data_box form">
+            <form class="layui-form">
+            <p class="textp01">自定义皮肤，您可根据需要,自定义以下标志，保存生效后,您的所有员工、下级代理登入本系统，将以新皮肤页面展现。</p>
+            <div class="from-row">
+                <label>站点名称：</label>
+                <input type="hidden" name="siteid"  value="" >
+                <input type="text" name="sitename" lay-verify="required|name" class="bm-input wd300" value="" >
+            </div>
+            <div class="from-row">
+                <label>系统LOGO：</label>
+                <span class="morlogo"><img id="dlogo" src="http://d.100m.net/100msh_upload/201801/20180131/dsp/7b87b6973fb049293e5eee19f160cc00.png" alt=""></span>
+                <input type="hidden" name="sitelogo" id="sitelogo" value="http://d.100m.net/100msh_upload/201801/20180131/dsp/7b87b6973fb049293e5eee19f160cc00.png" >               
+                <button type="button" class="upload_lg">上传图片 </button>
+                <input id="logodata" type="file" class="upload_lg" name="file" _size="50" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'dlogo')" value="选择上传">
+                <span>大小：50KB，100*30像素</span>
+            </div>
+            <div class="from-row">
+                <label>底部网站信息：</label>
+                <input type="text" name="btminfo" class="bm-input wd300" lay-verify="required|btmnews" value="" >
+            </div>
+            <div class="from-row">
+                <label>网站色调：</label>
+                <input type="hidden" name="stieskin" value="1" >
+                <ul class="skin_nav">
+                    <li class="on" id="1"><a href="javascript:;"   ><img src="/public/img/skin01.jpg" title="默认" ><i >&nbsp;</i></a><p>默认</p></li>
+                    <li class="" id="2"><a href="javascript:;"  ><img src="/public/img/skin02.jpg"  title="墨绿" ><i >&nbsp;</i></a><p>墨绿</p></li>
+                    <li class="" id="3"><a href="javascript:;"  ><img src="/public/img/skin03.jpg"  title="碧蓝" ><i >&nbsp;</i></a><p>碧蓝</p></li>
+                    <li class="" id="4"><a href="javascript:;" ><img src="/public/img/skin04.jpg"  title="高山"><i >&nbsp;</i></a><p>高山</p></li>
+                    <li class="" id="5" ><a href="javascript:;" ><img src="/public/img/skin05.jpg"   title="星空"><i >&nbsp;</i></a><p>星空</p></li>
+                </ul>
+            </div>
+            <div class="from-row">
+                <label>登录域名：</label>
+                <div class="status1">
+                    <span class="">https:// </span>
+                    <input type="text" name="domainname" class="bm-input wd300" placeholder="2-8位数字或小写字母" lay-verify="required|domain" value="">
+                    <select class="bm-select" name="domaindesc" style="width:150px;">
+                        <option value=".100msh.com">.100msh.com</option>
+                        <option value=".bmjy.com">.bmjy.com</option>
+                        <!-- <option value="">.abcwxchatcn.cn</option> -->
+                    </select>
+                    <span class="textred">如需指定域名,请联系你的线下运营对接人员</span>
+                </div>
+                
+                
+            </div>
+            <div class="btn_box mb30 mt30">
+                <button class="bm-btn bm-btn-blue" type="button" lay-submit lay-filter="submit">保存</button>
+            </div>
+        </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/layui/layui.js"></script>
+    <script type="text/javascript" src="/public/js/index.js"></script>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript">
+    var comp_pid;
+    
+    $(function(){
+        get_shin();
+        $('.skin_nav').on('click','li',function(){
+            $(this).addClass('on').siblings().removeClass('on');
+            //console.log("$(this)==", $(this));
+            var id = $(this).attr('id');
+            console.log("id==", id);
+            $('input[name="stieskin"]').val(id);
+        });
+    });
+    //获取网站皮肤数据
+    function get_shin() {
+            if (window.sessionStorage.comp_pid) {
+            var comp_pid = window.sessionStorage.comp_pid;
+            } else {
+                var comp_pid = '';
+            } 
+              $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/v1.2/Notice/getCompanySite",
+                data: {comp_pid:comp_pid},
+                success: function(result) {                   
+                    console.log(result);
+                    if (result.api_code == 1) {                                              
+                        console.log(result.data); 
+                        if (result.data !='') {
+                            var _html='';
+                            window.sessionStorage.setItem("comp_pid",result.data[0].comp_pid);
+                            $('#dlogo').attr("src",result.data[0].site_logo);
+                            $('input[name="siteid"]').val(result.data[0].site_id);
+                            $('input[name="sitename"]').val(result.data[0].site_name);
+                            $('input[name="sitelogo"]').val(result.data[0].site_logo);
+                            $('input[name="btminfo"]').val(result.data[0].site_bottom_name);
+                            $('input[name="stieskin"]').val(result.data[0].site_color);
+                           // $('input[name="domainname"]').val(result.data[0].domain);
+                           // $('select[name="domaindesc"]').find("option:selected").val(result.data[0].domain_desc);
+                            $('#'+result.data[0].site_color).addClass('on').siblings().removeClass('on');                         
+                            console.log('状态==',result.data[0].domain_status);
+                            
+                            if (result.data[0].domain_status == 1) {
+                                _html += '<span class="">https:// </span><input type="text" name="domainname" class="bm-input wd300" disabled="disabled"  value="'+result.data[0].domain+'">';
+                                if (result.data[0].domain_desc == '.100msh.com') {
+                                    _html += '<select class="bm-select" name="domaindesc" style="width:150px;" disabled="disabled"><option value=".100msh.com" selected="selected">.100msh.com</option><option value=".bmjy.com">.bmjy.com</option></select>';                            
+                                } else {
+                                    _html += '<select class="bm-select" name="domaindesc" style="width:150px;" disabled="disabled"><option value=".100msh.com" >.100msh.com</option><option value=".bmjy.com" selected="selected">.bmjy.com</option></select>';                            
+                                }
+                                _html +='<span class="textred"><span>（待生效）</span>  如需修改域名，请联系线下运营对接人员</span>';
+                            }
+                            if (result.data[0].domain_status == 2) {
+                                _html += '<span class="">https:// </span><input type="text" name="domainname" class="bm-input wd300" disabled="disabled"  value="'+result.data[0].domain+'">';
+                                if (result.data[0].domain_desc == '.100msh.com') {
+                                    _html += '<select class="bm-select" name="domaindesc" style="width:150px;" disabled="disabled"><option value=".100msh.com" selected="selected">.100msh.com</option><option value=".bmjy.com">.bmjy.com</option></select>';                            
+                                } else {
+                                    _html += '<select class="bm-select" name="domaindesc" style="width:150px;" disabled="disabled"><option value=".100msh.com" >.100msh.com</option><option value=".bmjy.com" selected="selected">.bmjy.com</option></select>';                            
+                                }
+                                _html +='<span class="textred"><span>（已生效）</span>  如需修改域名，请联系线下运营对接人员</span>';
+                            }
+                            if (result.data[0].domain_status == 3) {
+                                _html += '<span class="">https:// </span><input type="text" name="domainname" class="bm-input wd300"  value="'+result.data[0].domain+'">';
+                                if (result.data[0].domain_desc == '.100msh.com') {
+                                    _html += '<select class="bm-select" name="domaindesc" style="width:150px;" ><option value=".100msh.com" selected="selected">.100msh.com</option><option value=".bmjy.com">.bmjy.com</option></select>';                            
+                                } else {
+                                    _html += '<select class="bm-select" name="domaindesc" style="width:150px;" ><option value=".100msh.com" >.100msh.com</option><option value=".bmjy.com" selected="selected">.bmjy.com</option></select>';                            
+                                }
+                                _html +='<span class="textred"><span>（失败,该名称已被占用）</span> 如需指定域名,请联系你的线下运营对接人员</span>';
+                            }
+
+                            $('.status1').empty().html( _html);
+                        }                      
+                        
+                    } else {
+                        tipTopShow(result.msg);
+                    }
+                },
+                error: function(r) {
+                    tipTopShow(r);
+                }
+            });
+        }
+    
+        layui.use('form', function(){
+            var form = layui.form();
+            //自定义验证规则  
+            form.verify({  
+                    name: function(value){  
+                    if(value.length > 9){  
+                        return '不能超过9个汉字！';   
+                    }  
+                    }, btmnews: function(value){  
+                    if(value.length > 32){  
+                        return '不能超过32个字符!';  
+                    }  
+                    }
+                    ,domain: [/^[a-z0-9]{2,8}$/, '域名是数字或是小写字母，长度为2-8位！']
+            }); 
+            //提交
+            form.on('submit(submit)', function(data){
+                console.log('form==',data);
+                var site_id = $('input[name="siteid"]').val(),
+                comp_pid = sessionStorage.getItem('comp_pid'),
+                site_name = $('input[name="sitename"]').val(),
+                site_logo = $('input[name="sitelogo"]').val(),
+                site_bottom_name = $('input[name="btminfo"]').val(),
+                site_color = $('input[name="stieskin"]').val(),
+                domain = $('input[name="domainname"]').val(),
+                domain_desc = $('select[name="domaindesc"]').find("option:selected").val();                      
+                
+                if (site_id !='') {
+                    var url = "/v1.2/Notice/editSite";
+                    var formdata = {comp_pid:comp_pid,site_id:site_id,site_name:site_name,site_logo:site_logo,site_bottom_name:site_bottom_name,site_color:site_color,domain:domain,domain_desc:domain_desc};
+                    console.log('formdata==',formdata);
+                } else {
+                    var url = "/v1.2/Notice/addSite";
+                    var formdata = {comp_pid:comp_pid,site_name:site_name,site_logo:site_logo,site_bottom_name:site_bottom_name,site_color:site_color,domain:domain,domain_desc:domain_desc};
+                    console.log('formdata==',formdata);
+                }
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: url,
+                    data: formdata,
+                    success: function(result) {
+                        if (result.api_code == 1) {                        
+                            tipTopShow('成功！');
+                            get_shin();
+                            parent.location.reload();
+                        } else {
+                            tipTopShow(result.msg);
+                        }
+                    },
+                    error: function(r) {
+                        tipTopShow(r);
+                    }
+                });
+                    return false;
+                
+            });
+        });
+
+        
+        //图片上传
+        function imgPreview(fileDom,el) {
+            var resultSize = $(fileDom).parent().attr('data-resultsize');
+            var fileSize = (Math.round(resultSize * 100 / 1024) / 100) ;
+
+            //判断是否支持FileReader
+            if(window.FileReader) {
+                var reader = new FileReader();
+            } else {
+                tipTopShow("您的设备不支持图片预览功能，如需该功能请升级您的设备！");
+            }
+            //获取文件
+            var file = fileDom.files[0];
+            var imageType = /^image\//;
+            //是否是图片
+            if(!imageType.test(file.type)) {
+                tipTopShow("请选择图片！");
+               // $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+
+            var size = $(fileDom)[0].files[0].size;
+
+            if(size >resultSize){
+                tipTopShow('图片大小不能大于'+fileSize+'KB');
+                // $(fileDom).val('');//解决连续相同两张图片无法上传问题
+                return;
+            }
+            //读取完成
+            reader.onload = function(e) {
+                //获取图片dom
+                var img = document.getElementById(el);
+            };
+            reader.readAsDataURL(file);
+            // $("#"+el).css('z-index','999');
+            var formData = new FormData();
+            var ids = $(fileDom).attr('id');
+            var sizeid = $(fileDom).attr('_size');
+            formData.append('file', $('#'+ids)[0].files[0]);
+            formData.append('sizeid',sizeid);
+            $.ajax({
+                url: '/v1.2/Notice/uploadFile',
+                type: 'POST',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {                   
+                    var rs = eval("("+data+")");
+                    console.log(rs);                    
+                    if(rs.state==1){
+                        tipTopShow(rs.msg);
+                        document.getElementById(el).src = rs.url;
+                        $('#sitelogo').val(rs.url);
+                        // var logo = rs.url;
+                        // console.log('sitelogo==',logo);
+                        $('#dlogo').attr('src',rs.url);
+                        
+                    }else{
+                        tipTopShow(data);
+                    }
+                   
+                },
+                error: function (data) {
+                    tipTopShow("上传失败");
+                   
+                }
+            });
+            
+        }
+       
+        
+    </script>
+</body>
+
+</html>

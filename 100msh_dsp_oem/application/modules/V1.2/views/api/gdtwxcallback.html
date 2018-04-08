@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信绑定页面</title>
+    <style>
+        .title{
+            font-size: 24px;
+            line-height: 32px;
+            color: #000000;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .suc_logo{
+            width:100%;
+            height: 160px;
+            background: url(/public/img/wx_sucess.png) no-repeat center center;
+        }
+        .fail_logo{
+            width:100%;
+            height: 160px;
+            background: url(/public/img/wx_fail.png) no-repeat center center;
+        }
+        .sub-des{
+            font-size: 20px;
+            line-height: 32px;
+            color: #000000;
+            text-align: center;
+            font-weight: bold;
+        }
+        .sub-des a{
+            text-decoration: underline;
+            color: #0a6cd6;
+            cursor: pointer;
+        }
+        .sub-detail{
+            margin-top: 100px;
+            margin-left: 40%;
+        }
+    </style>
+</head>
+<body>
+<div class="title">微信公众平台账号授权</div>
+<!--<div class="suc_logo"></div>-->
+<div {{if $data.suc == 1}}class="suc_logo"{{else}}class="fail_logo"{{/if}}></div>
+<!--<div class="sub-des">授权成功，请关闭页面后刷新【我的广告主】页面。</div>-->
+<div class="sub-des">{{if $data.suc == 1}}授权成功，请关闭页面后刷新【我的广告主】页面。{{else}}授权失败，请<a href="/V1.2/Api/gdtWxCallback?login=1&comp_id={{$data.comp_id}}">点击重新授权</a>{{/if}}</div>
+{{if $data.suc == 0}}
+<div class="sub-detail">
+    <p>失败可能原因：</p>
+    <p>1、扫描的微信号不是公众号的管理者或运营者。</p>
+    <p>2、绑定的公众号没有开通广告主资格（登录公众平台-广告主点击开通）。</p>
+    <p>3、网络异常情况（请重新尝试扫描授权）</p>
+</div>
+{{/if}}
+</body>
+</html>

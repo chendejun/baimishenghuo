@@ -1,0 +1,126 @@
+<style type="text/css">
+    .set_bottom {padding-left: 130px;}
+    .set_bottom .bm-btn {height: 35px;line-height: 35px;width: 120px;border-radius: 5px;}
+    .set_bottom .bm-btn:first-child {background-color: #bbbbbb;margin-right: 15px;}
+    .content_box .form .from-spec {height: 38px;margin-top: 20px}
+    .content_box .form .from-spec b {font-weight: normal;margin-left: 10px;}
+    .content_box .form .from-row {margin-top: 20px}
+    .code_btn {height: 38px;line-height: 38px;}
+    .code_btn.bm-btn:disabled {background: #fff;}
+    .regtype_wrap,
+    .account_wrap {width: auto;height: 38px;position: relative;float: left;margin-right: 20px;}
+    .regtype_span{position: relative;}
+    .account_span {float: left;width: 18px;height: 18px;position: relative;left: 0;top: 50%;margin-top: -9px;margin-right: 5px;}
+    .regtype_span>.regType{opacity: 0;}
+    .account_span>.accountValue {position: absolute;left: 1px;top: 1px;z-index: 2;opacity: 0;}
+    .regicon {width: 15px;height: 15px;position: absolute;left: 0;top: 1px;background: url(/public/img/radio_icons.png);background-position: 0 0;background-size: cover;z-index: 1;opacity: 1;}
+    .from-row label,.from-spec span {width: 100px !important;}
+    .form .from-row,.form .from-spec{padding-left: 130px;}
+    .regmoneyTip {width: 280px;height: 22px;line-height: 22px;border: 1px solid #faccc6;background: #ffebeb;color: #fac2ba;font-size: 12px;padding: 0 10px;margin: 5px 0 10px 0;}
+    .status_tip {text-align: center;line-height: 16px;font-weight: 900;}
+    .layui-layer-setwin {display: none;}
+    .regmoneyTip{display: none;}
+    .invoice_type{ height: 56px; }
+    .invoice_type .regtype_wrap{width: 150px;}
+    .invoice_type .regtype_wrap p{ line-height: 20px;color: green; display: none; margin: 0;text-indent: 20px;font-size: 14px;}
+    .invoice_type .regtype_wrap b{font-weight: normal;}
+    .file_input{width:130px;height:130px;position:relative;}
+    .file_input input{width:130px!important;height:130px!important;position:absolute;padding:0!important;box-sizing: border-box;top:0;}
+    .file_input input[type="file"]{opacity: 0;cursor: pointer;}
+    .file_input>img {width: 130px;height: 130px;position: absolute;top: 0}
+    .file_text{text-align: center;font-size: 12px;color: #999;padding-top: 25px;}
+    .file_text b{margin: 10px 0;display: inline-block}
+    .emp{color: red;}
+</style>
+
+<form class="invoice_form" name="invoice_form" id="invoice_form">
+    <div class="form" style="width:710px;">
+        <div class="from-row">
+            <label><em class="emp">*</em>logo</label>
+            <div class="file_input">
+                <div class="file_text">
+                    <b>点击上传</b>
+                    <p>(JPG / PNG，小于50KB，尺寸为114*114px)</p>
+                </div>
+                <img id="logo_img">
+                <input id="file_logo" type="file" name="logo" _size ="1" data-size="30" accept="image/jpeg,image/jpg,image/png" onchange="imgUpload(this,'logo_img')">
+            </div>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>公众号名称</label>
+            <input type="text" id="pn_name" name="pn_name" class="bm-input" placeholder="请输入公众号名称">
+        </div>
+        <div class="from-spec">
+            <span><em class="emp">*</em>公众号类型</span>
+            <label>
+                <input type="radio" name="pn_type" value="1"/>订阅号
+            </label>
+            <label>
+                <input type="radio" name="pn_type" value="2"/>服务号
+            </label>
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>微信号</label>
+            <input type="text" id="pn_number" name="pn_number" class="bm-input" placeholder="请输入微信号">
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>门店名称</label>
+            <input type="text" id="shop_name" name="shop_name" class="bm-input" placeholder="请输入门店名称">
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>Appid</label>
+            <input type="text" id="pn_appid" name="pn_appid" class="bm-input" placeholder="请输入Appid">
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>shopid</label>
+            <input type="text" id="shop_id" name="shop_id" class="bm-input" placeholder="请输入shopid">
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>ssid</label>
+            <input type="text" id="ssid" name="ssid" class="bm-input" placeholder="请输入ssid">
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>Appsecret</label>
+            <input type="text" id="pn_appsecret" name="pn_appsecret" class="bm-input" placeholder="请输入Appsecret">
+        </div>
+        <div class="from-row">
+            <label><em class="emp">*</em>secretke</label>
+            <input type="text" id="secret_key" name="secret_key" class="bm-input" placeholder="请输入secretke">
+        </div>
+        <div class="from-row">
+            <label>手机号解密秘钥</label>
+            <input type="text" id="mobile_decrypt_key" name="mobile_decrypt_key" class="bm-input" placeholder="请输入手机号解密秘钥">
+        </div>
+        <div class="from-row">
+            <label>biz码</label>
+            <input type="text" id="biz_code" name="biz_code" class="bm-input" placeholder="请输入biz码">
+        </div>
+        <div class="from-spec">
+            <span><em class="emp">*</em>运营类别</span>
+            <label>
+                <input type="radio" name="public_cate" value="1" checked="checked"/>全国
+            </label>
+            <label>
+                <input type="radio" name="public_cate" value="2"/>自营
+            </label>
+        </div>
+        <div class="from-row">
+            <label>二维码图片</label>
+            <div class="file_input">
+                <div class="file_text">
+                    <b>点击上传</b>
+                    <p>(JPG / PNG，小于200KB，尺寸为344*344px)</p>
+                </div>
+                <img id="code_img">
+                <input id="file_code" type="file" name="pn_image" _size ="1" data-size="30" accept="image/jpeg,image/jpg,image/png" onchange="imgUpload(this,'code_img')">
+            </div>
+        </div>
+        <div class="set_bottom mt20">
+            <a href="javascript:;" class="bm-btn set_rate_btn" onclick="javascript:layer.closeAll();">取消</a>
+            <input type="button" class="bm-btn bm-btn-blue" value="确定" onclick="postData()">
+        </div>
+    </div>
+</form>
+
+
+

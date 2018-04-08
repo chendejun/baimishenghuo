@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-账户信息</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <style>
+        .status_tip {text-align: center;line-height: 16px;font-weight: 900;}
+    </style>
+</head>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 我的账户</span>
+        </div>
+        <div class="percent_box">
+            <div class="nav_box">
+                <a href="/v1.2/account/index">账户信息</a>
+                <a href="/v1.2/account/rechargelist">充值记录</a>
+                <a href="javascrip:;" class="cur">发票开具</a>
+                <a href="/index/operatormanage">操作员管理</a>
+            </div>
+            <div class="box_table">
+                <table id="invoice_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>申请日期</th>
+                            <th>开票金额</th>
+                            <th>开票项目</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+        <div class="invoice_form mt20">
+            <h4>
+                <i class="info_icon icon10"></i>发票开具申请</h4>
+            <form class="form">
+                <div class="from-spec">
+                    <span>发票类型：</span>
+                    <label>
+                        <input type="checkbox" disabled="false" checked="checked" /> 增值税普票</label>
+                </div>
+                <div class="from-row">
+                    <label>发票抬头：</label>
+                    <input type="text" name="invoice_title" id="invoice_title" value="" class="bm-input" placeholder="发票抬头" />
+                </div>
+                <div class="from-row">
+                    <label>企业税号：</label>
+                    <input type="text" name="enterprise_no" id="enterprise_no" value="" class="bm-input" placeholder="企业税号" maxlength="18" onkeyup="this.value=this.value.replace(/\s/g,'')"
+                        onafterpaste="this.value=this.value.replace(/\s/g,'')" />
+                </div>
+                <div class="from-row">
+                    <label>开票项目：</label>
+                    <select class="bm-select" id="invoice_type">
+                        <option value="0">信息服务费</option>
+                        <!-- <option value="1">服务费</option> -->
+                    </select>
+                </div>
+                <div class="from-row">
+                    <label>开票金额：</label>
+                    <input type="text" name="amount" id="amount" value="" class="bm-input" placeholder="开票金额" />
+                    <span class="red">当前剩余可开票金额 ¥
+                        <b id="total_amount">{{$usable_invoice}}</b>元</span>
+                        <em class="status_tip" id="status_tip" data="可开发票金额仅包括：现金充值余额。其它账户余额不可开具发票">?</em>
+                </div>
+                <div class="btn_box mt30 mb15">
+                    <button type="button" class="bm-btn bm-btn-blue" onclick="submitForm()">提交申请</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //获取数据
+        var limit = 10;
+        function getInvoiceList(curr) {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/account/invoice/page/' + (curr || 1) + '/limit/' + limit,
+                dataType: 'json',
+                beforeSend: function () {
+                    tipTopShow("正在查询记录...");
+                },
+                success: function (rs) {
+                    tipTopHide();       //隐藏提示框
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        var type_config = { "0": '信息服务费' },
+            status_config = { "0": '待审核', "1": '待开票', "2": '已开票', "3": '申请拒绝' };
+        function render_table(data) {
+            layer.closeAll();
+            var list_e = $("#invoice_list tbody"), str = "", no_msg = $(".noMsg");
+            if (data.list.length == 0) {
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text("");
+            $.each(data.list, function (k, v) {
+                str += '<tr>',
+                str += '<td>' + v.apply_time + '</td>';
+                str += '<td>' + v.amount + '</td>';
+                str += '<td>' + type_config[v.invoice_type] + '</td>';
+                str += '<td>' + status_config[v.status] ;
+                if(v.status == 2){
+                    str += '<span style="margin-left:15px;cursor: pointer;" onclick="smsg(\''+v.express_type+'\',\''+v.express_no+'\',\''+v.invoice_no+'\','+k+')" id = "s'+k+'">查看发票</span>'+'</td>';
+                }
+                str += '</tr>';
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(pages, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                skip: true, //是否开启跳页
+                skin: '#5877a4',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getInvoiceList(obj.curr);
+                    }
+                }
+            });
+        }
+        getInvoiceList();
+
+        //发票提交申请
+        function submitForm() {
+            var invoice_title = $.trim($('#invoice_title').val()),
+                enterprise_no = $.trim($('#enterprise_no').val()),
+                invoice_type = $.trim($('#invoice_type').val()),
+                total_amount = $('#total_amount').html(),
+                amount = $.trim($('#amount').val());
+            if (!invoice_title) {
+                tipTopShow('发票抬头不能为空！');
+                return;
+            }
+            if (!enterprise_no) {
+                tipTopShow('企业税号不能为空！');
+                return;
+            }
+            if (enterprise_no.length != 15 && enterprise_no.length != 18) {
+                tipTopShow('企业税号只能15位或18位');
+                return;
+            }
+            if (!amount) {
+                tipTopShow('开票金额不能为空！');
+                return;
+            }
+            if (!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(amount))) {
+                tipTopShow("请输入正确的开票金额！(2位小数)");
+                return;
+            }
+            if (parseFloat(amount) > parseFloat(total_amount)) {
+                tipTopShow('开票金额不能大于可开票金额！');
+                return;
+            }
+            var postData = { "invoice_title": invoice_title, "enterprise_no": enterprise_no, "invoice_type": invoice_type, "amount": amount };
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/account/applyInvoice',
+                dataType: 'json',
+                data: postData,
+                beforeSend: function () {
+                    //禁用按钮防止重复查询
+                    $(".bm-btn").attr({
+                        disabled: "disabled"
+                    });
+                },
+                success: function (rs) {
+                    $(".bm-btn").attr({ disabled: false });
+                    tipTopHide();       //隐藏提示框
+                    if (rs.state == 1) {         //提交成功
+                        tipTopShow(rs.msg)
+                        /*getInvoiceList();
+                        $('#invoice_title').val('');
+                        $('#enterprise_no').val('');
+                        $('#invoice_type').val('');
+                        $('#amount').val('');*/
+                        location.href = "/v1.2/account/invoice";
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    $(".bm-btn").attr({ disabled: false });
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        //提示
+        $('body').on('click', '.status_tip', function () {
+            layer.tips(this.getAttribute('data'), this, { time: 5000 });
+        })
+    function smsg(express_type,express_no,invoice_no , i){
+        var msg = '<span style="color:black;">发票号码：'+invoice_no;
+        msg += '<br>快递信息：';
+        if(express_type == 0){//0顺风，1圆通，2邮政EMS
+            msg += '顺风快递';
+        }else if(express_type == 1){
+            msg += '圆通快递';
+        }else if(express_type == 2){
+            msg += '邮政快递';
+        }
+        msg += '<br>快递单号：' + express_no +'</span>';
+        layer.tips(msg, '#s'+i,{tips: [3, '#f5f5f5'],time: 0,closeBtn:1});
+    }
+    </script>
+</body>
+
+</html>

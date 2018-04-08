@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+</head>
+<style type="text/css">
+    .timeBox{display: inline-block;}
+    .timeBox .layui-input-inline{width: 80px; display: inline-block;}
+</style>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step5">
+            <div class="from-row">
+                <label>广告名称：</label>
+                <input type="text" class="bm-input layui-input" name="ad_name" lay-filter="ad_user" placeholder="输入广告名称" value="" autocomplete="off">
+            </div>
+            <div class="from-row">
+                <label>投放日期：</label>
+                <input type="text" value="" class="bm-input layui-input mid_ipt" id="ad_startDate"/> <b>至</b>
+                <input type="text" value="" class="bm-input layui-input mid_ipt" id="ad_endDate" />
+                <span class="ml10">节假日安排</span>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="holiday" lay-filter="holiday" lay-verify="required">
+                        <option value="">不限</option>
+                        <option value="1">排除节假日</option>
+                        <option value="2">只节假日投放</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>投放时间：</label>
+                <div class="ad_timer">
+                    <input type="radio" name="ad_time_type" value="1" title="全时段" checked lay-filter="ad_time_type">
+                    <input type="radio" name="ad_time_type" value="2" title="自定义时段" lay-filter="ad_time_type">
+                    <span id="timeBox" class="timeBox" style="display: none">
+                        <div class="layui-input-inline">
+                            <select id="timeAear1" class="bm-select"></select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select id="timeAear2" class="bm-select"></select>
+                        </div>
+                    </span>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>出价方式：</label>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="ad_way" lay-verify="required" lay-filter="ad_way">
+                        <option value="1">CPM</option>
+                        <option value="2">CPC</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>出价：</label>
+                <input type="text" name="ad_bid" lay-filter="ad_bid" class="bm-input layui-input" placeholder="请输入出价" value="" autocomplete="off">
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(4)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" id="stepBtnp5">确定投放</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            var today = get_date(0),
+                domTimeAear1 = $("#timeAear1"),
+                domTimeAear2 = $("#timeAear2");
+
+            $('#ad_startDate').val(today);
+             //日期
+            laydate.render({
+                elem: '#ad_startDate',
+                type: 'date',
+                min: today
+            });
+            //日期
+            laydate.render({
+                elem: '#ad_endDate',
+                type: 'date',
+                min: today
+            });
+            //自定义时间变化
+            domTimeAear1.bind("change",function(){
+                var k = this.value,str = "",v=domTimeAear1.val();
+                for(var i = parseInt(k)+1; i<=24; i++){
+                    str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +':00</option>'
+                }
+                domTimeAear2.html(str);
+                if(k < v){
+                    domTimeAear2.val(v);
+                }
+                form.render();
+            });
+            domTimeAear2.bind("change",function(){
+                var k = this.value,str = "",v=domTimeAear1.val();
+                for(var i = 0; i<k; i++){
+                    str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +':00</option>'
+                }
+                domTimeAear1.html(str);
+                domTimeAear1.val(v);
+                form.render();
+            });
+            //渲染自定义时间
+            function reanderTimeAear(){
+                var str1 = "",str2="";
+                for(var i=0; i<=24; i++){
+                    str1 += i !=24 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +':00</option>'
+                    str2 += i !=0 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +':00</option>'
+                }
+                domTimeAear1.html(str1);
+                domTimeAear2.html(str2);
+                form.render();
+            }
+            reanderTimeAear();
+            //时间段选择
+            form.on('radio(ad_time_type)', function (data) {
+                var val = data.value; //1全时段 2 自定义
+                if(val==2){
+                    $('#timeBox').show();
+                }else{
+                    $('#timeBox').hide();
+                }
+            })
+        })
+        //广告计划新建
+        function addCamp(data,fn){
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Bhdelivery/addCamp',
+                dataType:'json',
+                data : data,
+                success: function(rs){
+                    if(rs.api_code == 1){         //如果查询成功
+                        fn.call(this,rs.data);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+              },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        //提交数据
+        function pageStorageData(lastdata){
+            var data = $.extend({},stgbh1, stgbh2, stgbh3, stgbh4,lastdata);
+            return data;
+        }
+        //下一步按钮检验
+        $('#stepBtnp5').on('click',function(e){
+            var th = $(this);
+            var res = checkDataStept5();
+            var cp_isadd = stgbh1 ? stgbh1.campaign_isadd:'1';
+            var compId = stgbh1 ? stgbh1.comp_id:'';
+            console.log(compId);
+            //var ckn = checkDelyname(compId);
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            /*if(!ckn.success){
+                tipTopShow(ckn.msg);
+                return;
+            }*/
+            stgbh5 = res.data;
+            console.log(stgbh5);
+            var postData = pageStorageData(stgbh5);
+            if(cp_isadd==1){//1新增 2选择
+                 addCamp(newCamp,function(cp_id){
+                     postData.bh_campaign_id = cp_id;
+                     postDataFn(postData);
+                 })
+            }
+        })
+        //创建广告
+        function postDataFn(postData){
+            $.ajax({
+                type: 'POST',
+                url: '/v1.2/Bhdelivery/addDelivery',
+                dataType:'json',
+                data:postData,
+                async:false,
+                success: function(rs){
+                    if (rs.api_code == 1) {
+                        location.href = '/v1.2/Bhdelivery/indexview';
+                    } else {
+                        layui.layer.msg(rs.msg);
+                    }
+                },
+                error: function(rs){
+                    layui.layer.msg("查询信息失败，请重试...");
+                }
+            });
+        }
+        //页面校验
+        function checkDataStept5(){
+            var ad_name = $.trim($('input[name=ad_name]').val()),
+                ad_startDate = $('#ad_startDate').val(),
+                ad_endDate = $('#ad_endDate').val(),
+                holiday = $('select[name=holiday]').val(),
+                time_type = $('input[name=ad_time_type]').val(),
+                ad_bid = $('input[name=ad_bid]').val(),
+                bidTyp = $('select[name=ad_way]').val(),
+                timeSt = '0:00',
+                timeEnd = '23:59',
+                dateTimeInfo,
+                returnData ={};
+            if(!ad_name){
+                return {"success":false,msg:"请选择广告名称！"};
+            }
+            if(!ad_startDate || !ad_endDate){
+                return {"success":false,msg:"请选择投放日期！"};
+            }
+            if(ad_startDate > ad_endDate){
+                return {"success":false,msg:"结束日期应大于开始日期！"};
+            }
+            if(time_type==2){
+                timeSt = $.trim($('#timeAear1 option:selected').text()),
+                timeEnd = $.trim($('#timeAear2 option:selected').text());
+            }
+            if(!ad_bid){
+                return {"success":false,msg:"请输入出价！"};
+            }
+            if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(ad_bid))){
+                return {"success":false,msg:"请输入正确的出价金额！"};
+            }
+            dateTimeInfo = timeSt+'-'+timeEnd;
+            returnData = {
+                "success":true,
+                "data":{"bid":ad_bid,"bidTyp":bidTyp,"holidayType":holiday,"dateTimeInfo":dateTimeInfo,"startDate":ad_startDate,"ad_endDate":ad_endDate,"delivery_name":ad_name}
+            };
+            return returnData;
+        }
+        function checkDelyname(comp_id){
+            var delivery_name = $.trim($('input[name=ad_name]').val()),
+                ck_type;
+            $.ajax({
+                type: 'POST',
+                url: '/v1.2/Bhdelivery/checkAdname',
+                dataType:'json',
+                data:{comp_id:compId,delivery_name:delivery_name},
+                async:false,
+                success: function(rs){
+                    if (rs.api_code == 1) {
+                        ck_type = 1;
+                    } else {
+                        ck_type = 0;
+                    }
+                },
+                error: function(rs){
+                    return {"success":false,msg:"广告名称不可用!"};
+                }
+            });
+            if (ck_type ==1) {
+                return {"success":true,msg:""};
+            } else {
+                return {"success":false,msg:"广告名称已存在!"};
+            }
+        }
+    </script>
+</body>
+</html>

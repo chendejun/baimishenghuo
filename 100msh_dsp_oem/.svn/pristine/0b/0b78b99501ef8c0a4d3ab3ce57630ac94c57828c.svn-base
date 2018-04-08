@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>我的广告主-广告主详情</title>
+	    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    	<link rel="stylesheet" href="../../../../../public/css/common.css">
+    	<link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    	<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    	<script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+		<style>
+			.content_box {min-width: 1504px;}
+			.acount_box,.table_style {padding: 0 30px;}
+
+		/*	.I_box ul li, .II_box ul li {
+				float: left;
+			}*/
+
+		</style>
+		<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="/public/js/common.js"></script>
+		<script src="/public/js/layer/layer.js"></script>
+	</head>
+
+
+	<body>
+		<div class="content_box">
+           <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+      </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+              <a href="basicdetail.html">基本资料</a>
+                <a href="javascript:;" class="cur">账户详情</a>
+                <a href="/v1.2/account/invoice">消耗查询</a>
+            </div>
+        </div>
+        	<div class="acount_box">
+        		<h4><i class="club_icons icon2"></i>账户详情</h4>
+
+				<div class="I_box">
+					<h3><i></i>I类账户</h3>
+					<ul class="clearfix">
+        				<li>
+        					<P>余额</P>
+        					<p>15600</p>
+        				</li>
+        				<li>
+        					<P>冻结中</P>
+        					<p>15600</p>
+        				</li>
+        				<li>
+        					<P>已消耗</P>
+        					<p>15600</p>
+        				</li>
+        			</ul>
+				</div>
+        		
+			
+			<div class="II_box">
+				<h3><i></i>II类账户</h3>
+				<ul>
+        			<li>
+        				<P>余额</P>
+        				<p>15600</p>
+        			</li>
+        			<li>
+        				<P>冻结中</P>
+        				<p>15600</p>
+        			</li>
+        			<li>
+        				<P>已消耗</P>
+        				<p>15600</p>
+        			</li>
+        		</ul>
+			</div>
+
+        		
+
+        	 </div>
+               <div class="box_table table_style">
+               	 <h4><i class="club_icons icon2"></i>账户流水记录</h4>
+                <div class="search_box">
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <table id="recharge_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>转账金额</th>
+                            <th>账户类型</th>
+                            <th>充值操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页
+                <div id="list_page" class="page"></div>
+            </div> -->
+        </div>
+	</body>

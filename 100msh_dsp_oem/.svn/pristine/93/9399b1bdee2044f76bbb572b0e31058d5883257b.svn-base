@@ -1,0 +1,267 @@
+<?php
+/**
+ * 我的账户
+ */
+class AccountController extends BasicController {
+	/**
+	 * 我的广告主
+	 * @return [type] [description]
+	 */
+	public function indexAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        if($this->uinfo['user_group'] == ROLE_OPERATED){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        $result = BmDspApi::request('advertiser/dlsAccInfo',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求代理商账户信息接口失败'));
+        }
+        //var_dump($result['data']['acc_info']);
+        $acc=$result['data']['acc_info'];
+        if($result['api_code'] == 0){
+            $account['cash_amount']=$account['virtual_amount']=$account['give_amount']=$account['today_expend']=$account['yes_expend']=$account['week_expend']=$account['month_expend']='0.00';
+            foreach ($acc as $k=>$v){
+                if($k == 0){
+                    $account['virtual_amount']=Helper::transAmount($v['usable_amount'],1);
+                }else if($k == 1){
+                    $account['cash_amount']=Helper::transAmount($v['usable_amount'],1);
+                }else if($k == 2){
+                    $account['give_amount']=Helper::transAmount($v['usable_amount'],1);
+                }
+//                $account['history_amount']+=$v['history_amount'];
+//                $account['total_disburse']+=$v['total_disburse'];
+
+            }
+            $account['today_expend']=Helper::transAmount($result['data']['today_expend'],1);
+            $account['yes_expend']=Helper::transAmount($result['data']['yes_expend'],1);
+            $account['week_expend']=Helper::transAmount($result['data']['week_expend'],1);
+            $account['month_expend']=Helper::transAmount($result['data']['month_expend'],1);
+           // $account['yes_disburse']=Helper::transAmount($result['data']['yes_disburse'],1);
+            //var_dump($account);
+            // $encrypt_obj=new Encrypt();
+            // $key="!abc#%*";
+            // $encrypt_obj->setKey($key);
+            // $encry_id=urldecode($encrypt_obj->encode("{$data['comp_pid']}"));
+
+            //$encry_id = 'OEM' . date('Ymd') . sprintf("%05d", $data['comp_pid']);
+            $tran = array('A' , 'B' , 'C' , 'D' ,'E' ,'F' , 'G' ,'H' , 'J' , 'K');
+            $len = strlen($data['comp_pid']);
+            $n = 6 - $len;
+            $code = '';
+            if($n > 0)  $code = substr(str_shuffle('123456789'), 0, $n);
+            $encry_id = '';
+            for ($i=0; $i < $len; $i++) { 
+            	$encry_id .= $tran[substr($data['comp_pid'] , $i , 1)];
+            }
+            $encry_id .= $code;
+
+            $sh = 0;
+            if($this->uinfo['user_group'] == ROLE_ROOT || $this->uinfo['user_group'] == ROLE_MANAGER) $sh = 1;
+            $this->getView()->assign('sh' , $sh);
+            $this->getView()->assign('account' , $account);
+            $this->getView()->assign('encry_id' , $encry_id);
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+	}
+	public function applyTransferAction(){
+		Yaf_Dispatcher::getInstance()->disableView(); 
+		$comp_id = Helper::clean($this->getRequest()->getParam('comp_id' , 0)); //广告主ID
+		$amount = Helper::clean($this->getRequest()->getParam('amount' , 0)); //转账金额
+		$code = Helper::clean($this->getRequest()->getParam('code' , '')); //验证码
+		$transfer_type = Helper::clean($this->getRequest()->getParam('transfer_type' , 0)); //转账类型（0百米账户充值，1广点通充值）
+		$account_type = Helper::clean($this->getRequest()->getParam('account_type' , 1)); //账户类型（0虚拟，1现金，2赠送）
+		$amount = Helper::transAmount($amount , 0); //转为分
+		$result = BmDspApi::request('fund/applyTransfer' , array('code'=> $code,'comp_id' => $comp_id ,'amount'=>$amount , 'staff_id'=>$this->uinfo['staff_id'] , 'transfer_type'=>$transfer_type,'account_type'=>$account_type));
+		if(isset($result['data'])){
+			Helper::outJson(array('state'=>1,'usable_amount'=>Helper::transAmount($result['data']['usable_amount'] , 1),'msg'=>'转账成功！'));
+		}else{
+			Helper::outJson(array('state'=>0,'msg'=> $result['error']));
+		}
+	}
+	/**
+	 * 微信支付页面
+	 * @return [type] [description]
+	 */
+	public function wxPayAction(){
+		$err = '';
+		$amount = Helper::clean($this->getRequest()->getParam('amount' , 0));
+		if($amount <=0 || $amount > 3000 || floor($amount) != $amount){
+			$err = "充值金额错误,充值金额只能为整数且不超过3000元!";
+		}else{
+			$pay_amount = (int)Helper::transAmount($amount , 0); //转为分
+			//$pay_amount = 1;
+			$result = BmDspApi::request('fund/createPayOrder' , array('comp_id' => $this->uinfo['comp_id'] , 'amount' => $pay_amount , 'staff_id' => $this->uinfo['staff_id']));
+			if(empty($result) || isset($result['error_code'])){
+				$err = "订单生成失败，请稍后再试!";
+			}else{
+				$this->getView()->assign('amount' , $amount);
+				$this->getView()->assign('out_trade_no' , $result['data']['out_trade_no']);
+			}
+		}
+		$this->getView()->assign('err' , $err);
+	}
+	/**
+	 * 生成支付二维码
+	 * @return [type] [description]
+	 */
+	public function qrcodeAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+		$out_trade_no = Helper::clean($this->getRequest()->getParam('out_trade_no' , ''));
+		//文件输出      
+	    include(LIB_PATH . '/phpqrcode/phpqrcode.php');      
+		// 二维码数据
+	    $data = "https://dev-dspapi.100msh.com/v2/fund/wxPay?out_trade_no={$out_trade_no}"; 
+		// 生成的文件名      
+	    //$filename = 'test.png';
+		// 纠错级别：L、M、Q、H      
+	    $errorCorrectionLevel = 'L';
+		// 点的大小：1到10      
+	    $matrixPointSize = 4;      
+	    QRcode::png($data, false, $errorCorrectionLevel, $matrixPointSize, 2);
+	}
+	/**
+	 * 检查订单状态
+	 * @return [type] [description]
+	 */
+	public function checkOrderAction(){
+		$out_trade_no = Helper::clean($this->getRequest()->getParam('out_trade_no' , ''));
+		$status = $this->redis->get('pay_' . $out_trade_no);
+		Helper::outJson(array('state'=>1,'order_status'=>(int)$status));
+	}
+	/**
+	 * 短信发送
+	 * @return [type] [description]
+	 */
+	public function sendSmsAction(){ 
+		$amount = Helper::clean($this->getRequest()->getParam('amount' , 0));
+		$amount = Helper::transAmount($amount , 0); //元转为分
+		$result = BmDspApi::request('fund/sendSms' , array('comp_id' => $this->uinfo['comp_id'] ,'amount'=>$amount)); //发送短信验证码
+		if(empty($result) || isset($result['error'])){
+			Helper::outJson(array('state'=>0,'msg'=>empty($result)?'短信发送异常，请稍后再试！':$result['error']));
+		}else{
+			Helper::outJson(array('state'=>1,'msg'=> $result['data']['msg'] , 'code' => $result['data']['code']));
+		}
+	}
+	/**
+	 * 发票开具
+	 * @return [type] [description]
+	 */
+	public function invoiceAction(){
+		$page = Helper::clean($this->getRequest()->getParam('page' , 0));
+		$limit = Helper::clean($this->getRequest()->getParam('limit' , 10));
+		if($page == 0){
+			$result = BmDspApi::request('fund/get' , array('comp_id' => $this->uinfo['comp_id'] , 'account_type' => 1));
+			$amount = 0;
+			if(!empty($result['data'])) $amount = Helper::transAmount($result['data']['1']['usable_invoice'], 1);
+			$sh = 0;
+            if($this->uinfo['user_group'] == ROLE_ROOT || $this->uinfo['user_group'] == ROLE_MANAGER) $sh = 1;
+            $this->getView()->assign('sh' , $sh);
+			$this->getView()->assign('usable_invoice' , $amount );
+		}else{
+			$result = BmDspApi::request('fund/invoiceList' , array('comp_id' => $this->uinfo['comp_id'] , 'page' => $page , 'limit' => $limit));
+			$list = array();
+			if(!empty($result['data']['list'])){
+				$list = $result['data']['list'];
+				foreach ($list as $key => $val) {
+					$list[$key]['amount'] = Helper::transAmount($val['amount'] , 1);
+					$list[$key]['apply_time'] = date('Y-m-d' , strtotime($val['apply_time']));
+				}
+			}
+			$pages = ceil($result['data']['count']/$limit); //总页数
+			Helper::outJson(array('state'=>1,'msg'=>'','data'=>array('pages' => $pages , 'list' => $list)));
+		}
+	}
+	/**
+	 * 开发票申请
+	 * @return [type] [description]
+	 */
+	public function applyInvoiceAction(){
+		Yaf_Dispatcher::getInstance()->disableView(); 
+		$data = array();
+		$data['invoice_title'] = Helper::clean($this->getRequest()->getPost('invoice_title')); //发票抬头
+		$data['enterprise_no'] = Helper::clean(trim($this->getRequest()->getPost('enterprise_no'))); //企业税号
+		$data['invoice_type'] = Helper::clean($this->getRequest()->getPost('invoice_type' , 0));
+		$data['amount'] = Helper::clean($this->getRequest()->getPost('amount'));
+		$data['apply_comp_id'] = $this->uinfo['comp_id'];
+		$data['apply_comp_pid'] = $this->uinfo['comp_pid'];
+		if($data['apply_comp_pid'] == 0 ) $data['apply_comp_pid'] = $this->uinfo['comp_id'];
+		$data['apply_staff_id'] = $this->uinfo['staff_id'];
+		if($data['amount']<=0 ){
+			Helper::outJson(array('state' => 0 , 'msg' => '开票金额填写错误01！'));
+		}
+		$data['amount'] = Helper::transAmount($data['amount'] , 0); //元转为分
+		if(floor($data['amount']) != $data['amount'] ){
+			Helper::outJson(array('state'=>0 , 'msg' => '开票金额填写错误02！'));
+		}
+		if(strlen($data['enterprise_no']) != 18 && strlen($data['enterprise_no']) != 15 ){
+			Helper::outJson(array('state'=>0 , 'msg' => '企业税号只能15位或18位！'));
+		}
+		if(mb_strlen($data['invoice_title']) > 125){
+			Helper::outJson(array('state'=>0 , 'msg' => '发票抬头不能超过125个字符！'));
+		}
+		if(empty($data['invoice_title']) || empty($data['enterprise_no']) || empty($data['amount'])){
+			Helper::outJson(array('state'=>0 , 'msg' => '发票抬头,企业税号及开票金额不能为空！'));
+		}
+		//$info = $acc->getAccountInfo($this->uinfo['account_id']);
+		$result = BmDspApi::request('fund/applyInvoice' , $data); //申请开发票
+		if(empty($result) || isset($result['error_code'])) Helper::outJson(array('state' => 0 , 'msg' => '发票开具申请失败！'));
+		Helper::outJson(array('state' => 1 , 'msg' => '发票开具申请成功！'));
+	}
+    /**
+     * 转账记录
+     * @return [type] [description]
+     */
+    public function rechargelistAction(){
+        $page = Helper::clean($this->getRequest()->getParam('page' , 0));
+        if($page > 0){
+            $data=array();
+            $data['comp_pid']=$this->uinfo['comp_id'];
+            $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+            $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+            $data['date']=Helper::clean($this->getRequest()->getParam('date' , date('Y-m')));
+            $result = BmDspApi::request('advertiser/recharge',$data,'GET');
+            // print_r($result['data']);
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求转账记录接口失败'));
+            }
+            if($result['api_code'] == 0){
+                Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }
+        $sh = 0;
+        if($this->uinfo['user_group'] == ROLE_ROOT || $this->uinfo['user_group'] == ROLE_MANAGER) $sh = 1;
+        $this->getView()->assign('sh' , $sh);
+    }
+    /**
+     * 支出记录
+     * @return [type] [description]
+     */
+    public function transferAction(){
+        $page = Helper::clean($this->getRequest()->getParam('page' , 0));
+        if($page > 0){
+            $data=array();
+            $data['comp_pid']=$this->uinfo['comp_id'];
+            $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+            $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+            $data['date']=Helper::clean($this->getRequest()->getParam('date' , date('Y-m')));
+//            $data['start_date']=Helper::clean($this->getRequest()->getParam('start_date' , ''));
+//            $data['end_date']=Helper::clean($this->getRequest()->getParam('end_date' , ''));
+//            $data['date_type']=Helper::clean($this->getRequest()->getParam('date_type' , 0));
+            $result = BmDspApi::request('advertiser/transfer',$data,'GET');
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求支出记录接口失败'));
+            }
+            if($result['api_code'] == 0){
+                Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }
+    }
+}

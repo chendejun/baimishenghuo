@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 客流分析 -->
+    <meta charset="UTF-8">
+    <title>DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <style type="text/css">
+        .table_box {
+            border: 1px solid #f4f5f6;
+        }
+
+        .table_box>ul {
+            background-color: #f6f6f6;
+            color: #999999
+        }
+
+        .table_box ul {
+            clear: both;
+            overflow: hidden;
+            zoom: 1;
+            width: 100%;
+            color: #666
+        }
+
+        .table_box li {
+            float: left;
+            text-align: left;
+            height: 40px;
+            line-height: 40px;
+            padding-left: 2%;
+        }
+
+        .table_box li:nth-child(1) {
+            width: 28%
+        }
+
+        .table_box li:nth-child(2) {
+            width: 18%
+        }
+
+        .table_box li:nth-child(3) {
+            width: 48%
+        }
+
+        .table_box .online::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: #47c23a;
+            display: inline-block;
+            margin-right: 6px;
+            border-radius: 50%;
+            position: relative;
+            top: -1px;
+        }
+
+        .table_box .offline::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: #f56c6c;
+            display: inline-block;
+            margin-right: 6px;
+            border-radius: 50%;
+            position: relative;
+            top: -1px;
+        }
+
+        .table-more {
+            height: 40px;
+            line-height: 40px;
+            border-top: 1px solid #fcfcfc;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .table_content {
+            max-height: 400px;
+            /* overflow-y: scroll; */
+            text-align: center;
+        }
+
+        .flow_data {
+            margin-top: 20px;
+        }
+
+        .flow_data b {
+            color: #333;
+            font-size: 14px;
+            padding: 10px 0;
+            display: inline-block;
+        }
+
+        .flow_data i {
+            color: #999;
+            font-size: 12px;
+            padding: 10px 0;
+            display: inline-block;
+        }
+
+        .flow_data ul {
+            border: 1px solid #f4f5f6
+        }
+
+        .flow_data li {
+            color: #999;
+            font-size: 14px;
+            line-height: 30px;
+            margin: 26.5px 0;
+            text-align: left;
+            padding-left: 2%;
+            width: 17.9%;
+            border-left: 1px solid #f2f4f5;
+        }
+
+        .flow_data li:nth-child(1) {
+            border-left: none;
+        }
+
+        .flow_data span {
+            color: #333!important;
+            font-size: 20px!important;
+        }
+
+        .table_content ul {
+            display: none
+        }
+
+        .table_content .tr_show {
+            display: block;
+        }
+
+        .date_flow {
+            margin-top: 80px;
+        }
+
+        .date_flow1 {
+            margin-top: 40px;
+        }
+
+        .flow_trend {
+            width: 100%;
+            height: 300px;
+        }
+
+        .date_flow a {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .date_flow .layui-form {
+            width: 220px;
+        }
+
+        #startTimes,
+        #endTimes {
+            width: 120px;
+            margin-right: 5px;
+            float: left;
+            display: none;
+        }
+
+        .btnTimes {
+            width: 50px;
+            height: 37px;
+            border: none;
+            background: #DDD;
+            color: #6d6d6d;
+            display: none;
+        }
+
+        /*日期选择*/
+
+        .time_filter {
+            display: inline-block;
+            vertical-align: top;
+            position: relative;
+            margin-left: 5px;
+            display: none;
+        }
+
+        .time_filter .ta_date {
+            width: 198px;
+            height: 38px;
+            line-height: 38px;
+            cursor: pointer;
+            text-align: center;
+            border: non;
+            border-radius: 5px
+        }
+
+        .time_filter .date_title {
+            display: block;
+            cursor: pointer;
+            width: 190px;
+            height: 30px;
+            z-index: 2
+        }
+
+        .layui-laydate-content td.laydate-selected {
+            background: #fff !important;
+        }
+
+        #tip_box {
+            background-color: #FAEBD7;
+            border: 1px solid #FFE4C4;
+            color: #FFA500;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        #tip_box i {
+            background: url("../../../../../public/img/tip_icon.png") no-repeat top center;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            top: 12px;
+            left: 10px;
+        }
+
+        #tip_box p {
+            padding-left: 15px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 12px;
+            float: left;
+        }
+
+        #tip_box a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Scenes/index">&lt; 返回人群画像</a>
+            </span>
+        </div>
+        <div id="tip_box">
+            <i class="fl"></i>
+            <p>温馨提示：客流分析统计数据5分钟更新，客群洞察及其他数据分析截止到昨日，当日数据请隔日查询。</p>
+            <a class="fr" href="javascript:" id="closeTip">关闭</a>
+        </div>
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="javascript:;" class="cur">客流分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cuspropety">客群属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <!-- <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a> -->
+                <a href="/v1.2/Scenes/cussource">客流来源
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/hotsearch">搜索热点
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/appanalysis">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="/v1.2/Scenes/changeanalysis" class="btn_link bm-btn bm-btn-blue fr modify">修改场景</a>
+            <!--菜单内容-->
+        </div>
+        <div class="data_box">
+            <div class="table_box">
+                <ul>
+                    <li>设备概况</li>
+                    <li>放置位置</li>
+                    <li>当前状态</li>
+                </ul>
+                <div class="table_content">
+                    <!-- <ul class="tr_show">
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul>
+                    <ul>
+                        <li>11111111111111</li>
+                        <li>前台</li>
+                        <li class="online">在线</li>
+                    </ul> -->
+                </div>
+                <div class="table-more">
+                    <i class="layui-icon">&#xe61a;</i>
+                </div>
+            </div>
+            <!-- 客流数据  -->
+            <div class="flow_data">
+                <div class="clearfix">
+                    <b class="fl">客流数据</b>
+                    <i class="fr">每5分钟更新</i>
+                </div>
+                <ul class="clearfix passenger_tab">
+                    <li>客流量
+                        <br>
+                        <span>0</span>
+                    </li>
+                    <li>停留进店
+                        <br>
+                        <span>0</span>
+                    </li>
+                    <li>停留率
+                        <br>
+                        <span>0.00%</span>
+                    </li>
+                    <li>新客率
+                        <br>
+                        <span>0.00%</span>
+                    </li>
+                    <li>平均停留时长/分钟
+                        <br>
+                        <span>0</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 7天客流趋势 -->
+            <div class="date_flow date_flow1">
+                <div class="clearfix">
+                    <div class="layui-form fl">
+                        <select name="timetype1" lay-filter="timetype1">
+                            <option value="7" selected="">近7天客流趋势</option>
+                            <option value="30">近30天客流趋势</option>
+                        </select>
+                    </div>
+                    <a class="fr" style="display:none;">
+                        <i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend1"></div>
+            </div>
+
+            <!-- 近30天24小时时段客流趋势 -->
+            <div class="date_flow date_flow2">
+                <div class="clearfix">
+                    <div class="layui-form fl">
+                        <select name="timetype2" lay-filter="timetype2">
+                            <option value="0" selected="">近30天24小时时段客流趋势</option>
+                            <option value="1">仅查周一至周四</option>
+                            <option value="2">仅查周五</option>
+                            <option value="3">仅查周六</option>
+                            <option value="4">仅查周日</option>
+                        </select>
+                    </div>
+                    <a class="fr" style="display:none;">
+                        <i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend2"></div>
+            </div>
+
+            <!-- 今日停留时长分析 -->
+            <div class="date_flow date_flow3">
+                <div class="clearfix">
+                    <div class="layui-form fl">
+                        <select name="timetype3" lay-filter="timetype3">
+                            <option value="0" selected="">今日停留时长分析</option>
+                            <option value="1">昨日停留时长分析</option>
+                            <option value="2">近7天停留时长分析</option>
+                            <option value="3">近30天停留时长分析</option>
+                        </select>
+                    </div>
+                    <a class="fr" style="display:none;">
+                        <i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend3"></div>
+            </div>
+
+            <!-- 今日与昨日客流同比分析 -->
+            <div class="date_flow date_flow4">
+                <div class="clearfix">
+                    <div class="layui-form fl" style="margin-right:10px">
+                        <select name="timetype4" lay-filter="timetype4">
+                            <option value="1" selected="">今日与昨日客流同比分析</option>
+                            <option value="2">客流同比分析-指定对比日期</option>
+                        </select>
+                    </div>
+                    <!-- <input type="text" class="layui-input" id="startTimes" placeholder="请选择开始日期">
+                    <input type="text" class="layui-input" id="endTimes" placeholder="请选择结束日期"> -->
+                    <!-- <button class="btnTimes">确认</button> -->
+                    <div class="time_filter layui-input-block fl " id="time_filter">
+                        <div class="ta_date">
+                            <input type="text" class="layui-input" id="date_day" placeholder=" 至 ">
+                        </div>
+                    </div>
+                    <a class="fr" style="display:none;">
+                        <i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend4"></div>
+            </div>
+            <!-- 近7天新老顾客对比 -->
+            <div class="date_flow date_flow5">
+                <div class="clearfix">
+                    <div class="layui-form fl">
+                        <select name="timetype5" lay-filter="timetype5">
+                            <option value="7" selected="">近7天新老顾客对比</option>
+                            <option value="30">近30天新老顾客对比</option>
+                        </select>
+                    </div>
+                    <a class="fr" style="display:none;">
+                        <i class="layui-icon">&#xe601;</i>下载数据</a>
+                </div>
+                <div class="flow_trend" id="flow_trend5"></div>
+            </div>
+        </div>
+        <div class="tip_box" style="display:none">
+            <p class="tip_title">还没有创建任何分析报表,赶紧去新建一个吧。</p>
+            <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="/v1.2/Scenes/changeanalysis">新建分析表</a>
+        </div>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+    <script>
+        var UrlPath = window.location.href,
+            Id = cookie.get('scenesId'), //场景ID
+            anStatus = cookie.get('anaylsisState'),  //场景状态    1草稿，2进行中，3已结束
+            scenesType = cookie.get('scenesType');  //场景类型  1普通版，2高级版
+
+        if (anStatus == 3) {
+            $('.modify').remove();
+        }
+
+        //获取近7天/30天客流趋势数据
+        function getRecentData(term) {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + Id + '/time_interval/' + term + '/type/' + 2,
+                dataType: 'json',
+                success: function (res) {
+                    //console.log(res);
+                    if (res.code == 10000) {
+                        var data = res.list;
+                        var timeArr = [],
+                            dataArr = [];
+                        $.each(data, function (k, v) {
+                            timeArr.push(v.date);
+                            dataArr.push(v.num);
+                        })
+                        crowd_snalysis('flow_trend1', dataArr, timeArr)
+                    } else {
+                        tipTopShow("查询客流趋势数据失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询客流趋势数据失败，请重试...");
+                }
+            });
+        }
+        //获取近30天/自定义查询的客流数据
+        function getNearThirtyData(term) {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + Id + '/time_interval/' + term + '/type/3',
+                //time_interval: 0=30天;1=只查询周一至周四；2=只查询周五；3=只查询周六；4=只查询周日
+                dataType: 'json',
+                success: function (res) {
+                    // console.log(res);
+                    if (res.code == 10000) {
+                        var data = res.list;
+                        var timeArr = [],
+                            dataArr = [];
+                        $.each(data, function (k, v) {
+                            timeArr.push(v.hour + ":00");
+                            dataArr.push(v.num);
+                        })
+                        crowd_snalysis('flow_trend2', dataArr, timeArr)
+                    } else {
+                        tipTopShow("查询客流趋势数据失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询客流趋势数据失败，请重试...");
+                }
+            });
+        }
+        //获取近期停留时长分析
+        function getNearStopTimeData(term) {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + Id + '/time_interval/' + term + '/type/4',//time_interval: 0=今天；1=昨天；2=近七天；3=近30天      
+                dataType: 'json',
+                success: function (res) {
+                    //console.log(res)
+                    if (res.code == 10000) {
+                        var data = res.list;
+                        var timeArr = [], //停留时间段
+                            dataArr = [];   //停留进店量
+                        $.each(data, function (k, v) {
+                            timeArr.push(v.stay_interval + "分钟");
+                            dataArr.push(v.customer_rate);
+                        })
+                        crowd_snalysis3('flow_trend3', dataArr, timeArr)
+                    } else {
+                        tipTopShow("查询停留时长数据失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询停留时长数据失败，请重试...");
+                }
+            });
+        }
+        //获取客流同比分析
+        function getTAndYContrastData(type, start, end) {
+            var startTime = "",
+                endTimes = "";
+            if (type == 1) {
+                var today = new Date(),
+                    yesterday = new Date(today - 24 * 60 * 60 * 1000),
+                    startTime = inItDate(yesterday),
+                    endTimes = inItDate(today);
+            } else {
+                startTime = start
+                endTimes = end;
+            }
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + Id + '/type/5' + '/start_date/' + startTime + '/end_date/' + endTimes,
+                dataType: 'json',
+                success: function (res) {
+                    //console.log(res)
+                    if (res.code == 10000) {
+                        var data = res.list;
+                        var allTimeArr = [],
+                            allDataArr = [];
+                        $.each(data, function (k, v) {
+                            var timeArr = [],
+                                dataArr = [];
+                            $.each(v.hours, function (key, Val) {
+                                dataArr.push(Val.num)
+                            })
+                            allDataArr[k] = dataArr;
+                        })
+                        var time = ["0点", "1点", "2点", "3点", "4点", "5点", "6点", "7点", "8点", "9点", "10点", "11点", "12点", "13点", "14点", "15点", "16点", "17点", "18点", "19点", "20点", "21点", "22点", "23点"]
+                        crowd_snalysis2('flow_trend4', time, allDataArr[0], allDataArr[1], 2, type, startTime, endTimes);
+                    } else {
+                        tipTopShow("查询客流同比分析数据失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询客流同比分析数据失败，请重试...");
+                }
+            });
+        }
+        function inItDate(time) {
+            var y = time.getFullYear();
+            var m = time.getMonth() + 1;
+            var d = time.getDate();
+            if (m <= 9) m = "0" + m;
+            if (d <= 9) d = "0" + d;
+            return y + "-" + m + "-" + d
+        }
+
+        //获取新老顾客对比
+        function getNewUserAndOldUserData(term) {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + Id + '/time_interval/' + term + '/type/6',//7=近七天；3=近30天      
+                dataType: 'json',
+                success: function (res) {
+                    //console.log(res)
+                    if (res.code == 10000) {
+                        var data = res.list;
+                        var timeArr = [], //日期
+                            newdataArr = [],   //新顾客
+                            olddataArr = [];
+                        $.each(data, function (k, v) {
+                            timeArr.push(v.date);
+                            newdataArr.push(v.new_cus_rate);
+                            olddataArr.push(v.old_cus_rate)
+                        })
+                        crowd_snalysis2('flow_trend5', timeArr, newdataArr, olddataArr, 1);
+                    } else {
+                        tipTopShow("查询新老顾客数据失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询新老顾客数据失败，请重试...");
+                }
+            });
+        }
+
+        //获取设备列表
+        function equipmentListData() {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/getSceneMac/scene_id/' + Id,
+                dataType: 'json',
+                success: function (res) {
+                    // console.log(res);
+                    if (res.state == 1) {
+                        var data = res.data;
+                        RenderEquipmentList(data);
+                    } else {
+                        tipTopShow("查询设备列表失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询设备列表失败，请重试...");
+                }
+            });
+        }
+        //渲染设备列表
+        function RenderEquipmentList(data) {
+            if (data.length == 0) {
+                $('.table_content').html('暂无设备信息')
+                return;
+            }
+            var Str = '';
+            var mac_statusArr = ['离线', '在线'];
+            var isonline = ['offline', 'online'];
+            $.each(data, function (k, v) {
+                if (k < 3) {
+                    Str += '<ul class="tr_show">'
+                    Str += '<li>' + v.mac_addr + '</li>'
+                    Str += '<li>' + v.mac_set + '</li>'
+                    Str += '<li class=' + isonline[v.mac_status] + '>' + mac_statusArr[v.mac_status] + '</li>'
+                    Str += '</ul>'
+                } else {
+                    Str += '<ul>'
+                    Str += '<li>' + v.mac_addr + '</li>'
+                    Str += '<li>' + v.mac_set + '</li>'
+                    Str += '<li class=' + isonline[v.mac_status] + '>' + mac_statusArr[v.mac_status] + '</li>'
+                    Str += '</ul>'
+                }
+            })
+            $('.table_content').html(Str)
+            if (data.length <= 3) {
+                $('.table-more').hide();
+            }
+        }
+        //获取客流数据
+        function getPassengerData() {
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + Id + "/type/1",   //Id场景id   type固定传1
+                dataType: 'json',
+                success: function (res) {
+                    // console.log(res)
+                    if (res.code == 10000) {
+                        var data = res.data;
+                        $('.passenger_tab').find('li').eq(0).find('span').text(data.total_num)
+                        $('.passenger_tab').find('li').eq(1).find('span').text(data.customer_num)
+                        $('.passenger_tab').find('li').eq(2).find('span').text(data.stay_rate + "%")
+                        $('.passenger_tab').find('li').eq(3).find('span').text(data.new_cus_rate + "%")
+                        $('.passenger_tab').find('li').eq(4).find('span').text(data.stay_length_avg)
+                    } else {
+                        tipTopShow("查询客流数据失败，请重试...");
+                    }
+                },
+                error: function (err) {
+                    tipTopShow("查询客流数据失败，请重试...");
+                }
+            });
+        }
+        getPassengerData()   //获取客流统计数据
+        equipmentListData();   //获取设备列表
+        getRecentData(7);  //获取近七天/30天的客流数据
+        getNearThirtyData(0) //初始化默认查询近三十天24小时的数据
+        getNearStopTimeData(0) //停留时长分析  默认查询今天
+        getNewUserAndOldUserData(7) //初始化新老顾客对比
+        getTAndYContrastData(1) //客流同比分析
+
+        //柱状图
+        function crowd_snalysis3(el, data, time) {
+            var myChart = echarts.init(document.getElementById(el));
+            var option = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    },
+                    formatter: '时间:{b0}<br/>占比:{c0}%'
+                },
+                grid: {
+                    left: '0%',
+                    right: '0%',
+                    bottom: '0%',
+                    width: '100%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: time,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis: [{
+                    name: '百分比',
+                    type: 'value',
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {  
+                        show: true,  
+                        interval: 'auto',  
+                        formatter: '{value}%'  
+                    },
+                    show:true,
+                    min: 0,
+                    max: 100
+                }],
+                series: [
+                    {
+                        name: '停留时长占比',
+                        type: 'bar',
+                        barWidth: '10%',
+                        data: data,
+                        itemStyle: {
+                            normal: {
+                                color: '#53d99d'
+                            }
+                        },
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+        //单层折线图
+        function crowd_snalysis(el, setData, xdata) {
+            var myChart = echarts.init(document.getElementById(el));
+            var set = {
+                tooltip: {
+                    trigger: 'axis',
+                    confine: true,
+                    axisPointer: {
+                        type: 'line'
+                    },
+                    formatter: '时间：{b0}<br />人数：{c0}'
+                },
+                grid: {
+                    left: '0%',
+                    right: '0%',
+                    bottom: '0%',
+                    width: "100%",
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xdata,
+                        boundaryGap: true,
+                        axisLabel: {
+                            textStyle: {
+                                fontSize: 10
+                            }
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        splitLine: { show: false },
+                        name: "人数",
+                        type: "value",
+                        axisLabel: {
+                            show: true,
+                            interval: 'auto',
+                            formatter: '{value}'
+                        },
+                        show: true
+                    }
+                ],
+                series: [
+                    {
+                        name: "人数",
+                        type: 'line',
+                        symbol: 'circle',
+                        smooth: false,
+                        areaStyle: { normal: { color: '#fff' } },
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                                formatter: '{c}',
+                                textStyle: {
+                                    fontSize: 10
+                                }
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: '#53d99d'
+                            }
+                        },
+                        data: setData
+                    }
+                ]
+            };
+            myChart.setOption(set);
+        };
+        //双折线图
+        function crowd_snalysis2(el, date, data1, data2, type, selectType, startTime, endTime) {  //data1新顾客   data2老顾客
+            var myChart = echarts.init(document.getElementById(el));
+            var typeArr = [],
+                comtype = "";
+            if (type == 1) {
+                typeArr = ['新顾客', '老顾客']
+                comtype = "百分比"
+                var yFormatter = '{value}%',
+                    ValFormatter = '{c}%';
+                    //ValFormatter = '{b}\n{c}%';
+                var Yl = [{
+                    type: 'value',
+                    name: comtype,
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: true,
+                        interval: 'auto',
+                        formatter: yFormatter
+                    },
+                    show: true,
+                    min: 0,
+                    max: 100
+                }]
+                var toolTipVal = '{a0}:{c0}%<br/>{a1}:{c1}%'
+            } else {
+                if (selectType == 1) {
+                    typeArr = ['昨日', '今日']
+                } else {
+                    typeArr = [startTime, endTime]    //自定义对比日期
+                }
+                comtype = "人数"
+                var yFormatter = '{value}',
+                    ValFormatter = '{c}';
+                var Yl = [{
+                    type: 'value',
+                    name: comtype,
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: true,
+                        interval: 'auto',
+                        formatter: yFormatter
+                    },
+                    show: true
+                }]
+                var toolTipVal = '{a0}:{c0}<br/>{a1}:{c1}'
+            }
+          
+            var set = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter : toolTipVal
+                },
+                legend: {
+                    orient: 'horizontal',  
+                    x: 'center',
+                    y:'top',
+                    data: typeArr
+                },
+                grid: {
+                    left: '0%',
+                    right: '0%',
+                    bottom: '0%',
+                    width: '100%',
+                    containLabel: true
+                },
+                calculable: true,
+                xAxis: [{
+                    type: 'category',
+                    data: date,
+                    min: 0
+                }],
+                yAxis: Yl,
+                series: [{
+                    name: typeArr[0],
+                    type: 'line',
+                    data: data1,
+                    itemStyle: {
+                        normal: {
+                            color: '#ee9e1f',
+                            lineStyle: {
+                                color: '#ee9e1f'
+                            },
+                            label: {
+                                show: true,
+                                position: 'top',
+                                formatter: ValFormatter
+                            }
+                        }
+                    }
+                },{
+                    name: typeArr[1],
+                    type: 'line',
+                    data: data2,
+                    itemStyle: {
+                        normal: {
+                            color: '#5bdaa3',
+                            lineStyle: {
+                                color: '#5bdaa3'
+                            },
+                            label: {
+                                show: true,
+                                position: 'top',
+                                formatter: ValFormatter
+                            }
+                        }
+                    }
+                }]
+            };
+            myChart.setOption(set);
+        };
+         //获取近期日期
+         function getDay(day) {
+            var today = new Date();
+            var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
+            today.setTime(targetday_milliseconds);
+
+            var tYear = today.getFullYear();
+            var tMonth = today.getMonth();
+            var tDate = today.getDate();
+            tMonth = doHandleMonth(tMonth + 1);
+            tDate = doHandleMonth(tDate);
+            return tYear + "-" + tMonth + "-" + tDate;
+        }
+
+        function doHandleMonth(month) {
+            var m = month;
+            if (month.toString().length == 1) {
+                m = "0" + month;
+            }
+            return m;
+        }
+
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                laydate = layui.laydate;
+            laydate.render({
+                elem: '#date_day',
+                format: 'yyyy-MM-dd',
+                range: true,
+                max: 0,
+                done: function (value, date, endDate) {
+                    $('.laydate-selected').css('background','#fff !important;')
+                    if (value) {
+                        var Val = value.split(' - ');
+                        getTAndYContrastData(2, Val[0], Val[1]);
+                    }
+                }
+            })        
+
+            $('.table-more').on('click', function () {
+                $('.table_content ul:not(.tr_show)').toggle();
+                if ($('.table-more').hasClass('cur') == false) {
+                    $('.table-more').addClass('cur');
+                    $('.table-more').html('<i class="layui-icon">&#xe619;</i>');
+                } else {
+                    $('.table-more').removeClass('cur');
+                    $('.table-more').html('<i class="layui-icon">&#xe61a;</i>');
+                }
+
+            });
+            //近七天/30天客流趋势数据
+            form.on('select(timetype1)', function (data) {
+                var category = data.value;  //获取select的value    // var categoryName = data.elem[data.elem.selectedIndex].text;  //获取文本内容
+                form.render('select');
+                getRecentData(category)
+            });
+            //近30天/24小时或者仅查询周内某个时间段客流趋势
+            form.on('select(timetype2)', function (data) {
+                var category = data.value;
+                form.render('select');
+                getNearThirtyData(category);
+            });
+            //停留时长分析
+            form.on('select(timetype3)', function (data) {
+                var category = data.value;
+                form.render('select');
+                getNearStopTimeData(category);
+            });
+            //客流同比分析
+            form.on('select(timetype4)', function (data) {
+                var category = data.value;
+                form.render('select');
+                if (category == 1) {
+                    $('#time_filter').hide();
+                } else {
+                    $('#time_filter').show();
+                    $('#date_day').val(getDay(0) + " - " + getDay(0))
+                }
+                getTAndYContrastData(category,getDay(0),getDay(0));
+            });
+            //新老顾客对比
+            form.on('select(timetype5)', function (data) {
+                var category = data.value;
+                form.render('select');
+                getNewUserAndOldUserData(category)
+            });
+        });
+        //关闭提示
+        $('#closeTip').on('click', function () {
+            $('#tip_box').toggle();
+        });
+
+    </script>
+</body>
+
+</html>

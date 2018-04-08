@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-财务管理</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+</head>
+
+<style type="text/css">
+	.label_form .mod_nav {margin: 10px 0 10px 28px;}
+   .addinput_box {background-color: #FFF;padding: 20px;}
+	
+	.mod_tip{ margin-left: 110px;color:#999; }
+	.mod_tip label {color:red;}
+	.recharge_box h4 {border-top: 1px solid #f2f4f5;font-size: 14px;line-height: 44px; border-bottom: none;}
+	.mod_count {width:100%; height: 208px;}
+  .mod_count:after { width: 100%;background: #f2f2f2; position: relative;top: -110px;right: 1px;clear: both;content: '\0020';display: block;
+          height: 1px;}
+	.mod_count input {border-top: 1px solid #f2f4f5;}
+	.mod_count p {font-size: 14px; height: 40px; line-height: 40px;padding-bottom: 20px;}
+  .mod_count p:last-child {padding-bottom: 0px;}
+</style>
+
+<body>
+	<div class="content_box">
+   <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+      </div>
+
+	<form class="label_form layui-form">
+	<div class="addinput_box">
+			<div class="add_linel">
+				<div class="add_title">广告主名称：</div>
+				<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+				<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+			</div>
+			<div class="add_linel">
+				<div class="add_title">广告主账户余额：</div>
+				<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+				<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+			</div>
+	</div>
+
+      <div class="recharge_box">
+      	    <h4><i class="club_icons icon2"></i>服务商账户充值</h4>
+      	    <div class="mod_box">
+      	    	  <ul class="mod_nav clearfix">
+               		 <li class="cur">
+                    	<p>I类账户充值</p>
+                	</li>
+                	<li>
+                    	<p>II类账户充值</p>
+                	</li>
+            	</ul>
+
+
+            	<div class="mod_tip">I类账户说明：I类账户只能投放主流网络广告，包括今日头条、爱奇艺、优酷、微博等，<label>不支持腾讯广告（含朋友圈广告）、短信投放。</label></div>
+            	<div class="mod_tip" style="display: none;">II类账户说明：II类广告可投放全网广告。</div>
+          
+      	    </div>
+          
+			<div class="mod_count">
+                <p class="">您的I类账户可用余额： ¥<span>5000</span></p>
+        		<p class="charge">请输入转账金额： <input type="text" value="" class="bm-input" name="crowd_name" id="crowd_name" placeholder="请输入充值金额"></p>
+				
+
+       			<p><input type="checkbox" name="vehicle" value="Car" checked="checked" lay-skin="primary" id="checked" /> 我已知晓转账后不可撤销</p>
+       			<a href="javascript:;" class="btn_link bm-btn bm-btn-blue" id="saveScene">立即转账</a>
+			</div>
+			
+			<div class="mod_count" style="display: none;">
+				<p >您的II类账户可用余额： ¥<span>5000</span></p >
+        		<p class="charge">请输入转账金额： <input type="text" value="" class="bm-input" name="crowd_name" id="crowd_name" placeholder="请输入充值金额"></p >
+       			<p ><input type="checkbox" name="vehicle" value="Car" checked="checked" lay-skin="primary" id="checked" /> 我已知晓转账后不可撤销</p>
+            <!-- <label><input type="checkbox" id="agreen" value="">确认了解并同意以上条款</label> -->
+       			<a href="javascript:;" class="btn_link bm-btn bm-btn-blue" id="saveScene" onclick="transfer();">立即转账</a>
+			</div>
+      </div>
+    </form>
+</div>
+<script>
+  layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+    
+         
+          });
+
+	    $('.mod_nav').on('click','li',function(){
+            var th = $(this),
+                idx = th.index();
+            th.addClass('cur').siblings().removeClass('cur');
+            $('.mod_count').eq(idx).show().siblings('.mod_count').hide();
+        	$('.mod_tip').eq(idx).show().siblings('.mod_tip').hide();
+
+        })
+
+
+      //立即转账
+      function transfer() {
+        
+      }
+</script>
+</body>
+
+
+
+

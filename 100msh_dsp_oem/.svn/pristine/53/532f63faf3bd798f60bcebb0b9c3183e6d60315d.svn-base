@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的平台-我的广告主</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laytpl/laytpl.js"></script>
+</head>
+<body>
+	<div class="content_box">
+		<div class="title_box">
+            <!-- <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span> -->
+            <span><a href="javascript:history.go(-1)">< 返回我的广告主</a></span>
+        </div>
+        <div class="advertr_info">
+        	{{if $data.comp_info.reject_message != ""}}
+        	<div class="adv_tip" id="adv_tip">
+		        <i></i>
+		        <p>{{$data.comp_info.reject_message}}</p>
+		    </div>
+		    {{/if}}
+		    <div class="adv_base">
+		    	<ul class="clearfix">
+		    		<li>
+		    			<p><span>广告主名称：</span>{{$data.comp_info.comp_name}}</p>
+		    		</li>
+		    		<li>
+		    			<p><span>所属区域：</span>{{$data.comp_info.pro_name}}　{{$data.comp_info.city_name}}　{{$data.comp_info.region_name}}</p>
+		    		</li>
+		    		<li>
+		    			<p><span>所属行业：</span>{{$data.comp_info.cate_name}}</p>
+		    		</li>
+		    		<li>
+		    			<p><span>广告主网址：</span>{{$data.comp_info.website_url}}</p>
+		    		</li>
+		    		{{if $data.comp_info.if_operate ==1}}
+		    		<li>
+		    			<p>
+		    				<span>投放人员：</span><select id="operate_sel" class="bm-select"></select>
+							<a href="javascript:;" class="bm-btn bm-btn-blue" onclick="keepOperate()">保存</a>
+		    			</p>
+		    		</li>
+		    		{{/if}}
+		    		<li>
+		    			<p><span>手机号码：</span>{{$data.comp_info.mobile_phone}}</p>
+		    		</li>
+		    		<li>
+		    			<p><span>联系人：</span>{{$data.comp_info.contacts}}</p>
+		    		</li>
+		    	</ul>
+		    </div>
+        </div>
+        <div class="advertr_info mt30">
+        	<div class="adv_title">
+        		<h4>账户详情</h4>
+        		<!-- <a href="javascript:;" class="bm-btn bm-btn-blue fl">为广告主充值</a> -->
+        	</div>
+        	<div class="adv_data">
+        		<ul class="clearfix">
+        			<li>
+        				<div class="li_name"><i class="club_icons icon14" ></i>现金账户</div>
+        				<div class="li_total">
+        					<p>余额</p>
+        					<span>{{$data.acc_info[1].usable_amount}}</span>
+        				</div>
+        				<div class="li_data clearfix">
+        					<div class="liboxs">
+        						<p>冻结中</p>
+        						<span>{{$data.acc_info[1].freeze_amount}}</span>
+        					</div>
+        					<div class="liboxs">
+        						<p>已消耗</p>
+        						<span>{{$data.acc_info[1].total_disburse}}</span>
+        					</div>
+        				</div>
+        			</li>
+        			<li>
+        				<div class="li_name"><i class="club_icons icon15"></i>赠送账户</div>
+        				<div class="li_total">
+        					<p>余额</p>
+        					<span>{{$data.acc_info[2].usable_amount}}</span>
+        				</div>
+        				<div class="li_data">
+        					<div class="liboxs">
+        						<p>冻结中</p>
+        						<span>{{$data.acc_info[2].freeze_amount}}</span>
+        					</div>
+        					<div class="liboxs">
+        						<p>已消耗</p>
+        						<span>{{$data.acc_info[2].total_disburse}}</span>
+        					</div>
+        				</div>
+        			</li>
+        			<li>
+        				<div class="li_name"><i class="club_icons icon16"></i>虚拟账户</div>
+        				<div class="li_total">
+        					<p>余额</p>
+        					<span>{{$data.acc_info[0].usable_amount}}</span>
+        				</div>
+        				<div class="li_data">
+        					<div class="liboxs">
+        						<p>冻结中</p>
+        						<span>{{$data.acc_info[0].freeze_amount}}</span>
+        					</div>
+        					<div class="liboxs">
+        						<p>已消耗</p>
+        						<span>{{$data.acc_info[0].total_disburse}}</span>
+        					</div>
+        				</div>
+        			</li>
+        		</ul>
+        	</div>
+        </div>
+        <div class="advertr_info mt30">
+        	<div class="adv_title"><h4>近6个月账户流水记录</h4></div>
+        	<table id="account_list" class="base_table">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>充值金额</th>
+                        <th>充值账户</th>
+                        <th>支付方式</th>
+                        <th>流水号</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p class="noMsg noMsg1"></p>
+            <!--列表分页-->
+            <div id="list_page1" class="page"></div>
+        </div>
+        <div class="advertr_info mt30 clearfix">
+        	<div class="part1 fl">
+	        	<h4><i class="club_icons icon13" ></i>消耗详情</h4>
+				<div class="pboxs">
+					<div class="p1">
+						<span>已投放广告</span>
+						<p><b>0</b>条</p>
+					</div>
+					<div class="p2">
+						<span>已消耗金额</span>
+						<p><b>{{$data.comp_info.total_disburse}}</b>元</p>
+					</div>
+				</div>
+	        </div>
+        	<div class="part2 fl">
+	        	<h4>近6个月广告消耗记录</h4>
+	        	<table id="transfer_list" class="base_table">
+	                <thead>
+	                    <tr>
+	                        <th>日期</th>
+	                        <th>投放广告数</th>
+	                        <th>消耗金额</th>
+	                        <th>广告曝光数</th>
+                            <th>广告点击数</th>
+	                        <th>点击率</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+	            <p class="noMsg noMsg2">暂无记录</p>
+	            <!--列表分页-->
+            	<div id="list_page2" class="page"></div>
+        	</div>
+        </div>
+	</div>
+	<script type="text/javascript">
+		var comp_id = {{$data.comp_info.comp_id}};
+		var ifOper = {{$data.comp_info.if_operate}},
+			operId = {{$data.comp_info.ascription_staff_id}};
+        var limit = 10;
+		//获取最近6个月充值记录
+        function getAccountList(curr) {
+            $.ajax({
+                type: "GET",
+                url: '/V1.2/Advertiser/advRecharge/comp_id/' + comp_id + '/page/' + (curr || 1) + '/limit/' + limit,
+                dataType: 'json',
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        renderTabel1(data);     //渲染表格数据
+                        renderPage1(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function renderTabel1(data) {
+            var list_e = $("#account_list tbody"), str = "", no_msg = $(".noMsg1");
+            if (data.pages == 0) {
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text("");
+            $.each(data.list, function (k, v) {
+                str += "<tr>"
+                str += "<td>" + v.transfer_time + "</td>"
+                str += "<td>" + v.amount + "</td>"
+                str += "<td>" + v.acc_type + "</td>"
+                str += "<td>" + v.transfer_type + "</td>"
+                str += "<td>" + v.transfer_no + "</td>"
+                str += "</tr>"
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage1(pages, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page1'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getAccountList(obj.curr);
+                    }
+                }
+            });
+        }
+        getAccountList();
+
+        //获取最近6个月充值记录
+        function getTransferList(curr) {
+            $.ajax({
+                type: "GET",
+                url: '/V1.2/Advertiser/advRecharge/comp_id/' + comp_id + '/page/' + (curr || 1) + '/limit/' + limit,
+                dataType: 'json',
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        renderTabel2(data);     //渲染表格数据
+                        renderPage2(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function renderTabel2(data) {
+            var list_e = $("#transfer_list tbody"), str = "", no_msg = $(".noMsg2");
+            if (data.pages == 0) {
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text("");
+            $.each(data.list, function (k, v) {
+                str += "<tr>"
+                str += "<td>" + v.transfer_time + "</td>"
+                str += "<td>" + v.amount + "</td>"
+                str += "<td>" + v.acc_type + "</td>"
+                str += "<td>" + v.transfer_type + "</td>"
+                str += "<td>" + v.transfer_no + "</td>"
+                str += "</tr>"
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage2(pages, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page2'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                skip: true, //是否开启跳页
+                skin: '#5877a4',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getTransferList(obj.curr);
+                    }
+                }
+            });
+        }
+        //getTransferList();
+
+        //投放人员列表
+        function getOperate(){
+        	$.ajax({
+                type: "POST",
+                url: '/V1.2/Advertiser/operate',
+                dataType: 'json',
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data,str='<option value="0">请选择</option>';
+                        $.each(data,function(k,v){
+                        	str +='<option value="'+v.staff_id+'">'+v.staff_name+'</option>'
+                        })
+                        $('#operate_sel').html(str);
+                        setTimeout(function(){
+	                        if(operId){
+	                        	$('#operate_sel').val(operId).change();
+	                        }
+                        },500)
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        if(ifOper==1){
+        	getOperate();
+        }
+
+        //保存投放人
+        function keepOperate(){
+        	var staff_id = $('#operate_sel').val();
+        	if(staff_id == '0'){
+                tipTopShow("请选择投放人员！");    //显示提示框
+				return;
+			}
+        	var dataPost = {'comp_id':comp_id,'ascription_staff_id':operId,'staff_id':staff_id};
+        	$.ajax({
+                type: "POST",
+                url: '/V1.2/Advertiser/setOperate',
+                dataType: 'json',
+                data: dataPost,
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        tipTopShow(rs.msg);
+                        operId = staff_id;
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+	</script>
+</body>
+</html>

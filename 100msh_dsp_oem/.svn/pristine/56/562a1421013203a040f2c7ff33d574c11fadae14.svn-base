@@ -1,0 +1,228 @@
+<?php
+class AgentController extends BasicController {
+	public function indexAction(){
+        $this->getView();
+	}
+    public function listAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        $data['agent_level']=$this->uinfo['agent_level'];
+        $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+        $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+        $result = BmDspApi::request('agent/advList',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取代理商列表接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    /**
+     * 获取区域地址
+     * @return [type] [description]
+     */
+    public function getScListAction(){
+        $data=array();
+        $data['sc_id']=intval($this->getRequest()->getParam('sc_id',0));
+        $result = BmDspApi::request('advertiser/getScList',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取区域地址接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','sc_list'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function addAction(){
+        if(isset($_POST)&&!empty($_POST)) {
+            $data['comp_pid'] = $this->uinfo['comp_id'];
+            $data['staff_id'] = $this->uinfo['staff_id'];
+            $data['agent_level']=$this->uinfo['agent_level'];
+            if($data['agent_level'] >= 3){
+                Helper::outJson(array('state'=>0 , 'msg' =>'此代理商不可以再新增下级代理！'));
+            }
+            $data['comp_name'] = Helper::clean($this->getRequest()->getPost('comp_name'));
+            $data['contacts'] = Helper::clean($this->getRequest()->getPost('contacts'));
+            $data['mobile_phone'] = Helper::clean($this->getRequest()->getPost('mobile_phone'));
+            $data['sc_pro'] = intval($this->getRequest()->getPost('sc_pro'));
+            $data['sc_pid'] = intval($this->getRequest()->getPost('sc_pid'));
+            $data['sc_id'] = intval($this->getRequest()->getPost('sc_id'));
+            $data['staff_acc'] = Helper::clean($this->getRequest()->getPost('staff_acc'));
+            if(empty(trim($data['comp_name']))){
+                Helper::outJson(array('state'=>0 , 'msg' =>'代理商名称不可为空'));
+            }
+            if(empty($data['contacts'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'联系人不可为空'));
+            }
+            if(isset($_POST['gdt_settle'])){
+                $data['gdt_settle']=trim($this->getRequest()->getPost('gdt_settle'));
+            }
+            $result = BmDspApi::request('agent/add',$data,'POST');
+            //var_dump($result);
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求api新增代理商接口失败'));
+            }
+            if($result['api_code'] == 0){
+                //添加操作日志
+                $log_content[] = "下级代理商管理 :". "代理商添加";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('代理商添加',$log_content_str,'LC008',"LOT001");
+                Helper::outJson(array('state' => 1, 'msg' => '添加成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }
+
+    }
+    public function editAction(){
+        $comp_id=$this->getRequest()->getParam('comp_id')?Helper::clean($this->getRequest()->getParam('comp_id')):0;
+        if(!$comp_id){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求参数错误'));
+        }
+        if(isset($_POST)&&!empty($_POST)) {
+            $data['comp_id'] = $comp_id;
+            $data['staff_id'] = $this->uinfo['staff_id'];
+            $data['comp_name'] = Helper::clean($this->getRequest()->getPost('comp_name'));
+            $data['contacts'] = Helper::clean($this->getRequest()->getPost('contacts'));
+            $data['mobile_phone'] = Helper::clean($this->getRequest()->getPost('mobile_phone'));
+            $data['sc_pro'] = intval($this->getRequest()->getPost('sc_pro'));
+            $data['sc_pid'] = intval($this->getRequest()->getPost('sc_pid'));
+            $data['sc_id'] = intval($this->getRequest()->getPost('sc_id'));
+            $data['staff_acc'] = Helper::clean($this->getRequest()->getPost('staff_acc'));
+            if(empty(trim($data['comp_name']))){
+                Helper::outJson(array('state'=>0 , 'msg' =>'代理商名称不可为空'));
+            }
+            if(empty($data['contacts'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'联系人不可为空'));
+            }
+            $result = BmDspApi::request('agent/edit',$data,'POST');
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求api编辑代理商接口失败'));
+            }
+            if($result['api_code'] == 0){
+                if($result['data']['if_edit'] == '1'){
+                    $mb_orig=$result['data']['mb_orig'];
+                    $mb_now=$result['data']['mb_now'];
+                    $one_name=$result['data']['one_name'];
+                    $comp_name=$result['data']['comp_name'];
+                    $content1 = "【".$one_name."】尊敬的用户，你的账号已撤消<".$comp_name.">管理员资格";
+                    $result1 = BmDspApi::request('sms/send' , array('content' => $content1 ,'mobile_phone'=>$mb_orig)); //发送短信验证码
+                    $content2 = "【".$one_name."】尊敬的用户，你的账号已被创建为<".$comp_name.">管理员，默认密码为账号后6位，服务商网址请联系对接人员获取。";
+                    $result2 = BmDspApi::request('sms/send' , array('content' => $content2 ,'mobile_phone'=>$mb_now)); //发送短信验证码
+                }
+                $str="";
+                //添加操作日志
+                $log_content[] = "下级代理商管理 :". "代理商修改";
+                $log_content[]="操作修改的员工ID：".$data['staff_id'];
+                foreach($result['data'] as $k=>$v){
+                    $str.=$k."-".$v."|";
+                }
+                $log_content[]="修改的字段信息：".trim($str,'|');
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('代理商修改',$log_content_str,'LC008',"LOT002");
+                Helper::outJson(array('state' => 1, 'msg' => '修改成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }
+    }
+    public function viewAction()
+    {
+        $comp_id = $this->getRequest()->getParam('comp_id') ? Helper::clean($this->getRequest()->getParam('comp_id')) : 0;
+        if (!$comp_id) {
+            Helper::outJson(array('state' => 0, 'msg' => '请求参数错误'));
+        }
+        $data=array();
+        $data['comp_id']=$comp_id;
+        $result = BmDspApi::request('agent/view',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求代理商信息接口失败'));
+        }
+        if($result['api_code'] == 0){
+            //var_dump($result['data']);
+            $this->getView()->assign('data' , $result['data']);
+            //Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function rechargeAction(){
+        $comp_id = $this->getRequest()->getParam('comp_id') ? Helper::clean($this->getRequest()->getParam('comp_id')) : 0;
+        if (!$comp_id) {
+            Helper::outJson(array('state' => 0, 'msg' => '请求参数错误'));
+        }
+        $data=array();
+        $data['comp_pid']=$comp_id;
+        $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+        $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+        $data['date']=Helper::clean($this->getRequest()->getParam('date' , date('Y-m')));
+        $result = BmDspApi::request('advertiser/recharge',$data,'GET');
+        // print_r($result['data']);
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求代理商记录接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function stopAction()
+    {
+        $comp_id = $this->getRequest()->getParam('comp_id') ? Helper::clean($this->getRequest()->getParam('comp_id')) : 0;
+        if (!$comp_id) {
+            Helper::outJson(array('state' => 0, 'msg' => '请求参数错误'));
+        }
+        $data=array();
+        $data['comp_id']=$comp_id;
+        $result = BmDspApi::request('agent/stop',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求停止代理商接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功'));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function recoverAction()
+    {
+        $comp_id = $this->getRequest()->getParam('comp_id') ? Helper::clean($this->getRequest()->getParam('comp_id')) : 0;
+        if (!$comp_id) {
+            Helper::outJson(array('state' => 0, 'msg' => '请求参数错误'));
+        }
+        $data=array();
+        $data['comp_id']=$comp_id;
+        $result = BmDspApi::request('agent/recover',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求回复代理商接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功'));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function resetAction()
+    {
+        $m = Helper::M('U');
+        if($this->getRequest()->isPost()){
+            $staff_id = Helper::clean($this->getRequest()->getPost('staff_id' , 0));
+            if (!$staff_id) {
+                Helper::outJson(array('state' => 0, 'msg' => '请求参数错误'));
+            }
+            $staff_info=$m->get('',$staff_id);
+            if(empty($staff_info)){
+                Helper::outJson(array('state' => 0 , 'msg' => '用户不存在！'));
+            }
+            $pwd = md5(substr($staff_info['user_name'] , -6));
+            $ef = $m->editPwd($pwd , $staff_id);
+            Helper::outJson(array('state' => 1 , 'msg' => '已重置密码！'));
+        }
+    }
+}

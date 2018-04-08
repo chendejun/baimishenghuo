@@ -1,0 +1,342 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step2">
+            <ul class="mod_nav clearfix" id="mod_nav">
+                <li class="cur" _type="1">基础条件定向</li>
+                <li class="" _type="2">自定义人群包</li>
+            </ul>
+            <div class="from-row">
+                <label>投放区域：</label>
+                <input type="radio" name="user_area" value="0" title="不限" checked lay-filter="user_area">
+                <input type="radio" name="user_area" value="1" title="省市" lay-filter="user_area">
+                <input type="radio" name="user_area" value="4" title="商圈" lay-filter="user_area">
+            </div>
+            <div class="city_box" style="display: none">
+                <div class="mod_club crowd_club" id="crowd_club" style="display: none">
+                    <h3>已选择</h3>
+                    <div class="club_li label_list scrollbar clearfix">
+                    </div>
+                </div>
+                <div class="crowd_box crowd_area clearfix">
+                    <div id="pro_list" class="box_list scrollbar" style="display: none"></div>
+                    <div id="city_list" class="box_list scrollbar" style="display: none"></div>
+                </div>
+            </div>
+            <div class="zone_box" style="display: none">
+                <div class="from-row zone_sel">
+                    <label>选择城市：</label>
+                    <div class="layui-input-inline">
+                        <select name="zone_city" lay-verify="required" lay-filter="zone_city" lay-search="" id="zone_city">
+                        </select>
+                    </div>
+                </div>
+                <div class="zone_mod" style="display: none">
+                    <div class="mod_club" id="sq_club" style="display: none">
+                        <h3>已选择</h3>
+                        <div class="club_li label_list scrollbar clearfix">
+                        </div>
+                    </div>
+                    <div class="sq_area clearfix">
+                        <div id="first_list" class="item_box fbox scrollbar" style="display: none"></div>
+                        <div id="second_list" class="item_box sbox scrollbar" style="display: none"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="usre_box">
+                <article>
+                    <div class="from-row">
+                        <label>性别：</label>
+                        <input type="radio" name="user_sex" value="" title="不限" checked >
+                        <input type="radio" name="user_sex" value="10001" title="男" >
+                        <input type="radio" name="user_sex" value="10002" title="女" >
+                    </div>
+                    <div class="from-row">
+                        <label>年龄：</label>
+                        <input type="radio" name="user_age" value="" title="不限" checked >
+                        <input type="radio" name="user_age" value="10001" title="18岁以下" >
+                        <input type="radio" name="user_age" value="10002" title="18岁-24岁" >
+                        <input type="radio" name="user_age" value="10003" title="25岁-34岁" >
+                        <input type="radio" name="user_age" value="10004" title="35岁以上" >
+                    </div>
+                    <div class="from-row">
+                        <label>IP定向：</label>
+                        <input type="radio" name="user_ip" value="0" title="不限" checked lay-filter="user_ip">
+                        <input type="radio" name="user_ip" value="1" title="定向" lay-filter="user_ip">
+                    </div>
+                    <div class="from-row ip_box" style="display: none">
+                        从 <input type="text" name="startIp" class="bm-input layui-input">
+                        至 <input name="endIp" type="text" class="bm-input layui-input">
+                    </div>
+                </article>
+                <article class="dmp_box" style="display: none">
+                    <div class="dmp_top">
+                        <span>选择自定义人群包</span>
+                        <!-- <a href="javascript:;" class="bm-btn bm-btn-white">新建人群包</a> -->
+                    </div>
+                    <div class="dmp_tab mt10">
+                        <table id="dmp_lists" class="base_table">
+                            <thead>
+                                <tr>
+                                    <th>人群包名称</th>
+                                    <th>覆盖人群数量/人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <p class="noMsg"></p>
+                    </div>
+                </article>
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(1)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" data="3" id="stepBtnp2">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/bhdelivery.js"></script>
+    <script type="text/javascript">
+        function preStepPage(v){
+            var v = parseInt(v)-1
+            location.href ='./create'+v+'.html';
+        }
+        function nextStepPage(v){
+            var v = parseInt(v)+1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            var isfistCity = true, isfistSq = true,isfistCrowd = true;
+
+
+            //广告计划类别选择
+            $('#mod_nav').on('click','li',function(){
+                var th = $(this),
+                    idx = th.index(),
+                    type = th.attr('_type'),
+                    dmpHtml = $("#dmp_lists tbody").html();
+                th.addClass('cur').siblings('li').removeClass('cur');
+                $('.usre_box article').eq(idx).show().siblings().hide();
+                $('input[name="user_area"][value="0"]').click();
+                $('.city_box').hide();
+                $('.zone_box').hide();
+                if(type==2 && isfistCrowd){
+                    getCrowdlist();
+                }
+                form.render();
+            })
+
+            //区域
+            form.on('radio(user_area)', function (data) {
+                var val = data.value;
+                $('.zone_box').hide();
+                $('.city_box').hide();
+                if(val==1){
+                    if(isfistCity){
+                        getBhCity(0);//请求省市
+                        isfistCity = false;
+                    }
+                    $('.city_box').show();
+                }else if(val==4){
+                    if(isfistSq){
+                        getBhCitySel();
+                        isfistSq = false;
+                    }
+                    $('.zone_box').show();
+                }
+            })
+            //IP定向
+            form.on('radio(user_ip)', function (data) {
+                var val = data.value;
+                if(val==1){
+                    $('.ip_box').show();
+                }else{
+                    $('.ip_box').hide();
+                }
+            })
+            //商圈
+            form.on('select(zone_city)', function (data) {
+                var val = data.value;
+                var box = $('.zoneId'+val);
+                if(val){
+                    $('.zbox').hide();
+                    if(box.length>0){
+                        box.show();
+                    }else{
+                        getBhZoneList(val);
+                    }
+                }
+            })
+            //获取人群包
+            function getCrowdlist(){
+                $.ajax({
+                    type: "POST",
+                    url: '/v1.2/Bhdelivery/getCrowdlist',
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            var data = rs.data;
+                            var list_e = $("#dmp_lists tbody"),str="",no_msg = $(".noMsg");
+                            if(data.length==0){
+                                list_e.html("");
+                                no_msg.text("暂无记录");
+                                return ;
+                            }
+                            no_msg.text("");
+                            $.each(data,function(k,v){
+                                str += '<tr><td class="ck_td"><input type="checkbox" name="dmp_check" value="'+v.crowd_id+'" lay-skin="primary" title="'+v.crowd_name+'"></td><td>'+v.cover_users+'</td></tr>';
+                            });
+                            list_e.html(str);
+                            if(isfistCrowd){
+                                isfistCrowd = false;
+                            }
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                        form.render();
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });
+            }
+
+            //商圈选择城市
+            function getBhCitySel(){
+                var postData ={'type':'1','cityId':''};
+                $.ajax({
+                    type: "POST",
+                    url: '/v1.2/BhDelivery/getBhCityArea',
+                    data: postData,
+                    dataType:'json',
+                    success: function(rs){
+                        if(rs.api_code == 1){
+                            var data = rs.data;
+                            var str ='<option value>请输入搜索选择城市</option>';
+                            if(!data){
+                                $('#zone_city').html('');
+                                return;
+                            }
+                            $.each(data,function(k,v){
+                                str += '<option value="'+v.cityId+'">'+v.name+'</option>';
+                            });
+                            $('#zone_city').html(str);
+                        }else{
+                            $('#zone_city').html('');
+                        }
+                        form.render();
+                    },
+                    error:function(rs){
+                        layui.layer.msg("查询信息失败，请重试...");
+                    }
+                });
+            }
+        })
+        //获取人群包Id集合
+        function getCrowdId(){
+            var dmpId =[];
+            $('input[name="dmp_check"]:checked').each(function() {
+                var id = $(this).val();
+                if(id){
+                    dmpId.push(id);
+                }
+            })
+            return dmpId;
+        }
+        //下一步按钮检验
+        $('#stepBtnp2').on('click',function(e){
+            var th = $(this),
+                id = th.attr('data');
+            var res = checkDataStept2();
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            stgbh2 = res.data;
+            getAdxs(1);
+            stepPage(id);
+        })
+        //ip地址校验
+        function isValidIP(ip) {
+            var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+            return reg.test(ip);
+        }
+        //页面校验
+        function checkDataStept2(){
+            var user_sex = $('input[name="user_sex"]:checked').val(),//性别
+                user_age = $('input[name="user_age"]:checked').val(),//年龄
+                user_ip = $('input[name="user_ip"]:checked').val(),//ip定向
+                user_area = $('input[name="user_area"]:checked').val(),//区域
+                navTy = $('#mod_nav .cur').attr('_type'),//1基础 2自定义人群包
+                cityData = getRegionJson(),
+                zoneData = getZoneJson(),
+                crowdData = [],
+                zVal = $('select[name=zone_city]').val(),
+                zText = $('select[name=zone_city] option:selected').text(),
+                startIp = $('input[name="startIp"]').val(),//开始IP
+                endIp = $('input[name="endIp"]').val(),//结束IP
+                ipSet='',areaSet=[];
+                returnData={};
+
+            if(user_area==1 && (JSON.stringify(cityData.data) == "{}")){ //省市
+                return {"success":false,msg:"请选择省市！"};
+            }
+            if(user_area==4 && (JSON.stringify(zoneData) == "{}")){
+                return {"success":false,msg:"请选择商圈！"};
+            }
+            if(navTy==1 && user_ip==1 ){
+                if(!startIp){
+                    return {"success":false,msg:"请输入起始IP！"};
+                }
+                if(isValidIP(startIp)==false){
+                    return {"success":false,msg:"请输入正确的起始IP！"};
+                }
+                if(!endIp){
+                    return {"success":false,msg:"请输入结束IP！"};
+                }
+                if(isValidIP(endIp)==false){
+                    return {"success":false,msg:"请输入正确的结束IP！"};
+                }
+                var sIpArr = startIp.split('.'),
+                    eIpArr = endIp.split('.');
+                if((sIpArr[0] != eIpArr[0]) || (sIpArr[1] != eIpArr[1]) || (sIpArr[2] != eIpArr[2])){
+                    return {"success":false,msg:"请输入同一网段IP！"};
+                }
+                if(sIpArr[3] > eIpArr[3]){
+                    return {"success":false,msg:"起始网段小于结束网段！"};
+                }
+                ipSet = startIp+'-'+endIp;
+            }
+            if(navTy==2){
+                crowdData = getCrowdId();
+                if(crowdData.length==0){
+                    return {"success":false,msg:"请选择自定义人群包！"};
+                }
+            }
+            if(user_area==1){
+                areaSet = cityData;
+            }else if(user_area==4){
+                areaSet = {"areaName":zText,"cityId":zVal,"data":zoneData};
+            }
+            var crowdDataStr = crowdData.join();
+            returnData = {
+                "success":true,
+                "data":{"beheGender":user_sex,"beheAge":user_age,"customIp":ipSet,"customCrowdIn":crowdDataStr,"areaType":user_area,"lbs":JSON.stringify(areaSet)}
+            };
+            return returnData;
+        }
+    </script>
+</body>
+</html>

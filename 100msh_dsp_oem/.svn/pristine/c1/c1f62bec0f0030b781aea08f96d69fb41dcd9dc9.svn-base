@@ -1,0 +1,13 @@
+<?php
+class SettleController extends BasicController {
+	public function indexAction(){
+        $agent_level=$this->uinfo['agent_level'];
+        if($agent_level >= 3){
+            $if_opear=0;
+        }else{
+            $if_opear=1;
+        }
+        //var_dump($agent_level);
+        $this->getView()->assign('if_opear' , $if_opear);
+	}
+}

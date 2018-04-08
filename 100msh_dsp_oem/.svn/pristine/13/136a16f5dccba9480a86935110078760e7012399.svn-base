@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的平台-我的广告主</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script src="../../../../../public/js/laypage/laypage.js"></script>
+    <script src="../../../../../public/js/layer/layer.js"></script>
+    <script src="../../../../../public/js/laytpl/laytpl.js"></script>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>百米DMP / 设备管理</span>
+        </div>
+        <div class="device_box">
+            <ul class="clearfix">
+                <li>
+                    <div class="li_title">
+                        <i class="club_icons icon17"></i>
+                        <span>设备数 / 个</span>
+                        <b>(后台设备更新<em class="red">1分钟/次</em>)</b>
+                    </div>
+                    <div class="echart_box ebox1" id="ebox1"></div>
+                    <div class="echart_label">
+                        <span><em class="c1"></em>在线</span>
+                        <span><em class="c2"></em>离线</span>
+                    </div>
+                </li>
+                <li>
+                     <div class="li_title">
+                        <i class="club_icons icon18"></i>
+                        <span>广告主 / 户</span>
+                        <b>(导出未绑设备广告主)</b>
+                    </div>
+                    <div class="echart_box ebox2" id="ebox2"></div>
+                    <div class="echart_label">
+                        <span><em class="c3"></em>已绑设备</span>
+                        <span><em class="c4"></em>未绑设备</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="li_title">
+                        <i class="club_icons icon19"></i>
+                        <span>探测人数 / 人</span>
+                        <b>(后台人数更新<em class="red">5分钟/次</em>)</b>
+                    </div>
+                    <div class="li_lists">
+                        <div class="li_row"><span>今日</span><b id="today_num">0</b><i class="" id="ificrease"></i></div>
+                        <div class="li_row"><span>昨日</span><b id="yes_num">0</b><i></i></div>
+                        <div class="li_row"><span>前日</span><b id="old_num">0</b><i></i></div>
+                    </div>
+                    <div class="li_tip">
+                        <b>今日对比昨日探测人数 </b>
+                        <em class="red" id="icreaseTip"></em>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="device_box mt20">
+            <div class="set_device_title">
+                <a class="btn_link bm-btn bm-btn-blue fl" href="javascript:;" onclick="addDeviceFn()">新建</a>
+                <div class="ipt_box">
+                    <select class="bm-select isrelation">
+                        <option value="">全部</option>
+                        <option value="1">在线</option>
+                        <option value="0">离线</option>
+                    </select>
+                    <input type="text" class="bm-input sear_device wd300" placeholder="设备MAC或广告主名称搜索" />
+                    <span class="btn_link bm-btn bm-btn-blue" id="search_adbtn" onclick="searchFn(this)">搜索</span>
+                </div>
+            </div>
+            <table id="device_list" class="base_table">
+                <thead>
+                    <tr>
+                        <th>序列</th>
+                        <th>设备MAC</th>
+                        <th>在线状态</th>
+                        <th>绑定广告主</th>
+                        <th>放置位置</th>
+                        <th>当前人数</th>
+                        <th>昨日人数</th>
+                        <th>前日人数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+            </table>
+            <p class="noMsg"></p>
+            <!--列表分页-->
+            <div id="list_page" class="page"></div>
+        </div>
+    </div>
+    <!--新增设备-->
+    <script id="add_device_box" type="text/html">
+        <div class="addperator_form">
+            <div class="form">
+                <div class="title">新建</div>
+                <div class="from-row">
+                    <label>绑定广告主：</label>
+                    <select class="bm-select comp_select wd300"></select>
+                </div>
+                <div class="from-row">
+                    <label>设备MAC：</label>
+                    <input type="text" name="device_name" class="bm-input wd300" placeholder="请输入设备背面的MAC地址，冒号可不填">
+                </div>
+                <div class="from-row">
+                    <label>放置位置：</label>
+                    <input type="text" name="device_loct" class="bm-input wd300" placeholder="输入不超过15个汉字">
+                </div>
+                <div class="set_bottom mt20">
+                    <a href="javascript:;" class="bm-btn cancel_btn" onclick="javascript:layer.closeAll();">取消</a>
+                    <input type="button" class="bm-btn bm-btn-blue" value="确定提交" onclick="addDevicePost()">
+                </div>
+            </div>
+        </div>
+    </script>
+     <!--查看设备-->
+    <script id="edit_device_box" type="text/html">
+        <div class="addperator_form">
+            <div class="form">
+                <div class="title">查看</div>
+                <div class="from-row">
+                    <label>绑定广告主：</label>
+                    <span><< d.compName >></span>
+                </div>
+                <div class="from-row">
+                    <label>设备MAC：</label>
+                    <span><< d.macName >></span>
+                    <a href="javascript:;" class="bm-btn bm-btn-blue unbind_btn" onclick="unbindDevice(<< d.macId >>)">取消与商户的绑定</a>
+                </div>
+                <div class="from-row">
+                    <label>放置位置：</label>
+                    <input type="text" name="edit_device_loct" class="bm-input wd300" value="<< d.macSet >>" placeholder="输入不超过15个汉字">
+                </div>
+                <div class="set_bottom mt20">
+                    <a href="javascript:;" class="bm-btn cancel_btn" onclick="javascript:layer.closeAll();">取消</a>
+                    <input type="button" class="bm-btn bm-btn-blue" value="保存" onclick="editDevicePost(<< d.macId >>)">
+                </div>
+            </div>
+        </div>
+    </script>
+    <script type="text/javascript">
+        laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+        var modEcharts1 = echarts.init(document.getElementById('ebox1'));
+        var modEcharts2 = echarts.init(document.getElementById('ebox2'));
+        //数据展示
+        function getDeviceSum(){
+            var icreaseTip={'1':'增长','2':'降低'};
+             $.ajax({
+                type: "GET",
+                url: '/v1.2/Device/getDeviceSum',
+                dataType: 'json',
+                success: function (rs) {
+                    var data = rs.data;
+                    var color1 =['#47c23a','#f56c6c'];
+                    var color2 =['#facc14','#8b6dfa'];
+                    //console.log('data==',data);
+                    var roundOption1 = chartOption(color1,data.deviceStatistics.total_num);
+                    var roundOption2 = chartOption(color2,data.advertiserStatistics.total_num);
+                    if (rs.state == 1) {
+                        roundOption1.series[0].data=[
+                             {value:data.deviceStatistics.on_line_num, name:'在线'},
+                             {value:data.deviceStatistics.off_line_num, name:'离线'},
+                        ];
+
+                        roundOption2.series[0].data=[
+                             {value:data.advertiserStatistics.binding_num, name:'已绑设备'},
+                             {value:data.advertiserStatistics.unbound_num, name:'未绑设备'},
+                        ];
+                        $('#today_num').html(data.detectionNumber.day_user_num);
+                        $('#yes_num').html(data.detectionNumber.yes_user_num);
+                        $('#old_num').html(data.detectionNumber.old_user_num);
+                        $('#icreaseTip').html(icreaseTip[data.detectionNumber.increase] + parseFloat(data.detectionNumber.rate *100)+'%');
+                        if(data.detectionNumber.increase==1){
+                            $('#ificrease').addClass('club_icons icon20').removeClass('icon21');
+                        }else{
+                            $('#ificrease').addClass('club_icons icon21').removeClass('icon20');
+                        }
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                    modEcharts1.setOption(roundOption1);
+                    modEcharts1.dispatchAction({
+                    type: 'showTip',
+                    seriesIndex: 0,
+                    dataIndex: 0
+                    });
+                    modEcharts2.setOption(roundOption2);
+                    modEcharts2.dispatchAction({
+                    type: 'showTip',
+                    seriesIndex: 0,
+                    dataIndex: 0
+                    });
+
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        getDeviceSum();
+
+        //广告主列表
+        function getCompList(){
+            $.ajax({
+                type:'POST',
+                url: '/v1.2/Ncrowd/getCompList',
+                dataType: 'json',
+                success: function(rs){
+                    var str ='',data= rs.data;
+                    if (rs.state == 1) {
+                        $.each(data, function (k, v) {
+                           str+='<option value="'+v.comp_id+'">'+v.comp_name+'</option>'
+                        })
+                        $('.comp_select').append(str);
+
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+
+            })
+        }
+
+        //设备列表搜索
+        var skeyWord = '',
+            isrelation = '';
+        function searchFn(th) {
+            var t = $(th),
+                inputDom = t.parent().find('input').val();
+                isrelation = $('.isrelation').val();
+            skeyWord = encodeURIComponent(inputDom);
+            getDeviceList();
+        }
+        //获取投放计划数据
+        var limit = 10;
+        function getDeviceList(curr) {
+            var name = skeyWord ? ('keyword/' + skeyWord + '/') : '';
+            var gdt_status = (isrelation !='') ? ('online_status/' + isrelation + '/') : '';
+            $.ajax({
+                type: "GET",
+                url: '/V1.2/Device/list/' + name + gdt_status + 'page/' + (curr || 1) + '/limit/' + limit,
+                dataType: 'json',
+                success: function (rs) {
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.totalPages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        var mac_status={'1':'在线','0':'离线'};
+        function render_table(data) {
+            var list_e = $("#device_list tbody"), str = "", no_msg = $(".noMsg");
+            if (data.totalPages == 0) {
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return;
+            }
+            no_msg.text("");
+            $.each(data.list, function (k, v) {
+                str += "<tr>"
+                str += "<td>" + parseInt(k+1+(data.page-1)*limit) + "</td>"
+                str += "<td>" + v.mac_addr + "</td>"
+                str += "<td>" + mac_status[v.mac_status] + "</td>"
+                str += "<td>" + v.comp_name + "</td>"
+                str += "<td>" + v.mac_set + "</td>"
+                str += "<td>" + v.day_user_num + "</td>"
+                str += "<td>" + v.yes_user_num + "</td>"
+                str += "<td>" + v.old_user_num + "</td>"
+                str += '<td><span class="table-option-btn mr30" onclick="viewDetail(\'' + v.mac_id +'\',\''+v.mac_addr+'\',\''+v.comp_id+'\',\''+v.comp_name+'\',\''+v.mac_set+'\')">查看</span>'
+                str += '<span class="table-option-btn" onClick="reNewPack('+v.comp_id+','+'\''+v.mac_addr+'\''+')" >生成人群包</span>'
+                str += "</td>"
+                str += "</tr>"
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(pages, curr) {
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function (obj, first) { //触发分页后的回调
+                    if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getDeviceList(obj.curr);
+                    }
+                }
+            });
+        }
+        getDeviceList();
+
+        //新建设备弹框
+        function addDeviceFn(){
+            var cacheDOM = $('#add_device_box').html();
+            if (cacheDOM == '') { return; }
+            layer.open({
+                type: 1,
+                title: '',
+                closeBtn:0,
+                area: ['820px', '500px'],
+                shadeClose: false, //点击遮罩关闭
+                content: cacheDOM
+            });
+            getCompList();
+        }
+        //新增设备
+        function addDevicePost(){
+            var comp_id = $('.comp_select').val(),
+                device_mac = $('input[name="device_name"]').val(),
+                position_des = $('input[name="device_loct"]').val();
+            if(!comp_id){
+                tipTopShow('请选择广告主！');
+                return;
+            }
+            if(!device_mac){
+                tipTopShow('请输入设备MAC地址！');
+                return;
+            }
+            if(!position_des){
+                tipTopShow('请输入放置位置！');
+                return;
+            }
+            if(position_des.length>15){
+                tipTopShow('放置位置不超过15个汉字！');
+                return;
+            }
+            var postData = {'comp_id':comp_id,'device_mac':device_mac,'position_des':position_des};
+            $.ajax({
+                type:'POST',
+                url: '/v1.2/Device/create',
+                dataType :'json',
+                data:postData,
+                success: function(rs){
+                    if(rs.state==1){
+                        tipTopShow(rs.msg);
+                        getDeviceSum();
+                        getDeviceList();
+                        setTimeout("layer.closeAll()", 100);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                    setTimeout("layer.closeAll()", 100);
+                }
+            })
+        }
+        //查看设备
+        function viewDetail(macId,macName,compId,compName,macSet){
+            var cacheDOM = $('#edit_device_box').html();
+            if (cacheDOM == '') { return;}
+            var data={};
+            data = {'macId':macId,'macName':macName,'compId':compId,'compName':compName,'macSet':macSet};
+            laytpl(cacheDOM).render(data, function(result){
+                layer.open({
+                    type: 1,
+                    title: '',
+                    closeBtn:0,
+                    area: ['820px', '500px'],
+                    shadeClose: false, //点击遮罩关闭
+                    content: result
+                });
+            })
+        }
+        //生成人群包
+        function reNewPack(id,addr){
+            var html ='以当前选择的广告主和设备探测到的人群，定向生成人群包,确定将跳转到人群定向新增页面';
+            layer.confirm(html, {
+                title:'生成人群包',
+                area : ['400px', '180px'],
+                btn: ["确定","不了"] //按钮
+                }, function(){
+                    location.href = '/v1.2/Ncrowd/apply?comp='+id+':'+addr;
+                }
+            )
+        }
+        //解绑
+        function unbindDevice(id){
+            var html ='取消后设备将停止探测人群，直到重新绑定任意商户。是否继续';
+            layer.confirm(html, {
+                title:'提示',
+                area : ['400px', '180px'],
+                btn: ["确定解绑","不了"] //按钮
+                }, function(){
+                    var postData = {'mac_id':id};
+                    $.ajax({
+                        type:'POST',
+                        url: '/v1.2/Device/deviceRelieve',
+                        dataType :'json',
+                        data:postData,
+                        success: function(rs){
+                            if(rs.state==1){
+                                tipTopShow(rs.msg);
+                                getDeviceSum();
+                                getDeviceList();
+                                setTimeout("layer.closeAll()", 100);
+                            }else{
+                                tipTopShow(rs.msg);
+                            }
+                        },
+                        error: function(rs){
+                            tipTopShow("查询信息失败，请重试...");    //显示提示框
+                            setTimeout("layer.closeAll()", 100);
+                        }
+                    })
+                }
+            )
+        }
+        //设置放置位置
+        function editDevicePost(id){
+            var position_des = $('input[name="edit_device_loct"]').val();
+            if(!position_des){
+                tipTopShow('请输入放置位置！');
+                return;
+            }
+            var postData = {'mac_id':id,'position_des':position_des};
+            $.ajax({
+                type:'POST',
+                url: '/v1.2/Device/setMac',
+                dataType :'json',
+                data:postData,
+                success: function(rs){
+                    if(rs.state==1){
+                        tipTopShow(rs.msg);
+                        getDeviceList();
+                        setTimeout("layer.closeAll()", 100);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                    setTimeout("layer.closeAll()", 100);
+                }
+            })
+        }
+
+        //环形图
+        function chartOption(color,num){
+            roundOption = {
+                color:color,
+                tooltip: {
+                    show:true,
+                    trigger: 'item',
+                    formatter: function(params, ticket, callback){
+                       var str = '<div style="text-align: center;width:90px;" id="toolTipBox"><p style="font-size:14px;margin:0px;color:#888;">总数</p><p style="font-size:20px;margin:0px">'+ num + '</p></div>'
+                        return str
+                    },
+                     position: function (point, params, dom, rect, size) {
+                        //console.log(dom); //可以看到，提示框是用position定位
+                         dom.style.marginLeft='-50px';
+                         dom.style.marginTop='-28px';
+                               return ['50%', '50%'];
+                          },
+                    alwaysShowContent:true,
+                    backgroundColor:'none',	//设置提示框的背景色
+                    textStyle:{
+                        color:'#333'
+                    }
+                },
+                grid: {
+                    bottom:'10%',
+                    left:'10%',
+                    right:'10%',
+                    top:'15%',
+                },
+                graphic:{
+                    type:'text',
+                    left:'center',
+                    top:'top',
+                    z:100,
+                    style:{
+                        text:'156531',
+                        fontSize:30,
+                        y:100,
+                        x:100,
+                        textAlign:'center',
+                        fill:'#000',
+                        width:50,
+                        height:50
+                    }
+                },
+                series: [
+                    {
+                        name:'访问来源',
+                        type:'pie',
+                        radius: ['55%', '65%'],
+                        center: ['50%', '50%'],
+                        hoverAnimation:false,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'outside',
+                                formatter: '{c}',
+                                textStyle: {
+                                    fontSize:'14',
+                                    color:'#333',
+                                },
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: true,
+                                legend:5,
+                                length2:5,
+                                lineStyle: {
+                                    color:'#bababa',
+                                }
+                            }
+                        },
+                        data:[{value:0,name:''},{value:0,name:''}]
+                    }
+                ]
+            };
+            return roundOption;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-财务管理</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+</head>
+
+<style type="text/css">
+	.label_form .mod_nav {margin: 10px 0 10px 28px;}
+   .addinput_box {background-color: #FFF;padding: 20px;}
+	
+	.mod_tip{ margin-left: 110px;color:#999; }
+	.mod_tip label {color:red;}
+	.recharge_box h4 {border-top: 1px solid #f2f4f5;font-size: 14px;line-height: 44px; border-bottom: none;}
+	.mod_count {width:100%; height: 208px;}
+  .mod_count:after { width: 100%;background: #f2f2f2; position: relative;top: -110px;right: 1px;clear: both;content: '\0020';display: block;
+          height: 1px;}
+	.mod_count input {border-top: 1px solid #f2f4f5;}
+	.mod_count p {font-size: 14px; height: 40px; line-height: 40px;padding-bottom: 20px;}
+  .mod_count p:last-child {padding-bottom: 0px;}
+</style>
+
+<body>
+	<div class="content_box">
+   <div class="title_box">
+            <span><a href="/v1.2/advertiser/index?isreturn=1">< 返回我的广告主</a></span>
+      </div>
+
+	<form class="label_form layui-form">
+	<div class="addinput_box">
+			<div class="add_linel">
+				<div class="add_title">广告主名称：</div>
+				<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+				<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+			</div>
+			<div class="add_linel">
+				<div class="add_title">广告主账户余额：</div>
+				<div class="add_info setedit set_name">{{$data.comp_info.comp_name}}</div>
+				<input type="text" class="edit_input editinput_name" value={{$data.comp_info.comp_name}}>
+			</div>
+	</div>
+
+      <div class="recharge_box">
+      	    <h4><i class="club_icons icon2"></i>服务商账户充值</h4>
+      	    <div class="mod_box">
+      	    	  <ul class="mod_nav clearfix">
+               		 <li class="cur">
+                    	<p>I类账户充值</p>
+                	</li>
+                	<li>
+                    	<p>II类账户充值</p>
+                	</li>
+            	</ul>
+
+
+            	<div class="mod_tip">I类账户说明：I类账户只能投放主流网络广告，包括今日头条、爱奇艺、优酷、微博等，<label>不支持腾讯广告（含朋友圈广告）、短信投放。</label></div>
+            	<div class="mod_tip" style="display: none;">II类账户说明：II类广告可投放全网广告。</div>
+          
+      	    </div>
+          
+			<div class="mod_count">
+                <p class="">您的I类账户可用余额： ¥<span>5000</span></p>
+        		<p class="charge">请输入转账金额： <input type="text" value="" class="bm-input" name="crowd_name" id="charge_amount" placeholder="请输入充值金额"></p>
+				
+
+       			<p><input type="checkbox" name="vehicle" value="Car" checked="checked" lay-skin="primary" id="checked" /> 我已知晓转账后不可撤销</p>
+       			<a href="javascript:;" class="btn_link bm-btn bm-btn-blue" id="transfer">立即转账</a>
+			</div>
+			
+			<div class="mod_count" style="display: none;">
+				<p >您的II类账户可用余额： ¥<span>5000</span></p >
+        		<p class="charge">请输入转账金额： <input type="text" value="" class="bm-input" name="crowd_name" id="charge_amount" placeholder="请输入充值金额"></p >
+       			<p ><input type="checkbox" name="vehicle" value="Car" checked="checked" lay-skin="primary" id="checked" /> 我已知晓转账后不可撤销</p>
+            <!-- <label><input type="checkbox" id="agreen" value="">确认了解并同意以上条款</label> -->
+       			<a href="javascript:;" class="btn_link bm-btn bm-btn-blue" id="transfer">立即转账</a>
+			</div>
+      </div>
+    </form>
+</div>
+<script>
+
+
+  // transfer_type/【0为DSP账户充值，1广点通充值
+  // account_type/【1为Ⅱ类账户，2为Ⅰ类账户】  
+  var transfer_type = 0 ,account_type = 2;
+  var amount = $.trim($('#charge_amount').val());
+  layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+          });
+
+	    $('.mod_nav').on('click','li',function(){
+            var th = $(this),
+                idx = th.index();
+            th.addClass('cur').siblings().removeClass('cur');
+            $('.mod_count').eq(idx).show().siblings('.mod_count').hide();
+        	$('.mod_tip').eq(idx).show().siblings('.mod_tip').hide();
+          account_type = idx == 1 ? 1 : 2;
+
+        })
+
+
+      //立即转账
+        $('#transfer').on('click', function () { 
+          console.log(amount,66);
+          sendMsg(amount);
+
+            var countdown = 90;
+                var obj = $(this);
+                settime(obj)
+                function settime(obj) { //发送验证码倒计时
+                    if (countdown == 0) {
+                        obj.attr('disabled', false);
+                        obj.css('background-color','#1E9FFF');
+                        obj.val("获取验证码");
+                        countdown = 90;
+                        return;
+                    } else {
+                        obj.attr('disabled', true);
+                        obj.css('background-color','#bbb');
+                        obj.val("重新发送(" + countdown + ")");
+                        countdown--;
+                    }
+                    setTimeout(function () {
+                        settime(obj)
+                    }, 1000)
+                }
+
+
+        });
+  
+
+      //发送验证码
+      function sendMsg (amount){
+         $.ajax({
+            type: "POST",
+            url: '/v1.2/account/sendSms/amount/' +  amount,
+            dataType: 'json',
+            success: function (rs) {
+                tipTopHide();
+                if (rs.state == 1) {
+                    layui.layer.msg('验证码发送成功');
+                     layer.open({
+                        type: 1,
+                        title: '提示',
+                        content: '<div style="padding: 20px;color:#333;font-size:14px;">充值需要验证操作授权。<p style="text-align:center;margin:20px;">请输入服务商管理员手机号收到的确认短信验证码</p><div style="margin: 0 auto;width: 220px;"><input type="text" id="msg" style="width:90px;height:36px;text-align: center;"><input type="button" style="width:100px;height:42px;background-color:#1E9FFF;border:none;color:#fff;margin-left:20px;" id="sendMsg" value="获取验证码"></div></div>',
+                        btn: '确定',
+                        btnAlign: 'c',
+                        shade: 0.6,
+                        yes: function () {
+                            var code = $.trim($('#msg').val());
+                            if (!code) {
+                                layui.layer.msg("请输入验证码");
+                              return false;
+                              }
+                              confirmCharge(amount,code);
+                          }
+                        });
+                } else {
+                    layui.layer.msg(rs.msg);
+                }
+            },
+            error: function (rs) {
+                layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+            }
+        });
+      }
+
+      //确认充值
+      function confirmCharge (amount,code){
+          $.ajax({
+            type: "POST",
+            url: '/v1.2/account/applyTransfer/comp_id/' +  comp_id + 'amount' + amount + 'code' + code + 'transfer_type' + transfer_type + 'account_type' + account_type,
+            dataType: 'json',
+            success: function (rs) {
+                tipTopHide();
+                if (rs.state == 1) {
+                    layui.layer.msg('充值成功');
+                } else {
+                    layui.layer.msg(rs.msg);
+                }
+            },
+            error: function (rs) {
+                layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+            }
+        });
+      }
+</script>
+</body>
+
+
+
+

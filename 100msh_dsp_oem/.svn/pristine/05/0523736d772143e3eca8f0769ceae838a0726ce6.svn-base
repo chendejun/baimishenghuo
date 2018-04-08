@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>OEM后台管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all" />
+    <style>
+    .login_body{width: 100%;height: 100%;overflow: hidden;}
+    .login_top{height:100px;background: #f8f8f8;padding: 10px 50px 0 60px; }
+    .log_logo{float: left;margin-top: 25px;}
+    .log_logo span{display: inline-block;font-size:16px; padding:8px 5px 0;color:#4c94f5;vertical-align: top;}
+    .log_logo img{width:135px;height:36px;display: inline-block;vertical-align: top;}
+    .login_top h2{float: right;font-size:16px;color: #666;margin-top:30px;}
+    .login_cont {background:url(/public/img/logbj0.jpg) no-repeat;width:100%;height:100%;background-size:auto 100%;}
+    /*登录样式*/
+    .web_login{ width:560px;height:440px;position:absolute;left:50%;top:50%;margin-top:-180px;margin-left:-280px; -webkit-border-radius: 10px;-moz-border-radius: 10px;-o-border-radius: 10px;border-radius: 10px;background:#fff;box-shadow:0 0 2px 0 rgba(0,0,0,.3);z-index:9;}
+    .login-box{position:relative;margin:30px auto 20px;width: 336px;}
+    .th1{font-size:16px;color:#666;line-height:56px;text-align:center; font-weight:bold;background:#f8f8f8;-webkit-border-radius: 10px 10px 0 0;-moz-border-radius: 10px 10px 0 0;-o-border-radius: 10px 10px 0 0;border-radius: 10px 10px 0 0;}    
+    .login-box .layui-input-block{margin-left:0;}
+    .login-box .layui-input{height: 50px;display: inline-block;}
+    .w330{width:330px !important;}
+    .w180{width:180px!important;}.w150{width:145px!important;}.wb100{width:100%;}
+   .alink{font-size:14px;color: #4c94f5;display: inline-block;}
+   .yzmpic{width: 105px;height: 50px;vertical-align:top;margin-left:10px;}
+   .layui-input-block .alink{float: right;line-height: 50px;}
+
+    .copyright{position:absolute;bottom:30px;text-align:center;left:0;right:0;color:#222;z-index:2;}
+    .login_footer {position:absolute;bottom:0;left:0;right:0;z-index:2;height:100px;background:#f8f8f8;}
+    .login_footer .copyright { position:relative; bottom:auto; display:block; font-size: 14px; color:#666; text-align: center; margin:30px 0 0;}
+
+    </style>
+</head>
+<body>
+    <div class="login_body">
+        <div class="login_top">
+            <div class="log_logo">
+                <img src="/public/img/dlogo.png" alt="晓客营销">
+                <!-- <span>服务商系统</span>                     -->
+            </div>
+            <!-- <h2>欢迎登录服务商系统</h2> -->
+        </div>
+        <div class="login_cont" id="login_cont">
+            <div class="web_login">
+                <h1 class="th1 mt20">用户登录</h1>
+                <form class="layui-form form_class login-box">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="text" name="user_name" lay-verify="num" class="layui-input w330" placeholder="请输入账号"  >
+                    </div>
+                </div>              
+                
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="password" name="password" lay-verify="passwd" class="layui-input w330" placeholder="请输入密码"  >
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="text" name="code" lay-verify="yzcode" class="layui-input w150" placeholder="请输入验证码" >
+                        <img title="点击刷新" src="/login/captcha" class="yzmpic" align="absbottom" onclick="this.src='/login/captcha?'+Math.random();"></img>
+                        <a href="" class="alink">忘记密码</a>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn w330" style="height:45px;" lay-submit lay-filter="checkout">确定</button>
+                    </div>
+                    
+                </div>
+            </form>
+            </div>
+            
+        </div>
+        <footer class="login_footer">
+                <p class="copyright ptext02">Copyright     2018 深圳市百米生活股份有限公司</p>
+        </footer>
+    </div>
+
+<script type="text/javascript" src="/public/layui/layui.js"></script>
+<script type="text/javascript" src="/public/js/index.js"></script>
+<script type="text/javascript" src="/public/js/md5.js"></script>
+<script type="text/javascript">
+
+var sc_h = document.documentElement.clientHeight;
+document.getElementsByTagName('body')[0].style.height = sc_h+'px'; 
+console.log('sc_h=',sc_h);
+document.getElementById("login_cont").style.height = sc_h - 210 +'px';
+
+layui.use('form', function(){
+    var form = layui.form();
+    //自定义验证规则  
+  form.verify({  
+        name: function(value){  
+          if(value.length < 4){  
+            return '请输入至少4位的账号';   
+          }  
+        }, yzcode: function(value){  
+          if(value.length < 4){  
+            return '请输入至少4个字符';  
+          }  
+        } 
+        ,num: [/^[0-9]{11}$/, '只能是数字,必须11位！'] 
+        ,phone: [/^1[3|4|5|7|8]\d{9}$/, '手机必须11位，只能是数字！']  
+        ,passwd: [/^[a-zA-Z0-9]{6,16}$/, '密码是数字或是字母，长度为6-16位！']
+  }); 
+//登录提交
+    form.on('submit(checkout)', function(data){
+        var fm = data.field;
+        $.ajax({
+              type: "POST",
+              dataType: "json",
+              url: "/login/index",
+              data: "user_name="+fm.user_name+"&pwd="+hex_md5(fm.password)+"&code="+fm.code,
+              success: function(result){
+                //   console.log(result);
+                //   alert(result);
+                  if(result.state==1){
+                    location.href = "/";
+                  }else{
+                    layui.layer.msg(result.msg);
+                  }
+              },
+              error: function(r){
+                layui.layer.msg(r.msg);
+              }
+        });
+        return false;
+    }); 
+});
+</script>
+</body>
+</html>

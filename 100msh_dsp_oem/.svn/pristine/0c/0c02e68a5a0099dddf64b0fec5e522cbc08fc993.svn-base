@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <style>
+        .content_box {
+            min-width: 1200px;
+            -webkit-min-width: 1200px;
+        }
+
+        .content {
+            background-color: #fff;
+            min-height: 600px;
+            min-width: 1250px;
+        }
+
+        .type_box {
+            padding-right: 20px;
+            padding-bottom: 20px;
+            padding-top: 20px;
+        }
+        #tip_box {
+            background-color: #FAEBD7;
+            border: 1px solid #FFE4C4;
+            color: #FFA500;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        #tip_box i {
+            background: url("../../../../../public/img/tip_icon.png") no-repeat top center;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            top: 12px;
+            left: 10px;
+        }
+
+        #tip_box p {
+            padding-left: 15px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 12px;
+            float: left;
+        }
+
+        #tip_box a {
+            margin-right: 10px;
+        }
+
+        #select_box {
+            width: 160px;
+        }
+
+        #item_ul {
+            top: 0
+        }
+
+        #item_ul li {
+            height: 36px;
+            line-height: 36px;
+        }
+
+        .crowd_attr {
+            padding: 20px;
+        }
+
+        #type_box>div:nth-child(odd) {
+            border-right: 1px solid #f2f4f5
+        }
+
+        /*日期选择*/
+
+        .time_filter {
+            display: inline-block;
+            vertical-align: top;
+            position: relative;
+            margin-left: 5px;
+            display: none;
+        }
+
+        .time_filter .ta_date {
+            width: 198px;
+            height: 38px;
+            line-height: 38px;
+            cursor: pointer;
+            text-align: center;
+            border: non;
+            border-radius: 5px
+        }
+
+        .time_filter .date_title {
+            display: block;
+            cursor: pointer;
+            width: 190px;
+            height: 30px;
+            z-index: 2
+        }
+
+        #tip_box,
+        #tip_wrapper {
+            background-color: #FAEBD7;
+            border: 1px solid #FFE4C4;
+            color: #FFA500;
+        }
+
+        #tip_wrapper {
+            height: 40px;
+            line-height: 40px;
+        }
+
+        #tip_box {
+            overflow: hidden;
+            width: auto;
+            /* padding: 6px 0; */
+            position: relative;
+        }
+
+        #tip_box i,
+        #tip_wrapper i {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            top: 8px;
+            left: 10px;
+        }
+
+        #tip_box i {
+            background: url("../../../../../public/img/tip_icon.png") no-repeat top center;
+        }
+
+        #tip_box p {
+            padding-left: 15px;
+        }
+
+        #tip_box div,
+        #tip_wrapper div {
+            font-size: 12px;
+            float: left;
+            padding-left: 15px;
+        }
+
+        #tip_wrapper {
+            padding-left: 0;
+            display: none;
+        }
+
+        #tip_box a {
+            margin-right: 10px;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            margin-top: -18px;
+        }
+
+        .no-data {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .content,
+        .tip_box {
+            display: none;
+        }
+
+        .menu_box {
+            padding: 10px 10px 0 10px;
+        }
+
+        .tab_box .btn_link {
+            top: 6px;
+        }
+
+        .no_data1 {
+            width: 100%;
+            margin-top: 80px;
+        }
+
+        .no_data1 img {
+            margin: 0 auto;
+            display: block;
+        }
+
+        .no_data2 {
+            width: 100%;
+            height: 500px;
+            position: relative;
+        }
+
+        .no_data2 img {
+            width: 550px;
+            height: auto;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            margin: auto;
+        }
+
+        .tab_box {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .tip_box {
+            overflow: hidden;
+        }
+
+        .tip_btn {
+            margin-top: 5px;
+        }
+
+        .senior,
+        .ordinary,
+        .examine,.auditing {
+            width: 100%;
+            overflow: hidden;
+            display: none;
+        }
+        .auditing{
+            margin-top: 50px;
+        }
+
+        .tip_box .tip_title {
+            height: auto;
+            line-height: 25px;
+            padding-top: 16px;
+        }
+
+        .tip_box .tip_title:nth-of-type(1) {
+            margin-top: 150px;
+        }
+
+        .senior>span {
+            color: #fff;
+        }
+
+        #tip_box {
+            background-color: #FAEBD7;
+            border: 1px solid #FFE4C4;
+            color: #FFA500;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        #tip_box i {
+            background: url("../../../../../public/img/tip_icon.png") no-repeat top center;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            top: 12px;
+            left: 10px;
+        }
+
+        #tip_box p {
+            padding-left: 15px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 12px;
+            float: left;
+        }
+
+        #tip_box a {
+            margin-right: 10px;
+        }
+
+        .examine .tip_title {
+            margin-top: 180px !important;
+        }
+
+        #type_box table {
+            width: 100%;
+            /* overflow: hidden; */
+            border: 1px solid #f2f4f5;
+            height: auto;
+        }
+
+        #type_box table tr {
+            width: 100%;
+            height: 54px;
+            line-height: 54px;
+            color: #8c8c8c;
+            font-size: 14px;
+            text-align: left;
+            border-bottom: 1px solid #f2f4f5;
+        }
+
+        #type_box table thead tr:nth-of-type(1) {
+            width: 100%;
+            height: 36px;
+            border: 1px solid #f2f4f5;
+            background: #f5f5f5;
+            color: #7e7e7e;
+            font-size: 14px;
+        }
+
+        #type_box table tr td:nth-of-type(1) {
+            width: 12%;
+            margin-right: 2%;
+            padding-left: 2%;
+        }
+
+        #type_box table tr td:nth-of-type(2) {
+            padding-left: 2%;
+            width: 20%;
+        }
+
+        #type_box table tr td:nth-of-type(3) {
+            padding-left: 2%;
+            width: 18%;
+        }
+
+        #type_box table tr td:nth-of-type(4) {
+            padding-left: 2%;
+            width: 20%;
+        }
+
+        #type_box table tr td:nth-of-type(5) {
+            padding-left: 2%;
+            width: 18%;
+            display: none;
+        }
+
+        #type_box table tr.list_tit th:first-of-type {
+            width: 12%;
+            margin-right: 2%;
+            padding-left: 2%
+        }
+
+        #type_box table tr.list_tit th:nth-of-type(2) {
+            padding-left: 2%;
+            width: 20%;
+        }
+
+        #type_box table tr.list_tit th:nth-of-type(3) {
+            padding-left: 2%;
+            width: 18%;
+        }
+
+        #type_box table tr.list_tit th:nth-of-type(4) {
+            padding-left: 2%;
+            width: 20%;
+        }
+
+        #type_box table tr.list_tit th:nth-of-type(5) {
+            padding-left: 2%;
+            width: 18%;
+            display: none;
+        }
+
+        .app_icon {
+            width: 25px;
+            height: 25px;
+            display: inline-block;
+            position: relative;
+            top: 50%;
+            margin-top: -27px;
+            margin-right: 16px;
+        }
+
+        .app_icon img {
+            width: 25px;
+            height: 25px;
+        }
+
+        .form_box li {
+            color: #999;
+            width: 100%;
+        }
+
+        .form_box label {
+            color: #333
+        }
+
+        .form_box {
+            margin: 0px 10px;
+        }
+
+        .layui-form-checkbox[lay-skin=primary] span {
+            color: #999
+        }
+        .layui-form-checked[lay-skin=primary] i{
+            background-color: #4aa6fc;
+            border: #4aa6fc;
+        }
+        .layui-form-label{
+            text-align: left;
+        }
+        .noMsg{
+            width: 100%;
+            height: 270px;
+            position:relative;
+            display: none;
+            margin-top:20px;
+        }
+        .noMsg img{
+            position: absolute;
+            margin: auto;
+            left: 0;
+            right:0;
+            bottom: 0;
+            top: 0;
+            width: auto;
+            height: 100%;
+        }
+        .layui-form-radio>i:hover, .layui-form-radioed>i{
+            color: #4aa6fc;
+        }
+        .layui-form-radio>i{
+            font-size:18px;
+            margin-right: 5px;
+        }
+        .layui-form-label{
+            float: left;
+            width:5%;
+        }
+        .radiocontent{
+            float: left;
+            width: 92%;
+        }
+
+        .sortbox{
+            width: 20px;
+            height: 20px;
+            display:inline-block;
+            position:relative;
+            left: 5px;
+        }
+        .asc{
+            width:0;
+            height:0;
+            border-width: 0px 9px 8px;
+            border-style:solid;
+            border-color:transparent transparent #cccccc;
+            position: absolute;;
+            display: inline-block;
+            top:5px;
+        }
+        .desc{
+            width:0;
+            height:0;
+            border-width:8px 9px 0;
+            border-style:solid;
+            border-color:#cccccc transparent transparent;
+            position: absolute;;
+            display: inline-block;
+            top:16px;
+        }
+        .desc.cur{
+            border-color:#9d9d9d transparent transparent;
+        }
+        .asc.cur{
+            border-color:transparent transparent #9d9d9d;
+        }
+        .loadmore{
+            width: 60px;
+            display: inline-block;
+            height: 25px;
+            line-height: 25px;
+            position: relative;
+            top: 4px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        .loadmore span{
+            width: auto;
+            height: auto;
+            display: inline-block;
+            margin-right: 3px;
+            color: #4c94f5;
+        }
+        .more_icon{
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            background: url(../../../../../public/img/more_icon1.png) no-repeat;
+            background-position: 2px 6px;
+        }
+        .loadcontent{
+            width:98%;
+            height: 84px;
+            border: 1px solid #f0f0f0;
+            padding-left:10px;
+            box-sizing: border-box;
+            position:relative;
+            margin-top: 5px;
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        /* 上箭头 */
+        .top{
+            width:20px;
+            height:20px;
+            position:absolute;
+            left:539px;
+            top: -13px;
+            z-index: 2;/*兼容ie8-*/
+        }
+        .top-arrow1,.top-arrow2{
+            width:0;
+            height:0;
+            display:block;
+            position:absolute;
+            left:0;
+            top:-7px;
+            z-index: 5;/*兼容ie8-*/
+            border-top:10px transparent dashed;
+            border-left:10px transparent dashed;
+            border-right:10px transparent dashed;
+            border-bottom:10px white solid;
+            overflow:hidden;
+        }
+        .top-arrow1{
+            border-bottom:10px #f0f0f0 solid;
+        }
+        .top-arrow2{
+            top:-5px;/*重要*/
+            border-bottom:10px white solid;
+        }
+        .load_movebox{
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+            display:none;
+            padding-bottom: 10px;
+        }
+        .load_movebox img{
+            margin-top: 90px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Scenes/index">&lt; 返回人群画像</a>
+            </span>
+        </div>
+        <div id="tip_box">
+            <i class="fl"></i>
+            <p>温馨提示：提交开通后，首次开通到生成数据分析报表需1~2个工作日，不便之处敬请理解。</p>
+            <a class="fr" href="javascript:" id="closeTip">关闭</a>
+        </div>
+        <div class="tab_box ">
+            <div class="menu_box fl ">
+                <a href="/v1.2/Scenes/flowanalysis">客流分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cuspropety">客群属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <!-- <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a> -->
+                <a href="/v1.2/Scenes/cussource">客流来源
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/hotsearch">搜索热点
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="/v1.2/Scenes/changeanalysis" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        </div>
+        <div class="content">
+            <div class="type_box clearfix">
+                <div class="layui-form fl" id="select_box">
+                    <select name="timetype" lay-filter="timetype">
+                        <option value="1" selected="">昨日</option>
+                        <option value="7">近7天</option>
+                        <option value="30">近30天</option>
+                        <option value="0">指定日期</option>
+                    </select>
+                </div>
+                <div class="time_filter layui-input-block fl " id="time_filter">
+                    <div class="ta_date">
+                        <input type="text" class="layui-input" id="date_day" placeholder=" 至 ">
+                    </div>
+                </div>
+                <ul class="item_ul fl" id="item_ul">
+                    <li type="3" class="cur">全部</li>
+                    <li type="1">新访客</li>
+                    <li type="2">老访客</li>
+                </ul>
+                <p class="fl">常用APP分析截止到昨日</p>
+            </div>
+            <div class="form_box layui-form layui-form-item">
+                <ul class="clearfix">
+                    <li class="fl">
+                        <label class="layui-form-label">分类类型：</label>
+                        <div class="radiocontent">
+                            <input type="radio" name="apptype" value="16" lay-filter="apptype" title="通讯聊天" checked>
+                            <input type="radio" name="apptype" value="17" lay-filter="apptype" title="综合资讯" >
+                            <input type="radio" name="apptype" value="19" lay-filter="apptype" title="视频服务" >
+                            <input type="radio" name="apptype" value="25" lay-filter="apptype" title="应用分发" >
+                            <input type="radio" name="apptype" value="11" lay-filter="apptype" title="社交网络" >
+                            <input type="radio" name="apptype" value="10" lay-filter="apptype" title="金融理财" >
+                            <div class="loadmore"><span>更多</span><i class="more_icon"></i></b></div>
+                            <div class="loadcontent">
+                                <div class="arrow-top arrow-box" >
+                                    <b class="top"><i class="top-arrow1"></i><i class="top-arrow2"></i></b>
+                                </div>
+                                <input type="radio" name="apptype" value="1" lay-filter="apptype" title="便捷生活">
+                                <input type="radio" name="apptype" value="2" lay-filter="apptype" title="房屋地产">
+                                <input type="radio" name="apptype" value="3" lay-filter="apptype" title="人才招聘">
+                                <input type="radio" name="apptype" value="4" lay-filter="apptype" title="交通导航">
+                                <input type="radio" name="apptype" value="5" lay-filter="apptype" title="个人工具">
+                                <input type="radio" name="apptype" value="6" lay-filter="apptype" title="旅游出行">
+                                <input type="radio" name="apptype" value="7" lay-filter="apptype" title="健康医疗" >
+                                <input type="radio" name="apptype" value="8" lay-filter="apptype" title="美食外卖" >
+                                <input type="radio" name="apptype" value="9" lay-filter="apptype" title="电子商务" >
+                                <input type="radio" name="apptype" value="12" lay-filter="apptype" title="电子阅读" >
+                                <input type="radio" name="apptype" value="13" lay-filter="apptype" title="实用工具" >
+                                <input type="radio" name="apptype" value="14" lay-filter="apptype" title="学习教育" >
+                                <input type="radio" name="apptype" value="15" lay-filter="apptype" title="办公管理" >
+                                <input type="radio" name="apptype" value="18" lay-filter="apptype" title="汽车服务" >
+                                <input type="radio" name="apptype" value="20" lay-filter="apptype" title="音乐音频" >
+                                <input type="radio" name="apptype" value="21" lay-filter="apptype" title="游戏服务" >
+                                <input type="radio" name="apptype" value="22" lay-filter="apptype" title="女性亲子" >
+                                <input type="radio" name="apptype" value="23" lay-filter="apptype" title="拍摄美化" >
+                                <input type="radio" name="apptype" value="24" lay-filter="apptype" title="智能设备" >
+                                
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="type_box" id="type_box" style="padding-top:10px;">
+                <table>
+                    <thead>
+                        <tr class="list_tit">
+                            <th>序号</th>
+                            <th>应用TOP100</th>
+                            <th>分类</th>
+                            <th>活跃渗透率<span class="sortbox"><i class="asc" data-sortType='2'></i><i class="desc cur" data-sortType='1'></i></span>
+                            <th>全网区分度</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="noMsg"><img src="../../../../../public/img/no_data.png"/></div>
+                <div class="load_movebox">
+                    <img src="../../../../../public/img/loading_icon1.png"/>
+                    <p>数据分析中，请稍等……</p>
+                </div>
+            </div>
+        </div>
+        <div class="tip_box">
+            <div class="senior">
+                <p class="tip_title">您的高级版本已申请开通，请耐心等待结果，预计在1~2个工作日完成。</p>
+                <p class="tip_title">本功能需单独开通</p>
+                <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="/v1.2/Scenes/changeanalysis">我要开通</a>
+            </div>
+            <div class="ordinary">
+                <p class="tip_title">本功能需先开通高级版本后再行开通
+                    <!-- <span>￥1000/年。</span> -->
+                </p>
+                <p class="tip_title">点击右上角“修改”按钮，进入本场景修改页面，选择开通“高级版”，完成支付后
+                    <br/>等待开通高级版本，预计完成需要1~2个工作日。</p>
+            </div>
+            <div class="examine">
+                <p class="tip_title">本功能需单独开通,<span>￥1000/年。</span></p>
+                <a class="btn_link bm-btn bm-btn-blue fl tip_btn"  onclick="PayAction()">我要开通</a>
+            </div>
+            <div class="auditing">
+                <p class="tip_title">您已申请开通，请等待开通审核，预计需时1~2个工作日</p>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+<script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+<script>
+    var Id = cookie.get('scenesId'), //场景ID
+        scenesType = cookie.get('scenesType');  //场景类型  1普通版，2高级版
+    var baidu_state = cookie.get('baidu_state');
+    if (scenesType == 2) {    //高级版
+        $('.tip_box').show();
+        $('.examine').show();
+    } else if (scenesType == 1) {     //普通版
+        $('.tip_box').show();
+        $('.ordinary').show();
+    } else {
+        if (baidu_state == 0) {
+            $('.tip_box').show();
+            $('.auditing').show();
+        }else{
+            $('.content').show();
+        }
+    }
+    
+    if (baidu_state == 0) {
+        $('#tip_box p').html('您已申请开通，请耐心等待结果，预计在1~2个工作日完成。')
+    }
+    
+    function PayAction() {
+        $.ajax({
+            type: "POST",
+            url: '/v1.2/Scenes/checkAmountSufficientApi/scene_id/' + Id + '/scene_type/' + 3,
+            dataType: 'json',
+            success: function (res) {
+                if (res.state == 1) { //验证成功
+                    layer.open({
+                        type: 1,
+                        title: '支付确认',
+                        content: '<div style="padding: 20px;color:#333;font-size:14px;">本次费用将从服务商账户中扣除支付。您的余额可支付本次付款。<p style="text-align:center;margin:20px;">请输入服务商管理员收到的确认短信验证码</p><div style="margin: 0 auto;width: 220px;"><input type="text" id="msg" style="width:90px;height:36px;text-align: center;"><input type="button" style="width:100px;height:42px;background-color:#1E9FFF;border:none;color:#fff;margin-left:20px;" id="sendMsg" value="获取验证" onclick="sendMsg()"></div></div>',
+                        btn: '确定支付',
+                        btnAlign: 'c',
+                        shade: 0.6,
+                        yes: function () {
+                            var code = $.trim($('#msg').val());
+                            if (!code) {
+                                layui.layer.msg("请输入验证码");
+                                return false;
+                            }
+                            upgradeToAppFn(code);
+                        }
+                    });
+                } else if (res.state == 0) {  //验证失败
+                    tipTopShow("验证金额失败，请重试...");
+                    return;
+                } else if (res.state == -1) {   //金额不足
+                    layer.open({
+                        type: 1,
+                        title: '支付确认',
+                        content: '<div style="padding: 20px 20px 0;color:#333;font-size:14px;">本次费用将从服务商账户中扣除支付。你的余额不足。</div>',
+                        btn: '确定',
+                        btnAlign: 'c',
+                        shade: 0.6,
+                        yes: function () {
+                            location.href = '/v1.2/account/index';
+                        }
+                    });
+                }
+            },
+            error: function (err) {
+                tipTopShow("验证金额失败，请重试...");
+            }
+        });
+    }
+
+    $('.loadmore').on('click',function(){
+        event.stopPropagation();
+        if($(this).hasClass('active')==false){
+            $(this).addClass('active');
+            $('.loadcontent').show();
+            $('.more_icon').css('background-position','2px -22px')
+        }else{
+            $(this).removeClass('active');
+            $('.loadcontent').hide();
+            $('.more_icon').css('background-position','2px 6px')
+        }
+    })
+
+    $('.sortbox i').on('click',function(){
+        $(this).addClass('cur').siblings().removeClass('cur');
+        var resultTime = getUlListVal().split('=');
+        getCheckboxVal(resultTime[0],resultTime[1],resultTime[2])
+    })
+    function getCheckboxVal(startTime,endTime,userType){
+        var apptypeStr = $("input:radio[name='apptype']:checked").val(),
+            Keys = $("input:radio[name='apptype']:checked").attr('title')
+        getListData(startTime, endTime, userType,apptypeStr,Keys)
+    }
+    getCheckboxVal(getDay(-1), getDay(-1),3)
+    //升级App分析版本
+    function upgradeToAppFn(code) {
+        $.ajax({
+            type: "POST",
+            url: '/v1.2/Scenes/upgradeToApp',
+            dataType: 'json',
+            data: {
+                'scene_id': Id,
+                'code': code
+            },
+            success: function (res) {
+                console.log(res)
+                if (res.state == 1) {
+                    tipTopShow(res.msg)
+                    setTimeout(() => {
+                        location.href = '/v1.2/Scenes/index';
+                    }, 1500);
+                }else{
+                    tipTopShow(res.msg);
+                }
+            },
+            error: function (err) {
+                tipTopShow("查询信息失败，请重试...");
+            }
+        });
+    }
+    //发送短信
+    function sendMsg() {
+        $.ajax({
+            type: "POST",
+            url: '/v1.2/scenes/sendShortMessage',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res)
+                if (res.state == 1) {
+                    tipTopShow('验证码发送成功');
+                    settime();
+                    //发送验证码倒计时  
+                    var countdown = 90;
+                    $('#sendMsg').val("重新发送(" + countdown + ")");
+                    function settime() {
+                        if (countdown == 0) {
+                            $('#sendMsg').removeAttr('disabled');
+                            $('#sendMsg').css('background-color', '#1E9FFF');
+                            $('#sendMsg').val("获取验证码");
+                            countdown = 90;
+                            return;
+                        } else {
+                            $('#sendMsg').attr('disabled', 'disabled');
+                            $('#sendMsg').css('background-color', '#bbb');
+                            $('#sendMsg').val("重新发送(" + countdown + ")");
+                            countdown--;
+                        }
+                        setTimeout(function () {
+                            settime()
+                        }, 1000)
+                    }
+                } else {
+                    tipTopShow(res.msg);
+                }
+            },
+            error: function (err) {
+                tipTopShow("验证码发送失败");
+            }
+        });
+    }
+
+
+    function SortAction(result,type){  
+        var colId = "ratio"   //需要排序的key值    result  数据   type 排序方式   1降序 2升序
+		var desc = function(x, y) {
+			return(x[colId] < y[colId]) ? 1 : -1
+		}
+		//对json进行升序排序函数  
+		var asc = function(x, y) {
+			return(x[colId] > y[colId]) ? 1 : -1
+		}
+        if(type==1){
+            result.sort(desc); //降序排序
+        }else{
+    		result.sort(asc); //升序排序
+        }
+        return result
+    }
+    //获取列表数据
+    function getListData(startTime, endTime, usertype, apptype,Keys) {
+        $.ajax({
+            type: "GET",
+            url: '/v1.2/scenes/passenger/type/12/scene_id/' + Id + '/start_date/' + startTime + '/end_date/' + endTime + '/customer_type/' + usertype + '/app_category_type/' + apptype,
+            dataType: 'json',
+            beforeSend:function(){
+                $('.load_movebox').show();
+                $('.noMsg').hide();
+                $('#type_box table tbody').html("")
+            },
+            success: function (res) {
+               // console.log(res)
+                if(res.code==10000){
+                    if(res.data.length==0){
+                        return;
+                    }
+                    var sortTypes = $('.sortbox .cur').attr('data-sorttype');
+                    var resultData = SortAction(res.data[Keys],sortTypes);
+                    RenderList(resultData,Keys);
+                }else{
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            },
+            error: function (err) {
+                tipTopShow("查询信息失败，请重试...");
+            },
+            complete:function(){
+                $('.load_movebox').hide();
+            }
+        });
+    }
+    //渲染数据列表
+    function RenderList(data,Keys){
+        if(data.length==0){
+            $('.noMsg').show();
+            $('#type_box table tbody').html("")
+            return;
+        }else{
+            $('.noMsg').hide();
+        }
+        var str='',
+            index=0;
+        $.each(data,function(k,v){
+                index++;
+                str+='<tr>';
+                str+='<td>'+index+'</td>';
+                str+='<td>'+v.app+'</td>';
+                str+='<td>'+Keys+'</td>';
+                str+='<td>'+round2(v.ratio*100,2)+'%</td>';
+                str+='</tr>';    
+        })
+        $('#type_box table tbody').html(str)
+    }
+
+
+    //获取近期日期
+    function getDay(day) {
+        var today = new Date();
+        var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
+        today.setTime(targetday_milliseconds);
+
+        var tYear = today.getFullYear();
+        var tMonth = today.getMonth();
+        var tDate = today.getDate();
+        tMonth = doHandleMonth(tMonth + 1);
+        tDate = doHandleMonth(tDate);
+        return tYear + "-" + tMonth + "-" + tDate;
+    }
+
+    function doHandleMonth(month) {
+        var m = month;
+        if (month.toString().length == 1) {
+            m = "0" + month;
+        }
+        return m;
+    }
+    //新老客户切换
+    function getUlListVal() {
+        var userType = $('#item_ul').find('.cur').attr('type'),
+            category = $("select[name='timetype']").val(),
+            startDate = "",
+            endDate = "";
+        if (category == 0) {
+            $('#time_filter').show();
+            if ($('#date_day').val() != "") {
+                var times = $('#date_day').val().split(' - ')
+                startDate = times[0];
+                endDate = times[1];
+            }
+        } else if (category == 1) {
+            startDate = getDay(-category);
+            endDate = startDate;
+            $('#time_filter').hide();
+        } else {
+            startDate = getDay(-category);
+            endDate = getDay(-1);
+            $('#time_filter').hide();
+        }
+        return startDate + "=" + endDate + "=" + userType + "=" + category
+    }
+
+    layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            element = layui.element,
+            laydate = layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#date_day',
+            format: 'yyyy-MM-dd',
+            range: true,
+            max: -1,
+            done: function (value, date, endDate) {
+                if (value) {
+                    var userType = $('#item_ul').find('.cur').attr('type'),
+                        Val = value.split(' - ');
+                    //计算两日期相差多少天
+                    function getTime2Time($time1, $time2) {
+                        var time1 = arguments[0],
+                            time2 = arguments[1];
+                        time1 = Date.parse(time1) / 1000;
+                        time2 = Date.parse(time2) / 1000;
+                        var time_ = time1 - time2;
+                        return(time_ / (3600 * 24));
+                    }
+                   var result = getTime2Time(Val[0],Val[1])
+                   result = result>0 ? result : result*-1
+                   if(result>30){
+                       tipTopShow('最多查询30天的数据情况！')
+                      return;
+                   }
+                   getCheckboxVal(Val[0], Val[1], userType)
+                }
+            }
+        })
+
+        form.on('select(timetype)', function (data) {
+            var category = data.value;
+            form.render('select');
+            var startDate = "",
+                endDate = "",
+                userType = $('#item_ul').find('.cur').attr('type');
+            if (category == 0) {
+                $('#time_filter').show();
+            } else if (category == 1) {
+                startDate = getDay(-category);
+                endDate = startDate;
+                $('#time_filter').hide();
+                getCheckboxVal(startDate, endDate, userType);
+            } else {
+                startDate = getDay(-category);
+                endDate = getDay(-1);
+                $('#time_filter').hide();
+                getCheckboxVal(startDate, endDate, userType);
+            }
+        });
+        form.on('radio(apptype)', function (data) {
+            var resultTime = getUlListVal().split('=');
+            if (resultTime[3] != 0) {
+                getCheckboxVal(resultTime[0],resultTime[1],resultTime[2])
+            } else {
+                if ($('#date_day').val() == "") {
+                    tipTopShow('请选择查询日期！');
+                    return;
+                }else{
+                    var date = $('#date_day').val().split(' - ');
+                    getCheckboxVal(date[0], date[1], resultTime[2])
+                }
+            }
+        });
+
+        $('#item_ul li').on('click', function () {
+            $("#item_ul li").removeClass("cur");
+            $(this).addClass("cur");
+            var resultTime = getUlListVal().split('=');
+            if (resultTime[3] != 0) {
+                getCheckboxVal(resultTime[0],resultTime[1],resultTime[2])
+            } else {
+                if ($('#date_day').val() == "") {
+                    tipTopShow('请选择查询日期！');
+                    return;
+                } else {
+                    var date = $('#date_day').val().split(' - ');
+                    getCheckboxVal(date[0], date[1], resultTime[2])
+                }
+            }
+        })
+    })
+    function round2(number, fractionDigits) {
+            with (Math) {
+                return round(number * pow(10, fractionDigits)) / pow(10, fractionDigits);
+            }
+        }
+
+
+    //关闭提示
+    $('#closeTip').on('click', function () {
+        $('#tip_box').toggle();
+    });
+
+</script>
+
+</html>

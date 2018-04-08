@@ -1,0 +1,88 @@
+<?php
+
+/**
+ *
+ */
+class PortraitsController extends BasicController
+{
+    /**
+     * [SUCCESS_STATE 请求成功状态]
+     * @var integer
+     */
+    const SUCCESS_STATE = 1;
+
+    /**
+     * [FAIL_STATE 请求失败状态]
+     * @var integer
+     */
+    const FAIL_STATE = 0;
+
+
+    protected $queryTags = '/tags/queryTags.do';
+
+    public function indexAction()
+    {
+        echo 'ok'; exit;
+    }
+
+    public function portraitsPaymentAction()
+    {
+        $user_mac = Helper::clean($this->getRequest()->getParam('user_mac'));
+
+        //if (!empty($_POST) && isset($_POST)) {
+            $this->checkParam('用户mac',$user_mac);
+            $rel = $this->getQueryTags($user_mac);
+
+            Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => $rel));
+
+
+        // }else {
+        //     Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => '非法请求'));
+        // }
+    }
+
+
+    /**
+     * [getQueryTags 得到用户mac标签数据]
+     * @return [type] [description]
+     */
+    protected function getQueryTags($user_mac)
+    {
+        $scenes = Helper::M('Scenes');
+		$data_arr = [];
+		// 获取token
+		$token = $scenes->getToken();
+		$config = Yaf_Registry::get("config");
+		// 域名
+		$host = $config['dsp.host'];
+		$url = $host.$this->queryTags.'?token='.$token.'&mac='.$user_mac;
+		//var_dump($url);exit;
+		$data = DoNetwork::makeRequest($url,'GET');
+        $data_arr = json_decode($data,true);
+		if (is_array($data_arr) && array_key_exists('code',$data_arr) && $data_arr['code'] == 10000 ) {
+			$this->redis->set('dsp_'.$this->queryTags.'_'.$user_mac.'_'.date('YmdH',time()),$data_arr,60*60);
+			$data_arr_data = $data_arr['data'];
+		}else {
+			$redis_rel = $this->redis->get('dsp_'.$this->queryTags.'_'.$user_mac.'_'.date('YmdH',time()));
+			$data_arr_data = $redis_rel['data'];
+		}
+
+		return $data_arr_data;
+
+    }
+
+    protected function checkParam($param_column,$param_value,$param_Range = array())
+    {
+        if (empty($param_value)) {
+            Helper::outJson(array('state'=>0,'msg'=>'请输入：'.$param_column));
+        }
+        if (count($param_Range)>0) {
+            if (!in_array($param_value,$param_Range)) {
+                Helper::outJson(array('state'=>0,'msg'=>'参数'.$param_column.'不合法'));
+            }
+        }
+    }
+
+
+
+}

@@ -1,0 +1,185 @@
+.tr_select {
+    width: 143px;
+    height: 38px;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 5px;
+    color: #666666;
+}
+
+.tr_select>option {
+    padding: 10px 0;
+}
+
+
+.tr_selectdiv,
+.tr_selectlist {
+    border: 1px solid #dddddd;
+    color: #666666;
+}
+
+.tr_selectdiv {
+    width: 133px;
+    line-height: 28px;
+    position: relative;
+    padding: 5px 10px;
+    position: relative;
+    border-radius: 5px;
+}
+
+.tr_selectdiv::after {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 9px solid #666666;
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+    right: 10px;
+    top: 12px;
+}
+
+.tr_selectlist {
+    margin-top: -1px;
+    background: #fff;
+    display: none;
+    z-index: 2;
+    position: absolute;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 153px;
+}
+
+.tr_selectlist>li {
+    height: 20px;
+    line-height: 20px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.tr_selectlist>li:hover {
+    background: #1e90ff;
+    color: #fff;
+}
+
+.bm_right {
+    margin-right: 10px;
+}
+.bd_Map {
+            display: inline-block;
+            width: 38px;
+            height: 34px;
+            color: #6585b5;
+            font-size: 20px;
+            margin-left: 5px;
+        }
+
+        .synchroTbox {
+            height: 38px;
+            line-height: 38px;
+            color: #666666;
+        }
+
+        .checkbox_focus {
+            position: relative;
+            top: 2px;
+            left: 0;
+        }
+
+        .checkbox_focus .statusBg {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            color: #5877a4;
+            background: url(../../../public/img/checkboxchose.png) no-repeat;
+            background-position: 3px 6px;
+        }
+
+        .synchroT,
+        .pushmore {
+            position: absolute;
+            left: 4px;
+            top: 2px;
+            opacity: 0;
+        }
+
+        .add_photoswrapper {
+            width: 850px;
+            overflow: hidden;
+            margin-left: 50px;
+        }
+    .photos_div,
+    .photosMore_div {
+        width: 261px;
+        height: 158px;
+        border: 1px solid #dddddd;
+        background: #f5f6f8;
+        margin: 0 20px 20px 0;
+        text-align: center;
+        line-height: 19px;
+        color: #999999;
+        float: left;
+        position: relative;
+    }
+    .photos_div{
+        display: table;
+    }
+
+    .photos_div>span{
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+        padding: 15px;
+    }
+    .photosMore_div>span {
+        padding: 15px;
+        text-align: center;
+        line-height: 128px;
+        font-weight: 900;
+    }
+    .photos_div>span>h4 {
+        font-weight: 900;
+    }
+
+    .pushImg,.pushmoreImg {
+        width: 261px;
+        height: 158px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+    }
+    .select_wrap {
+        float: left;
+        margin-right: 10px;
+        position: relative;
+    }
+
+    .show {
+        display: block !important;
+    }
+
+    .resultImg {
+        width: 261px;
+        height: 158px;
+        display: block;
+    }
+/* 
+    .add_photoswrapper .photos_div>span,.add_photoswrapper .photosMore_div>span {
+        display:block;
+    } */
+    #mask{
+        position: absolute;
+        z-index: 1;
+        left:0;
+        bottom: 0;
+        right: 0;
+        top: 0;
+        background: rgba(0, 0, 0,0);
+        width:100%;
+        height:100%;
+        display: none;
+    }

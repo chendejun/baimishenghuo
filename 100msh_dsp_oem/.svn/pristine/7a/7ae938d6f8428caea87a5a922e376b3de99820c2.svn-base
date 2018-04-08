@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/css/layui.css" >
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box"><span>百米DMP / 客流人群分析</span></div>
+    <div class="tab_box " >
+        <div class="menu_box fl ">
+            <a href="/v1.2/Scenes/flowanalysis">客流分析
+                <p></p>
+            </a>
+            <a href="/v1.2/Scenes/cuspropety">客户属性
+                <p></p>
+            </a>
+            <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                <p></p>
+            </a>
+            <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                <p></p>
+            </a>
+            <a href="/v1.2/Scenes/cussource">客流来源
+                <p></p>
+            </a>
+            <a href="/v1.2/Scenes/hotsearch">搜索热点
+                <p></p>
+            </a>
+            <a href="javascript:;"  class="cur">常用APP分析<p></p></a>
+            <div class="menu_bottom"></div>
+        </div>
+        <a href="create_analysis.html" class="btn_link bm-btn bm-btn-blue fr" >修改场景</a>
+    </div>
+
+    <div class="tip_box">
+        <p class="tip_title">本功能需要单独开通，<span>1000元/年。</span></p>
+        <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="create_analysis.html">我要开通</a>
+    </div>
+</div>
+</body>
+</html>

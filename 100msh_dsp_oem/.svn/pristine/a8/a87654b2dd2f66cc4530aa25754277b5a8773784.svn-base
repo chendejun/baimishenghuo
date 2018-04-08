@@ -1,0 +1,560 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../public/css/tencent_ad.css">
+</head>
+<style>
+    body{min-width: 1350px;position: relative;}
+    .mod_material{margin-left: 80px;width: 970px;overflow: hidden;overflow-y: auto;border: 1px solid #ccc;}
+    .material_list .waterfall {position: relative;}
+    .mat_lists .item{position: initial !important;}
+    .step3 h3{margin-top: 20px;margin-bottom: 15px;}
+</style>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form mt20">
+        <div class="flow_steps gdt_create">
+            <ul class="clearfix">
+                <li>广告计划</li>
+                <li class="current_pre">投放人群</li>
+                <li class="current">创意和文案</li>
+                <li class="last">排期和出价</li>
+            </ul>
+        </div>
+        <div class="step_box">
+            <article class="step3 on" type="3">
+                <div class="mod_part posit_part clearfix">
+                    <h3 class="from-row-title" >广告版位</h3>
+                    <div class="posit_sel">
+                        <select class="bm-select" id="getgroup">
+                        </select>
+                        <select class="bm-select" id="getSizelist">
+                        </select>
+                    </div>
+                    <div class="posit_show clearfix">
+                        <table id="posit_list" class="base_table">
+                            <thead>
+                                <tr>
+                                    <th>广告版位名称</th>
+                                    <th>尺寸大小</th>
+                                    <th>描述</th>
+                                    <th>所属平台</th>
+                                    <th>最大覆盖人群</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- <tr>
+                                    <td>手机QQ</td>
+                                    <td>640*120单图</td>
+                                    <td>QQ客户端</td>
+                                    <td>移动平台</td>
+                                    <td>99499</td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                        <p class="noMsg no_poslist"></p>
+                        <!-- <p class="posit_more">显示更多</p> -->
+                    </div>
+                    <div class="box_height"></div>
+                </div>
+                <div class="mod_part">
+                    <h3 class="from-row-title">选择创意</h3>
+                    <div class="from-row">
+                        <label>创意选择：</label>
+                        <div>
+                            <label class="c-label"><input type="radio" name="mattype" value="1" checked="checked"/>&nbsp;&nbsp;从素材库中选择</label>
+                            <label class="c-label"><input type="radio" name="mattype" value="2" />&nbsp;&nbsp;新建</label>
+                        </div>
+                    </div>
+                    <div class="from-row">
+                        <label>标签：</label>
+                        <div class="label_cont radio_div" id="label_cont">
+                            <ul class="clearfix">
+                                <!-- <li _data="1">全部</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="from-row">
+                        <label>创建时间：</label>
+                        <div class="timer_cont radio_div" id="timer_cont">
+                            <ul class="clearfix">
+                                <li _data="2" class="active">全部</li>
+                                <li _data="0">本月</li>
+                                <li _data="1">上月</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mod_material mt20">
+                        <!-- 素材库start -->
+                        <div id="materialLayer">
+                            <div id="materialBox" class="material_list scrollbar" style="padding:15px;overflow-x:hidden;">
+                               <p class="noMsg no_matlist"></p>
+                                <div id="mat_lists" class="mat_lists waterfall">
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 素材库end -->
+                    </div>
+                    <div class="from-row">
+                        <label>落地页地址：</label>
+                        <input type="text" value="" id="idea_url" class="bm-input wd300" placeholder="输入广告目标页地址" />
+                    </div>
+                    <div class="from-row mod_url_type" style="display: none">
+                        <label>落地页内容：</label>
+                        <div class="url_type">
+                            <label class="c-label"><input name="urlType" type="radio" value="1" _data="VIEW_DETAILS" checked="checked"> 查看详情</label>
+                            <label class="c-label"><input name="urlType" type="radio" value="2" _data="GET_COUPONS"> 领取优惠</label>
+                            <label class="c-label" style="width: 80px;"><input name="urlType" type="radio" value="3" _data="MAKE_AN_APPOINTMENT"> 预约活动</label>
+                            <i class="club_icons icon1" onclick="showtips()" id="stps"></i>
+                        </div>
+                    </div>
+                    <div class="box_height"></div>
+                </div>
+                <div class="mod_part">
+                    <h3 class="from-row-title">广告文案</h3>
+                     <div class="from-row">
+                        <label>文案内容：</label>
+                        <input type="text" value="" id="idea_cont" class="bm-input wd300" maxlength="10" placeholder="请输入不超过10个字符的广告文案" />
+                    </div>
+                    <div class="from-row">
+                        <label>广告描述：</label>
+                        <input type="text" value="" id="idea_des" class="bm-input wd300" maxlength="10" placeholder="请输入4到10个字符的广告描述" />
+                    </div>
+                </div>
+                <div class="commit-box">
+                    <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="preStepPage3()">上一步</button>
+                    <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="nextStepPage3()">下一步</button>
+                </div>
+            </article>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="../../../public/js/layui/layui.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../public/js/layui/css/layui.css">
+    <script type="text/javascript">
+        var storageInfo1 = sessionStorage.getItem('storageInfo1') ? JSON.parse(sessionStorage.getItem('storageInfo1')) : '',//页面缓存
+            storageInfo2 = sessionStorage.getItem('storageInfo2') ? JSON.parse(sessionStorage.getItem('storageInfo2')) : '',
+            storageInfo3 = sessionStorage.getItem('storageInfo3') ? JSON.parse(sessionStorage.getItem('storageInfo3')) : '',
+            comp_id = storageInfo1.comp_id,
+            product_type = storageInfo1.product_type; //推广目标4是微信品牌页 6普通链接
+        var limit=10,total,mPage=1,mTotal,isFirstLoad = true, ajaxLoading = false ;
+
+        //初始化
+        function init(){
+            getTags();//获取标签
+            getgroup(); //获取版位
+            if(storageInfo3){ //缓存渲染
+                readPageInfo(storageInfo3);
+            }
+        }
+        init();
+        //页面校验
+        function checkDataStept3(type){
+            var ideaUrl = $('#idea_url').val(),
+                ideaCont = $('#idea_cont').val(),
+                ideaDes = $('#idea_des').val(),
+                posId = $('#posit_list').attr('_id'),
+                matId = $('#mat_lists').attr('_id'),
+                adgroup_id = $('#getgroup').val(),
+                adsize_id = $('#getSizelist').val(),
+                img_size = $('#posit_list').attr('img_size'),
+                img_size1 = $('#posit_list').attr('img_size1'),
+                tag_id = $('#label_cont').find('.active').attr('_data'),
+                tag_time = $('#timer_cont').find('.active').attr('_data'),
+                link_name_type = (product_type == 4 ? $('input[name="urlType"]:checked').val():'');
+            if(type==2){
+                if(!posId){
+                    return {"success":false,msg:"请选择广告版位!"};
+                }
+                if(!matId){
+                    return {"success":false,msg:"请选择创意素材!"};
+                }
+                if(!ideaUrl){
+                    return {"success":false,msg:"请输入广告目标页地址!"};
+                }
+                if(!checkUrl(ideaUrl)){
+                    tipTopShow("请输入正确的跳转地址！");
+                    return;
+                }
+                if(!ideaCont){
+                    return {"success":false,msg:"请输入广告文案!"};
+                }
+                if(ideaCont.length>10){
+                    return {"success":false,msg:"广告文案不超过10个字符!"};
+                }
+                if(!ideaDes){
+                    return {"success":false,msg:"请输入广告描述!"};
+                }
+                if(ideaDes.length<4 || ideaDes.length>10){
+                    return {"success":false,msg:"广告描述长度为4到10个字符!"};
+                }
+            }
+            return {"success":true,"data":{"material_id":matId,"jump_url":ideaUrl,"delivery_desc":ideaDes,"delivery_cont":ideaCont,"ad_pos_id":posId,"adgroup_id":adgroup_id,"adsize_id":adsize_id,'img_size':img_size,'img_size1':img_size1,'tag_id':tag_id,'tag_time':tag_time,'link_name_type':link_name_type}};
+        }
+        //上一步
+        function preStepPage3(){
+            var res = checkDataStept3(1);
+            sessionStorage.setItem('storageInfo3',JSON.stringify(res.data));
+            console.log(res.data);
+            location.href='/v1.2/gdtdelivery/create2'
+        }
+        //下一步
+        function nextStepPage3(){
+            var res = checkDataStept3(2);
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            sessionStorage.setItem('storageInfo3',JSON.stringify(res.data));
+            console.log(res.data);
+            location.href='/v1.2/gdtdelivery/create4'
+        }
+        //渲染缓存数据
+        function readPageInfo(data){
+            $('#posit_list').attr('_id',data.ad_pos_id).attr('img_size',data.img_size).attr('img_size1',data.img_size1);
+            $('#timer_cont').find('li').removeClass('active');
+            $('#timer_cont').find('li[_data="'+data.tag_time+'"]').addClass('active');
+            $('#mat_lists').attr('_id',data.material_id);
+            $('#idea_url').val(data.jump_url);
+            $('#idea_cont').val(data.delivery_cont);
+            $('#idea_des').val(data.delivery_desc);
+             if(product_type== 4){
+                $('.mod_url_type').show();
+                $('input[name="urlType"][_data="'+data.link_name_type+'"]').attr('checked','checked');
+            }else{
+                $('.mod_url_type').hide();
+            }
+        }
+        //获取下拉框（全部版位）
+        function getgroup(){
+            var str = '';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getgroup',
+                dataType: 'json',
+                async : false,
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<option value="'+rs.data[i].adgroup_id+'">'+rs.data[i].adgroup_name+'</option>'
+                    }
+                    $('#getgroup').html(str);
+                    if(!storageInfo3){
+                        setTimeout(function(){
+                            $('#getgroup').change();
+                        },50)
+                    }else{
+                        $('#getgroup').val(storageInfo3.adgroup_id);
+                        getSizelist(storageInfo3.adgroup_id,1);//缓存
+                        $('#getSizelist').val(storageInfo3.adsize_id);
+                        getAdpostion(storageInfo3.adgroup_id,storageInfo3.adsize_id);
+                    }
+                    if(product_type == 4){ //微信朋友圈
+                        $('#getgroup').val(5).change();
+                        $('#getgroup option[value="5"]').siblings().attr('disabled','disabled');
+                    }else if(product_type == 6){
+                        $('#getgroup option[value="5"]').attr('disabled','disabled');
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+
+        //获取下拉框（全部全部尺寸）
+        function getSizelist(gId,type){
+            var str = '',adgroup_id = $('#getgroup').val() || gId;;
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getSizelistgdt',
+                data:{'adgroup_id':adgroup_id},
+                dataType: 'json',
+                async : false,
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        str += '<option value="'+rs.data[i].ad_size_id+'" adgroup_id="'+rs.data[i].adgroup_id+'">'+rs.data[i].ad_size_name+'</option>'
+                    }
+                    $('#getSizelist').html(str);
+                    mPage=1;
+                    materSerach(1);//获取素材列表
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        //获取下拉框（具体尺寸详情）
+        function getAdpostion(adgroup_id,size_id){
+            var platform_id = {'1':'wifi平台','2':'腾讯平台'};
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/getAdpostion',
+                data:{'adgroup_id':adgroup_id,'size_id':size_id},
+                dataType: 'json',
+                async : false,
+                success: function (rs) {
+                    var postList = $('#posit_list tbody'), str = '',no_msg = $(".no_poslist");
+                    if(rs.data.length == 0){
+                        postList.html("");
+                        no_msg.text("暂无记录");
+                        return ;
+                    }
+                    no_msg.text("");
+                    for(var i = 0;i < rs.data.length;i++){
+                        var isChecked = false;
+                        if(rs.data[i].ad_pos_id==storageInfo3.ad_pos_id){
+                            isChecked = true;
+                        }
+                        str += '<tr class="ptr ' + (isChecked ? 'cur' : '') +'" _id="'+rs.data[i].ad_pos_id+'" img_size="'+rs.data[i].img_size+'" img_size1="'+rs.data[i].img_size1+'" pos_name="'+rs.data[i].ad_pos_name+'" pos_size="'+rs.data[i].ad_size_name+'"><td>'+rs.data[i].ad_pos_name+'</td><td>'+rs.data[i].ad_size_name+'</td><td>'+rs.data[i].ad_pos_desc+'</td><td>'+platform_id[rs.data[i].platform_id]+'</td><td>'+rs.data[i].pos_number+'</td></tr>'
+                    }
+                    postList.html(str);
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        $('#getgroup').change(function(){
+            var id = $(this).val();
+            getSizelist(id);
+            $('#getSizelist').change();
+        })
+        $('#getSizelist').change(function(){
+            var id = $(this).val(),
+                g_id = $('#getgroup').val();
+            $('#posit_list').attr('_id','');
+            $('#idea_url').val('');
+            getAdpostion(g_id,id);
+            mPage=1;
+            materSerach(1);//获取素材列表
+        })
+
+        $('input[name="mattype"]').click(function(){
+            var thVal = $(this).val(),
+                pos_id = $('#posit_list').attr('_id'),
+                groupId = $('#getgroup').val(),
+                sizeId = $('#getSizelist').val();
+            if(thVal==2){
+                if(!pos_id){
+                    tipTopShow('请选择广告版位');
+                    return false;
+                }
+                var res = checkDataStept3(1);
+                sessionStorage.setItem('storageInfo3',JSON.stringify(res.data));
+                console.log(res.data);
+                location.href = '/v1.2/Materiald/addview?groupId='+groupId+'&sizeId='+sizeId;
+            }
+        })
+        //选择版位
+        $('#posit_list tbody').on('click','.ptr',function(e){
+            var th = $(this),
+                id = th.attr('_id'),
+                img_size = th.attr('img_size'),
+                img_size1 = th.attr('img_size1'),
+                pos_name = th.attr('pos_name'),
+                pos_size = th.attr('pos_size'),
+                nowDate = new Date();
+            th.addClass('cur').siblings().removeClass('cur');
+            $('#posit_list').attr('_id',id).attr('img_size',img_size).attr('img_size1',img_size1);
+            $('#mat_lists').attr('_id','');
+            $('#mat_lists').empty();
+            var definedName = pos_name+'_'+pos_size +'_'+ get_date(0).replace(/-/g,'')+nowDate.getHours()+nowDate.getMinutes();
+            sessionStorage.setItem('definedName',definedName);
+            mPage=1;
+            materSerach(1);
+        })
+
+        //返回多少月前的月份
+        function get_month(v){
+            var d = new Date();
+                d.setMonth(d.getMonth()-v,1);
+            var y = d.getFullYear(),
+                m = (d.getMonth()+1) > 9 ? d.getMonth()+1 : "0"+(d.getMonth()+1);
+            return y.toString() +"-"+ m.toString();
+        }
+        //获取标签
+        function getTags(){
+            var str = '';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/materiald/getTags',
+                dataType: 'json',
+                success: function (rs) {
+                    for(var i = 0;i < rs.data.length;i++){
+                        var isChecked = false;
+                        if(rs.data[i].material_tag_id == storageInfo3.tag_id){
+                            isChecked = true;
+                        }
+                        if(i==0){
+                            str += '<li _data="" class="' + (!isChecked ? 'active' : '') +'">全部</li>'
+                        }
+                        str += '<li _data="'+rs.data[i].material_tag_id+'" class="' + (isChecked ? 'active' : '') +'">'+rs.data[i].tag_name+'</li>'
+                    }
+                    $('#label_cont ul').html(str);
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        //搜索素材
+        function materSerach(mPage){
+            var tagLab = $('#label_cont').find('.active'),
+                mPage = mPage ? mPage : 1;
+            if(storageInfo3 && isFirstLoad){
+                var pos_id = storageInfo3.ad_pos_id,
+                    img_size = storageInfo3.img_size || $('#posit_list').attr('img_size'),
+                    img_size1 = storageInfo3.img_size1 || $('#posit_list').attr('img_size1'),
+                    group_id = storageInfo3.adgroup_id,
+                    size_id = storageInfo3.adsize_id,
+                    tag_id = storageInfo3.tag_id,
+                    timeLab = storageInfo3.tag_time,
+                    time =  timeLab !=2 ?get_month(timeLab):'';
+            }else{
+                var pos_id = $('#posit_list').attr('_id'),
+                    img_size = (pos_id ? $('#posit_list').attr('img_size'):''),
+                    img_size1 = (pos_id ? $('#posit_list').attr('img_size1'):''),
+                    group_id = $('#getgroup').val(),
+                    size_id =  $('#getSizelist').val(),
+                    tag_id = (tagLab.length ? tagLab.attr('_data'):'' ),
+                    timeLab = $('#timer_cont').find('.active'),
+                    time = timeLab.length && (timeLab.attr('_data')!=2) ? get_month(timeLab.attr('_data')):'';
+            }
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/materiald/yserach',
+                data:{'group_id':group_id,'size_id':size_id,'tag_id':tag_id,'time':time,'img_size':img_size,'img_size1':img_size1,'page':mPage,'limit':limit},
+                dataType: 'json',
+                success: function (rs) {
+                    if(rs.api_code == 0){         //如果查询成功*/
+                        var data = rs.data;     //返回数据赋值
+                        mTotal = rs.page_count;
+                        render_table(data,rs.page_count);     //渲染表格数据
+                        if(storageInfo3 && isFirstLoad){
+                            isFirstLoad = false;
+                        }
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        //渲染瀑布流数据
+        function render_table(data,totalPage){
+            var list_e = $("#mat_lists"),str="",no_msg = $(".no_matlist");
+            if(totalPage == 0){
+                list_e.html("");
+                no_msg.text("暂无素材");
+                $('.mod_material').css('height','100px');
+                return false;
+            }
+            $('.mod_material').css('height','500px');
+            no_msg.text("");
+            var mId = $('#mat_lists').attr('_id') || storageInfo3.material_id;
+            $.each(data,function(k,v){
+                str += '<div class="item materialPage'+ mPage + (mId == v.material_id?" cur":"")+'"><div class="title">'+v.tag_name + v.ad_size_name+'</div>';
+                str += '<div class="photo"><em></em><i></i>';
+                str += '<img src="'+v.img_url+'" alt="">';
+                str += '<div class="mod_btns"><span class="btn_chose" _id="'+v.material_id+'" _url="'+v.material_url+'" _type="'+v.link_name_type+'">选中投放</span></div></div>';
+                str += '<div class="info"><span>'+v.material_name+'</span><span>'+v.ad_size_name+'大小</span>';
+                str += '<p>'+v.material_url+'</p>';
+                str += '<p>'+getLocalTime(v.add_time)+' 创建 by '+v.staff_name+'</p></div></div>';
+            });
+            if(mPage==1){
+                list_e.html(str);
+            }else{
+                list_e.append(str);
+            }
+        }
+        function scrollFn(){
+            if(ajaxLoading){
+                return ;
+            }
+            var elem = $('.mod_material')[0],
+                top_height = elem.scrollTop,
+                win_height = elem.clientHeight,
+                elem_height = elem.scrollHeight;
+            if(elem_height <= win_height + top_height && mPage < mTotal){
+                ajaxLoading = true;
+                mPage++;
+                materSerach(mPage);
+            }
+        }
+
+        $('.mod_material')[0].onscroll = $('.mod_material')[0].onscroll = scrollFn;
+        function getLocalTime(n){
+            var d = new Date(new Date(n*1000).getTime());
+            return (d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
+        }
+        //判断图片是否加载完成
+        function imageLoaded(images, loaded) {
+            var imagesSize = images.length;
+            var onloadSize = 0, onerrorSize = 0;
+            for(var i = 0; i < imagesSize; i++) {
+                var img = document.createElement('img');
+                img.src = images[i];
+                img.onload = function() {
+                    onloadSize++;
+                    if(onerrorSize + onloadSize == imagesSize) {
+                        loaded.call(this);
+                    }
+                }
+                img.onerror = function() {
+                    onerrorSize++;
+                    if(onerrorSize + onloadSize == imagesSize) {
+                        loaded.call(this);
+                    }
+                }
+            }
+        }
+        //选择投放
+        $('#mat_lists').on('click','.btn_chose',function(){
+            var thisId = $(this).attr('_id'),
+                thisUrl = $(this).attr('_url'),
+                thisType = $(this).attr('_type');
+            $('.item').removeClass('cur')
+            $(this).closest('.item').addClass('cur');
+            $('#mat_lists').attr('_id',thisId);
+            $('#idea_url').val(thisUrl);
+            if(product_type== 4){
+                $('.mod_url_type').show();
+                $('input[name="urlType"][_data="'+thisType+'"]').attr('checked','checked');
+            }else{
+                $('.mod_url_type').hide();
+            }
+        })
+        //标签与时间选择筛选
+        $('.radio_div').on('click','li',function(){
+            var th = $(this);
+            var pos_id = $('#posit_list').attr('_id');
+            if(!pos_id){
+                tipTopShow('请选择广告版位');
+                return;
+            }
+            th.addClass('active').siblings().removeClass('active');
+            $('#mat_lists').empty();
+            mPage=1;
+            materSerach(1);
+        })
+        //落地页提示信息
+        function showtips(){
+            var msg = '<span style="color:black;">查看详情：落地页面仅做推广品牌用。<br>领取优惠：落地页面中必须包括有“领取优惠”明显标志。<br>预约活动：落地页面中必须包括有“预约活动”明显标志。</span>';
+            layer.tips(msg, '#stps',{tips: [3, '#f5f5f5'], area: ['400px', 'auto'],time: 0,closeBtn:1});
+        }
+    </script>
+</body>
+</html>

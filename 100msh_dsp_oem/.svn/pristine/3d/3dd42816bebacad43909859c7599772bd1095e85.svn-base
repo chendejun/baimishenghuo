@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>自定义换肤</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all" />
+    <style>
+        p{margin: 0;}
+        .skin_nav{display: block;}
+        .skin_nav li{display:inline-block;margin-left: 30px;margin-bottom:20px;}
+        .skin_nav li a{display: block;width:198px;height:148px;border:1px solid #f2f4f5;text-align: center;font-size:14px;}
+        .skin_nav a img{width:198px;height:148px;}.skin_nav li p{text-align: center;font-size:14px;line-height: 30px;}
+        .skin_nav li a.on{border:2px solid #4c94f5;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>自定义皮肤</span>
+        </div>
+        <div class="data_box form">
+            <p>自定义皮肤，您可根据需要,自定义以下标志，保存生效后,您的所有员工、下级代理登入本系统，将以新皮肤页面展现。</p>
+            <div class="from-row">
+                <label>站点名称：</label>
+                <input type="text" name="sitename" class="bm-input wd300" >
+                <span class="input_tip"></span>
+            </div>
+            <div class="from-row">
+                <label>系统LOGO：</label>
+                <input type="button" name="syslogo" value="使用默认" >
+                <input type="flie" name="syslogo" value="选择上传" >
+                <span>大小：50KB，100*30像素</span>
+                <span class="input_tip"></span>
+            </div>
+            <div class="from-row">
+                <label>底部网站信息：</label>
+                <input type="text" name="btminfo" class="bm-input wd300" >
+                <span class="input_tip"></span>
+            </div>
+            <div class="from-row">
+                <label>网站色调：</label>
+                <input type="hidden" name="wzskin" value="" >
+                <ul class="skin_nav">
+                    <li><a href="" class="on"><img src="/public/img/skin01"  ></a><p>默认</p></li>
+                    <li><a href="" class=""><img src="/public/img/skin02"  ></a><p>墨绿</p></li>
+                    <li><a href="" class=""><img src="/public/img/skin03"  ></a><p>碧蓝</p></li>
+                    <li><a href="" class=""><img src="/public/img/skin04" ></a><p>高山</p></li>
+                    <li><a href="" class=""><img src="/public/img/skin05"  ></a><p>星空</p></li>
+                </ul>
+                <span class="input_tip"></span>
+            </div>
+            <div class="from-row">
+                <label>登录域名：</label>
+                <span class="">https://</span>
+                <input type="text" name="domainname" class="bm-input wd300" placeholder="2-8位数字或小写字母">
+                <select class="">
+                    <option value="">.100msh.com</option>
+                    <option value="">.100msh.net</option>
+                </select>
+                <b>如需指定域名,请联系你的线下运营对接人员</b>
+                <span class="input_tip"></span>
+            </div>
+            <div class="btn_box">
+                <button class="bm-btn bm-btn-blue" type="button" onclick="submit()">保存</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/layui/layui.js"></script>
+    <script type="text/javascript" src="/public/js/index.js"></script>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript">
+        function submit() {            
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "",
+                data: {},
+                success: function(result) {
+                    if (result.state == 1) {                        
+                        tipTopShow('成功！');
+                    } else {
+                        tipTopShow(result.msg);
+                    }
+                },
+                error: function(r) {}
+            });
+        }
+    </script>
+</body>
+
+</html>

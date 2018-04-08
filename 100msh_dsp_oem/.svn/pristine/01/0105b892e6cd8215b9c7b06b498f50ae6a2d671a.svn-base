@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>代理商基本资料</title>
+    <link rel="stylesheet" href="../../../../..//public/css/base.css">
+    <link rel="stylesheet" href="../../../../..//public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js?2"></script>
+    <link rel="stylesheet" href="../../../../../public/js/laypage/skin/laypage.css">
+</head>
+<style>
+    .bm-select {
+        float: right;
+    }
+
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .info_box {
+        width: 100%;
+        overflow: hidden;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .agentinfolist {
+        width: 100% !important;
+        overflow: hidden;
+        display: block;
+        position: relative !important;
+        left: 0;
+        top: 0;
+        padding-left: 0 !important;
+        padding-bottom: 15px !important;
+        border-bottom: 1px solid #f2f4f5;
+    }
+
+    .infolist li {
+        width: 100%;
+        padding: 23px 0 0 66px;
+        box-sizing: border-box;
+    }
+
+    .linetitle {
+        color: #666666;
+        font-size: 15px;
+        float: left;
+        width: 200px;
+        text-align: right;
+        margin-right: 12px;
+    }
+
+    .agentdata,
+    .editinputinfo {
+        color: #5d5d5d;
+        font-size: 15px;
+        float: left;
+    }
+
+    .bm-btn {
+        padding: 0 10px;
+        width: auto;
+        box-sizing: border-box;
+        margin-right: 10px;
+    }
+
+    .agentdata span {
+        margin-right: 15px !important;
+    }
+
+    .adcount {
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
+        color: #666666;
+    }
+
+    .adcount div {
+        margin-right: 96px;
+        padding-right: 8px;
+        float: left;
+    }
+
+    #userList {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+        margin-bottom: 49px;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 15px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+
+    #edituserinfo {
+        widows: 120px;
+        height: 40px;
+        margin: 0 auto;
+    }
+
+    .userinfo_wrapper {
+        text-align: center;
+    }
+
+    .resetadminTip {
+        color: #f56c6c;
+        padding-left: 327px;
+        height: 22px;
+        line-height: 22px;
+        display: none;
+        overflow: hidden;
+    }
+
+    .setphonebox,
+    .adinfobox {
+        width: auto;
+        overflow: hidden;
+    }
+
+    .setphonebox {
+        display: none;
+    }
+
+    .setphone,
+    .setname,
+    .setuserphone,
+    .setusername {
+        width: 148px;
+        height: 38px;
+        line-height: 38px;
+        border: 1px solid #ddd;
+        padding: 0 10px;
+        margin-right: 9px;
+        font-size: 12px;
+    }
+
+    .setphoneTip {
+        padding-left: 212px;
+        height: 22px;
+        line-height: 22px;
+        color: #c4c4c4;
+        display: none;
+        overflow: hidden;
+    }
+
+    #saveInfo,
+    .editinputinfo {
+        display: none;
+    }
+
+    .province,
+    .city,
+    .district {
+        width: 130px !important;
+    }
+
+    .edit_box1 {
+        width: 100%;
+        height: 100%;
+        padding-top: 40px;
+        box-sizing: border-box;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .layui-layer-btn {
+        text-align: center !important;
+    }
+
+    .layui-layer-btn a {
+        height: 28px !important;
+        line-height: 28px !important;
+        width: 60px;
+        padding-top: 3px !important;
+        padding-bottom: 3px !important;
+        text-align: center;
+    }
+
+    .nav_box .pages {
+        display: inline-block;
+        font-size: 14px;
+        text-align: center;
+        height: 38px;
+        margin-right: 40px;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .nav_box .pages.cur {
+        border-bottom: 2px solid #4c94f5;
+        color: #4c94f5;
+        background-color: #fff;
+    }
+
+    .tab {
+        display: none;
+        width: 100%;
+        /* overflow: hidden; */
+    }
+
+
+
+    /* 账户详情 */
+
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .info_box {
+        width: 100%;
+        overflow: hidden;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .adcount {
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
+        color: #666666;
+    }
+
+    .adcount div {
+        margin-right: 96px;
+        padding-right: 8px;
+        float: left;
+    }
+
+    #userList {
+        width: 100%;
+        overflow: hidden;
+        display: none;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+        margin-bottom: 49px;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 14px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+
+    .userinfo_wrapper {
+        text-align: center;
+    }
+
+    .account_wrapper {
+        width: 100%;
+        overflow: hidden;
+        padding: 20px 20px 30px 20px;
+        box-sizing: border-box;
+        border-bottom: 1px solid #f2f4f5;
+    }
+
+    .account_wrapper .left,
+    .account_wrapper .right {
+        height: 100px;
+        width: 50%;
+        float: left;
+        position: relative;
+    }
+
+    .account_wrapper .right::before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 60px;
+        border-left: 1px solid #f2f4f5;
+        position: absolute;
+        left: 0;
+        top: 20px;
+    }
+
+    .account_wrapper .left {
+        padding-left: 104px;
+        box-sizing: border-box;
+    }
+
+    .account_wrapper .right {
+        padding-left: 109px;
+        box-sizing: border-box;
+    }
+
+    .account_wrapper .left .type1,
+    .account_wrapper .left .type2,
+    .account_wrapper .right .type1,
+    .account_wrapper .right .type2 {
+        width: 178px;
+        float: left;
+        height: 100%;
+    }
+
+    .account_wrapper .left .type2 {
+        margin-left: 18px;
+    }
+
+    .account_wrapper .typename {
+        height: 16px;
+        margin-bottom: 40px;
+        padding-left: 9px;
+        position: relative;
+    }
+
+    .account_wrapper .typename::before {
+        display: block;
+        content: "";
+        width: 0;
+        height: 15px;
+        border-left: 5px solid #57abf9;
+        position: absolute;
+        left: 0;
+        top: 3px;
+    }
+
+    .account_wrapper .accountexplan {
+        font-size: 15px;
+        color: #a1a1a1;
+        padding-left: 13px;
+    }
+
+    .account_wrapper .money {
+        font-size: 20px;
+        color: #333333;
+        margin-top: 2px;
+        padding-left: 13px;
+    }
+
+    .tabchangebox {
+        width: 100%;
+        margin-top: 23px;
+        height: 40px;
+        margin-bottom: 10px;
+    }
+
+    .tabchangebox .nav {
+        height: 38px;
+        border: 1px solid #cccccc;
+        border-radius: 5px;
+        overflow: hidden;
+        width: 300px;
+        float: left;
+    }
+
+    .tabchangebox .nav .type {
+        height: 38px;
+        background: #fff;
+        width: 50%;
+        color: #666666;
+        font-size: 14px;
+        text-align: center;
+        line-height: 38px;
+        float: left;
+    }
+
+    .tabchangebox .nav .type.cur {
+        background: #4c94f5;
+        color: #fff;
+    }
+
+    #nearDate {
+        float: right;
+    }
+
+    #userList.list2 {
+        display: block;
+    }
+
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .info_box {
+        width: 100%;
+        overflow: hidden;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .adcount {
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
+        color: #666666;
+    }
+
+    .adcount div {
+        margin-right: 96px;
+        padding-right: 8px;
+        float: left;
+    }
+
+    #userList {
+        width: 100%;
+        overflow: hidden;
+        padding-top: 10px;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+        margin-bottom: 49px;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 14px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+
+    .userinfo_wrapper {
+        text-align: center;
+    }
+
+    .account_wrapper {
+        width: 100%;
+        overflow: hidden;
+        padding: 20px 20px 30px 20px;
+        box-sizing: border-box;
+        border-bottom: 1px solid #f2f4f5;
+    }
+
+    .account_wrapper .accounttypes {
+        width: 24.8%;
+        float: left;
+        height: 100px;
+    }
+
+    .account_wrapper .accounttypes .accountname {
+        height: 30px;
+        line-height: 30px;
+        font-size: 15px;
+        color: #666666;
+        text-align: center;
+    }
+
+    .account_wrapper .accounttypes .accountdetails {
+        text-align: center;
+        font-size: 14px;
+        color: #999999;
+        margin-top: 10px;
+    }
+
+    .account_wrapper .accounttypes .accountdetails span {
+        font-size: 26px;
+        color: #409eff;
+    }
+
+    .account_wrapper .accounttypes:nth-of-type(2),
+    .account_wrapper .accounttypes:nth-of-type(3),
+    .account_wrapper .accounttypes:nth-of-type(4) {
+        position: relative;
+    }
+
+    .account_wrapper .accounttypes:nth-of-type(2)::before,
+    .account_wrapper .accounttypes:nth-of-type(3)::before,
+    .account_wrapper .accounttypes:nth-of-type(4)::before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 60px;
+        border-left: 1px solid #f2f4f5;
+        position: absolute;
+        left: 0;
+        top: 20px;
+    }
+
+    #nearDate {
+        float: right;
+    }
+
+    /* 消耗查询 */
+
+    .ta_date input {
+        width: 90%;
+        border: none;
+        outline: none;
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .date-picker-wrapper .drp_top-bar .clear-btn {
+        display: block;
+        position: absolute;
+        right: 40px;
+        top: 6px;
+        padding: 3px 5px;
+        margin: 0;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 1px solid #0076a3;
+        background: #0095cd;
+        background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+        background: -moz-linear-gradient(top, #00adee, #0078a5);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');
+        color: #fff;
+        line-height: initial;
+    }
+
+    .box_title {
+        margin: 20px 0;
+    }
+
+    .box_info {
+        margin-bottom: 70px;
+    }
+
+    .box_info .flex {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+    }
+
+    .box_info .flex .flex_item {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+        height: auto;
+        color: #fff;
+        margin-left: 30px;
+        border-radius: 2px;
+    }
+
+    .box_info .flex .flex_item:first-child {
+        margin: 0;
+    }
+
+    .box_info h3 {
+        margin-top: 40px;
+        font-size: 32px;
+    }
+
+    .box_info h4 {
+        margin: 20px 0 30px 0;
+        padding: 0;
+        font-size: 14px;
+    }
+
+    .b_red {
+        background-color: #fda2aa
+    }
+
+    .b_yellow {
+        background-color: #fbd28e
+    }
+
+    .b_bule {
+        background-color: #8cbbf9
+    }
+
+    .b_green {
+        background-color: #88d285
+    }
+
+    #transfer_list {
+        margin: 0;
+    }
+
+    .Wdate {
+        height: 38px!important;
+    }
+
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .noMsg {
+        padding-bottom: 15px;
+
+    }
+    .create_c{
+    	width: 100%;
+	    height: 200px;
+	    text-align: center;
+	    line-height: 200px;
+	    font-size: 20px;
+	    color: #7f7f7f;
+    }
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Settle/index?isreturn=1">
+                    <i class="backlist"></i>返回代理商列表</a>
+            </span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <div class="pages cur">基本资料</div>
+                <div class="pages">账户详情</div>
+                <div class="pages">消耗查询</div>
+                <div class="pages">人群画像开通记录</div>
+            </div>
+            <div class="tab">
+                <div class="info_box">
+                    <div class="box_title">基础信息</div>
+                    <ul class="agentinfolist">
+                        <li style="width:100%;">
+                            <div class="linetitle">服务商名称：</div>
+                            <div class="showbaseinfo agentdata">{{$data.comp_info.comp_name}}</div>
+                            <div class="editinputinfo">
+                                <input type="text" class="setname" value="{{$data.comp_info.comp_name}}" />
+                            </div>
+                        </li>
+                        <li style="width:60%;">
+                            <div class="linetitle">所在地区：</div>
+                            <div class="showbaseinfo agentdata location"></div>
+                            <div class="editinputinfo">
+                                <select class="bm-select province" name="province" onchange="getCity()" style="float:left;margin-right: 10px;">
+                                    <!-- <option>请选择省</option> -->
+                                </select>
+                                <select class="bm-select city" name="city" onchange="getDistrict()" style="float:left;margin-right: 10px;">
+                                    <!-- <option>请选择市</option> -->
+                                </select>
+                                <select class="bm-select district" name="district" style="float:left;">
+                                    <!-- <option>请选择市</option> -->
+                                </select>
+                            </div>
+                        </li>
+                        <li style="width:39%;">
+                            <div class="linetitle" style="width:100px">状态：</div>
+                            {{if $data.comp_info.status == 0}}
+                            <div class="showbaseinfo agentdata">停用</div>
+                            {{elseif $data.comp_info.status ==1}}
+                            <div class="showbaseinfo agentdata">正常</div>
+                            {{/if}}
+                            <div class="editinputinfo">
+                                <select class="bm-select status">
+                                    <option value="0">停用</option>
+                                    <option value="1">正常</option>
+                                </select>
+                            </div>
+                        </li>
+                        <li style="width:60%;">
+                            <div class="linetitle">联系人：</div>
+                            <div class="showbaseinfo agentdata">{{$data.comp_info.contacts}}</div>
+                            <div class="editinputinfo">
+                                <input type="text" class="setusername" value="{{$data.comp_info.contacts}}" />
+                            </div>
+                        </li>
+                        <li style="width:40%;">
+                            <div class="linetitle" style="width:100px">联系电话：</div>
+                            <div class="showbaseinfo agentdata">{{$data.comp_info.mobile_phone}}</div>
+                            <div class="editinputinfo">
+                                <input type="text" class="setuserphone" value="{{$data.comp_info.mobile_phone}}" />
+                            </div>
+                        </li>
+                        <li style="width:100%;height:100px;">
+                            <div class="linetitle">管理员账号：</div>
+                            <div class="agentdata" style="width:70%;">
+                                <div class="adinfobox">
+                                    <span>{{$data.comp_info.user_name}}</span>
+                                    <button class="btn_link bm-btn bm-btn-blue" id="resetpassword" onclick="resetPasswordFn()">重置管理员密码</button>
+                                    <button class="btn_link bm-btn bm-btn-blue" id="editNumber" onclick="EditNumberFn()">修改管理员账号</button>
+                                </div>
+                                <div class="setphonebox">
+                                    <input type="text" class="setphone" placeholder="请输入新的手机账号" />新账号密码为账号后六位</div>
+                            </div>
+                            <div class="resetadminTip">重置后密码为账号后6位。</div>
+                            <!-- <div class="setphoneTip">注意：保存生效后，系统会自动下发短信给原、新账号提示调整。</div> -->
+                        </li>
+                    </ul>
+                    <div class="box_title">客户信息</div>
+                    <div class="userinfo_wrapper">
+                        <div class="adcount">
+                            <div class="adnum">广告主数：{{$data.comp_info.adv_nums}}</div>
+                            <div class="nextagent">下级代理商数：{{$data.comp_info.agent_nums}}</div>
+                        </div>
+                        <div id="userList" style="display:block">
+                            <table id="dmp_list" class="base_table">
+                                <thead>
+                                    <tr>
+                                        <th>名称</th>
+                                        <th>开通时间</th>
+                                        <th>广告主数</th>
+                                        <th>投放广告数</th>
+                                        <th>广告消耗金额</th>
+                                        <th>投放短信数</th>
+                                        <th>短信消耗金额</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{if $data.next_data}} {{foreach from=$data.next_data key=k item=next}}
+                                    <tr>
+                                        <td>{{$next.comp_name}}</td>
+                                        <td>{{$next.add_time}}</td>
+                                        <td>{{$next.adv_nums}}</td>
+                                        <td>{{$next.deli_nums}}</td>
+                                        <td>{{$next.disbure_nums}}</td>
+                                        <td>{{$next.msg_nums}}</td>
+                                        <td>{{$next.msg_disbure}}</td>
+                                    </tr>
+                                    {{/foreach}} {{else}}
+                                    <tr style="border-top:1px solid #f2f4f5">
+                                        <td colspan='7' style="text-align:center;background:#fff;color:orange">暂无数据</td>
+                                    </tr>
+                                    {{/if}}
+                                </tbody>
+                            </table>
+                            <p class="noMsg"></p>
+                            <!--列表分页-->
+                            <div id="list_page1" class="page"></div>
+                        </div>
+                        <button class="btn_link bm-btn bm-btn-blue" id="edituserinfo">修改基础信息</button>
+                        <button class="btn_link bm-btn bm-btn-blue" id="saveInfo">保存修改</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tab">
+                <div class="info_box">
+                    <div class="box_title">账户详情</div>
+                    <div class="account_wrapper">
+                        <div class="left">
+                            <div class="type1">
+                                <div class="typename">Ⅰ类账户</div>
+                                <div class="accountexplan">余额/元</div>
+                                <div class="money">{{$data.acc_info.amount_one}}</div>
+                            </div>
+                            <div class="type2">
+                                <div class="typename">Ⅱ类账户</div>
+                                <div class="accountexplan">余额/元</div>
+                                <div class="money">{{$data.acc_info.amount_two}}</div>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <div class="type1">
+                                <div class="typename">人群画像高级版</div>
+                                <div class="accountexplan">剩余/次</div>
+                                <div class="money acc1">1</div>
+                            </div>
+                            <div class="type2">
+                                <div class="typename">人群画像APP分析版</div>
+                                <div class="accountexplan">剩余/次</div>
+                                <div class="money acc2">1</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box_title mt20">充值记录</div>
+                    <div class="userinfo_wrapper">
+                        <div class="tabchangebox">
+                            <div class="nav">
+                                <div class="type cur" data-regtype='1'>账户充值记录</div>
+                                <div class="type" data-regtype='2'>人群画像充值记录</div>
+                            </div>
+                            <select class="bm-select" id="nearDate1" onchange="SelectGetMonth()">
+                                <!-- <option value='1'>最近6个月</option> -->
+                            </select>
+                        </div>
+                        <div id="userList" class="list1">
+                            <table id="dmp_list" class="base_table page2Tab1" style="margin-bottom:0;">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>充值次数</th>
+                                        <th>充值账户</th>
+                                        <th>充值操作人员</th>
+                                        <th>流水号</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- <tr>
+                                        <td>2017-12-19 15:02:25</td>
+                                        <td>1</td>
+                                        <td>人群画像高级版本</td>
+                                        <td>战三</td>
+                                        <td>WX2656653213165468</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                            <p class="noMsg"></p>
+                            <!--列表分页-->
+                            <div id="list_page2" class="page"></div>
+                        </div>
+                        <div id="userList" class="list2">
+                            <table id="dmp_list" class="base_table page2Tab2" style="margin-bottom:0;">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>转账金额/元</th>
+                                        <th>转入账户</th>
+                                        <th>充值操作人员</th>
+                                        <th>流水号</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- <tr>
+                                        <td>2017-12-19 15:02:25</td>
+                                        <td>1</td>
+                                        <td>人群画像高级版本</td>
+                                        <td>战三</td>
+                                        <td>WX2656653213165468</td>
+                                    </tr> -->
+                                    <!-- <tr>
+                                        <td>汇总</td>
+                                        <td>1</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                            <p class="noMsg"></p>
+                            <!--列表分页-->
+                            <div id="list_page3" class="page"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab">
+                <div class="box_info">
+                    <p class="box_title">消耗详情</p>
+                    <ul class="flex" style="position:relative;padding-left:0;width:100%;">
+                        <li class="flex_item b_red" style="text-align:center;">
+                            <h3>0</h3>
+                            <h4>已投放广告/条 </h4>
+                        </li>
+                        <li class="flex_item b_yellow" style="margin-left:30;text-align:center;">
+                            <h3>0</h3>
+                            <h4>广告消耗金额/元</h4>
+                        </li>
+                        <li class="flex_item b_bule" style="margin-left:30;text-align:center;">
+                            <h3>0</h3>
+                            <h4>已投放短信/条</h4>
+                        </li>
+                        <li class="flex_item b_green" style="margin-left:30;text-align:center;">
+                            <h3>0</h3>
+                            <h4>短信消耗金额/元</h4>
+                        </li>
+                    </ul>
+                </div>
+                <div class="box_table table_style">
+                    <p class="box_title" style="margin-top:0;">日消耗明细</p>
+                    <div class="search_box" style="display: none;">
+                        <select class="bm-select" id="nearDate2">
+                            <!-- <option value='1'>最近6个月</option> -->
+                        </select>
+                    </div>
+                    <div class="create_c">
+                    	实现中……
+                    </div>
+                    <table id="transfer_list" class="base_table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>投放广告数</th>
+                                <th>消耗金额</th>
+                                <th>广告曝光数</th>
+                                <th>广告点击数</th>
+                                <th>点击率</th>
+                                <th>投放短信数</th>
+                                <th>短信消耗金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <p class="noMsg"></p>
+                    <!--列表分页-->
+                    <div id="list_page" class="page"></div>
+                </div>
+            </div>
+            <div class="tab">
+                <div class="info_box">
+                    <div class="box_title">人群画像开通详情</div>
+                    <div class="account_wrapper">
+                        <div class="accounttypes">
+                            <div class="accountname">人群画像高级版开通</div>
+                            <div class="accountdetails">
+                                <span class="sceneNum1">0</span>次</div>
+                        </div>
+                        <div class="accounttypes">
+                            <div class="accountname">人群画像APP分析版开通</div>
+                            <div class="accountdetails">
+                                <span class="sceneNum2">0</span>次</div>
+                        </div>
+                        <div class="accounttypes">
+                            <div class="accountname">自有广告主开通</div>
+                            <div class="accountdetails">
+                                <span class="sceneNum3">0</span>次</div>
+                        </div>
+                        <div class="accounttypes">
+                            <div class="accountname">转给下级代理</div>
+                            <div class="accountdetails">
+                                <span class="sceneNum4">0</span>次</div>
+                        </div>
+                    </div>
+
+                    <div class="userinfo_wrapper">
+                        <div class="tabchangebox mt20">
+                            <div class="box_title" style="width:50%;text-align:left;float:left;margin:0;">人群画像开通明细</div>
+                            <select class="bm-select" id="nearDate3" onchange="getSceneListData()">
+                                <!-- <option value='1'>最近6个月</option> -->
+                            </select>
+                        </div>
+                        <div id="userList" style="display:block;">
+                            <table id="dmp_list" class="base_table page4Tab" style="margin-bottom:0;">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>开通次数</th>
+                                        <th>开通对象名称</th>
+                                        <th>客户类型</th>
+                                        <th>版本名称</th>
+                                        <th>操作人员</th>
+                                        <th>流水号</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- <tr>
+                                        <td>2017-12-19 15:02:25</td>
+                                        <td>1</td>
+                                        <td>大鹏服务商</td>
+                                        <td>代理商</td>
+                                        <td>人群画像高级版本</td>
+                                        <td>张三</td>
+                                        <td>WX2656653213165468</td>
+                                    </tr>
+                                    <tr>
+                                        <td>汇总</td>
+                                        <td>1</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                            <p class="noMsg"></p>
+                            <!--列表分页-->
+                            <div id="list_page5" class="page"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </script>
+        <!--人群详情end-->
+        <script type="text/javascript" src="../../../../..//public/js/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="../../../../..//public/js/common.js"></script>
+        <script src="../../../../../public/js/laypage/laypage.js"></script>
+        <script type="text/javascript" src="../../../../../public/js/My97DatePicker/WdatePicker.js"></script>
+        <!-- 基本资料 -->
+        <script type="text/javascript">
+            // var url = window.location.href,
+            //     Id = url.substring(url.lastIndexOf('/') + 1),
+            var initAdminInfo = '{{$data.comp_info.user_name}}';  //初始化时保存管理员账号，保存时方便对比是否修改
+            var IDS = '{{$data.comp_info.comp_id}}'  //服务商ID
+            $('.tab').eq(0).show();
+            console.log()
+            if('{{$data.comp_info.status}}'==0){
+                $('.status').val('0')
+            }else{
+                $('.status').val('1')
+            }
+            //页面切换
+            $('.nav_box .pages').on('click', function () {
+                $(this).addClass('cur').siblings().removeClass('cur');
+                $('.tab').eq($(this).index()).show().siblings('.tab').hide();
+            })
+            var sc_pro = "{{$data.comp_info.sc_pro}}",  //省ID
+                sc_pid = "{{$data.comp_info.sc_pid}}",  //市ID
+                sc_id = "{{$data.comp_info.sc_id}}",  //区ID
+                staffId = "{{$data.comp_info.staff_id}}"; // 被重置密码的操作员ID
+
+            //根据省返回市
+            function getCity() {
+                var cityId = $('.province').val();
+                if (cityId == "") {
+                    $('.city').html('<option value="">请选择</option>');
+                    $('.district').html('<option value="">请选择</option>');
+                } else {
+                    getProvince(cityId, 2);
+                    $('.district').html('<option value="">请选择</option>');
+                }
+            }
+            //根据市返回区县
+            function getDistrict() {
+                var cityId = $('.city').val();
+                if (cityId == "") {
+                    $('.district').html('<option value="">请选择</option>');
+                } else {
+                    getProvince(cityId, 3);
+                }
+            }
+            //获取所在地区数据
+            var getfirstcity = 1;
+            function getProvince(type, nodetype) {
+                $.ajax({
+                    type: "GET",
+                    url: "/V1.2/Advertiser/getScList/sc_id/" + type,
+                    dataType: 'json',
+                    success: function (res) {
+                        //  console.log(res)
+                        if (res.state == 1) {
+                            renderCityList(res.sc_list, nodetype)
+                        } else {
+                            layui.layer.msg('获取所在地区列表失败！');
+                        }
+
+                    },
+                    error: function (err) {
+                        layui.layer.msg('获取所在地区列表失败！');
+                    }
+                })
+            }
+            function renderCityList(data, nodetype) {
+                var str = '<option value="">请选择</option>'
+                $.each(data, function (k, v) {
+                    str += '<option value="' + v.sc_id + '">' + v.sc_name + '</option>';
+                })
+                if (nodetype == 1) {
+                    $('.province').html(str);
+                    $('.province').val(sc_pro);
+                    if (getfirstcity == 1) {
+                        getfirstcity = 2;
+                        getProvince(sc_pro, 2)
+                    }
+                } else if (nodetype == 2) {
+                    $('.city').html(str);
+                    $('.city').val(sc_pid);
+                    if (getfirstcity == 2) {
+                        getfirstcity = 3;
+                        getProvince(sc_pid, 3)
+                    }
+                } else if (nodetype == 3) {
+                    $('.district').html(str);
+                    $('.district').val(sc_id);
+                }
+                $('.location').text($(".province").find("option:selected").text() + "  " + $(".city").find("option:selected").text() + "  " + $(".district").find("option:selected").text());
+            }
+            getProvince(0, 1); //初始化默认传0，获取所有省份；
+
+
+            //重置管理员密码
+            function resetPasswordFn() {
+                $('.resetadminTip').show();
+                $.ajax({
+                    type: "POST",
+                    url: "/v1.2/Agent/reset",
+                    dataType: 'json',
+                    data: {
+                        'staff_id': staffId
+                    },
+                    success: function (res) {
+                        // console.log(res)
+                        layui.layer.msg(res.msg);
+                    },
+                    error: function (err) {
+                        layui.layer.msg('网络出错，请稍后重试！');
+                    }
+                })
+            }
+
+            //修改管理员账号
+            function EditNumberFn() {
+                $('.adinfobox').hide();
+                $('.resetadminTip').hide();
+                $('.setphonebox').show();
+                $('.setphoneTip').show();
+            }
+            //修改基础资料，显示输入框；
+            $('#edituserinfo').on('click', function () {
+                $(this).hide();
+                $('#saveInfo').show();
+                $('.showbaseinfo').hide();
+                $('.editinputinfo').show();
+            })
+
+
+            layui.use(['form', 'layer'], function () {
+                var form = layui.form(),
+                    layer = layui.layer;
+                $('#saveInfo').on('click', function () {
+                    layer.open({
+                        type: 1,
+                        btn: ['确定', '取消'],
+                        skin: 'layui-layer-demo', //样式类名
+                        anim: 2,
+                        title: " ",
+                        area: ['400px', '200px'],
+                        shadeClose: true, //开启遮罩关闭
+                        content: '<div class="edit_box1">确定修改当前信息</div>',
+                        yes: function (index, layero) {
+                            layer.close(index);
+                            SaveInfo();
+                        }, btn2: function (index, layero) {
+                            layer.close(index);
+                        }
+                    });
+                })
+
+                //保存
+                function SaveInfo() {
+                    var agentName = $.trim($('.setname').val()),   //代理商名称
+                        province = $.trim($('.province').val()),   //省
+                        city = $.trim($('.city').val()),    //市
+                        district = $.trim($('.district').val()),  //区
+                        status = $.trim($('.status').val()),   //状态
+                        username = $.trim($('.setusername').val()),   //联系人
+                        phone = $.trim($('.setuserphone').val()),     //联系电话
+                        comp_name_reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,32}$/,   //代理商名称正则
+                        contacts_reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,10}$/,  //联系人正则
+                        mobile_phone_reg = /^((0\d{2,3}-\d{7,8})|(1[3456789]\d{9}))$/,   //联系电话正则
+                        staff_acc_reg = /^1[3|4|5|6|7|8|9]\d{9}$/;   //管理员正则
+
+                    if (!comp_name_reg.test(agentName)) {
+                        layui.layer.msg('请输入正确的代理商名称');
+                        return false;
+                    }
+                    if (province == '' || city == '' || district == '') {
+                        layui.layer.msg('请选择所在区域');
+                        return false;
+                    }
+                    if (username.length > 10) {
+                        layui.layer.msg('代理商联系人最长不超过10个字符');
+                        return false;
+                    }
+                    if (!contacts_reg.test(username)) {
+                        layui.layer.msg('请输入正确的代理商联系人');
+                        return false;
+                    }
+                    if (!mobile_phone_reg.test(phone)) {
+                        layui.layer.msg('请输入正确的联系电话！');
+                        return false;
+                    }
+
+                    var resetAdminNum = $.trim($('.setphone').val()); //管理员账号（手机号）
+                    if (initAdminInfo != resetAdminNum && resetAdminNum != "") {
+                        var adminnum = $.trim($('.setphone').val());
+                        if (!staff_acc_reg.test(resetAdminNum)) {
+                            layui.layer.msg('请输入正确的管理员账号！');
+                            return false;
+                        }
+                        var postData = {
+                            'comp_name': agentName,   //代理商名称
+                            'contacts': username,  //联系人
+                            'mobile_phone': phone,   //联系电话
+                            'sc_pro': province,   //省
+                            'sc_pid': city,  //市
+                            'sc_id': district,  //区
+                            'status': status,      //状态
+                            "staff_acc": adminnum   //管理员账号
+                        }
+                    } else {
+                        var postData = {
+                            'comp_name': agentName,   //代理商名称
+                            'contacts': username,  //联系人
+                            'mobile_phone': phone,   //联系电话
+                            'sc_pro': province,   //省
+                            'sc_pid': city,  //市
+                            'sc_id': district,  //区
+                            'status': status     //状态
+                        }
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "/v1.2/Agent/edit/comp_id/" + IDS,
+                        dataType: 'json',
+                        data: postData,
+                        success: function (res) {
+                            //console.log(res)
+                            layui.layer.msg(res.msg);
+                            if (res.state == 1) {
+                                setTimeout(function(){
+                                    window.location.href = '/v1.2/Settle/index'
+                                },1000)
+                            }
+
+                        },
+                        error: function (err) {
+                            layui.layer.msg('网络出错，请稍后重试！');
+                        }
+                    })
+                }
+            })
+        </script>
+        <!-- 账户详情 -->
+        <script type="text/javascript">
+            var isEdit = '';
+            //获取近六个月的日期
+            function getSixMonth() {
+                function getLastYearMonthArray() {
+                    var d = new Date();
+                    var result = [];
+                    for (var i = 0; i < 5; i++) {
+                        var dd = d.getMonth();
+                        var m;
+                        if (dd == 2) {
+                            d.setMonth(d.getMonth() - 2);
+                            m = "02"
+                        } else if (dd == 0) {
+                            if (i != 0) {
+                                if ($.inArray(d.getFullYear() + "01", result) != -1) {
+                                    d.setMonth(d.getMonth() - 1);
+                                    m = d.getMonth() + 1;
+                                    m = m < 10 ? "0" + m : m;
+                                } else {
+                                    m = "01"
+                                }
+                            } else {
+                                d.setMonth(d.getMonth() - 1);
+                                m = d.getMonth() + 1;
+                                m = m < 10 ? "0" + m : m;
+                            }
+                        } else {
+                            d.setMonth(d.getMonth() - 1);
+                            m = d.getMonth() + 1;
+                            m = m < 10 ? "0" + m : m;
+                        }
+                        if (i == 0) {
+                            lastMonth = "" + d.getFullYear() + m;
+                        } else if (i == 11) {
+                            lastYearLastMonth = "" + d.getFullYear() + m;
+                        }
+                        var month = d.getFullYear() + "" + m;
+                        result.push(month);
+                    }
+                    return result.reverse();
+                }
+                var oDate = new Date(),
+                    laY = oDate.getFullYear(),
+                    laM = oDate.getMonth() + 1,
+                    MonthArr = getLastYearMonthArray();
+                laY = laY < 10 ? "0" + laY : laY;
+                laM = laM < 10 ? "0" + laM : laM;
+                MonthArr.push(laY + "" + laM);
+                function resultMonth(arr) {
+                    var newArr = [];
+                    $.each(MonthArr, function (k, v) {
+                        var y = v.slice(0, 4),
+                            m = v.slice(4);
+                        newArr[k] = y + "-" + m
+                    })
+                    return newArr
+                }
+                return MonthArr = resultMonth(MonthArr).reverse();
+            }
+            //给下拉菜单赋值；
+            function setOptionTime(selector) {
+                var Arr = getSixMonth(),
+                    str = '';
+                $.each(Arr, function (k, v) {
+                    str += '<option value="' + v + '">' + v + '</option>';
+                })
+                $(selector).html(str);
+            }
+            setOptionTime('#nearDate1');   //账户详情近六个月月份数
+            setOptionTime('#nearDate2');   //消耗详情近六个月月份数
+            setOptionTime('#nearDate3');   //人群画像近六个月月份数
+            //充值记录nav切换
+            var dateType = $('#nearDate1').find('option:selected').text(); //时间长度
+            regListNode = 1;
+            $('.tabchangebox .nav .type').on('click', function () {
+                $(this).addClass('cur').siblings().removeClass('cur');
+                SelectGetMonth();
+            })
+
+            //获取月份下拉框的值时判断nav值，调用方法
+            function SelectGetMonth() {
+                var regtype = $('.tabchangebox .nav .type.cur').attr('data-regtype');
+                if (regtype == 1) {  //充值记录
+                    $('#userList.list2').show();
+                    $('#userList.list1').hide();
+                    AgentRechargeFn();
+                } else {
+                    $('#userList.list1').show();
+                    $('#userList.list2').hide();
+                    getPortraitCrowdData();
+                }
+            }
+
+            //获取账户充值记录列表数据
+            function AgentRechargeFn(curr) {
+                var dateType = $('#nearDate1').find('option:selected').text();
+                $.ajax({
+                    type: "POST",
+                    url: "/v1.2/agent/recharge/page/" + (curr || 1) + "/limit/10/date/" + dateType + "/comp_id/" + IDS,
+                    dataType: 'json',
+                    success: function (res) {
+                        //  console.log(res)
+                        if (res.state == 1) {
+                            renderRegList(res.data);
+                            renderPage2('#list_page3', curr, res.data.pages);
+                        } else {
+                            layui.layer.msg('查询信息失败，请重试...');
+                        }
+                    },
+                    error: function (err) {
+                        layui.layer.msg('查询信息失败，请重试...');
+                    }
+                })
+            }
+            //渲染充值列表数据
+            function renderRegList(data) {
+                if (data.list.length == 0) {
+                    $('#list_page3').siblings('table').find('tbody').html("");
+                    $('#list_page3').siblings('.noMsg').text('暂无数据！');
+                    return;
+                } else {
+                    $('#list_page3').siblings('.noMsg').text('');
+                }
+                var str = '';
+                $.each(data.list, function (k, v) {
+                    str += '<tr>'
+                    str += '<td>' + v.trade_time + '</td>'
+                    str += '<td>' + v.trade_amount + '</td>'
+                    str += '<td>' + v.acc_type + '</td>'
+                    str += '<td>' + v.staff_name + '</td>'
+                    str += '<td>' + v.trade_no + '</td>'
+                    str += '</tr>'
+                })
+                $('.page2Tab2').find('tbody').html(str);
+                $('.page2Tab2').find('tbody').append('<tr><td>汇总</td><td>' + data.total + '</td><td></td><td></td><td></td></tr>')
+            }
+            AgentRechargeFn();
+
+            //获取人群画像充值记录数据
+            function getPortraitCrowdData(curr) {
+                var month = $('#nearDate1').find('option:selected').text();
+                $.ajax({
+                    type: "GET",
+                    url: "/v1.2/SceneExtension/getTransferResourceRecord/comp_id/" + IDS + "/transfer_type/2/page/" + (curr || 1) + "/date/" + month,
+                    dataType: 'json',
+                    success: function (res) {
+                        //console.log(res)
+                        if (res.state == 1) {
+                            RenderPortraitCrowdList(res.data);
+                            renderPage3('#list_page2', curr, res.data.pages)
+                        } else {
+                            layui.layer.msg('查询信息失败，请重试...');
+                        }
+                    },
+                    error: function (err) {
+                        layui.layer.msg('查询信息失败，请重试...');
+                    }
+                })
+            }
+            //渲染人群画像充值记录列表
+            function RenderPortraitCrowdList(data) {
+                if (data.list.length == 0) {
+                    $('#list_page2').siblings('table').find('tbody').html("");
+                    $('#list_page2').siblings('.noMsg').text('暂无数据！');
+                    return;
+                } else {
+                    $('#list_page2').siblings('.noMsg').text('');
+                }
+                var str = '';
+                $.each(data.list, function (k, v) {
+                    str += '<tr>'
+                    str += '<td>' + v.add_time + '</td>'
+                    str += '<td>' + v.record_num + '</td>'
+                    str += '<td>' + v.to_comp_name + '</td>'
+                    str += '<td>' + v.staff_name + '</td>'
+                    str += '<td>' + v.record_no + '</td>'
+                    str += '</tr>'
+                })
+                $('.page2Tab1').find('tbody').html(str);
+                $('.page2Tab1').find('tbody').append('<tr><td>汇总</td><td>' + data.total + '</td><td></td><td></td><td></td></tr>')
+            }
+
+            //分页
+            function renderPage2(selector, curr, pages) {
+                laypage({
+                    cont: $(selector),
+                    pages: pages, //通过后台拿到的总页数
+                    skin: '#4c94f5',
+                    prev: '<em class="layui-icon"></em>',
+                    next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function (obj, first) { //触发分页后的回调
+                        currNum = obj.curr;
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            AgentRechargeFn(obj.curr);  //此处方法为需要分页时请求数据的函数
+                        }
+                    }
+                });
+            }
+            //分页
+            function renderPage3(selector, curr, pages) {
+                laypage({
+                    cont: $(selector),
+                    pages: pages, //通过后台拿到的总页数
+                    skin: '#4c94f5',
+                    prev: '<em class="layui-icon"></em>',
+                    next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function (obj, first) { //触发分页后的回调
+                        currNum = obj.curr;
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getPortraitCrowdData(obj.curr);   //此处为需要分页时请求数据的函数
+                        }
+                    }
+                });
+            }
+
+            //获取账户详情人群画像高级版和app分析版剩余次数
+            function getAccountDetail() {
+                $.ajax({
+                    type: "GET",
+                    url: "/v1.2/SceneExtension/getAllServerSceneResource/comp_id/" + IDS,
+                    dataType: 'json',
+                    success: function (res) {
+                        // console.log(res)
+                        if (res.state == 1) {
+                            $('.acc1').text(res.data['{{$data.comp_info.comp_id}}'].high_num)
+                            $('.acc2').text(res.data['{{$data.comp_info.comp_id}}'].app_num)
+                        } else {
+                            layui.layer.msg('查询信息失败，请重试...');
+                        }
+                    },
+                    error: function (err) {
+                        layui.layer.msg('获取所在地区列表失败！');
+                    }
+                })
+            }
+            getAccountDetail();
+        </script>
+        <!-- 消耗查询 -->
+        <script type="text/javascript">
+            //获取消耗详情数据
+            function getConsumCount() {
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/SceneExtension/getServerSmsInfo/comp_id_csv/' + IDS,
+                    dataType: 'json',
+                    success: function (res) {
+                        console.log(res)
+                        if (res.state == 1) {
+                            $('.b_red').find('h3').text(res.data.data[IDS].count);
+                            $('.b_yellow').find('h3').text(splitNum(res.data.data[IDS].total_cost));
+                            $('.b_bule').find('h3').text(res.data.data[IDS].send_success);
+                            $('.b_green').find('h3').text(splitNum(res.data.data[IDS].use_money));
+                        } else {
+                            tipTopShow(res.msg);
+                        }
+                    },
+                    error: function (err) {
+                        tipTopShow("查询信息失败，请重试...");
+                    }
+                });
+            }
+            getConsumCount();
+            //只保留两位小数（不四舍五入）
+            function splitNum(num) {
+                if (num.toString().split(".").length >= 2) {
+                    var n1 = num.toString().split(".")[0];
+                    var n2 = num.toString().split(".")[1].slice(0, 2);
+                    return n1 + "." + n2
+                } else {
+                    var n1 = num.toString().split(".")[0];
+                    return n1
+                }
+            }
+
+
+        </script>
+        <!-- 人群画像 -->
+        <script type="text/javascript">
+            //获取人群画像开通列表数据
+            function getSceneListData(curr) {
+                var date = $('#nearDate3').find('option:selected').text();
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/SceneExtension/getTransferResourceRecord/comp_id/' + IDS + '/transfer_type/1/date/' + date + '/page/' + (curr || 1),
+                    dataType: 'json',
+                    success: function (res) {
+                        // console.log(res)
+                        if (res.state == 1) {
+                            RenderSceneList(res.data);
+                            renderPage4('#list_page5', curr, res.data.pages)
+                        } else {
+                            tipTopShow(res.msg);
+                        }
+                    },
+                    error: function (err) {
+                        tipTopShow("查询信息失败，请重试...");
+                    }
+                });
+            }
+            //渲染人群画像开通明细列表
+            function RenderSceneList(data) {
+                if (data.list.length == 0) {
+                    $('#list_page5').siblings('table').find('tbody').html("");
+                    $('#list_page5').siblings('.noMsg').text('暂无数据！');
+                    return;
+                } else {
+                    $('#list_page5').siblings('.noMsg').text('');
+                }
+                var str = '';
+                $.each(data.list, function (k, v) {
+                    var record_type = '',
+                        poster_type = '';
+                    str += '<tr>'
+                    str += '<td>' + v.add_time + '</td>'
+                    str += '<td>' + v.record_num + '</td>'
+                    str += '<td>' + v.to_comp_name + '</td>'
+                    if (v.record_type == 1) {
+                        record_type = '代理商'
+                    } else {
+                        record_type = '广告主'
+                    }
+                    str += '<td>' + record_type + '</td>'
+                    if (v.poster_type == 2) {
+                        poster_type = '高级版'
+                    } else {
+                        poster_type = 'app分析版'
+                    }
+                    str += '<td>' + poster_type + '</td>'
+                    str += '<td>' + v.staff_name + '</td>'
+                    str += '<td>' + v.record_no + '</td>'
+                    str += '</tr>'
+                })
+                $('.page4Tab').find('tbody').html(str);
+                $('.page4Tab').find('tbody').append('<tr><td>汇总</td><td>' + data.total + '</td><td></td><td></td><td></td><td></td><td></td></tr>')
+            }
+            getSceneListData();
+            //分页
+            function renderPage4(selector, curr, pages) {
+                //显示分页
+                laypage({
+                    cont: $(selector), //容器。值支持id名、原生dom对象，jquery对象。
+                    pages: pages, //通过后台拿到的总页数
+                    skin: '#4c94f5',
+                    prev: '<em class="layui-icon"></em>',
+                    next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function (obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getSceneListData(obj.curr);
+                        }
+                    }
+                });
+            }
+
+            //为人群画像开通详情赋值
+            function getServerSceneUseInfo() {
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/SceneExtension/getServerSceneUseInfo/comp_id/' + IDS,
+                    dataType: 'json',
+                    success: function (res) {
+                        //   console.log(res)
+                        if (res.state == 1) {
+                            $('.sceneNum1').text(res.data.high_num)
+                            $('.sceneNum2').text(res.data.app_num)
+                            $('.sceneNum3').text(res.data.advertiser_use_num)
+                            $('.sceneNum4').text(res.data.server_use_num)
+                        } else {
+                            tipTopShow("查询信息失败，请重试...");
+                        }
+                    },
+                    error: function (err) {
+                        tipTopShow("查询信息失败，请重试...");
+                    }
+                });
+            }
+            getServerSceneUseInfo();
+
+        </script>
+</body>
+
+</html>

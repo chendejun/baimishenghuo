@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP / 客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <style type="text/css">
+        .detail_box {
+            background-color: #fff;
+            padding:20px;
+        }
+
+        .detail_box .top_box a{
+            margin-left: 10px;
+        }
+
+        .detail_box .top_box input {
+            width: 180px;
+        }
+
+
+        .detail_box .list_content .item {
+            border:1px solid #ccc;
+            width: 30%;
+            height: 175px;
+            /*background-color: red;*/
+            position: relative;
+
+        }
+
+        .detail_box .list_content .item .item_title {
+            font-size: 22px;
+            text-align: center;
+            padding-top: 30px;
+        }
+
+        .detail_box .list_content .item .sub_title {
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+        }
+
+        .detail_box .list_content .item .dev_num {
+            color: #999;
+            text-align: right;
+            margin-right: 10px;
+            position: absolute;
+            bottom: 10px;
+            right: 0;
+        }
+    </style>
+
+
+</head>
+<body>
+<div class="content_box">
+    <div class="detail_box">
+        <div class="title_box">
+            <span>百米DMP / 客流人群分析</span>
+        </div>
+
+        <div class="detail_box">
+            <div class="top_box">
+                <select class="bm-select isrelation ">
+                    <!-- <option>已开通-关联</option> -->
+                </select>
+                <a class="btn_link bm-btn bm-btn-blue fr" id="search_adbtn" href="create_analysis.html">新建分析表</a>
+                <input type="text" class="bm-input  fr" placeholder="请输入场景或广告主名称" />
+            </div>
+            <div class="list_content mt20">
+                <ul id="item_list">
+                    <li class="item" onclick="itemClick();">
+                        <img src="" alt="">
+                        <p class="item_title">这是一个场景</p>
+                        <p class="sub_title">2018-01-08新建</p>
+                        <p class="dev_num">大牛广告主 / <span>22</span>台设备</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="../../../../../public/js/layui/layui.js"></script>
+<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+<script>
+    //搜索
+    function searchFn() {
+
+    }
+
+    // 获取场景列表数据
+    function getAnalyList() {
+
+    }
+
+
+
+    function itemClick() {
+        location.href = 'index.html';
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1195 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../public/css/tencent_ad.css">
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form mt20">
+        <div class="flow_steps gdt_create">
+            <ul class="clearfix">
+                <li class="current_pre">广告计划</li>
+                <li class="current">投放人群</li>
+                <li>创意和文案</li>
+                <li class="last">排期和出价</li>
+            </ul>
+        </div>
+        <div class="step_box">
+            <article class="step2 on" type="2">
+                <h3 class="from-row-title">定向人群</h3>
+                <div class="from-row">
+                    <label>人群范围：</label>
+                    <div>
+                        <label class="c-label"><input type="radio" name="crowdtype" value="5" checked="checked">&nbsp;&nbsp;腾讯自有定向</label>
+                        <label class="c-label dmp_label" style="display: none"><input type="radio" name="crowdtype" value="2">&nbsp;&nbsp;百米DMP人群包</label>
+                    </div>
+                </div>
+                <div class="crow_part part1" style="display: block">
+                    <div class="from-row">
+                        <label>人群包：</label>
+                        <ul class="plan_type clearfix" id="gdt_pack_new">
+                            <li class="cur" _type="2">选择已有人群包<i></i></li>
+                            <li _type="1">新建人群包<i></i></li>
+                        </ul>
+                        <input type="text" id="gdt_pack_id" class="bm-select wd300" placeholder="请输入搜索已有腾讯人群包" value="" _type="2" autocomplete="off">
+                        <!-- <span class="input-tip blue gdt_pack_new" id="gdt_pack_new" _type="2" _title="请输入计划名称" _id="" autocomplete="off">新建人群包</span> -->
+                        <div id="gdt_pack_box" class="search_list" style="display: none"></div>
+                    </div>
+                    <div class="pack_form mt20">
+                        <div class="mod_box geo_location" _type="geo_location">
+                            <div class="box_tit">
+                                <label>地域</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont gdt_region">
+                                <div class="mod_club crowd_club" id="crowd_club" style="display: none">
+                                    <h3>已选择</h3>
+                                    <div class="club_li label_list scrollbar clearfix">
+                                    </div>
+                                </div>
+                                <div class="crowd_box crowd_area clearfix">
+                                    <div id="province_list" class="box_list scrollbar" style="display: none"></div>
+                                    <div id="city_list" class="box_list scrollbar" style="display: none"></div>
+                                    <div id="area_list" class="box_list scrollbar" style="display: none"></div>
+                                </div>
+                            </div>
+                            <div class="box_cont wx_region">
+                                <div class="mod_club wx_locate_total" id="wx_locate_total" style="display: none">
+                                    <h3>已选择</h3>
+                                    <div class="club_li wx_area scrollbar clearfix">
+                                    </div>
+                                </div>
+                                <div class="mod_items">
+                                    <div class="wx_locate_box scrollbar" id="wx_locate_box"></div>
+                                </div>
+                                <input type="hidden" id="region_level">
+                                <!-- <input type="hidden" id="wxAreaInfo"> -->
+                            </div>
+                            <div class="crowd_type" id="crowd_type"></div>
+                        </div>
+                        <div class="mod_box gender" _type="gender">
+                            <div class="box_tit">
+                                <label>性别</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <ul class="box_cont sex_cont">
+                                <label><input name="sex" class="sex_man" type="radio" value="MALE" checked="true">男</label>
+                                <label><input name="sex" class="sex_lady" type="radio" value="FEMALE" >女</label>
+                            </ul>
+                        </div>
+                        <div class="mod_box age" _type="age">
+                            <div class="box_tit">
+                                <label>年龄</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont clearfix age_cont">
+                                <div class="sel_box ageSel1" id="ageSel1">
+                                    <div class="sel_title"></div>
+                                    <ul class="sel_cont scrollbar" type="1"></ul>
+                                </div>
+                                <i>—</i>
+                                <div class="sel_box ageSel2" id="ageSel2">
+                                    <div class="sel_title"></div>
+                                    <ul class="sel_cont scrollbar" type="2"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mod_box education" _type="education">
+                            <div class="box_tit">
+                                <label>用户学历</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont checkbox_div">
+                                <ul class="clearfix"></ul>
+                            </div>
+                        </div>
+                        <div class="mod_box relationship_status" _type="relationship_status">
+                            <div class="box_tit">
+                                <label>婚恋状态</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont checkbox_div">
+                                <ul class="clearfix"></ul>
+                            </div>
+                        </div>
+                        <div class="mod_box user_os" _type="user_os">
+                            <div class="box_tit">
+                                <label>操作系统</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont checkbox_div">
+                                <ul class="clearfix"></ul>
+                            </div>
+                        </div>
+                        <div class="mod_box network_type" _type="network_type">
+                            <div class="box_tit">
+                                <label>联网方式</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont checkbox_div">
+                                <ul class="clearfix"></ul>
+                            </div>
+                        </div>
+                        <div class="mod_box network_operator" _type="network_operator">
+                            <div class="box_tit">
+                                <label>移动运营商</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont checkbox_div">
+                                <ul class="clearfix"></ul>
+                            </div>
+                        </div>
+                        <div class="mod_box shopping_capability" _type="shopping_capability">
+                            <div class="box_tit">
+                                <label>消费能力</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont checkbox_div">
+                                <ul class="clearfix"></ul>
+                            </div>
+                        </div>
+                        <div class="mod_box keyword" _type="keyword">
+                            <div class="box_tit">
+                                <label>关键字</label>
+                                <span class="mui_switch"></span>
+                            </div>
+                            <div class="box_cont keyword_cont">
+                                <div class="mod_club crowd_club" id="keyword_club" style="display: none">
+                                    <h3>已选择</h3>
+                                    <div class="club_li label_list scrollbar clearfix">
+                                    </div>
+                                </div>
+                                <div class="keyword_input">
+                                    <div class="mod_ipt">
+                                        <input type="text" id="keyword_box" placeholder="输入关键词，回车键(enter)提交">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="targeting_id">
+                </div>
+                <div class="crow_part part2" style="display: none">
+                    <div class="from-row">
+                        <label>DMP人群包：</label>
+                        <!-- <input type="text" id="dmp_pack_id" class="bm-select wd300" placeholder="请输入搜索已有百米DMP人群包" value="">
+                        <div id="dmp_pack_box" class="dmp_pack_box" style="display: none"></div> -->
+                        <select class="bm-select wd300" id="dmp_pack_id">
+                            <option value="">请选择百米DMP人群包</option>
+                        </select>
+                        <a href="javascript:;" onclick="newPack(3)">新建百米DMP人群包</a>
+                        <div class="pack_tit" style="display: none">
+                            <span>人群名称：<b id="dmp_pack_name"></b></span>
+                            <span>覆盖人数：<b id="dmp_pack_num"></b></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="commit-box">
+                    <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="preStepPage2()">上一步</button>
+                    <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="nextStepPage2()">下一步</button>
+                </div>
+            </article>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../public/js/layer/layer.js"></script>
+    
+    <script type="text/javascript">
+        var storageInfo1 = sessionStorage.getItem('storageInfo1') ? JSON.parse(sessionStorage.getItem('storageInfo1')) : '',
+            storageInfo2 = sessionStorage.getItem('storageInfo2') ? JSON.parse(sessionStorage.getItem('storageInfo2')) : '', //页面缓存
+            wxAreaId = sessionStorage.getItem('wxAreaId') ? sessionStorage.getItem('wxAreaId') : '', //微信区域ID
+            wxAreaVal = sessionStorage.getItem('wxAreaVal') ? sessionStorage.getItem('wxAreaVal') : '', //微信区域值
+            comp_id = storageInfo1.comp_id,
+            product_type = storageInfo1.product_type; //推广目标4是微信品牌页 6普通链接
+        var pList = $('#province_list'),//步骤2
+            cList = $('#city_list'),
+            aList = $('#area_list'),
+            crowdClub = $('#crowd_club'),
+            ageTit1 = $("#ageSel1 .sel_title"),
+            ageTit2 = $("#ageSel2 .sel_title"),
+            ageCont1 = $("#ageSel1 ul"),
+            ageCont2 = $("#ageSel2 ul"),
+            keyBox = $('#keyword_box'),
+            keyClub = $('#keyword_club'),//关键字
+            gdtpackBox = $('#gdt_pack_box'),
+            gdtpackNew = $('#gdt_pack_new'),
+            gdtpackId = $('#gdt_pack_id'),
+            getGDTTimer,getDMPListTimer;
+
+        const OPEN = 'cur',CHOSE = 'chose',CHILDCHOSE = 'childchose';
+        var crowdDataArr = []; //城市数组初始化
+        var crowdValArr = []; //城市数组值初始化
+        if(crowdDataArr.length!=0){
+            crowdClub.show(); //显示选中城市
+            for(var i = 0; i < crowdDataArr.length; i++) {
+                setAreaVal(crowdDataArr[i],crowdValArr[i]);
+            }
+        }
+        //初始化
+        function init(){
+            getTargetList();//获取可选项列表
+            getDMPPackList ();//DMP列表
+            if(product_type==4){
+                $('.dmp_label').hide();
+                $('.wx_region').show();
+                $('.gdt_region').hide();
+            }else{
+                $('.dmp_label').show();
+                $('.wx_region').hide();
+                $('.gdt_region').show();
+                getProvinceList();//请求省市
+            }
+            readerAge();//初始化年龄
+            if(storageInfo2){ //缓存渲染
+                readPageInfo(storageInfo2);
+            }
+        }
+        init();
+        //人群范围选择
+        $('input[name="crowdtype"]').bind("change",function(){
+            if(this.value==5){
+                $('.part1').show().siblings('.crow_part').hide();
+            }else {
+                $('.part2').show().siblings('.crow_part').hide();
+            }
+        })
+        //根据腾讯人群包整体展开收起
+        $('.box_tit').on('click',function(){
+            var th = $(this),
+                modBox = th.closest('.mod_box'),
+                type = modBox.attr('_type');
+            modBox.toggleClass('on');
+            th.find('.mui_switch').toggleClass('cur');
+        })
+
+        //获取DMP包列表
+        function getDMPPackList(){
+            $.ajax({
+                type: "POST",
+                url: "/v1.2/materiald/getdmps",
+                dataType:'json',
+                success: function(rs){
+                    if(rs.api_code == 0){
+                        var data = rs.data,str='';
+                        for(var i = 0;i < rs.data.length;i++){
+                            str += '<option value="'+rs.data[i].crowd_id+'" _nums="'+rs.data[i].download_nums+'">'+rs.data[i].crowd_name+'</option>'
+                        }
+                        $('#dmp_pack_id').append(str);
+                        if(storageInfo2){
+                            $('#dmp_pack_id').val(storageInfo2.audience_file_id).change();
+                        }
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+        //DMP包选择
+        $('#dmp_pack_id').change(function(){
+            var id = $(this).val();
+            var opt = $('#dmp_pack_id option:selected');
+            if(id){
+                $('.pack_tit').show();
+                $('#dmp_pack_name').text(opt.text());
+                $('#dmp_pack_num').text(opt.attr('_nums'));
+            }else{
+                $('.pack_tit').hide();
+            }
+        })
+        //获取腾讯人群包信息
+        gdtpackId.on('focus',function(e){
+            if($(this).attr('_type') !=2){
+                return false;
+            }
+           gdtpackBox.show();
+        }).on('input click',function(e){
+            if($(this).attr('_type') !=2){
+                return false;
+            }
+            var keyword = $(this).val() ? $(this).val():'';
+            getGDTTimer && clearTimeout(getGDTTimer);
+            getGDTTimer = setTimeout(function(){
+                getGDTPackList(keyword,function(res){
+                    var html ='';
+                    if(!res){
+                       gdtpackBox.html('');
+                        return;
+                    }
+                     $.each(res,function(k,v){
+                        var str = v.label_info.replace(/"/g, '&quot;').replace(/'/g, '&quot;');
+                        html +='<li class="gdt_pack_item" _id="'+v.targeting_id+'" _data="'+str+'">'+v.crowd_name+'</li>';
+                    });
+                   gdtpackBox.html('<ul>'+html+'</ul>');
+                });
+            })
+        })
+
+        gdtpackBox.on('click','.gdt_pack_item',function(e){
+            var th = $(this),
+                data = th.attr('_data'),
+                labelArr = JSON.parse(data);
+            gdtpackId.val(th.text()).attr('_id',th.attr("_id"));
+            gdtpackBox.hide();
+            readGDTHtml(labelArr);
+        })
+        $(document).on('click',function(e){
+            if(e.target.id == 'gdt_pack_box' || e.target.id == 'gdt_pack_id'){
+                return;
+            }
+            if(e.target.className !='sel_title'){
+               $('.sel_cont').removeClass('on');
+            };
+            gdtpackBox.hide();
+        })
+        //新建腾讯人群包
+        gdtpackNew.on('click','li',function(e){
+            var th = $(this),
+                type = th.attr('_type'),
+                placeholderTip = {'1':'请输入人群包名称','2':'请输入搜索已有人群包'}; //1新增 2选择
+            th.addClass('cur').siblings('li').removeClass('cur');
+            gdtpackId.attr('_type',type).attr('placeholder',placeholderTip[type]).val('').attr('_id','');
+            $('.pack_form').find('.mod_box').each(function(){
+                var th = $(this),                
+                type = th.attr('_type');
+                if(type =='geo_location'){
+                    if(th.hasClass('on')){
+                        clearArea();
+                        th.removeClass('on');
+                    }
+                }else if(type =='gender'){
+                    if (th.hasClass('on')) {
+                        th.removeClass('on');
+                    } 
+                }else if(type =='age'){
+                    if (th.hasClass('on')) {
+                        th.removeClass('on');
+                    } 
+                }else if(type =='keyword'){
+                    if (th.hasClass('on')) {
+                        th.removeClass('on');
+                    } 
+                }else{
+                    if (th.hasClass('on')) {
+                        th.removeClass('on');
+                    } 
+                }
+                
+            });
+        })
+        //获取腾讯人群包列表
+        function getGDTPackList (keyword,fn){
+            var id = comp_id,
+                type = (product_type == 4 ?'2':'1');
+            var post_data = {'targeting_name':keyword,'comp_id':id,'type':type};
+            $.ajax({
+                type: "POST",
+                url: "/v1.2/Materiald/gettargets",
+                data : post_data,
+                dataType:'json',
+                success: function(rs){
+                    var data = rs.data;
+                    if(rs.api_code == 0){
+                        fn.call(this,data);
+                    }else{
+                       gdtpackBox.html('');
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+        //获取人群包数据
+        function getGdtData(){
+            var ageSt = $('#ageSel1').find('.sel_title').attr('_id'),
+                ageEd = $('#ageSel2').find('.sel_title').attr('_id'),
+                targeting_name = gdtpackId.val(),
+                targeting_id = $('#gdt_pack_id').attr('_id'),
+                target_type = gdtpackId.attr('_type'), //1新建 2搜索
+                targeting = {},
+                gender=[],age=[],keyword ={},words=[],
+                keySpan = $('#keyword_club').find('span'),
+                targt_type = (product_type == 4?'2':'1');
+            $('.pack_form').find('.mod_box').each(function(){
+                var th = $(this),
+                    type = th.attr('_type');
+                if(type =='geo_location'){
+                    if(th.hasClass('on')){
+                        var geo_location={},
+                            location_types= new Array($('input[name="local_type"]:checked').val());
+                        if(product_type == 6){
+                            geo_location.regions = getRegion()[0];
+                        }else if(product_type == 4){
+                            geo_location.regions = getWxResult()[0];
+                        }
+                        geo_location.location_types = location_types
+                        targeting.geo_location = geo_location;
+                    }
+                }else if(type =='gender'){
+                    if(th.hasClass('on')){
+                        gender.push($('input[name="sex"]:checked').val());
+                        targeting.gender = gender;
+                    }
+                }else if(type =='age'){
+                    if(th.hasClass('on')){
+                        age.push(ageSt+'~'+ageEd);
+                        targeting.age = age;
+                    }
+                }else if(type =='keyword'){
+                    if(th.hasClass('on')){
+                        if(keySpan.length !=0){
+                            keySpan.each(function() {
+                                var data = $(this).attr('_data');
+                                words.push(data);
+                            })
+                            keyword.words = words;
+                            targeting.keyword = keyword;
+                        }
+                    }
+                }else{
+                    if(th.hasClass('on')){
+                        var arr=[];
+                        $('.'+type).find('.active').each(function() {
+                            var data = $(this).attr('_data');
+                            arr.push(data);
+                            targeting[type] = arr;
+                        })
+                    }
+                }
+            })
+
+            if(target_type == 2){
+                var data = {"success":true,"data":{"targeting":JSON.stringify(targeting),"comp_id":comp_id,"targeting_name":targeting_name,"type":targt_type,"targeting_id": targeting_id}};
+            }else{
+                var data = {"success":true,"data":{"targeting":JSON.stringify(targeting),"comp_id":comp_id,"targeting_name":targeting_name,"type":targt_type}};
+            }
+            return data;
+        }
+        //渲染腾讯人群包内容
+        function readGDTHtml(labelArr){
+            console.log(labelArr);
+            var laberParam = ['education','network_operator','network_type','relationship_status','shopping_capability','user_os'];
+            $('.mod_box').removeClass('on').find('.mui_switch').removeClass('cur');
+            for(var j=0;j<laberParam.length;j++){
+                $('.'+laberParam[j]).find('li').removeClass('active');
+            }
+            for(var i in labelArr){
+                var vlabel =labelArr[i];
+                if(vlabel.length){
+                    $('.'+i).addClass('on').find('.mui_switch').addClass('cur');
+                }
+                if(i =='gender'){
+                    $('.'+i).find('input[value="'+vlabel[0]+'"]').attr('checked',true).siblings().attr('checked',false);
+                }else if(i =='geo_location'){
+                    $('#crowd_type').find('input[value="'+vlabel.location_types[0]+'"]').attr('checked',true).siblings().attr('checked',false);
+                    var regionsLabel = vlabel.regions ? vlabel.regions:[];
+                    if(regionsLabel && regionsLabel.length){
+                        $('.'+i).addClass('on').find('.mui_switch').addClass('cur');
+                    }
+                    if(product_type==6){
+                        crowdDataArr = regionsLabel;
+                        getProvinceList();//请求省市
+                    }
+                    if(product_type==4){
+                        wxAreaId = regionsLabel;
+                    }
+
+                }else if(i =='age'){
+                    if(vlabel.length != 0){
+                        var ageNum = vlabel[0].split('~');
+                        readerAge(ageNum[0],ageNum[1]);
+                    }
+
+                }else if(i =='keyword'){
+                    console.log(vlabel.words,vlabel.words.length)
+                    if(vlabel.words.length != 0){
+                        keyClub.show();
+                        keyClub.find('.label_list').children().remove();
+                        console.log(vlabel.words);
+                        for( var k=0;k<vlabel.words.length;k++){
+                            setKeyword(vlabel.words[k]);
+                        }
+                        $('.'+i).addClass('on').find('.mui_switch').addClass('cur');
+                    }
+                }else{
+                    for( var k in vlabel){
+                        $('.'+i).find('li[_data="'+vlabel[k]+'"]').addClass('active');
+                    }
+                }
+            }
+        }
+        //获取各二级分类标签列表数据
+        function getTargetList(){
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Materiald/gettargetings',
+                dataType:'json',
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.api_code == 0){         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        renderTargetList(data);
+                        if (storageInfo2 && storageInfo2.targeting){
+                            readGDTHtml(JSON.parse(storageInfo2.targeting));
+                        }
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+              },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染二级分类标签数据
+        function renderTargetList(data){
+            for(var i in data){
+                var html='',str='',vdata = data[i];
+                if(i == 'location_types'){////地点类型
+                    $.each(vdata,function(k,v){
+                        str+='<label><input name="local_type" type="radio" value="'+v.type+'" '+ (k==0?'checked="true"':"") +'>'+v.name+'</label>';
+                    })
+                    $('.mod_box').find('.crowd_type').html(str);
+                }else if( i !='geo_location' && i !='age' && i !='gender'&& i !='keyword'){
+                    $.each(vdata,function(k,v){
+                        html+='<li _data="'+v.type+'">'+v.name+'</li>';
+                    })
+                    $('.'+i).find('.box_cont ul').html(html);
+                }
+            }
+        }
+
+        //渲染年龄
+        function readerAge(v1,v2){
+            var str1 = "",str2="";
+            var v1 = v1? Number(v1) :'5',
+                v2 = v2? Number(v2) :'66';
+            for(var i=5; i<=66; i++){
+                str1 += '<li _id="'+ i +'">'+ i +(i!= 66?'岁':'岁及以上') +'</li>';
+                str2 += '<li _id="'+ i +'">'+ i +(i!= 66?'岁':'岁及以上') +'</li>';
+            }
+            $("#ageSel1 ul").html(str1);
+            $("#ageSel2 ul").html(str2);
+            if(v1){
+                ageTit1.text(v1 +(v1!= 66?'岁':'岁及以上')).attr('_id',v1)
+                for(j = 5; j<=66;j++){
+                   ageCont2.find('li[_id='+j+']').removeClass('disabled');
+                }
+                for(var i = 5; i<parseInt(v1); i++){
+                    ageCont2.find('li[_id="'+i+'"]').addClass('disabled');
+                }
+            }
+            if(v2){
+                ageTit2.text(v2 +(v2!= 66?'岁':'岁及以上')).attr('_id',v2);
+                for(j = 5; j<=66;j++){
+                   ageCont1.find('li[_id='+j+']').removeClass('disabled');
+                }
+                for(var i = parseInt(v2)+1; i<=66; i++){
+                    ageCont1.find('li[_id="'+i+'"]').addClass('disabled');
+                }
+            }
+        }
+        //年龄段选择
+        $('.sel_box').on('click','.sel_title',function(){
+            var th = $(this),
+                contDom = th.parent().children('.sel_cont'),
+                type = contDom.attr('type');
+            th.parent().siblings().children('.sel_cont').removeClass('on');
+            contDom.toggleClass('on');
+        }).on('click','.sel_cont li',function(){
+            var th = $(this),
+                id = th.attr('_id'),
+                contDom = th.parent(),
+                titleDom = th.closest('.sel_box').children('.sel_title'),
+                titleId = titleDom.attr('_id'),
+                type = contDom.attr('type');
+            if(th.hasClass('disabled')){
+                return false;
+            }
+            titleDom.html(th.text()).attr('_id',id);
+            contDom.removeClass('on');
+            if(type==1){
+                var v1 = ageTit1.attr('_id');
+                for(j = 5; j<=66;j++){
+                   ageCont2.find('li[_id='+j+']').removeClass('disabled');
+                }
+                for(var i = 5; i<parseInt(v1); i++){
+                    ageCont2.find('li[_id="'+i+'"]').addClass('disabled');
+                }
+            }else if(type==2){
+                var v2 = ageTit2.attr('_id');
+                for(j = 5; j<=66;j++){
+                   ageCont1.find('li[_id='+j+']').removeClass('disabled');
+                }
+                for(var i = parseInt(v2)+1; i<=66; i++){
+                    ageCont1.find('li[_id="'+i+'"]').addClass('disabled');
+                }
+            }
+        })
+
+        //页面校验
+        function checkDataStept2(type){
+            var crowd_name = gdtpackId.val(),
+                crowd_id = gdtpackId.attr('_id'),
+                targeting_type = gdtpackId.attr('_type'),
+                tipMsg = gdtpackId.attr('placeholder'),
+                geoLocation = $('.geo_location'),
+                geoLocaLabel = geoLocation.find('.label_list').children().length,
+                wxgeoLocaLabel = getWxResult()[0];
+                crowd_type = $('input[name=crowdtype]:checked').val(),
+                wxRgLevel = $('#region_level').val();
+                audience_file_id = '',
+                targeting ='';
+            if(type==2 && crowd_type ==5){
+                if(!crowd_name){
+                    return {"success":false,msg:tipMsg};
+                }
+                if(targeting_type==2 && !crowd_id){
+                    return {"success":false,msg:'请选择正确人群包'};
+                }
+                if(geoLocation.hasClass('on')){
+                    if(product_type == 6 && geoLocaLabel==0){
+                        return {"success":false,msg:'请选择正确区域!'};
+                    }
+                    if(product_type == 4 && wxgeoLocaLabel==''){
+                        return {"success":false,msg:'请选择正确区域!'};
+                    }
+                }
+                var gdtData = getGdtData();
+                targeting = gdtData.data.targeting;
+            }
+            if(type==2 && crowd_type==2){
+                audience_file_id = $('#dmp_pack_id').val();
+                if(!audience_file_id){
+                    return {"success":false,msg:'请选择百米DMP人群包!'};
+                }
+
+                wxRgLevel = '';
+            }
+            return {'success':true,'data':{'crowd_type':crowd_type,'crowd_name':crowd_name,'crowd_id':crowd_id,'targeting':targeting,'targeting_type':targeting_type,'audience_file_id':audience_file_id,'region_level':wxRgLevel}};
+        }
+        //上一步
+        function preStepPage2(){
+            var res = checkDataStept2(1);
+            sessionStorage.setItem('storageInfo2',JSON.stringify(res.data));
+            var wxResult = getWxResult();
+            //wxResult = {'wxAreaId':getWxResult()[0],'wxAreaVal':getWxResult()[1],'wxLevel':$('#region_level').val()}
+            sessionStorage.setItem('wxAreaId',wxResult[0]);
+            sessionStorage.setItem('wxAreaVal',wxResult[1]);
+            console.log(res.data);
+            location.href='/v1.2/gdtdelivery/create1'
+        }
+        //下一步
+        function nextStepPage2(){
+            var res = checkDataStept2(2);
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            targeting = getGdtData();
+            sessionStorage.setItem('storageInfo2',JSON.stringify(res.data));
+            sessionStorage.setItem('targetingData',JSON.stringify(targeting.data));
+            var wxResult = getWxResult();
+            sessionStorage.setItem('wxAreaId',wxResult[0]);
+            sessionStorage.setItem('wxAreaVal',wxResult[1]);
+            console.log(res.data);
+            location.href='/v1.2/gdtdelivery/create3'
+        }
+        //新建百米人群包
+        function newPack(type){
+            var res = checkDataStept2(1);
+            sessionStorage.setItem('storageInfo2',JSON.stringify(res.data));//存储投放第二步表单内容
+            location.href = "../dcrowd/apply?type="+type;
+        }
+        //渲染缓存数据
+        function readPageInfo(data){
+            $('input[name="crowdtype"][value="'+data.crowd_type+'"]').attr('checked','checked').change();
+            $('#region_level').val(data.region_level);
+            if(data.crowd_type == 5){
+                $('.part1').show().siblings('.crow_part').hide();
+                gdtpackNew.find('li[_type="'+data.targeting_type+'"]').addClass('cur').siblings().removeClass('cur');
+                gdtpackId.val(data.crowd_name).attr('_id',data.crowd_id).attr('_type',data.targeting_type);
+            }else {
+                $('.part2').show().siblings('.crow_part').hide();
+            }
+        }
+
+        //腾讯人群包checkbox类型选择
+        $('.checkbox_div').on('click','li',function(e){
+            var th = $(this),
+                thData = th.attr('_data'),
+                modBox = th.closest('.mod_box'),
+                modBoxType = modBox.attr('_type');
+            if(modBoxType){
+                if(th.hasClass('active')) {
+                    //setValue(pageDataArr, modBoxType, thData, false);
+                    th.removeClass('active');
+                }else {
+                    //setValue(pageDataArr, modBoxType, thData, true);
+                    th.addClass('active');
+                }
+            }else{
+                th.toggleClass('active');
+            }
+        })
+
+        //查看设置的值是否已经存在
+        function find(arr, callback) {
+          var i = 0, len = arr.length;
+          while(i < len) {
+            var item = arr[i];
+            if(callback.call(callback, item, i)) {
+              return [item, i];
+            }
+            i++;
+          }
+          return undefined;
+        }
+        //设置值
+        function setValue(obj, name, value, add) {
+          var arr = obj[name] || [];
+          var existed = find(arr, function(item) { return item === value });
+          if(existed === undefined) {
+            add && arr.push(value)
+          }else {
+            !add && arr.splice(existed[1], 1)
+          }
+        }
+
+        //获取城市数据
+        function getAreas(id, isChecked) {
+            var html = '';
+            var post_data = {'type':'DISTRICT','region_id':id};
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Materiald/gettargetregions',
+                dataType:'json',
+                data : post_data,
+                async : false,
+                success: function(rs){
+                    var data = rs.data;
+                    if(rs.api_code == 0){
+                        $.each(data.list,function(k,v){
+                            var checked = false;
+                            for(var j = 0; j < crowdDataArr.length; j++) {
+                                 if(crowdDataArr[j] == v.id) {
+                                    checked = true;
+                                    crowdDataArr.splice(j, 1);
+                                    crowdValArr.splice(j, 1);
+                                    break;
+                                 }
+                            }
+                            html +='<li class="lists" id="'+v.id+'" _data="'+v.city_level+'"><em class="checkbox ' + (isChecked ? 'chose' : '') +(checked ? ' chose' : '') + '"></em>'+v.name+'</li>';
+                        })
+                    }else{
+                        tipTopShow('获取失败！');
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+            return html;
+        }
+        //获取省市列表
+        function getProvinceList(){
+            var post_data = {'type':'REGION'};
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Materiald/gettargetregions',
+                dataType:'json',
+                data : post_data,
+                async : false,
+                success: function(rs){
+                    var html = '';
+                    var data = rs.data;
+                    if(rs.api_code == 0){
+                        if(data.list.length){
+                            pList.html('');
+                            cList.hide().html('');
+                            crowdClub.hide();
+                            $('.label_list').children().remove()
+                        }
+                        $.each(data.list,function(k,v){
+                            var checked = false;
+                            for(var j = 0; j < crowdDataArr.length; j++) {
+                                 if(crowdDataArr[j] == v.id) {
+                                    checked = true;
+                                    crowdDataArr.splice(j, 1);
+                                    crowdValArr.splice(j, 1);
+                                    break;
+                                 }
+                            }
+                            if(v.id !='156' && v.id !='9000'){
+                                html +='<li class="lists" id="'+v.id+'" _data="'+v.city_level+'"><em class="checkbox ' + (checked ? ' chose' : '') + '"></em>'+v.name+'</li>';
+                                pList.show().html('<ul class="plist">'+ html +'</ul>');
+                                if(checked){
+                                    setAreaVal(v.id);
+                                }
+                                var cityStr='';
+                                $.each(v.city,function(n,m){
+                                    var cityChecked = false;
+                                    for(var d = 0; d < crowdDataArr.length; d++) {
+                                         if(crowdDataArr[d] == m.id) {
+                                            cityChecked = true;
+                                            crowdDataArr.splice(d, 1);
+                                            crowdValArr.splice(d, 1);
+                                            break;
+                                         }
+                                    }
+                                    cityStr +='<li class="lists" id="'+m.id+'" _data="'+m.city_level+'"><em class="checkbox '+(cityChecked ? ' chose' : '') + '"></em>'+m.name+'</li>';
+                                    if(cityChecked){
+                                        setAreaVal(m.id,m.name);
+                                    }
+                                })
+                                cList.append('<ul class="plist" pid="' + v.id + '">'+ cityStr +'</ul>');
+                            }
+                        })
+                    }else{
+                        tipTopShow('获取失败！');
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("操作失败请重试！");
+                }
+            });
+        }
+        //关键字显示
+        keyBox.on('keydown',function(e){
+            if(e.keyCode ==13){
+                var word = $.trim(keyBox.val());
+                if(word){
+                    setKeyword(word);
+                }
+            }
+        })
+        //设置关键字
+        function setKeyword(word){
+            var labelSpan = keyClub.find('.label_list span'),
+                clearKey = '<a href="javascript:;" class="clear_key" onclick="clearKeyFn()">清空</a>';
+                for(var i =0; i<labelSpan.length; i++){
+                    if(labelSpan.eq(i).attr('_data') == word){
+                        tipTopShow('"重复"的关键字无法添加！');
+                        keyBox.val('');
+                        return false;
+                    }
+                }
+                keyClub.show();
+                var html ='<span _data="'+ word +'">'+ word +'<i class="del_key" _data="'+ word +'"></i></span>';
+
+                if($('.clear_key').length !=0){
+                    $('.clear_key').remove();
+                }
+                keyClub.find('.label_list').append(html).append(clearKey);
+                keyBox.val('');
+        }
+        //选择删除关键字
+        keyClub.on('click','.del_key',function(){
+            var labelBox = keyClub.find('.label_list'),
+                thSpan = $(this).closest('span');
+                thSpan.remove();
+            if(labelBox.find('span').length === 0){
+                keyClub.hide();
+                $('.clear_btn').remove();
+            }else{
+                keyClub.show();
+            }
+        })
+        //清空关键字
+        function clearKeyFn(){
+            var labelSpan = keyClub.find('.label_list span');
+            for(var i =0; i<labelSpan.length; i++){
+                labelSpan.eq(i).remove();
+                $('.clear_btn').remove();
+                keyClub.hide();
+            }
+        }
+        //设置区域值
+        function setAreaVal(id,nm){
+            var showBox = crowdClub.find('.label_list');
+            var idDom = showBox.find('#'+id);
+            var clearBtn = '<a href="javascript:;" class="clear_btn" onclick="clearArea()">清空</a>'
+            if(idDom.length==0){
+                crowdClub.show();
+                if(nm){
+                    var html ='<span id="'+ id+'">'+ nm +'<i class="delAreaVal" _id="'+ id+'"></i></span>';
+                }else{
+                    var name = $('.crowd_area').find('#'+id).text()
+                    var html ='<span id="'+ id+'">'+ name +'<i class="delAreaVal" _id="'+ id+'"></i></span>';
+                }
+                if($('.clear_btn').length !=0){
+                    $('.clear_btn').remove();
+                }
+                crowdClub.find('.label_list').append(html).append(clearBtn);
+            }
+        }
+        //删除区域值
+        function removeAreaVal(id){
+            var showBox = crowdClub.find('.label_list');
+            showBox.find('#'+id).remove();
+            if(showBox.find('span').length === 0){
+                crowdClub.hide();
+                $('.clear_btn').remove();
+            }else{
+                crowdClub.show();
+            }
+        }
+        //清空区域值选项
+        function clearArea(){
+            var clearId = getRegion()[0];
+            for(var i=0; i<clearId.length;i++){
+                removeAreaVal(clearId[i]);
+                $('#'+ clearId[i]).find('.checkbox').click();
+            }
+        }
+
+        //区域值清除
+        crowdClub.on('click','.delAreaVal',function(){
+            var id = $(this).attr('_id');
+            var showBox = crowdClub.find('.label_list');
+            $('#'+ id).remove();
+            $('#'+ id).find('.checkbox').click();
+            if(crowdDataArr.length!=0){
+                for(var j = 0; j < crowdDataArr.length; j++) {
+                    if(crowdDataArr[j] == id) {
+                        crowdDataArr.splice(j, 1);
+                        crowdValArr.splice(j, 1);
+                    }
+                }
+            }
+            if(showBox.children().length === 0){
+                crowdClub.hide();
+            }else{
+                crowdClub.show();
+            }
+        })
+
+
+        /**
+         * 选择省市标签
+         */
+        $('body').on('click','#province_list li', function(e){ //点击省份获取城市列表
+            var tagId = $(this).attr('id'),
+            ul = cList.find('[pid="' + tagId + '"]'),
+            isChecked = $(this).find('.chose').length > 0;
+            aList.hide();
+            cList.show();
+            $(this).addClass('cur').siblings('li').removeClass('cur');
+            if(ul.length > 0) {
+                ul.show().siblings('ul').hide()
+            }else {
+                cList.children('ul').hide();
+            }
+        }).on('click','#city_list li', function(e){ //点击城市获取区列表
+            var tagId = $(this).attr('id'),
+                pId = $(this).parent().attr('pid'),
+              child = aList.children('[pid="' + pId + '"]'),
+              ul = child.children('[pid="' + tagId + '"]'),
+              isChecked = $(this).find('.chose').length > 0;
+            aList.show();
+            $(this).addClass('cur').siblings('li').removeClass('cur').parent().siblings('ul').find('li').removeClass('cur');
+            if(child.length > 0) {
+                child.show().siblings('div').hide()
+                if(ul.length > 0) {
+                    ul.show().siblings('ul').hide()
+                }else {
+                    var data = getAreas(tagId, isChecked);
+                    child.children('ul').hide()
+                    child.append('<ul class="plist" pid="' + tagId + '">'+ data +'</ul>');
+                }
+            }else {
+                var data = getAreas(tagId, isChecked);
+                aList.children('div').hide()
+                aList.append('<div pid="' + pId + '"><ul class="plist" pid="' + tagId + '">'+ data +'</ul></div>');
+            }
+        }).on('click', '#area_list .checkbox', function(e) { //选中或取消区
+            e.stopPropagation()
+            var t = $(this),
+                plist = t.closest('.plist'),
+                pSize = plist.children().length,
+                id = t.closest('.lists').attr('id');
+                pid = plist.attr('pid'),
+                ppid = t.closest('div').attr('pid'),
+                pplist = cList.children('[pid="' + ppid + '"]'),
+                ppSize = pplist.children().length,
+                cCheckbox = cList.find('#' + pid).children('.checkbox'),
+                pCheckbox = pList.find('#' + ppid).children('.checkbox');
+
+            if(t.hasClass('chose')) {
+                t.removeClass('chose');
+                cCheckbox.removeClass('chose');
+                if(plist.find('.chose').length == 0) {
+                    cCheckbox.removeClass('childchose');
+                }else {
+                    cCheckbox.addClass('childchose');
+                }
+
+                pCheckbox.removeClass('chose');
+                if(pplist.find('.chose').length == 0) {
+                    if(pplist.find('.childchose').length == 0) {
+                        pCheckbox.removeClass('childchose');
+                    }else {
+                        pCheckbox.addClass('childchose');
+                    }
+                }else {
+                    pCheckbox.addClass('childchose');
+                }
+
+                plist.find('.lists').each(function(){
+                    var alistId = $(this).attr('id');
+                    var hsChose = $('#'+alistId).children('.checkbox');
+                    if(hsChose.hasClass('chose')){
+                        setAreaVal(alistId);
+                    }
+                })
+                pplist.find('.lists').each(function(){
+                    var clistId = $(this).attr('id');
+                    var hsChose = $('#'+clistId).children('.checkbox');
+                    if(hsChose.hasClass('chose')){
+                        setAreaVal(clistId);
+                    }
+                })
+                removeAreaVal(ppid);
+                removeAreaVal(pid);
+                removeAreaVal(id);
+            }else {
+                t.addClass('chose');
+                if(plist.find('.chose').length == pSize) {
+                    cCheckbox.addClass('chose').removeClass('childchose');
+                    plist.find('.lists').each(function(){
+                        var alistId = $(this).attr('id');
+                        removeAreaVal(alistId);
+                    })
+                    setAreaVal(pid);
+                }else {
+                    cCheckbox.addClass('childchose');
+                    setAreaVal(id);
+                }
+
+                if(pplist.find('.chose').length == ppSize) {
+                    pCheckbox.addClass('chose').removeClass('childchose');
+                    setAreaVal(ppid);
+                    pplist.find('.lists').each(function(){
+                        var clistId = $(this).attr('id');
+                        removeAreaVal(clistId);
+                    })
+                }else {
+                    pCheckbox.addClass('childchose');
+                }
+            }
+        }).on('click', '#city_list .checkbox', function(e) { //选中或取消城市
+            e.stopPropagation();
+            var t = $(this),
+                id = t.parent().attr('id'),
+                plist = t.closest('.plist'),
+                pSize = plist.children().length,
+                pid = plist.attr('pid'),
+                aCheckbox = aList.find('[pid="' + id + '"]').find('.checkbox'),
+                pCheckbox = pList.find('#' + pid).children('.checkbox');
+            if(t.hasClass('chose')) {
+                t.removeClass('chose childchose');
+                aCheckbox.removeClass('chose');
+                pCheckbox.removeClass('chose');
+
+                if(plist.find('.chose').length == 0) {
+                    if(plist.find('.childchose').length == 0) {
+                        pCheckbox.removeClass('childchose');
+                    }else {
+                        pCheckbox.addClass('childchose');
+                    }
+                }else {
+                    pCheckbox.addClass('childchose');
+                }
+
+                aList.find('[pid="' + id + '"]').find('.lists').each(function() { //区值移除
+                    var alistId = $(this).attr('id');
+                    var hsChose = $('#'+alistId).children('.checkbox');
+                    if(hsChose.hasClass('chose')){
+                        console.log(alistId);
+                        removeAreaVal(alistId);
+                    }
+                })
+                plist.find('.lists').each(function(){
+                    var clistId = $(this).attr('id');
+                    var hsChose = $('#'+clistId).children('.checkbox');
+                    if(hsChose.hasClass('chose')){
+                        setAreaVal(clistId);
+                    }
+                })
+                removeAreaVal(id);
+                removeAreaVal(pid);
+                console.log(id,pid);
+            }else {
+                t.removeClass('childchose').addClass('chose');
+                aCheckbox.addClass('chose');
+                if(plist.find('.chose').length == pSize) {
+                    pCheckbox.addClass('chose').removeClass('childchose');
+                    plist.find('.lists').each(function(){
+                        var clistId = $(this).attr('id');
+                        removeAreaVal(clistId);
+                    })
+                    setAreaVal(pid);
+                }else {
+                    pCheckbox.addClass('childchose')
+                    setAreaVal(id);
+                }
+                aList.find('[pid="' + id + '"]').find('.lists').each(function() { //区值移除
+                    var alistId = $(this).attr('id');
+                    removeAreaVal(alistId);
+                })
+            }
+        }).on('click', '#province_list .checkbox', function(e) { //选中或取消省份
+            e.stopPropagation();
+            var t = $(this),
+                id = t.parent().attr('id'),
+                plist = t.closest('.plist'),
+                cCheckbox = cList.find('[pid="' + id + '"]').find('.checkbox'),
+                aCheckbox = aList.children('[pid="' + id + '"]').find('.checkbox');
+
+            if(t.hasClass('chose')) {
+                t.removeClass('chose childchose');
+                cCheckbox.removeClass('chose');
+                aCheckbox.removeClass('chose');
+                removeAreaVal(id);
+            }else {
+                t.removeClass('childchose').addClass('chose');
+                cCheckbox.addClass('chose').removeClass('childchose');
+                aCheckbox.addClass('chose');
+                setAreaVal(id);
+            }
+            cList.find('[pid="' + id + '"]').find('.lists').find('.chose').each(function() { //市值移除
+                removeAreaVal($(this).parent().attr('id'));
+            })
+            aList.children('[pid="' + id + '"]').find('.lists').find('.chose').each(function() { //区值移除
+                removeAreaVal($(this).parent().attr('id'));
+            })
+        })
+        //取选中的城市id
+        function getRegion(){
+            var areaId =[],areaVal = [],areaArr=[];
+            $('#crowd_club .label_list').find('span').each(function() {
+                var id = $(this).attr('id');
+                var name = $(this).text();
+                areaId.push(id);
+                areaVal.push(name);
+            })
+            areaArr[0] = areaId.concat(crowdDataArr);
+            areaArr[1] = areaVal.concat(crowdValArr);
+            return areaArr;
+        }
+
+    </script>
+    <script type="text/javascript" src="../../../public/js/wx_regions.js"></script>
+</body>
+</html>

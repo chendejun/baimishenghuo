@@ -1,0 +1,45 @@
+<?php
+
+/**
+ *
+ */
+class TestController extends BasicController
+{
+
+    public function indexAction()
+    {
+        $data = [
+            'to'=> 'list',
+            'reportType'=> 'time',
+            'date'=> '2018-02-26_2018-03-26',
+            'campaignId'=> '',
+            'orderId'=> '',
+            'isPc'=> 0,
+            'control'=> 1,
+            'selectId'=> 0,
+            'siteId'=> 0,
+            'v'=> ''
+        ];
+
+    }
+
+
+    public function getBhTimeStatisticsAction()
+    {
+        $data = [
+            'to'=> 'list',
+            'reportType'=> 'time',
+            'date'=> '2018-02-26_2018-03-26',
+            'campaignId'=> '',
+            'orderId'=> '',
+            'isPc'=> 0,
+            'control'=> 1,
+            'selectId'=> 0,
+            'siteId'=> 0,
+            'v'=> ''
+        ];
+
+        $rel = BhDspApi::getData($data);
+        Helper::outJson(json_decode($rel,true));
+    }
+}

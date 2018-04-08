@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告管理-Wi-Fi广告</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+</head>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>广告管理 / 今日头条广告</span>
+        </div>
+        <div class="data_box">
+            <div class="tab_topbtn">
+                <a class="big-btn bm-btn bm-btn-blue mr20" href="/v1.2/delivery/add">新增投放</a>
+            </div>
+            <div class="mt20">
+                <table id="index_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>广告名称</th>
+                            <th>投放时间</th>
+                            <th>广告状态</th>
+                            <th>预算/类型</th>
+                            <th>出价/出价方式</th>
+                            <th>曝光次数</th>
+                            <th>点击量</th>
+                            <th>订单金额</th>
+                            <th>投放目的</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+
+    <script type="text/javascript">
+        //获取数据
+        var limit = 10;
+        function getList(curr){
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/headline/index/page/'+ (curr || 1)+'/limit/'+limit,
+                dataType:'json',
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.state == 1){         //如果查询成功
+                        var data = rs.list;     //返回数据赋值
+                        render_table(rs.totalPages,data);     //渲染表格数据
+                        renderPage(rs.totalPages, curr);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        var delivery_status={'0':'待审核','1':'投放中','2':'审核失败','3':'投放结束'},
+            bid_type={'1':'CPM', '2':'CPC'},
+            money_type={'1':'总预算', '2':'日预算'};
+        function render_table(totalPages,data){
+            var list_e = $("#index_list tbody"),str="",no_msg = $(".noMsg");
+            if(totalPages == 0){
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return ;
+            }
+            no_msg.text("");
+            $.each(data,function(k,v){
+                str +='<tr>';
+                str +='<td>'+ v.delivery_name +'</td>';
+                str +='<td>'+ v.delivery_start_date+'~'+v.delivery_end_date+'</td>';
+                if(v.delivery_status==2){
+                    str +='<td>'+ delivery_status[v.delivery_status] +'<em class="status_tip" data="'+(v.audit_remark?v.audit_remark:"无理由")+'">？<em></td>';
+                }else{
+                    str +='<td>'+ delivery_status[v.delivery_status] +'</td>';
+                }
+                str +='<td>'+ v.money +'/'+ money_type[v.money_type] +'</td>';
+                str +='<td>'+ v.bid_money +'/'+ bid_type[v.bid_type] +'</td>';
+                str +='<td>'+ v.cpm_num +'</td>';
+                str +='<td>'+ v.cpc_num +'</td>';
+                str +='<td>'+ v.order_money +'</td>';
+                str +='<td>落地页</td>';
+                str +='<td><a href="javascript:;" class="table-option-btn mr15" onclick="viewFn('+v.jr_delivery_id+')">修改</a></td>';
+                str +='</tr>';
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(pages,curr){
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function(obj, first){ //触发分页后的回调
+                    if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getList(obj.curr);
+                    }
+                }
+            });
+        }
+        getList();
+
+        //重新投放
+        function viewFn(id){
+            location.href = '/v1.2/headline/showview?id='+id;
+        }
+
+        //审核失败理由
+        $('body').on('click','.status_tip',function(){
+            layer.tips(this.getAttribute('data'), this);
+        })
+    </script>
+    </body>
+</html>

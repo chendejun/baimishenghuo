@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/css/layui.css" >
+    <style type="text/css">
+
+        .detail_box{
+            background-color: #fff;
+            min-height: 500px;
+        }
+
+        .detail_box p {
+            text-align: center;
+            font-size: 14px;
+            line-height: 50px;
+            height: 50px;
+            color: #999999;
+            padding-top: 150px;
+        }
+
+
+        .detail_box  a {
+            margin-top: 10px;
+            display: block;
+            text-align: center;
+            position: relative;
+            left: 45%;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box"><span>DMP / 客流人群分析</span></div>
+    <div class="detail_box">
+        <p>还没有创建任何分析报表,赶紧去新建一个吧。</p>
+        <a class="btn_link bm-btn bm-btn-blue fl" href="create_analysis.html">新建分析表</a>
+    </div>
+</div>
+</body>
+</html>

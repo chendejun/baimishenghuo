@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 客户属性 -->
+    <meta charset="UTF-8">
+    <title>DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.0.2/echarts.js"></script>
+    <script src="../../../../../public/js/chinamap.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/dateRange.js"></script>
+    <style type="text/css">
+        body{overflow-x: hidden}
+        .type_box{padding-top: 30px;}
+        .content {background-color: #fff;min-height: 500px;}
+        #select_box{width: 160px;}
+        #item_ul{top: 0}
+        #item_ul li{height: 36px;line-height: 36px;}
+        .crowd_attr{padding: 20px;}
+        /* 进度条 */
+        #crowd_table{width: 30%;margin-left: 5%;}
+        #crowd_table>ul li{float: left;background-color: #f5f5f5}
+        #crowd_table>ul li:nth-child(1){color: #f5f5f5;}
+        #crowd_table li{height: 40px;line-height: 40px;}
+        #crowd_table li:nth-child(1){width: 15%;}
+        #crowd_table li:nth-child(2){width: 20%}
+        #crowd_table li:nth-child(3){width: 65%}
+        #crowd_table li .layui-progress-bar{position: initial;background-color:#618cff;}
+        #crowd_table li .layui-progress{position: relative;top: 16px;margin-right:20%;height: 10px;border-radius:0;}
+        #crowd_table li .layui-progress-bar{height: 10px;border-radius:0;}
+        #crowd_table li span{position: absolute;right: -18%;top: -5px;}
+        .table_content{max-height: 320px;overflow-y: auto;}
+        .table_content ul{clear: both;overflow:hidden;zoom:1;width: 100%;color: #666}
+        .table_content ul li{float: left;}
+        .table_content ul li:nth-child(1){text-align: center}
+        /* 性别比例 */
+        #type_box ul{margin-top: 50px;}
+        #type_box ul li{width: 50%;font-size: 14px;color: #666;border: none;}
+        #type_box ul li::before{content: '';width: 15px;height: 15px;display: inline-block;position: relative;top: 2px;left: -10px;}
+        .sex_ratio{position: relative;}
+        .sex_ratio .layui-progress{background-color:#fdd22a;border-radius:0}
+        .sex_ratio .layui-progress-bar{background-color: #53d99d;border-radius:0}
+        .car_ratio .layui-progress{background-color:#bbb;border-radius:0;}
+        .car_ratio .layui-progress-bar{background-color: #666;border-radius:0;}
+        .sex_ratio ul li:nth-child(1)::before{background-color: #53d99d;}
+        .sex_ratio ul li:nth-child(2)::before{background-color: #fdd22a;}
+        .car_ratio ul li:nth-child(1)::before{background-color: #666;}
+        .car_ratio ul li:nth-child(2)::before{background-color: #bbb;}
+        #type_box>div{display: inline-block;width:40%;height:300px;padding: 2% 4%;border-bottom: 1px solid #f2f4f5;position: relative;}
+        #type_box>div:nth-child(odd){border-right: 1px solid #f2f4f5}
+        #education,#age,#job,.car_ratio{top: -27px;position:relative}
+        #consumption{top: -57px;}
+        #edu,#ag,#jo,#cons{height: 300px;}
+        #edu_nodata{top: -20px}
+        .sex_ratio .no_data1{top:20px;}
+        #ag_nodata,#jo_nodata,#cons_nodata{top: 0;}
+        #edu_nodata img,#ag_nodata img,#jo_nodata img,#cons_nodata img{margin-top: 60px;}
+        #activity,#mobile,#life{top: -54px;padding:2% 0 0 4%!important;width:28%!important;border-bottom: none!important;}
+        #life{border-left:1px solid #f2f4f5;border-right:none}
+        
+        .sex_ratio b{color: #333;font-size: 14px;display: inline-block;}
+        .man_icon{background-image: url('../../../../../public/img/crow_analysis.png');width: 17px;height: 45px;display: inline-block;background-position:0 0; }
+        .woman_icon{background-image: url('../../../../../public/img/crow_analysis.png');width: 28px;height: 45px;display: inline-block;background-position:-27px 0; }
+        .car_icon,.nocar_icon{background-image: url('../../../../../public/img/crow_analysis.png');width: 45px;height: 24px;display: inline-block;background-position:-65px -21px; }
+        .nocar_icon{opacity: .6}
+        .sex_img,.car_img{margin:110px 0 20px 0}
+
+        /*日期选择*/
+        .time_filter{display:inline-block;vertical-align: top; position: relative; margin-left: 5px;}
+        .time_filter .ta_date{width: 198px; height:38px;line-height: 38px;cursor: pointer;text-align: center;border: non; border-radius: 5px}
+        .time_filter .date_title{display: block;cursor:pointer;width:190px;height:30px;z-index:2}
+
+        .layui-form-select dl dd.layui-this {background-color:#4c94f5;}
+        .layui-form-radio i:hover,.layui-form-radioed i {color:#4aa6fc;}
+        .layui-form-checkbox[lay-skin=primary]:hover i {border-color:#4aa6fc;}
+        .layui-form-checked[lay-skin=primary] i {background-color:#4aa6fc}
+        .layui-form-checked span {color:#009eff !important;}
+
+        #tip_box {background-color:#FAEBD7;border:1px solid #FFE4C4;color:#FFA500;height:40px;line-height:40px;}
+        #tip_box i {background:url("../../../../../public/img/tip_icon.png") no-repeat top center;width:20px;height:20px;display:inline-block;vertical-align:middle;position:relative;top:12px;left:10px;}
+        #tip_box p {padding-left:15px;height:40px;line-height:40px;font-size:12px;float:left;}
+        #tip_box a {margin-right:10px;}
+        .layui-progress-text{display: none;}
+        .no_data1{width: 100%!important;margin-top: 70px;height: 260px;background-color: #fff;z-index: 2;display: none;position: absolute;left: 0}
+        .no_data2{width: 100%!important;margin-top: 80px;}
+        .no_data1 img,.no_data2 img{margin: 0 auto;display: block;}
+        .analys_box,.tip_box{display: none;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Scenes/index">&lt; 返回人群画像</a>
+            </span>
+        </div>
+        <div id="tip_box">
+            <i class="fl"></i>
+            <p>温馨提示：提交开通后，首次开通到生成数据分析报表需1~2个工作日，不便之处敬请理解。</p>
+            <a class="fr" href="javascript:" id="closeTip">关闭</a>
+        </div>
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="/v1.2/Scenes/flowanalysis">客流分析
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">客群属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <!-- <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a> -->
+                <a href="/v1.2/Scenes/cussource">客流来源
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/hotsearch">搜索热点
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/appanalysis">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="/v1.2/Scenes/changeanalysis" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+
+        </div>
+
+        <div class="analys_box">
+            <div class="">
+                <!-- 人群地区属性 -->
+                <!-- <div class="crowd_attr clearfix" style="display:none">
+                    <div id="crowd_attr" class="fl" style="width:45%;height:370px;margin-right:5%"></div>
+                    <div id="crowd_table" class="fl">
+                        <ul class="clearfix">
+                            <li>序号</li>
+                            <li>省份</li>
+                            <li>占比</li>
+                        </ul>
+                        <div class="table_content">
+                            <ul>
+                                <li>1</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>2</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>3</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>4</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>5</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>6</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>7</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>8</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>9</li>
+                                <li>福建</li>
+                                <li>
+                                    <div class="layui-progress" lay-showpercent="true">
+                                        <div class="layui-progress-bar" lay-percent="50%"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="type_box clearfix">
+                <div class="layui-form fl" id="select_box">
+                    <select name="dategroup" lay-filter="dategroup">
+                        <option value="1" selected="">昨日</option>
+                        <option value="2">近7天</option>
+                        <option value="3">近30天</option>
+                        <option value="4">指定日期</option>
+                    </select>
+                </div>
+
+                <div class="time_filter layui-input-block fl " id="time_filter" style="display: none;">
+                    <div class="ta_date">
+                        <input type="text" class="layui-input" id="date_day" placeholder=" 至 ">
+                    </div>
+                </div>
+
+                <div class="cus_filter fl">
+                    <ul class="item_ul fl" id="item_ul">
+                        <li type="3" class="cur">全部</li>
+                        <li type="1">新访客</li>
+                        <li type="2">老访客</li>
+                    </ul>
+                    <p class="fl">客群属性分析截止到昨日</p>
+                </div>
+
+            </div>
+            <div class="type_box" id="type_box">
+                <!-- 性别比例 -->
+                <div class="sex_ratio">
+                    <div class="no_data1 fl"><img src="../../../../../public/img/no_data1.png"></div>
+                    <b class="fl">性别比例</b>
+                    <div class="clearfix sex_img">
+                        <i class="man_icon fl"></i>
+                        <i class="woman_icon fr"></i>
+                    </div>
+                    <div class="layui-progress" lay-showpercent="true" lay-filter="gender">
+                        <div class="layui-progress-bar" lay-percent="0.00%" id="gender"></div>
+                    </div>
+                    <ul class="clearfix">
+                        <li class="fl">男
+                            <span id="gender_male">0.00%</span>
+                        </li>
+                        <li class="fl">女
+                            <span id="gender_female">0.00%</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 学历分布 -->
+                <div id="education">
+                    <div id="edu"></div>
+                    <div id="edu_nodata" class="no_data1">
+                        <img src="../../../../../public/img/no_data1.png">
+                    </div>
+                </div>
+                <!-- 年龄分布 -->
+                <div id="age">
+                    <div id="ag"></div>
+                    <div id="ag_nodata" class="no_data1">
+                        <img src="../../../../../public/img/no_data1.png">
+                    </div>
+                </div>
+                <!-- 职业分布 -->
+                <div id="job">
+                    <div id="jo"></div>
+                    <div id="jo_nodata" class="no_data1">
+                        <img src="../../../../../public/img/no_data1.png">
+                    </div>
+                </div>
+                <!-- 消费水平 -->
+                <div id="consumption">
+                    <div id="cons"></div>
+                    <div id="cons_nodata" class="no_data1">
+                        <img src="../../../../../public/img/no_data1.png">
+                    </div>
+                </div>
+                <!-- 私家车拥有情况 -->
+                <div class="car_ratio">
+                    <div class="no_data1 fl"><img src="../../../../../public/img/no_data1.png"></div>
+                    <b class="fl">私家车拥有情况</b>
+                    <div class="clearfix car_img">
+                        <i class="car_icon fl"></i>
+                        <i class="nocar_icon fr"></i>
+                    </div>
+                    <div class="layui-progress" lay-showpercent="true" lay-filter="car">
+                        <div class="layui-progress-bar" lay-percent="0.00%" id="car"></div>
+                    </div>
+                    <ul class="clearfix">
+                        <li class="fl">有车
+                            <span id="own_car">0.00%</span>
+                        </li>
+                        <li class="fl">无车
+                            <span id="no_car">0.00%</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 活跃度占比 -->
+                <!-- <div id="activity"></div> -->
+                <!-- 手机终端分布 -->
+                <!-- <div id="mobile"></div> -->
+                <!-- 人生阶段 -->
+                <!-- <div id="life"></div> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="tip_box" style="display: none">
+            <p class="tip_title">本功能为高级版本付费功能</p>
+            <p class="tip_subtitle">点击下方“修改”按钮，进入本场景修改页面,选择开通“高级版”，完成支付后等待开通，预计完成需要1~2个工作日。</p>
+            <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="/v1.2/Scenes/changeanalysis">修改</a>
+        </div>
+
+    <script>
+        var scene_id = cookie.get('scenesId'),
+            type = 7,
+            start_date = getBeforeDate(1),
+            end_date = start_date,
+            customer_type = 3, //全部
+            scenes_type = cookie.get('scenesType'),
+            baidu_state = cookie.get('baidu_state');
+
+        if (baidu_state == 0) {
+            $('#tip_box p').html('您已申请开通，请耐心等待结果，预计在1~2个工作日完成。')
+        }
+
+        //场景类型： 1 普通版 2高级版
+        if (scenes_type == 1) {
+            $('.tip_box').css('display', 'block');
+            $('.analys_box').css('display', 'none');
+
+        }else if(scenes_type == 2 || scenes_type == 3 ){
+            $('.tip_box').css('display', 'none');
+            $('.analys_box').css('display', 'block');
+
+            getProperty(scene_id, start_date, end_date, 3);
+        }
+
+
+        layui.use(['form', 'layer', 'element', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                element = layui.element,
+                laydate = layui.laydate;
+
+            //日期
+            laydate.render({
+                elem: '#date_day',
+                format: 'yyyy-MM-dd',
+                range: true,
+                min: -30,
+                max: -1,
+                done: function (value, date, endDate) {
+                    console.log(value); //得到日期生成的值，如：2017-08-18
+                    if (value) {
+                        start_date = value.substr(0, 10);
+                        end_date = value.substr(13, 10);
+                        console.log(scene_id, customer_type, start_date, end_date);
+                        getProperty(scene_id, start_date, end_date, customer_type);
+                    }
+                }
+            });
+
+            $("#item_ul li").on("click", function () {
+                $("#item_ul li").removeClass("cur");
+                $(this).addClass("cur");
+                var type = $(this).attr("type");
+
+                //新老顾客选择
+                customer_type = type;
+                getProperty(scene_id, start_date, end_date, customer_type);
+            });
+
+
+            //日期选择
+            form.on('select(dategroup)', function (data) {
+                console.log(data.value);
+                var val = data.value;
+                if (val == 1) {
+                    //昨日
+                    start_date = getBeforeDate(1);
+                    end_date = start_date;
+                    getProperty(scene_id, start_date, end_date, customer_type);
+
+                } else if (val == 2) {
+                    //近7天
+                    start_date = getBeforeDate(7);
+                    end_date = getBeforeDate(1);
+                    getProperty(scene_id, start_date, end_date, customer_type);
+
+                } else if (val == 3) {
+                    //进30天
+                    start_date = getBeforeDate(30);
+                    end_date = getBeforeDate(1);
+                    getProperty(scene_id, start_date, end_date, customer_type);
+                }
+
+                var display = val == 4 ? 'block' : 'none';
+                $('#time_filter').css('display', display);
+                console.log(start_date, end_date, customer_type);
+            });
+
+        });
+
+
+        // // 人群地区属性
+        // var $crowd_attr = document.getElementById("crowd_attr"),
+        //     crowdattr = echarts.init($crowd_attr);
+        // var option = {
+        //     title: {
+        //         text: '人群地区属性',
+        //         itemGap: 30,
+        //         left: 'left',
+        //         textStyle: {
+        //             color: '#333',
+        //             fontStyle: 'normal',
+        //             fontWeight: 'bold',
+        //             fontSize: 14
+        //         }
+        //     },
+        //     tooltip: {
+        //         // trigger: 'item'
+        //         formatter: '{b0}<br />占比：{c0}%'
+        //     },
+        //     legend: {
+        //         orient: 'vertical',
+        //         left: 'right'
+        //     },
+        //     visualMap: {
+        //         min: 0,
+        //         max: 2500,
+        //         left: 'right',
+        //         top: 'bottom',
+        //         text: ['高', '低'],
+        //         // calculable: true,
+        //         inRange: {
+        //             color: ['#ffffff', '#E0DAFF', '#ADBFFF', '#9CB4FF', '#6A9DFF', '#3889FF']
+        //         }
+        //     },
+        //     series: [{
+        //         type: 'map',
+        //         mapType: 'china',
+        //         roam: true,
+        //         label: {
+        //             normal: {
+        //                 // show: true
+        //             },
+        //             emphasis: {
+        //                 show: true
+        //             }
+        //         },
+        //         data: [{
+        //                 name: '北京',
+        //                 value: '53'
+        //             },
+        //             {
+        //                 name: '天津',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '上海',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '重庆',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '河北',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '河南',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '云南',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '辽宁',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '黑龙江',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '湖南',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '安徽',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '山东',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '新疆',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '江苏',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '浙江',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '江西',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '湖北',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '广西',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '甘肃',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '山西',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '内蒙古',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '陕西',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '吉林',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '福建',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '贵州',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '广东',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '青海',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '西藏',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '四川',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '宁夏',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '海南',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '台湾',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '香港',
+        //                 value: randomData()
+        //             },
+        //             {
+        //                 name: '澳门',
+        //                 value: randomData()
+        //             }
+        //         ]
+        //     }]
+        // };
+        // crowdattr.setOption(option);
+
+        // function randomData() {
+        //     return Math.round(Math.random() * 1000);
+        // }
+
+
+        // 学历分布
+        var $edu = document.getElementById("edu"),
+        edu = echarts.init($edu),
+            e_data = [{
+                value: 0,
+                name: '本科及以上'
+            }, {
+                value: 0,
+                name: '大专'
+            }, {
+                value: 0,
+                name: '高中及以上'
+            }]
+        ring(edu, '学历分布', e_data);
+
+        // 消费水平
+        var $cons = document.getElementById("cons"),
+            cons = echarts.init($cons),
+            c_data = [{
+                value: 0,
+                name: '高'
+            }, {
+                value: 0,
+                name: '中'
+            }, {
+                value: 0,
+                name: '低'
+            }]
+        ring(cons, '消费水平', c_data)
+
+        // // 活跃度占比
+        // var $activity = document.getElementById("activity"),
+        //     activity = echarts.init($activity),
+        //     c_data = [{
+        //         value: 935,
+        //         name: '高活跃顾客'
+        //     }, {
+        //         value: 148,
+        //         name: '低活跃顾客'
+        //     }]
+        // ring(activity, '活跃度占比', c_data)
+
+        // // 手机终端分布
+        // var $mobile = document.getElementById("mobile"),
+        //     mobile = echarts.init($mobile),
+        //     c_data = [{
+        //         value: 435,
+        //         name: '无线Safari浏览器'
+        //     }, {
+        //         value: 848,
+        //         name: 'APP内嵌浏览器'
+        //     }, {
+        //         value: 679,
+        //         name: 'UC浏览器'
+        //     }, {
+        //         value: 679,
+        //         name: 'QQ移动浏览器'
+        //     }, {
+        //         value: 679,
+        //         name: '其他'
+        //     }]
+        // ring(mobile, '手机终端分布', c_data)
+
+
+        //圆环图
+        function ring(el, text, data) {
+            set = {
+                title: {
+                    text: text,
+                    itemGap: 30,
+                    left: 'left',
+                    textStyle: {
+                        color: '#333',
+                        fontStyle: 'normal',
+                        fontWeight: 'bold',
+                        fontSize: 14
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)",
+                },
+                series: [{
+                    name: text,
+                    type: 'pie',
+                    radius: ['42%', '55%'],
+                    color: ['#53d99d', '#f6cb21', '#618cff', '#fc706f', '#fecbd4'],
+                    label: {
+                        normal: {
+                            formatter: '{b}\n{d}%'
+                        },
+                    },
+                    data: data
+                }]
+            };
+            el.setOption(set);
+        }
+
+
+        // 年龄分布
+        var $ag = document.getElementById("ag"),
+            ag = echarts.init($ag);
+        column(ag, '年龄分布', ['18岁以下', '18~24岁', '25~34岁', '35~44岁', '45~54岁', '55~64岁', '65岁以上'], [0, 0,
+            0, 0, 0, 0, 0
+        ])
+
+        // 职业分布
+        var $jo = document.getElementById("jo"),
+            jo = echarts.init($jo);
+        column(jo, '职业分布', ['生产操作人员', '文职人员', '专业技术人员', '管理者和企业主', '个体经营者', '服务人员'], [0, 0, 0, 0,
+            0, 0
+        ])
+
+        //柱状图
+        function column(el, text, xdata, sdata) {
+            option = {
+                title: {
+                    text: text,
+                    itemGap: 30,
+                    left: 'left',
+                    textStyle: {
+                        color: '#333',
+                        fontStyle: 'normal',
+                        fontWeight: 'bold',
+                        fontSize: 14
+                    }
+                },
+                color: ['#618cff'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                        // type : 'line'       
+                    },
+                    formatter: '{b0}<br />{c0}%'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [{
+                    type: 'category',
+                    data: xdata,
+                    axisLabel:{  
+                        interval: 0  
+                    },  
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }],
+                yAxis: [{
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        formatter: '{value} %'
+                    }
+                }],
+                series: [{
+                    // name:'直接访问',
+                    type: 'bar',
+                    barWidth: '60%',
+                    data: sdata,
+                    barWidth: 10,
+                }]
+            };
+            el.setOption(option);
+        }
+
+
+        // var $life = document.getElementById("life"),
+        //     life = echarts.init($life);
+
+        // radar(life)
+        // // 雷达图
+        // function radar(el) {
+        //     option = {
+        //         title: {
+        //             text: '人生阶段',
+        //             itemGap: 30,
+        //             left: 'left',
+        //             textStyle: {
+        //                 color: '#333',
+        //                 fontStyle: 'normal',
+        //                 fontWeight: 'bold',
+        //                 fontSize: 14
+        //             }
+        //         },
+        //         tooltip: {},
+        //         radar: {
+        //             // shape: 'circle',
+        //             indicator: [{
+        //                     name: '恋爱中',
+        //                     max: 6500
+        //                 },
+        //                 {
+        //                     name: '备婚',
+        //                     max: 16000
+        //                 },
+        //                 {
+        //                     name: '有房',
+        //                     max: 30000
+        //                 },
+        //                 {
+        //                     name: '有车',
+        //                     max: 38000
+        //                 },
+        //                 {
+        //                     name: '已婚',
+        //                     max: 52000
+        //                 },
+        //                 {
+        //                     name: '有孩',
+        //                     max: 52000
+        //                 },
+        //                 {
+        //                     name: '养老',
+        //                     max: 52000
+        //                 }
+        //             ]
+        //         },
+        //         series: [{
+        //             type: 'radar',
+        //             // areaStyle: {normal: {}},
+        //             data: [{
+        //                 value: [4300, 10000, 20000, 25000, 30000, 19000, 9000],
+        //                 name: '人生阶段'
+        //             }]
+        //         }]
+        //     };
+        //     el.setOption(option);
+        // }
+
+
+        function getProperty(scene_id, start_date, end_date, cus_type) {
+
+            tipTopShow("查询中...");
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/scenes/passenger/scene_id/' + scene_id + "/start_date/" + start_date + "/end_date/" +
+                    end_date + "/customer_type/" + cus_type + "/type/7",
+                dataType: 'json',
+                success: function (rs) {
+                    tipTopHide(); //隐藏提示框
+                    if (rs.code == 10000) { //如果查询成功
+                        var data = rs.data; //返回数据赋值
+                        if (data !='') {
+                            genderData(data['性别']);
+                            getEduData(data['学历']);
+                            ageData(data['年龄']);
+                            jobData(data['职业']);
+                            cuslever(data['消费水平']);
+                            carowner(data['私家车拥有情况']);
+                        }else{
+                            $('#type_box').html('<div class="no_data2"><img src="../../../../../public/img/no_data2.png"></div></div>')
+                        }
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试..."); //显示提示框
+                }
+            });
+        }
+
+
+        //年龄分布
+        function ageData(data) {
+            if(data != ''){
+                $('#ag_nodata').hide();  
+                var xdata = [],
+                    nameData = [],
+                    flag;
+                for (var i = 0; i <= data.length - 1; i++) {
+                    xdata[i] = data[i].tag;
+                    nameData.push(parseFloat(data[i].ratio * 100).toFixed(2));
+                }
+                column(ag, '年龄分布', xdata, nameData);
+            }else{
+                $('#ag_nodata').show();  
+            }
+        }
+
+        //职业分布
+        function jobData(data) {
+            if(data != ''){
+                $('#jo_nodata').hide();  
+                var xdata = [],
+                    nameData = [],
+                    flag;
+                for (var i = 0; i <= data.length - 1; i++) {
+                    xdata[i] = data[i].tag;
+                    nameData.push(parseFloat(data[i].ratio * 100).toFixed(2));
+                }
+                column(jo, '职业分布', xdata, nameData);
+            }else{
+                $('#jo_nodata').show();   
+            }
+        }
+                
+            
+
+        //消费水平
+        function cuslever(data) {
+            if(data != ''){     
+                $('#cons_nodata').hide();        
+                var xdata = [],
+                    nameData = [],
+                    flag;
+                for (var i = 0; i <= data.length - 1; i++) {
+                    xdata[i] = data[i].tag;
+                    flag = data[i].ratio ? true : false;
+                    nameData.push({
+                        value: data[i].ratio,
+                        name: data[i].tag
+                    });
+                }
+                ring(cons, '消费水平', nameData);
+            }else{
+                $('#cons_nodata').show();  
+            } 
+        }
+
+        //学历分布
+        function getEduData(data) {
+            if(data != ''){       
+                $('#edu_nodata').hide();  
+                var xdata = [],
+                    eduData = [],
+                    flag;
+                for (var i = 0; i <= data.length - 1; i++) {
+                    xdata[i] = data[i].tag;
+                    flag = data[i].ratio ? true : false;
+                    eduData.push({
+                        value: data[i].ratio,
+                        name: data[i].tag
+                    });
+                }
+                ring(edu, '学历分布', eduData);
+            }else{
+                $('#edu_nodata').show();
+            }
+        }
+
+        //性别比例
+        function genderData(data) {
+            if(data != ''){
+                $('.sex_ratio .no_data1').hide();
+                var maleStr = parseFloat(data[0].ratio * 100).toFixed(2) + "%";
+                var femaleStr = parseFloat(data[1].ratio * 100).toFixed(2) + "%";
+                $('#gender_male').html(maleStr);
+                $('#gender_female').html(femaleStr);
+                // $('#gender').html(maleStr);
+                $('#gender').css("width", maleStr);
+            }else{
+                $('.sex_ratio .no_data1').show();
+            }
+        }
+
+        //私家车拥有情况
+        function carowner(data) {
+            if(data != ''){
+                $('.car_ratio .no_data1').hide();
+                var carStr = parseFloat(data[0].ratio * 100).toFixed(2) + "%";
+                var nocarStr = parseFloat(data[1].ratio * 100).toFixed(2) + "%";
+                $('#own_car').html(carStr);
+                $('#no_car').html(nocarStr);
+                // $('#car').html(carStr);
+                $('#car').css("width", carStr);
+            }else{
+                $('.car_ratio .no_data1').show();
+            }
+        }
+
+        //关闭提示
+        $('#closeTip').on('click', function () {
+            $('#tip_box').toggle();
+        });
+    </script>
+</body>
+
+</html>

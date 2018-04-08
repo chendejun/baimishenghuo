@@ -1,0 +1,57 @@
+<?php
+class LoginController extends BasicController {
+	/**
+	 * 登录
+	 * @return [type] [description]
+	 */
+	public function indexAction(){
+		if($this->getRequest()->isPost()){
+			Yaf_Dispatcher::getInstance()->disableView();
+			$user_name = Helper::clean($this->getRequest()->getPost('user_name'));
+			$pwd = Helper::clean($this->getRequest()->getPost('pwd'));
+			$code = Helper::clean($this->getRequest()->getPost('code'));
+			if(strtolower($code) != $_SESSION['captcha_code']){
+				echo json_encode(array('state' => 0 , 'msg'=>'验证码错误！')); exit;
+			}
+			if(empty($user_name) || empty($pwd)){
+				echo json_encode(array('state' => 0 , 'msg'=>'用户名或密码不能为空！')); exit;
+			}
+			$m = Helper::M('U');
+			$data = $m->login($user_name , $pwd);
+			if(empty($data)){
+				echo json_encode(array('state' => 0 , 'msg'=>'用户名跟密码不匹配！')); exit;
+			}
+			echo json_encode(array('state' => 1 , 'jump'=>'/')); exit;
+		}
+		$m = Helper::M('Nav');
+		$css = array(1 => 'default' , 2 => 'bkgreen' , 3 => 'darkblue' , 4 => 'mountain' , 5 => 'starsky');
+        $default_skin = array('site_color' => 'default' , 'site_logo' => '/public/img/logo1.png' , 'site_bottom_name' => 'Copyright     2018 深圳市百米生活股份有限公司' , 'site_name' => '晓客营销系统');
+		$skin = $m->getSkin(0 , Helper::getHost());
+		if(empty($skin)){
+			$skin = $default_skin;
+		}else{
+			$skin['site_color'] = $css[$skin['site_color']];
+		}
+		$this->getView()->assign('skin' , $skin);
+	}
+	/**
+	 * 二维码
+	 * @return [type] [description]
+	 */
+	public function captchaAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+        $captcha = new Captcha();
+        echo $captcha->doimg();
+        $_SESSION['captcha_code'] = $captcha->getCode();//验证码保存到SESSION中
+    }
+	/**
+	 * 退出
+	 * @return [type] [description]
+	 */
+	public function loginoutAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+		$m = Helper::M('U');
+		$m->loginout();
+		header("Location: {$this->url}/login/index"); exit;
+	}
+}

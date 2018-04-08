@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>账户中心-支出记录</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+</head>
+<style>
+    .ta_date input{width: 90%;border: none;outline: none;height: 38px;line-height: 38px;}
+    .date-picker-wrapper .drp_top-bar .clear-btn {display: block; position: absolute; right: 40px;top: 6px; padding: 3px 5px; margin: 0;font-size: 12px; border-radius: 4px;  
+        cursor: pointer;  border: 1px solid #0076a3;  background: #0095cd;  background: -webkit-gradient(linear,left top,left bottom,from(#00adee),to(#0078a5));  
+        background: -moz-linear-gradient(top,#00adee,#0078a5);  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');  
+        color: #fff;  line-height: initial;  }
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 支出记录</span>
+        </div>
+        <div class="data_box">
+           <!--  <div class="search_box">
+               <input type="text" value="" class="bm-input" placeholder="选择时间段" />
+               <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+           </div> -->
+            <div class="box_table table_style">
+                <div class="search_box">
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+                </div>
+                <table id="transfer_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>支出对象</th>
+                            <th>账户类型</th>
+                            <th>支出金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        var dateTimer='',
+            thisMonth = get_date(0).substr(0,7);
+        $('#date_id').bind('focus',function(){
+            WdatePicker({
+                dateFmt:'yyyy-MM',
+                minDate:'2017-07',
+                maxDate: thisMonth
+            })
+        });
+        //搜索
+        function searchFn(){
+            dateTimer= $('#date_id').val();
+            getTransferList();
+        }
+        //获取数据
+        var limit = 10;
+        function getTransferList(curr){
+            var date = dateTimer ? ('/date/'+dateTimer) :'';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/account/transfer/page/'+ (curr || 1)+'/limit/'+ limit+date,
+                dataType:'json',
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.state == 1){         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        render_table(data);     //渲染表格数据
+                        renderPage(data.pages, curr);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+
+        //渲染表格数据
+        function render_table(data){
+            var list_e = $("#transfer_list tbody"),str="",no_msg = $(".noMsg");
+            if(data.list.length == 0){
+                list_e.html("");
+                no_msg.text("暂无记录");
+                return ;
+            }
+            no_msg.text("");
+            $.each(data.list,function(k,v){
+                str +='<tr>',
+                str +='<td>'+ v.transfer_time +'</td>';
+                str +='<td>'+ v.comp_name +'</td>';
+                str +='<td>'+ v.acc_type +'</td>';
+                str +='<td>'+ v.amount +'</td>';
+                str +='</tr>';
+            });
+            list_e.html(str);
+        }
+        //分页
+        function renderPage(pages,curr){
+            //显示分页
+            laypage({
+                cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                pages: pages, //通过后台拿到的总页数
+                //skip: true, //是否开启跳页
+                skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+                curr: curr || 1, //当前页
+                jump: function(obj, first){ //触发分页后的回调
+                    if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                        getTransferList(obj.curr);
+                    }
+                }
+            });
+        }
+        getTransferList();
+        $(function(){
+            if($("#daterange").val()!=""){
+                $('.clear-btn').css("display","block");
+            }
+        });
+
+    </script>
+</body>
+</html>

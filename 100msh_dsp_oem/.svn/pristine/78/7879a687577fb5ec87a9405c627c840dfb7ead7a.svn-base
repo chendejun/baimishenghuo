@@ -1,0 +1,132 @@
+[product]
+application.directory=APP_PATH "/application/"
+
+; Template suffix
+application.view.ext = "html"
+application.dispatcher.throwException=1
+application.dispatcher.catchException=1
+
+
+application.modules = Index,v1.2
+
+db.dsp.host = "db.inc.100msh.com"
+db.dsp.dbname = "100msh_dspoem"
+db.dsp.username = "100msh_dspoem"
+db.dsp.password = "123456"
+db.dsp.port = 3306
+
+db.dsf.host = "db.inc.100msh.com"
+db.dsf.dbname = "100msh_dsp_dsf"
+db.dsf.username = "100msh_dsp_dsf"
+db.dsf.password = "123456"
+db.dsf.port = 3307
+
+db.account.host = "db.inc.100msh.com"
+db.account.dbname = "100msh_dspoem_account"
+db.account.username = "dspoem_account"
+db.account.password = "123456"
+db.account.port = 3306
+
+db.admin.host = "db.inc.100msh.com"
+db.admin.dbname = "100msh_admin"
+db.admin.username = "100msh_admin"
+db.admin.password = "123456"
+db.admin.port = 3307
+
+db.stat.host = "db.inc.100msh.com"
+db.stat.dbname = "100msh_dspoem_stat"
+db.stat.username = "dspoem_stat"
+db.stat.password = "123456"
+db.stat.port = 3307
+
+db.sms.host = "db.inc.100msh.com"
+db.sms.dbname = "100msh_dspoem_sms"
+db.sms.username = "dspoem_sms"
+db.sms.password = "123456"
+db.sms.port = 3306
+
+
+
+
+
+;localhost
+redis_host = "127.0.0.1"
+redis_port = 6379
+redis_prefix = "oem:"
+redis_auth = ""
+
+smarty.left_delimiter   = "{{"
+smarty.right_delimiter  = "}}"
+smarty.template_dir     = APP_PATH "/application/views/"
+smarty.compile_dir      = APP_PATH "/application/cache/compile/"
+smarty.cache_dir        = APP_PATH "/application/cache/"
+
+
+
+config.ACCESSORY_FOLDER      = "/data001/data/sites/100msh_upload/"; // 附件上传路径
+config.ACCESSORY_URL         = 'http://d.100m.net/100msh_upload/'; // 附件访问路径
+config.app_id      = '741288131';
+config.app_key      = '72d6596c0325e06671c807a1f566c4c5';
+config.api_host     = 'https://api.100msh.com:543/';
+config.api_version     = 'v1';
+
+dsp.url = "https://dev-oemapi.100msh.com/v1/";//dsp访问地址
+dsp.token_url = "https://dev-oemapi.100msh.com/v1/oauth/access_token.json?app_id=100000001&app_key=2bd45723c3fc477d6633b5d26ef06fdf";//获取token、
+dsp.app_id = "100000001";//获取token
+dsp.app_key = "2bd45723c3fc477d6633b5d26ef06fdf";//获取token
+
+;DMP
+dmp.api_host="http://datamart.100msh.com"
+dmp.api_dir="/bmtagapi/api/v1/taggroup/"
+dmp.down_dir="/output/"
+dmp.appid="bmzgappsys"
+dmp.secret="af22b59f6414910748726ca58dcf9fa9"
+dmp.des_secret="BA@YCT57"
+ndmp.n_call_back_url="https://dev-dspservice.100msh.com/v1.2/api/nCrowdCbk"
+ndmp.api_host="http://dmp-api-qcloud.100msh.com"
+ndmp.appid="bmzgappsys"
+ndmp.secret="af22b59f6414910748726ca58dcf9fa9"
+
+;tag
+tag.region="区域"
+tag.age="年龄"
+tag.education="受教育水平"
+tag.industry="从业行业"
+tag.house="房产"
+tag.car="汽车"
+tag.home="建材家居"
+tag.digital="家电数码"
+tag.service="生活服务"
+tag.hobby="休闲爱好"
+tag.music="影视音乐"
+tag.game="游戏"
+tag.dress="服饰鞋包"
+tag.health="医疗健康"
+tag.beauty="个护美容"
+tag.train="教育培训"
+tag.tourism="旅游酒店"
+tag.baby="母婴亲子"
+tag.sports="体育健身"
+tag.shopping="网络购物"
+tag.sex="性别"
+tag.comp="广告主名称"
+tag.cycle="统计周期"
+tag.attr="用户属性"
+tag.visit="到访时间"
+tag.stay="停留时长"
+tag.frequency="周期频数"
+tag.type="人群包类型"
+
+;crowd
+crowd.dls_crowd_nums=9999
+
+;广点通
+gdt.gdt_app_id = '1106482216'
+gdt.gdt_app_key = '32f2e857b02125d1ef637cca93400b0d'
+gdt.gdt_api_url = 'https://api.e.qq.com'
+gdt.gdt_redirect_uri = 'https://dev-dspservice.100msh.com/api/gdtcallback'
+gdt.wx_redirect_uri = 'https://dev-dspservice.100msh.com/V1.2/api/gdtWxCallback'
+
+
+;
+dsp.whole = '1,2,143,147'

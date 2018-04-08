@@ -1,0 +1,852 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/22
+ * Time: 18:02
+ */
+
+class BhdeliveryController extends BasicController {
+
+
+    public function addviewAction(){
+
+    }
+    public function addview1Action(){
+
+    }
+    public function addview2Action(){
+
+    }
+    public function addview3Action(){
+
+    }
+    public function addview4Action(){
+
+    }
+    public function addview5Action(){
+
+    }
+    public function indexviewAction(){
+
+    }
+    public function getaccess(){
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+        return  $access_token;
+    }
+    /*
+     * 获取广告计划列表
+     */
+	public function getCampaignListAction(){
+		$name = Helper::clean($this->getRequest()->getPost('name'));
+        $start_date = Helper::clean($this->getRequest()->getPost('start_date'));
+        $end_date = Helper::clean($this->getRequest()->getPost('end_date'));
+        $status = Helper::clean($this->getRequest()->getPost('status'));
+        $page = Helper::clean($this->getRequest()->getPost('page',1));
+        $param = [
+        	'platform_id'=>5,
+            'comp_pid'=>$this->uinfo['comp_id'],
+            'name'=>$name,
+        	'status'=>$status,
+            'page'=>$page,
+            'start_date'=>$start_date,
+            'end_date'=>$end_date
+        ];
+        $result = BmDspApi::request('bhad/getCampaignList', $param);
+        if (!empty($result) && $result['api_code'] == 0 && isset($result['data'])) {
+            Helper::outJson(array('api_code'=>1,'data'=>$result['data']));
+        }
+        Helper::outJson(array('api_code'=>0,'data'=>''));
+    }
+	/*
+     * 获取广告计划列表
+     */
+	public function getCompCampaignListAction(){
+		$comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));
+        $param = [
+        	'platform_id'=>5,
+        	'type'=>2,
+            'comp_pid'=>$this->uinfo['comp_id'],
+            'comp_id'=>$comp_id
+        ];
+        $result = BmDspApi::request('bhad/getCampaignList', $param);
+        if (!empty($result) && $result['api_code'] == 0 && isset($result['data'])) {
+            Helper::outJson(array('api_code'=>1,'data'=>$result['data']));
+        }
+        Helper::outJson(array('api_code'=>0,'data'=>''));
+    }
+	/*
+     * 获取广告计划下投放列表
+     */
+	public function getDeliveryListAction(){
+        $bh_campaign_id = Helper::clean($this->getRequest()->getPost('bh_campaign_id'));
+        $result = BmDspApi::request('bhad/getDeliveryList', array('bh_campaign_id'=>$bh_campaign_id));
+        if (!empty($result) && $result['api_code'] == 0 && isset($result['data'])) {
+            Helper::outJson(array('api_code'=>1,'data'=>$result['data']));
+        }
+        Helper::outJson(array('api_code'=>0,'data'=>$result['error']));
+	}
+	/*
+     * 获取广告投放详细信息
+     */
+	public function getDeliveryInfoAction(){
+        $bh_delivery_id = Helper::clean($this->getRequest()->getPost('bh_delivery_id'));
+        $result = BmDspApi::request('bhad/getDeliveryInfo', array('bh_delivery_id'=>$bh_delivery_id));
+        if (!empty($result) && $result['api_code'] == 0 && isset($result['data'])) {
+            Helper::outJson(array('api_code'=>1,'data'=>$result['data']));
+        }
+        Helper::outJson(array('api_code'=>0,'data'=>$result['error']));
+	}
+      /*
+       * 检查计划名称是否已经使用
+       */
+      public function checkCamAction(){
+          $bh_campaign_name = Helper::clean($this->getRequest()->getPost('bh_campaign_name'));//广告计划名称
+          $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+          $Bhdelivery = Helper::M('Bhdelivery');
+          $result = $Bhdelivery->checkCam($comp_id,$bh_campaign_name);
+          if($result){
+              $arr = array('api_code' => 0, 'msg' => '该计划名称已经被使用');
+              Helper::outJson($arr);
+          }else{
+              $arr = array('api_code' => 1, 'msg' => '该计划名称可用');
+              Helper::outJson($arr);
+          }
+
+      }
+    /*
+   * 检查广告名称是否已经使用
+   */
+    public function checkAdnameAction(){
+        $delivery_name = Helper::clean($this->getRequest()->getPost('delivery_name'));//广告计划名称
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->checkAdname($comp_id,$delivery_name);
+        if($result){
+            $arr = array('api_code' => 0, 'msg' => '该广告名称已经被使用');
+            Helper::outJson($arr);
+        }else{
+              $arr = array('api_code' => 1, 'msg' => '该广告名称尚未被使用');
+              Helper::outJson($arr);
+          }
+
+    }
+      /*
+       *添加计划
+       */
+      public function addCampAction(){
+          $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+          $bh_campaign_name = Helper::clean($this->getRequest()->getPost('bh_campaign_name'));//广告计划名称
+          $startDate = Helper::clean($this->getRequest()->getPost('startDate'));//开始时间
+          $endDate = Helper::clean($this->getRequest()->getPost('endDate'));//结束时间
+          $budgetSwitch = Helper::clean($this->getRequest()->getPost('budgetSwitch'));//日预算状态
+          $budget = Helper::clean($this->getRequest()->getPost('budget'));//日预算
+          $totalBudgetSwitch = Helper::clean($this->getRequest()->getPost('totalBudgetSwitch'));//总预算状态
+          $totalBudget = Helper::clean($this->getRequest()->getPost('totalBudget'));//总预算
+          $data['comp_id'] = $comp_id;
+          $data['bh_campaign_name'] = $bh_campaign_name;
+          $data['startDate'] = $startDate;
+          $data['endDate'] = $endDate;
+          $data['budgetSwitch'] = $budgetSwitch;
+          $data['budget'] = $budget*100;
+          $data['totalBudgetSwitch'] = $totalBudgetSwitch;
+          $data['totalBudget'] = $totalBudget*100;
+          $data['comp_pid'] = $this->uinfo['comp_id'];//代理商id
+          $data['add_staff_id'] = $this->uinfo['staff_id'];
+          $data['add_time'] = time();
+          $this->db    = Yaf_Registry::get('db');
+          $this->db->bh->startTrans();
+          $Bhdelivery = Helper::M('Bhdelivery');
+          $bh_campaign_id = $Bhdelivery->addcamp($data);
+          if($bh_campaign_id) {
+              //冻结资金
+              $rand = rand(100,10000);
+              $info = array('comp_id' => $comp_id, 'comp_pid' =>  $data['comp_pid'], 'amount' => $data['totalBudget'], 'rel_no' => 'bh_'.$rand.$bh_campaign_id);
+
+              $detail = array(
+                  array('platform_id' => 5, 'amount' => $data['totalBudget'])
+              );
+              // $freezeid =  $m->freezeAmount($info , $detail);
+
+              $result = BmDspApi::request('fund/freezeAmount', array('info' => $info, 'data' => $detail));
+              if (empty($result) || isset($result['error_code'])) {
+                  $this->db->bh->rollback();
+                  Helper::outJson(array('api_code' => 0, 'msg' => '添加失败，资金异常'));
+                  exit;
+              } else {
+                  $freeze_id =  $result['data']['freeze_id'];
+                  $update_date['freeze_id'] =$freeze_id;
+                  $result1  = $Bhdelivery->edit($bh_campaign_id,$update_date);
+                  if($result1){
+                      $this->db->bh->commit();
+                      $arr = array('api_code' => 1, 'msg' => 'success');
+                      $arr['data'] = $bh_campaign_id;
+                      Helper::outJson($arr);
+                  }else{
+                      $this->db->bh->rollback();
+                      Helper::outJson(array('api_code' => 0, 'msg' => '添加失败'));
+                  }
+              }
+          }else{
+              Helper::outJson(array('api_code' => 0, 'msg' => '添加失败'));
+              exit;
+          }
+
+
+      }
+
+    /*
+   * 获取人群包列表
+   */
+    public function getCrowdlistAction()
+    {
+        $comp_pid = $this->uinfo['comp_id'];//代理商id
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->getCrowdlist($comp_pid);
+        if($result){
+            foreach($result as $key=>$val){
+                $Markete = Helper::M('Market');
+                $crowd_info = $Markete->getCrowdinfo($val['crowd_id'], $comp_pid);;
+                if($crowd_info){
+                    $result[$key]['cover_users'] = $crowd_info[0]['cover_users'];
+                }else{
+                    $result[$key]['cover_users'] = '';
+                }
+            }
+        }
+        $arr = array('api_code' => 1, 'msg' => 'success',);
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+    /*
+     * 获取所有媒体列表
+     */
+    public function  getAlladxAction(){
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $adxs_info = $Bhdelivery->getAlladx();
+        $arr = array('api_code' => 1, 'msg' => 'success',);
+        $arr['data'] = $adxs_info;
+        Helper::outJson($arr);
+    }
+
+    /*
+     * 获取媒体列表
+     */
+    public function getAdxsAction(){
+
+        $where  = "";
+        $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+        if($osType_o==1){
+            if($where){
+                $where = $where." AND osType_o=1";
+            }else{
+                $where = "osType_o=1";
+
+            }
+        }
+        $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+        if($osType_i==1){
+            if($where){
+                $where = $where." AND osType_i=1";
+            }else{
+                $where = "osType_i=1";
+            }
+        }
+        $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+        if($behavior_type_t==1){
+            if($where){
+                $where = $where." AND behavior_type_t=1";
+            }else{
+                $where = "behavior_type_t=1";
+            }
+        }
+        $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+        if($behavior_type_x==1){
+            if($where){
+                $where = $where." AND behavior_type_x=1";
+            }else{
+                $where = "behavior_type_x=1";
+            }
+        }
+        $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+        if($action_type_h==1){
+            if($where){
+                $where = $where." AND action_type_h=1";
+            }else{
+                $where = "action_type_h=1";
+            }
+        }
+       // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+        //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+        $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+        if($action_type_k==1){
+            if($where){
+                $where = $where." AND action_type_k=1";
+            }else{
+                $where = "action_type_k=1";
+            }
+        }
+        $source_type_q = Helper::clean($this->getRequest()->getPost('source_type_q'));//来源支持-全网智能优化 0 不支持 1支持
+        if($source_type_q==1){
+            if($where){
+                $where = $where." AND source_type_q=1";
+            }else{
+                $where = "source_type_q=1";
+            }
+        }
+        $source_type_z = Helper::clean($this->getRequest()->getPost('source_type_z'));//来源支持-指定应用 0 不支持 1支持
+        if($source_type_z==1){
+            if($where){
+                $where = $where." AND source_type_z=1";
+            }else{
+                $where = "source_type_z=1";
+            }
+        }
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $size_info = $Bhdelivery->getAdxs($where);
+        $adx_list = array();
+        if($size_info){
+                foreach($size_info as $key=>$val){
+                          if(!in_array($val['adx_Id'],$adx_list)){
+                              $adx_list[] = (int)$val['adx_Id'];
+                          }
+                }
+        }
+        if($adx_list){
+            $adx_lists = "(";
+            foreach ($adx_list as $key=>$val){
+                if($adx_lists== "("){
+                    $adx_lists = $adx_lists.$val;
+                }else{
+                    $adx_lists = $adx_lists.",".$val;
+                }
+
+
+            }
+            $adx_lists = $adx_lists.")";
+            //获取媒体列表
+          $adxInfo =   $Bhdelivery->getAdxlist($adx_lists);
+        }else{
+            $adxInfo = '';
+        }
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $adxInfo;
+        Helper::outJson($arr);
+
+    }
+    /*
+     * 获取对应的媒体多选规格列表
+     */
+    public function getSourcestypeqAction(){
+        $adx_ids = Helper::clean($this->getRequest()->getPost('adx_ids'));//媒体列表
+        $adxs_arr = explode(",",$adx_ids);
+        $list_arr = array();
+        $lists_arr = array();
+        foreach ($adxs_arr as $key=>$val){
+            $where  = "";
+            $adx_id = $val;//媒体列表
+            if($adx_id){
+                if($where){
+                    $where = $where." AND $adx_id=".$adx_id;
+                }else{
+                    $where = "$adx_id=".$adx_id;;
+                }
+            }
+            $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+            if($osType_o==1){
+                if($where){
+                    $where = $where." AND osType_o=1";
+                }else{
+                    $where = "osType_o=1";
+                }
+            }
+            $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+            if($osType_i==1){
+                if($where){
+                    $where = $where." AND osType_i=1";
+                }else{
+                    $where = "osType_i=1";
+                }
+            }
+            $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+            if($behavior_type_t==1){
+                if($where){
+                    $where = $where." AND behavior_type_t=1";
+                }else{
+                    $where = "behavior_type_t=1";
+                }
+            }
+            $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+            if($behavior_type_x==1){
+                if($where){
+                    $where = $where." AND behavior_type_x=1";
+                }else{
+                    $where = "behavior_type_x=1";
+                }
+            }
+            $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+            if($action_type_h==1){
+                if($where){
+                    $where = $where." AND action_type_h=1";
+                }else{
+                    $where = "action_type_h=1";
+                }
+            }
+            // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+            //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+            $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+            if($action_type_k==1){
+                if($where){
+                    $where = $where." AND action_type_k=1";
+                }else{
+                    $where = "action_type_k=1";
+                }
+            }
+            $source_type_q = 1;//来源支持-全网智能优化 0 不支持 1支持
+            if($source_type_q==1){
+                if($where){
+                    $where = $where." AND source_type_q=1";
+                }else{
+                    $where = "source_type_q=1";
+                }
+            }
+            $Bhdelivery = Helper::M('Bhdelivery');
+            $size_info = $Bhdelivery->getAdxs($where);
+           if($size_info){
+               foreach($size_info as $key1=>$val1){
+                   if(!in_array($val1['ad_size_name'],$list_arr)){
+                       $list_arr[] =   $val1['ad_size_name'];
+                       $lists_arr[] = $val1;
+                   }
+               }
+           }
+
+        }
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $lists_arr;
+        Helper::outJson($arr);
+    }
+    /*
+     * 获取全网智能优化对应的媒体对应的规格
+     */
+    public function  getSourcetypeqAction(){
+
+        $where  = "";
+        $adx_id = Helper::clean($this->getRequest()->getPost('adx_id'));//媒体列表
+        if($adx_id){
+            if($where){
+                $where = $where." AND $adx_id=".$adx_id;
+            }else{
+                $where = "$adx_id=".$adx_id;;
+            }
+        }
+        $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+        if($osType_o==1){
+            if($where){
+                $where = $where." AND osType_o=1";
+            }else{
+                $where = "osType_o=1";
+            }
+        }
+        $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+        if($osType_i==1){
+            if($where){
+                $where = $where." AND osType_i=1";
+            }else{
+                $where = "osType_i=1";
+            }
+        }
+        $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+        if($behavior_type_t==1){
+            if($where){
+                $where = $where." AND behavior_type_t=1";
+            }else{
+                $where = "behavior_type_t=1";
+            }
+        }
+        $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+        if($behavior_type_x==1){
+            if($where){
+                $where = $where." AND behavior_type_x=1";
+            }else{
+                $where = "behavior_type_x=1";
+            }
+        }
+        $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+        if($action_type_h==1){
+            if($where){
+                $where = $where." AND action_type_h=1";
+            }else{
+                $where = "action_type_h=1";
+            }
+        }
+        // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+        //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+        $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+        if($action_type_k==1){
+            if($where){
+                $where = $where." AND action_type_k=1";
+            }else{
+                $where = "action_type_k=1";
+            }
+        }
+        $source_type_q = 1;//来源支持-全网智能优化 0 不支持 1支持
+        if($source_type_q==1){
+            if($where){
+                $where = $where." AND source_type_q=1";
+            }else{
+                $where = "source_type_q=1";
+            }
+        }
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $size_info = $Bhdelivery->getAdxs($where);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $size_info;
+        Helper::outJson($arr);
+     }
+    /*
+     * 获取对应媒体对应的app列表
+     */
+    public function getAppAction(){
+
+        $adx_Id = Helper::clean($this->getRequest()->getPost('adx_Id'));//媒体列表
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $applist = $Bhdelivery->getApp($adx_Id);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $applist;
+        Helper::outJson($arr);
+    }
+    /*
+     *获取app对应的规格列表
+     */
+    public function getAppSizeAction(){
+
+        $where = "";
+        $ap_id = Helper::clean($this->getRequest()->getPost('ap_id'));//app对应id
+        if($ap_id){
+            if($where){
+                $where = $where." AND ap_id=".$ap_id;
+            }else{
+                $where = "ap_id=".$ap_id;;
+            }
+        }
+        $osType_o = Helper::clean($this->getRequest()->getPost('osType_o'));//是否支持安卓
+        if($osType_o==1){
+            if($where){
+                $where = $where." AND osType_o=1";
+            }else{
+                $where = "osType_o=1";
+            }
+        }
+        $osType_i = Helper::clean($this->getRequest()->getPost('osType_i'));//是否支持ios
+        if($osType_i==1){
+            if($where){
+                $where = $where." AND osType_i=1";
+            }else{
+                $where = "osType_i=1";
+            }
+        }
+        $behavior_type_t = Helper::clean($this->getRequest()->getPost('behavior_type_t'));//是否支持网页跳转
+        if($behavior_type_t==1){
+            if($where){
+                $where = $where." AND behavior_type_t=1";
+            }else{
+                $where = "behavior_type_t=1";
+            }
+        }
+        $behavior_type_x = Helper::clean($this->getRequest()->getPost('behavior_type_x'));//是否支持下载应用
+        if($behavior_type_x==1){
+            if($where){
+                $where = $where." AND behavior_type_x=1";
+            }else{
+                $where = "behavior_type_x=1";
+            }
+        }
+        $action_type_h = Helper::clean($this->getRequest()->getPost('action_type_h'));//形式支持-横幅 0 不支持 1支持
+        if($action_type_h==1){
+            if($where){
+                $where = $where." AND action_type_h=1";
+            }else{
+                $where = "action_type_h=1";
+            }
+        }
+        // $action_type_s = Helper::clean($this->getRequest()->getPost('action_type_s'));//形式支持-视频贴片 0 不支持 1支持
+        //$action_type_y = Helper::clean($this->getRequest()->getPost('action_type_y'));//形式支持-原生信息流 0 不支持 1支持
+        $action_type_k = Helper::clean($this->getRequest()->getPost('action_type_k'));//形式支持-开屏 0 不支持 1支持
+        if($action_type_k==1){
+            if($where){
+                $where = $where." AND action_type_k=1";
+            }else{
+                $where = "action_type_k=1";
+            }
+        }
+        $source_type_z = 1;//来源支持-指定应用
+        if($source_type_z==1){
+            if($where){
+                $where = $where." AND source_type_z=1";
+            }else{
+                $where = "source_type_z=1";
+            }
+        }
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->getAppSize($where);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+    /*
+     * 获取对应规格的创意
+     */
+    public function  getCreativeAction(){
+        $ad_size_name = Helper::clean($this->getRequest()->getPost('ad_size_name'));//上传规格id
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $type = Helper::clean($this->getRequest()->getPost('type'));//type
+        $data['ad_size_name'] = $ad_size_name;
+        $data['comp_id'] = $comp_id;
+        $data['type'] = $type;
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $comp_pid = $this->uinfo['comp_pid'];
+        $size_info = $Bhdelivery->getSize($ad_size_name);
+        if($size_info){
+            $access_token = $this->getaccess();
+            $url = $this->config['dsp']['url']."material/serach?access_token=".$access_token."&comp_id=".$comp_id."&comp_pid=".$comp_id."&group_id=".'222'."&size_id=".'33'."&material_name=&time=&platform_id=";_id;
+            echo $url;exit;
+            $doNet = new DoNetwork();
+        }else{
+            $arr = array('api_code' => 1, 'msg' => 'success');
+            $arr['data'] = array();
+        }
+        var_dump($size_info);exit;
+        $result = $Bhdelivery->getCreative($data);
+
+        Helper::outJson($arr);
+    }
+    /*
+     * 修改广告单元状态
+     *
+     */
+    public function updateAdStatusAction(){
+        $bh_delivery_id = Helper::clean($this->getRequest()->getPost('bh_delivery_id'));//广告id
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//comp_id
+        $status = Helper::clean($this->getRequest()->getPost('status'));//广告修改状态getAdinfo
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $adsInfo = $Bhdelivery->getAdinfo($bh_delivery_id,$comp_id);
+        if($adsInfo[0]['status']==3){
+            $arr = array('api_code' => 0, 'msg' => '该广告已结束');
+        }else{
+            $result = $Bhdelivery->updateAdStatus($bh_delivery_id,$status);
+            if($result){
+                $arr = array('api_code' => 1, 'msg' => '修改成功');
+                }else{
+                $arr = array('api_code' =>0, 'msg' => '修改失败，请稍后重试');
+            }
+        }
+        Helper::outJson($arr);
+        }
+    /*
+     * 修改计划状态
+     */
+    public function updateCampStatusAction(){
+        $bh_campaign_id = Helper::clean($this->getRequest()->getPost('bh_campaign_id'));//计划id
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//comp_id
+        $status = (int)Helper::clean($this->getRequest()->getPost('status'));//计划状态修改
+        if($status==2){
+            $status_ad = 4;
+        }else{
+            $status_ad = 2;
+        }
+        $this->db    = Yaf_Registry::get('db');
+        $this->db->bh->startTrans();
+        $Bhdelivery = Helper::M('Bhdelivery');
+        if($status==2 || $status==4){
+            $result =  $Bhdelivery->updateCampStatus($bh_campaign_id,$status,$comp_id);
+            if($result){
+                $result_ad =  $Bhdelivery->updateAdsStatus($bh_campaign_id,$status_ad,$status,$comp_id);
+
+                if(!empty($result_ad)){
+                    $this->db->bh->commit();
+                    $arr = array('api_code' => 1, 'msg' => 'success');
+                }else{
+                    $this->db->bh->rollback();
+                    $arr = array('api_code' =>0, 'msg' => '修改失败，请稍后重试');
+                }
+            }else{
+                $arr = array('api_code' =>0, 'msg' => '修改失败，请稍后重试');
+            }
+
+        }else{
+            $arr = array('api_code' =>0, 'msg' => '状态只能切换为暂停和投放中');
+        }
+        Helper::outJson($arr);
+
+   }
+   /*
+    * 修改计划名称
+    */
+   public function updateCampnameAction(){
+
+       $bh_campaign_name = Helper::clean($this->getRequest()->getPost('bh_campaign_name'));//广告计划名称
+       $bh_campaign_id =  Helper::clean($this->getRequest()->getPost('bh_campaign_id'));//广告计划名称
+       $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+       $Bhdelivery = Helper::M('Bhdelivery');
+       $result = $Bhdelivery->checkCam($comp_id,$bh_campaign_name);
+       if($result){
+           $arr = array('api_code' => 0, 'msg' => '该计划名称已经被使用');
+
+       }else{
+           $where['bh_campaign_id'] = $bh_campaign_id;
+           $where['comp_id'] = $comp_id;
+          $data['bh_campaign_name'] =  $bh_campaign_name;
+          $result_update = $Bhdelivery->updateCampname($where,$data);
+          if($result_update){
+              $arr = array('api_code' => 1, 'msg' => '修改成功');
+          }else{
+              $arr = array('api_code' => 0, 'msg' => '修改失败');
+          }
+
+       }
+       Helper::outJson($arr);
+
+   }
+    /*
+     * 创建创意
+     */
+    public function addCreativeAction(){
+        $ad_size_name = Helper::clean($this->getRequest()->getPost('ad_size_name'));//上传规格id
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $creative_name = Helper::clean($this->getRequest()->getPost('creative_name'));//创意名称
+        $jump_url = Helper::clean($this->getRequest()->getPost('jump_url'));//跳转地址
+        $img_url = Helper::clean($this->getRequest()->getPost('img_url'));//图片url
+        $type  = Helper::clean($this->getRequest()->getPost('type'));//来源  1 全网智能优化 2  指定应用
+        $data['ad_size_name'] = $ad_size_name;
+        $data['creative_name'] = $creative_name;
+        $data['jump_url'] = $jump_url;
+        $data['img_url'] = $img_url;
+        $data['type'] = $type;
+        $data['comp_id'] = $comp_id;
+        $data['comp_pid'] =  $this->uinfo['comp_pid'];
+        $data['time'] = time();
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $result = $Bhdelivery->addCreative($data);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+
+    }
+    /*
+     * 获取全网广告省市列表
+     */
+    public function getBhCityAction(){
+        $Bh_city_dao = Helper::M("BhCity");
+        $pid = Helper::clean($this->getRequest()->getPost('pid'));//城市父级ID
+        if($pid==0 || $pid==''){
+        	$level=1;
+        }else{
+        	$level=2;
+        }
+        $cityList = $Bh_city_dao->getBhCity($pid,$level);
+        Helper::outJson(array('api_code'=>1,'msg'=>'','data'=>$cityList));
+    }
+	/*
+     * 获取全网广告 事地区商圈列表
+     */
+    public function getBhCityAreaAction(){
+        $Bh_city_dao = Helper::M("BhCity");
+        $type = Helper::clean($this->getRequest()->getPost('type'));//获取类型
+        $cityId = Helper::clean($this->getRequest()->getPost('cityId'));//获取类型
+        $areaList = $Bh_city_dao->getBhCityArea($type,$cityId);
+        Helper::outJson(array('api_code'=>1,'msg'=>'','data'=>$areaList));
+    }
+    /*
+     *获取
+     */
+
+    /*
+    * 创建广告
+    */
+    public function addDeliveryAction(){
+        $bh_campaign_id = Helper::clean($this->getRequest()->getPost('bh_campaign_id'));//广告计划id
+        $type = Helper::clean($this->getRequest()->getPost('type'));//投放平台 1 PC端  2 移动端
+        $osType = Helper::clean($this->getRequest()->getPost('osType'));//投放类型 1 Android  2 iOS
+        $budgetControlType = Helper::clean($this->getRequest()->getPost('budgetControlType'));//投放速率类型 0 按花费控制  1 按展示量控制
+        $budgetAllocationType = Helper::clean($this->getRequest()->getPost('budgetAllocationType'));//按花费控制类型 1加速 2 匀速
+        $budgetAllocationMoney = Helper::clean($this->getRequest()->getPost('budgetAllocationMoney'));//按花费控制单价
+        $budgetAllocationCycle = Helper::clean($this->getRequest()->getPost('budgetAllocationCycle'));//按花费控制单位（1 小时 2 天）
+        $budgetControlVal = Helper::clean($this->getRequest()->getPost('budgetControlVal'));//按展示量控制 次数 （千次单位）
+        $budgetAllocationDisplay = Helper::clean($this->getRequest()->getPost('budgetAllocationDisplay'));//按展示量控制单位（1 小时 2 天）
+        $frequencyNum = Helper::clean($this->getRequest()->getPost('frequencyNum'));//频次控制 次数
+        $frequencyCycle = Helper::clean($this->getRequest()->getPost('frequencyCycle'));//频次控制单位 1小时 2天 3周 4月
+        $beheGender = Helper::clean($this->getRequest()->getPost('beheGender'));//性别参数
+        $beheAge = Helper::clean($this->getRequest()->getPost('beheAge'));//年龄参数
+        $customIp = Helper::clean($this->getRequest()->getPost('customIp'));//ip定向范围
+        $areaType =  Helper::clean($this->getRequest()->getPost('areaType'));//投放区域类型 1 省市 4 商圈
+        $lbs = Helper::clean($this->getRequest()->getPost('lbs'));//区域集合
+        $behaviorType = Helper::clean($this->getRequest()->getPost('behaviorType'));//后续行为1跳转页面2下载应用3微信品牌页
+        $creativeType = Helper::clean($this->getRequest()->getPost('creativeType'));//创意形式 1横幅 2视频贴片 3 智能创意 4JS素材 5 开屏6 原生信息流 7 文字链
+        $mediaType = Helper::clean($this->getRequest()->getPost('mediaType'));//媒体选择 1全网智能优化 2指定应用 3指定广告位 4指定应用类型 5指定媒体锦囊
+        $adxType = Helper::clean($this->getRequest()->getPost('adxType'));//媒体集合
+        $appIn = Helper::clean($this->getRequest()->getPost('appIn'));//应用集合
+        $advertData = Helper::clean($this->getRequest()->getPost('advertData'));//创意集合
+        $customCrowdIn = Helper::clean($this->getRequest()->getPost('customCrowdIn'));//人群定向包集合
+        $delivery_name = Helper::clean($this->getRequest()->getPost('delivery_name'));//广告投放名称
+        $startDate = Helper::clean($this->getRequest()->getPost('startDate'));//投放开始日期
+        $endDate = Helper::clean($this->getRequest()->getPost('endDate'));//投放结束日期
+        $dateTimeInfo = Helper::clean($this->getRequest()->getPost('dateTimeInfo'));//自定义时间集合
+        $holidayType = Helper::clean($this->getRequest()->getPost('holidayType'));//节假日设置
+        $bidTyp = Helper::clean($this->getRequest()->getPost('bidTyp'));//投放类型（1 CPM 1CPC）
+        $bid = Helper::clean($this->getRequest()->getPost('bid'));//出价
+        $comp_pid = $this->uinfo['comp_id'];//服务商id
+        $comp_id = Helper::clean($this->getRequest()->getPost('comp_id'));//广告主id
+        $add_staff_id = $this->uinfo['staff_id'];;
+        $add_time = time();
+
+        $data['bh_campaign_id'] = $bh_campaign_id;
+        $data['type'] = $type;
+        $data['osType'] = $osType;
+        $data['budgetControlType'] = $budgetControlType;
+        $data['budgetAllocationType'] = $budgetAllocationType;
+        $data['budgetAllocationMoney'] = $budgetAllocationMoney*100;
+        $data['budgetAllocationCycle'] = $budgetAllocationCycle;
+        $data['budgetControlVal'] = $budgetControlVal;
+        $data['budgetAllocationDisplay'] = $budgetAllocationDisplay;
+        $data['frequencyNum'] = $frequencyNum;
+        $data['frequencyCycle'] = $frequencyCycle;
+        $data['beheGender'] = $beheGender;
+        $data['beheAge'] = $beheAge;
+        $data['areaType'] = $areaType;
+        $data['lbs'] = $lbs;
+        $data['customIp'] = $customIp;
+        $data['behaviorType'] = $behaviorType;
+        $data['creativeType'] = $creativeType;
+        $data['mediaType'] = $mediaType;
+        $data['adxType'] = $adxType;
+        $data['appIn'] = $appIn;
+        $data['advertData'] = $advertData;
+        $data['customCrowdIn'] = $customCrowdIn;
+        $data['delivery_name'] = $delivery_name;
+        $data['startDate'] = $startDate;
+        $data['endDate'] = $endDate;
+        $data['dateTimeInfo'] = $dateTimeInfo;
+        $data['holidayType'] = $holidayType;
+        $data['bidTyp'] = $bidTyp;
+        $data['bid'] = $bid*100;
+        $data['comp_id'] = $comp_id;
+        $data['comp_pid'] = $comp_pid;
+        $data['add_staff_id'] = $add_staff_id;
+        $data['add_time'] = $add_time;
+        $Bhdelivery = Helper::M('Bhdelivery');
+        $check_name = $Bhdelivery->checkAdname($comp_id,$delivery_name);
+        if($check_name){
+            $arr = array('api_code' => 0, 'msg' => '名称已被使用');
+            Helper::outJson($arr);
+        }
+        $result = $Bhdelivery->addDelivery($data);
+        $arr = array('api_code' => 1, 'msg' => 'success');
+        $arr['data'] = $result;
+        Helper::outJson($arr);
+    }
+
+}

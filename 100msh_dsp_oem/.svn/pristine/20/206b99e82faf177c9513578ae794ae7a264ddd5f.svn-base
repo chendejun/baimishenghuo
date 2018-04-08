@@ -1,0 +1,147 @@
+<?php
+class U extends Model{
+	public function __construct(){
+		parent::__construct();
+		session_start();
+	}
+	public function checkLogin(){   
+		if(isset($_SESSION['uinfo']) && !empty($_SESSION['uinfo']) ){
+			$this->uinfo = $_SESSION['uinfo'];
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * 登录验证
+	 * @param  [type] $user_name [description]
+	 * @param  [type] $pwd       [description]
+	 * @return [type]            [description]
+	 */
+	public function login($user_name , $pwd){
+		$result = $this->db->dsp->table('dsp_comp_staff')->field('user_name,staff_name,user_group,staff_id')->where("user_name='{$user_name}' AND pwd='{$pwd}' AND `source`=4 AND `status`=1")->find();
+		if(empty($result)) return false;
+		$row = $this->db->dsp->table('dsp_staff_rel')->field('comp_id')->where("staff_id='{$result['staff_id']}'")->find();
+		$comp_info = $this->db->dsp->table('dsp_company')->field('comp_id,comp_pid,sc_pro,sc_pid,comp_name,mobile_phone')->where("comp_id='{$row['comp_id']}'")->find();
+		$this->db->dsp->table('dsp_comp_staff')->data(array('last_login_time' => date('Y-m-d H:i:s')))->where("staff_id={$result['staff_id']}")->update();
+		$this->db->dsp->table('dsp_company')->data(array('staff_login_time' => date('Y-m-d H:i:s')))->where("comp_id={$row['comp_id']}")->update();
+		$data = array_merge($result , $comp_info);
+		$_SESSION['uinfo'] = $data;
+		return $data;
+	}
+	/**
+	 * 清除SESSION
+	 * @return [type] [description]
+	 */
+	public function loginout(){
+		unset($_SESSION);
+		session_destroy(); 
+		return true;
+	}
+	/**
+	 * 修改登录密码
+	 * @param  [type] $pwd [description]
+	 * @return [type]      [description]
+	 */
+	public function editPwd($pwd , $staff_id){
+		return $this->db->dsp->table('dsp_comp_staff')->data(array('pwd' => $pwd))->where("staff_id={$staff_id}")->update();
+	}
+	/**
+	 * 获取用户列表
+	 * @param  [type] $step  [description]
+	 * @param  [type] $limit [description]
+	 * @return [type]        [description]
+	 */
+	public function getlist($step , $limit , $staff_name , $user_group , $is_pages = false){
+		$where = "";
+		if(!empty($staff_name)) $where = " AND b.staff_name LIKE \"%{$staff_name}%\"";
+		if($user_group > 1){
+			$where .= " AND b.user_group={$user_group}";
+		}else{
+			$where .= " AND b.user_group>1";
+		}
+		if(!$is_pages){
+			return $this->db->dsp->query("SELECT b.user_name,b.staff_id,b.staff_name,b.user_group,b.`status`,b.add_time FROM dsp_staff_rel a LEFT JOIN dsp_comp_staff b ON a.staff_id=b.staff_id WHERE a.comp_id={$this->uinfo['comp_id']} {$where} ORDER BY a.staff_id ASC LIMIT {$step} , $limit");
+		}else{
+			$row = $this->db->dsp->query("SELECT count(1) as num FROM dsp_staff_rel a LEFT JOIN dsp_comp_staff b ON a.staff_id=b.staff_id WHERE a.comp_id={$this->uinfo['comp_id']} {$where} ");
+			$data = array('pages' => 0 , 'list' => array());
+			if($row[0]['num'] > 0){
+				$data['pages'] = ceil($row[0]['num']/$limit);
+				$data['list'] = $this->db->dsp->query("SELECT b.user_name,b.staff_id,b.staff_name,b.user_group,b.`status`,b.add_time FROM dsp_staff_rel a LEFT JOIN dsp_comp_staff b ON a.staff_id=b.staff_id WHERE a.comp_id={$this->uinfo['comp_id']} {$where} ORDER BY a.staff_id ASC LIMIT {$step} , $limit");
+			}
+			return $data;
+		}
+	}
+	/**
+	 * 获取操作员信息
+	 * @param  [type] $user_name [description]
+	 * @return [type]            [description]
+	 */
+	public function get($user_name = '' , $staff_id = 0){
+		$where = '';
+		if(!empty($user_name)){
+			$where = "user_name='{$user_name}'";
+		}elseif(!empty($staff_id)){
+			$where = "staff_id='{$staff_id}'";
+		}
+		return $this->db->dsp->table("dsp_comp_staff")->where($where)->find();
+	}
+	/**
+	 * 添加操作员
+	 * @param [type] $arg [description]
+	 */
+	public function addPerator($arg){
+		$this->db->dsp->startTrans();
+		$e1 = $this->db->dsp->table("dsp_comp_staff")->data($arg)->insert();
+		if($e1 > 0){
+			$e2 = $this->db->dsp->table("dsp_staff_rel")->data(array('comp_id' => $this->uinfo['comp_id'] , 'staff_id' => $e1))->insert();
+			if(!$e2) $this->db->dsp->rollback();
+		}else{
+			$this->db->dsp->rollback();
+		}
+		$this->db->dsp->commit();
+		return true;
+	}
+	/**
+	 * 检查广告主与用户关系
+	 * @param  [type] $staff_id [description]
+	 * @return [type]           [description]
+	 */
+	public function checkStaff($comp_id , $staff_id){
+		$row = $this->db->dsp->table("dsp_staff_rel")->where("comp_id={$comp_id} AND staff_id={$staff_id}")->find();
+		if(!empty($row)){
+			return $this->db->dsp->table('dsp_comp_staff')->where("staff_id={$staff_id}")->find();
+		}
+		return false;
+	}
+	/**
+	 * 编辑操作员信息
+	 * @return [type] [description]
+	 */
+	public function update($data , $staff_id){
+		return $this->db->dsp->table('dsp_comp_staff')->data($data)->where("staff_id={$staff_id}")->update();
+	}
+	/**
+	 * 转移广告主
+	 * @param  [type] $staff_id      被转移操作员ID
+	 * @param  [type] $move_staff_id 新操作员ID
+	 * @param  [type] $oper_staff_id 操作转移的操作员ID
+	 * @return [type]                [description]
+	 */
+	public function move_staff($staff_id , $move_staff_id , $oper_staff_id){
+		$rows = $this->db->dsp->table('dsp_company')->field('comp_id')->where("ascription_staff_id={$staff_id}")->sselect();
+		if(!empty($rows)){
+			$list = array();
+			foreach ($rows as $key => $val) {
+				$list[] = $val['comp_id'];
+			}
+			$data['staff_id'] = $staff_id;
+			$data['move_staff_id'] = $move_staff_id;
+			$data['oper_staff_id'] = $oper_staff_id;
+			$data['comp_ids'] = json_encode($list);
+			$data['move_time'] = date('Y-m-d H:i:s');
+			$this->db->dsp->table('dsp_move_staff')->data($data)->insert();
+			$this->db->dsp->execute("UPDATE dsp_company SET ascription_staff_id={$move_staff_id} WHERE comp_id IN(".implode(',', $list).")");
+		}
+		return $this->db->dsp->table('dsp_comp_staff')->data(array('move_staff_id' => $move_staff_id))->where('staff_id={$staff_id}')->update();
+	}
+}

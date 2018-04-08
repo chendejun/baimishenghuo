@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+    <body>
+        <form class="" action="https://dev-dspoem.100msh.com/v1.2/Device/setMac" method="post">
+            <div class="">
+                <label for="">广告主</label>
+                <select class="" name="comp_id">
+                    <option value="206088">marie111</option>
+                    <option value="206089">www</option>
+                    <option value="205940">中科新业深圳分公司</option>
+                </select>
+            </div>
+            <div class="">
+                <label for="">设备mac</label>
+                <input type="text" name="mac_id" value="15">
+            </div>
+            <div class="">
+                <label for="">放置位置</label>
+                <input type="text" name="position_des" value="">
+            </div>
+            <button type="submit" name="button">submit</button>
+        </form>
+    </body>
+</html>

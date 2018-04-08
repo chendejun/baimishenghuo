@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 搜索热点 -->
+    <meta charset="UTF-8">
+    <title>百米DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <style type="text/css">
+        .type_box{padding-top: 30px;}
+        .crowd_table{width: 40%;margin: 1% 4%;}
+        .crowd_table>ul li{float: left;background-color: #f5f5f5}
+        .crowd_table li{height: 40px;line-height: 40px;}
+        .crowd_table li:nth-child(1){width: 15%;}
+        .crowd_table li:nth-child(2){width: 17%;padding-right: 3%;}
+        .crowd_table li:nth-child(3){width: 65%}
+        .crowd_table li .layui-progress-bar{position: initial;background-color:#618cff;}
+        .crowd_table li .layui-progress{position: relative;top: 16px;margin-right:20%;height: 10px;border-radius:0;}
+        .crowd_table li .layui-progress-bar{height: 10px;border-radius:0;}
+        .crowd_table li span{position: absolute;right: -18%;top: -5px;}
+        .crowd_table b{color: #333;font-size: 14px;padding: 10px 0;display: inline-block;}
+        .crowd_table .up::after,.crowd_table .down::after{content: '';display: inline-block;width: 10px;height: 10px;margin-left: 10px;}
+        .crowd_table .up::after{background-image: url('../../../../../public/img/crow_analysis.png');background-position:-107px 0;}
+        .crowd_table .down::after{background-image: url('../../../../../public/img/crow_analysis.png');background-position:-87px 0;}
+        .crowd_table:nth-child(3) li,.crowd_table:nth-child(4) li{text-align: center} 
+        .table_content{max-height: 400px;overflow-y: auto;}
+        .table_content ul{clear: both;overflow:hidden;zoom:1;width: 100%;color: #666}
+        .table_content ul li{float: left;}
+        .crowd_table>ul li:nth-child(1),.table_content ul li:nth-child(1){text-align: center}
+        .table_content ul:nth-child(1) li:nth-child(1) i,.table_content ul:nth-child(2) li:nth-child(1) i,.table_content ul:nth-child(3) li:nth-child(1) i{background-color: #f56c6c;color: #fff;width: 18px;height: 16px;display: inline-block;line-height: 16px;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>百米DMP / 客流人群分析</span>
+        </div>
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="/v1.2/Scenes/flowanalysis">客流分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cuspropety">客户属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cussource">客流来源
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">搜索热点
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/appanalysis">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="create_analysis.html" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        </div>
+
+        <div class="content">
+            <div class="type_box clearfix">
+                <select class="bm-select select_box fl" id="select_box">
+                    <option value="">昨日</option>
+                    <option value="1">近7天</option>
+                    <option value="2">近30天</option>
+                    <option value="3">指定日期</option>
+                </select>
+                <ul class="item_ul fl" id="item_ul">
+                    <li type="1" class="cur">全部</li>
+                    <li type="2">新访客</li>
+                    <li type="3">老访客</li>
+                </ul>
+                <p class="fl">查询搜索热点需跨度3天以上</p>
+            </div>
+
+            <!-- 人群地区属性 -->
+            <div class="crowd_attr clearfix">
+                <div class="crowd_table fl">
+                    <b>娱乐</b>
+                    <ul class="clearfix">
+                        <li>排名</li>
+                        <li>关键词</li>
+                        <li>关注度</li>
+                    </ul>
+                    <div class="table_content">
+                        <ul>
+                            <li>
+                                <i>1</i>
+                            </li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>2</i>
+                            </li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>3</i>
+                            </li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>4</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>5</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>6</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>7</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>8</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>9</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>10</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>11</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="crowd_table fl">
+                    <b>人物</b>
+                    <ul class="clearfix">
+                        <li>排名</li>
+                        <li>关键词</li>
+                        <li>关注度</li>
+                    </ul>
+                    <div class="table_content">
+                        <ul>
+                            <li>
+                                <i>1</i>
+                            </li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>2</i>
+                            </li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>3</i>
+                            </li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>4</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>5</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>6</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>7</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>8</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>9</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>10</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>11</li>
+                            <li>福建</li>
+                            <li>
+                                <div class="layui-progress" lay-showpercent="true">
+                                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="crowd_table fl">
+                    <b>热搜</b>
+                    <ul class="clearfix">
+                        <li>排名</li>
+                        <li>关键词</li>
+                        <li>搜索指数</li>
+                    </ul>
+                    <div class="table_content">
+                        <ul>
+                            <li>
+                                <i>1</i>
+                            </li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>2</i>
+                            </li>
+                            <li>福建</li>
+                            <li class="down">283433</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>3</i>
+                            </li>
+                            <li>福建</li>
+                            <li class="down">283433</li>
+                        </ul>
+                        <ul>
+                            <li>4</li>
+                            <li>福建</li>
+                            <li class="down">283433</li>
+                        </ul>
+                        <ul>
+                            <li>5</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>6</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>7</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>8</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>9</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>10</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>11</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="crowd_table fl">
+                    <b>热点</b>
+                    <ul class="clearfix">
+                        <li>排名</li>
+                        <li>关键词</li>
+                        <li>搜索指数</li>
+                    </ul>
+                    <div class="table_content">
+                        <ul>
+                            <li>
+                                <i>1</i>
+                            </li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>2</i>
+                            </li>
+                            <li>福建</li>
+                            <li class="down">283433</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <i>3</i>
+                            </li>
+                            <li>福建</li>
+                            <li class="down">283433</li>
+                        </ul>
+                        <ul>
+                            <li>4</li>
+                            <li>福建</li>
+                            <li class="down">283433</li>
+                        </ul>
+                        <ul>
+                            <li>5</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>6</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>7</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>8</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>9</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>10</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                        <ul>
+                            <li>11</li>
+                            <li>福建</li>
+                            <li class="up">283433</li>
+                        </ul>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="tip_box" style="display: none">
+            <p class="tip_title">本功能为高级版本付费功能，费用
+                <span>3000元/年。</span>
+            </p>
+            <p class="tip_subtitle">点击下方“修改”按钮，进入本场景修改页面,选择开通“高级版”，完成支付后等待开通，预计完成需要1~2个工作日。</p>
+            <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="create_analysis.html">修改</a>
+        </div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript">
+    layui.use(['form', 'layer', 'element'], function () {
+        var form = layui.form(),
+            layer = layui.layer,
+            element = layui.element;
+
+            $("#item_ul li").on("click", function () {
+                $("#item_ul li").removeClass("cur");
+                $(this).addClass("cur");
+                var type = $(this).attr("type");
+            });
+
+
+
+
+
+
+
+    })
+</script>

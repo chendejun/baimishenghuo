@@ -1,0 +1,154 @@
+﻿/* layer UI重置 */
+.layui-input-inline{width: 350px;}
+.layui-form-select dl dd.layui-this {background-color:#4c94f5;}
+.layui-form-radio i:hover,.layui-form-radioed i {color:#4aa6fc;}
+.layui-form-checkbox[lay-skin=primary]:hover i {border-color:#4aa6fc;}
+.layui-form-checked[lay-skin=primary] i {background-color:#4aa6fc}
+.layui-form-checked span {color:#009eff !important;}
+/* 表单 */
+.form{background-color: #FFF;padding:20px;min-height: 800px;}
+.form .from-row{padding-left: 160px;margin-top: 20px;min-height: 40px;}
+.form .from-row label{font-weight: normal; color: #333333;font-family: "微软雅黑";line-height: 40px;width: 150px;}
+.form .from-row b{font-weight: normal; padding: 0 10px;}
+.form .from-row .bm-input{height: 40px;line-height: 40px;width: 350px;}
+.form .from-row .bm-input:disabled{background: #f0f0f0;}
+.form .from-row .bm-input.mid_ipt{width: 154px; display: inline-block;}
+.form .from-row .bm-input.sm_ipt{width: 80px; display: inline-block;line-height: 38px;height: 38px;vertical-align: middle;}
+.form .from-row .bm-select{height: 40px;line-height: 40px;box-sizing: content-box;}
+.form .from-row .c-label {position: static;display: inline-block;text-align: left;}
+.form .from-row-title {font-weight: bold;font-size: 15px;padding-left: 80px;margin: 20px 0 10px 0;}
+/* 搜索下拉列表 */
+.search_list{position: absolute;display: block;height: 200px;width:300px;z-index: 10;background: #fff;overflow-y: scroll;border: 1px solid #dddddd;margin: -1px;}
+.search_list ul{padding: 10px;}
+.search_list ul li{line-height: 30px; cursor: pointer;}
+
+/* 下一步按钮 */
+.commit-box{padding:20px;margin-top: 50px;padding-left: 80px;}
+.commit-box .bm-btn{width: 150px;height: 42px;line-height: 42px; margin-right: 15px}
+
+/* 滚动条 */
+.scrollbar::-webkit-scrollbar {width:5px;height:5px;}
+.scrollbar::-webkit-scrollbar-thumb{background:rgba(1,1,1,0.1);border-radius:4px; }
+.scrollbar::-webkit-scrollbar-track{ width:10px; background:none;}
+
+/* 步骤 */
+.step_bar{width: 100%; padding: 40px 0;}
+.step_bar ul{height: 64px; width: 850px; margin: 0 auto;}
+.step_bar ul li{float: left; color: #bababa; font-size: 16px; width:170px; position: relative;z-index: 0;}
+.step_bar ul li.cur{color: #4c94f5;}
+.step_bar ul li.cur i{background: #4c94f5;}
+.step_bar ul li p{line-height: 44px;}
+.step_bar ul li:last-child{width: 100px;}
+.step_bar li i{width:100%; height: 1px;background: #eee;display: block; position: absolute; top:16px; z-index: -1; }
+.step_bar li .step_icon{background-image: url(../../public/img/step_icon.png); background-repeat: no-repeat; width: 32px; height: 32px; display: inline-block; vertical-align: middle;margin-right: 5px; font-size: 0;}
+.step_bar li .step_icon.icon1{ background-position: -80px 0;}
+.step_bar li .step_icon.icon2{ background-position: -80px -80px;}
+.step_bar li .step_icon.icon3{ background-position: -80px -160px;}
+.step_bar li .step_icon.icon4{ background-position: -80px -240px;}
+.step_bar li .step_icon.icon5{ background-position: -80px -320px;}
+.step_bar li.cur .step_icon.icon1{ background-position: 0 0;}
+.step_bar li.cur .step_icon.icon2{ background-position: 0 -80px;}
+.step_bar li.cur .step_icon.icon3{ background-position: 0 -160px;}
+.step_bar li.cur .step_icon.icon4{ background-position: 0 -240px;}
+.step_bar li.cur .step_icon.icon5{ background-position: 0 -320px;}
+
+/* 腾讯自有定向 —— checkbox类选择 */
+.checkbox_div li{ display: block; float: left;font-size: 14px; color: #adaeae; height: 32px; line-height: 32px; padding: 0 20px; margin: 0 10px 10px 0; cursor: pointer; -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.checkbox_div li.active{ background: #adaeae;border-radius: 15px; color: #fff; }
+
+/* step1 */
+.gdt_create.flow_steps ul{width: 932px;}
+.row_type li {float: left;height: 40px;line-height: 40px;width: 120px;margin-right: 20px;cursor: pointer;margin-bottom: 10px;text-align: center; position: relative;}
+.row_type li.cur{color: #4c94f5;}
+.row_type li.cur i{width: 30px;height: 2px;background: #4c94f5;display: block;position: absolute;left: 45px;right: 0;bottom: 0;}
+.step1 .user_recent{background: #eee;padding: 10px; width: 332px;}
+.step1 .user_recent p{height:30px; line-height: 30px; background: #fff; border:1px solid #ddd; border-bottom:none;border-radius: 5px 5px 0 0;padding: 0 10px; margin: 0;position: relative;}
+.step1 .user_recent p i{position: absolute;background: url(../../public/img/sel_icon.png) no-repeat center;width: 30px;height: 30px;right: 0;top:0;display: inline-block;vertical-align: middle;}
+.step1 .user_recent ul{background: #fff;border:1px solid #ddd;border-radius:0 0 5px 5px;}
+.step1 .user_recent ul li{height: 30px; line-height: 30px; position: relative;cursor: pointer;padding: 0 5px 0 10px; }
+.step1 .user_recent ul li.cur,.step1 .user_recent ul li:hover{background:#f2f4f8; color:#5877a4;}
+.step1 .user_recent ul span{float: left;  overflow: hidden; white-space: nowrap;text-overflow: ellipsis;display: block; width: 55%;}
+.step1 .user_recent ul b{width: 135px; position: absolute; right: 0; overflow: hidden; white-space: nowrap;text-overflow: ellipsis; font-weight: normal;}
+.step1 .new_plan{display: inline-block; cursor: pointer;line-height: 40px;}
+.box_rate {width: 200px; display: inline-block;}
+.box_rate .layui-input-inline{width: 80px;}
+.box_rate .bm-input{width: 80px;}
+
+/* step2 */
+.step_box .row_check{ position: absolute; left: 520px;top: 0;line-height: 40px;}
+.step_box .layui-form-radio{width: 115px;}
+.step_box .mod_nav{margin: 10px 0 40px 80px;}
+.step_box .mod_nav li{ width: 200px; height: 60px; line-height: 60px; border: 1px solid #ccc; color: #999; float: left; text-align: center; cursor: pointer;}
+.step_box .mod_nav li.cur{ color: #409eff; border-color: #409eff;position: relative;}
+.step_box .mod_nav li:first-child{margin-right: -1px; border-radius: 5px 0 0 5px;}
+.step_box .mod_nav li:last-child{border-radius: 0 5px 5px 0 ;}
+.step_box .usre_box .dmp_box{width: 700px;padding-left: 80px; margin-top: 20px;}
+.step_box .usre_box .dmp_box .dmp_top span{height: 44px; line-height: 44px}
+.step_box .usre_box .dmp_box .dmp_top a{float: right;}
+.step_box .usre_box .ip_box .bm-input{display: inline-block; width: 150px;}
+
+/*省市选择 */
+.city_box{width: 700px;margin: 20px 0 0 162px;border: 1px solid #eee; padding: 20px;}
+.city_box .crowd_box{ position: static; height: 305px;}
+.city_box .crowd_box .box_list{ position: static;  float: left}
+.mod_club {position: relative;display: none;}
+.mod_club h3{position: absolute;height: 30px;line-height: 30px;padding: 0;margin: 0; font-size: 13px; color: #666;}
+.mod_club .club_li{ padding-left: 70px; margin-right: 30px; margin-bottom: 20px; max-height: 148px;overflow-y: scroll;}
+.mod_club .club_li span{ display: block; float: left; background: #f0f3f6; border: 1px solid #dfe1e7; border-radius: 15px; font-size: 14px; color: #686868; height: 28px; line-height: 28px; padding: 0 20px; margin: 0 10px 10px 0; position: relative;}
+.mod_club .club_li a.clear_btn{vertical-align: middle;line-height: 32px;color: #008fe4;width: 80px;display: inline-block;}
+.mod_club .club_li span:hover{ background: #e1e7f1;padding: 0 30px 0 10px;-webkit-transition-duration: 0.4s;}
+.mod_club .club_li span i{display: none}
+.mod_club .club_li span:hover i{position: absolute;background: url(../../public/img/close_icon.png) no-repeat center;width: 16px;height: 16px;background-size: 0.8rem auto;right: 10px;top: 7px;display: inline-block;vertical-align: middle;}
+/*商圈选择 */
+.item_box li.item input[type="checkbox"]{display: none;}
+.item_box li.item em.checkbox{ display: inline-block;margin: -3px 10px 0 0;vertical-align:middle; width: 30px; height: 100%; background: url(../../public/img/checkbox.png) 8px 50% no-repeat;}
+.item_box li.item em.checkbox.childchose{ background: url(../../public/img/checkboxchildchose.png) 8px 50% no-repeat;}
+.item_box li.item em.checkbox.chose{ background: url(../../public/img/checkboxchose.png) 8px 50% no-repeat;}
+.zone_box{width: 700px;margin: 20px 0 0 162px;border: 1px solid #eee; padding: 20px; min-height: 100px;}
+.zone_box .layui-input-inline{width: 180px;}
+.zone_box .zone_sel{float: right; margin-top: 0;}
+.zone_box .zone_mod{margin-top: 60px;}
+.sq_area{width: 700px;border: 1px solid #eee;}
+.sq_area .item_box{display: block;height: 300px;width: 150px;float: left;background: #fff;overflow-y: scroll;border-right: 1px solid #eee; float: left;}
+.sq_area .item_box li.cur{background: #dfecfc;}
+.sq_area .item_box.sbox{width: 540px; border-right: none;margin-top: 10px;}
+.sq_area .lists{cursor: pointer;line-height: 36px;height: 36px;padding: 0 10px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;border-bottom:1px solid #eee;}
+.sq_area .item_box .item{cursor: pointer;line-height: 30px;padding: 0 10px;height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;width: 130px; float: left;}
+.dmp_tab .base_table {height: 300px;position: relative;}
+.dmp_tab .base_table tbody {height: 300px;overflow: scroll;display: block;width: 700px;position: absolute;left: 0;right: 0;overflow-x: hidden;}
+.dmp_tab .base_table tr{width: 100%;display: inline-table;}
+.dmp_tab .base_table tr td{width: 50%;}
+.dmp_tab .base_table tr td.ck_td{text-align: left;padding-left: 80px;}
+/* step3 */
+.media_box{width: 800px;}
+.media_box .item{ width: 126px;height: 50px;margin-left: -1px; margin-bottom: -1px;position: relative; float: left;}
+.media_box.m1 .item .item_check{ width: 38px;height: 38px;position: absolute;left: 0px;top: 0px;cursor: pointer;background: url(../../public/img/batch_icon.png) no-repeat;background-position: -1px -1px;
+    background-size: 38px auto;}
+.media_box.m1 .item.on .item_check{ background-position:center;}
+.media_box.m1 .item:hover .item_check{background-position: 0 bottom;}
+.media_box.m1 .item.on:hover .item_check{background-position:center;}
+.media_box.m2 .item:after{content: "";background-color: rgba(0,0,0,0.1);position: absolute;left: 0;right: 0;top: 0;bottom: 0;}
+.media_box.m2 .item.on:after{background-color: transparent;}
+
+/* step4 */
+.img_upload li{float: left;}
+.img_upload .file_input{width:200px;height:140px;margin: 10px;}
+.img_upload .file_input>img{width:200px;height:140px;}
+.img_upload .file_input input{width:200px!important;height:140px!important;}
+.img_upload .file_input b{border: 1px solid #4c94f5; color: #4c94f5;height: 24px;line-height: 24px;margin: 0;border-radius: 3px;}
+/* 素材列表 */
+.mat_lists ul{width: 1110px; max-height: 750px; overflow: scroll;border: 1px solid #ddd;padding-top: 15px;padding-left: 15px;}
+.mat_lists .item{background: #ccc; width: 186px;padding: 10px;margin-bottom: 15px; margin-right: 15px; float: left; background-color: #fff;box-shadow: 0 1px 3px rgba(0,0,0,.3);-webkit-transition: all 0.3s;-moz-transition: all 0.3s;-o-transition: all 0.3s;-ms-transition: all 0.3s;transition: all 0.3s;}
+.mat_lists .item .title{line-height: 16px; color: #666; word-spacing: normal;padding-bottom: 10px;}
+.mat_lists .item .photo{position: relative; height: 235px;width: 186px; background: #f8f8f8;display: table-cell;vertical-align: middle;}
+.mat_lists .item .photo img{ width: 100%; max-height:100%;vertical-align: top;}
+.mat_lists .item .photo i{position: absolute;background: url(../../public/img/club_icon.png) no-repeat center;width: 25px;height: 25px;right: 0;top:0;display: inline-block;}
+.mat_lists .item .mod_btns{position: absolute;top:50%;margin-top: -15px;left: 50%; margin-left: -50px;z-index: 101;display: none;}
+.mat_lists .item .mod_btns span{ width: 100px; height: 30px; line-height: 30px; background: #fff; text-align: center; color: #666; margin: 0 auto;  border-radius: 5px;box-shadow: 0 1px 3px rgba(0,0,0,.3);display: block;cursor: pointer;}
+.mat_lists .item .info{padding: 10px 0 0 0 ;}
+.mat_lists .item .info span{color:#597caf;font-size: 14px; line-height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; display: block;}
+.mat_lists .item .info p{color:#999999; font-size: 12px; word-break: break-all; line-height: 20px; margin-bottom: 5px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; display: block;}
+.mat_lists .item:hover .mod_btns,.mat_lists .item.cur .mod_btns{display: block;}
+.mat_lists .item.cur .mod_btns span.btn_chose{background: #f08519; color: #fff;}
+.mat_lists .item:hover em, .delivery_list .item.cur em{position: absolute; top: 0; bottom: 0;left: 0;right: 0; background-color: rgba(0,0,0,0.3);z-index: 100;}
+.mod_material{width: 900px;overflow: hidden;overflow-y: auto;border: 1px solid #eee;}

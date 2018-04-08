@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+	<link rel="stylesheet" href="../../../../../public/css/common.css">
+</head>
+<style>
+	*{ -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-click-highlight-color:rgba(0,0,0,0);}
+	.hladd_form{background-color: #fff;padding: 20px 30px;}
+    .hladd_form .from-row{margin:20px 0 20px 30px; position: relative;}
+	.hladd_form .box_name{font-weight: bold; padding-left: 60px; margin: 30px 20px 20px;}
+    .hladd_form .dom_input label{ position: initial;}
+	.hladd_form .dom_input em.emp{color: #ff0000;}
+    .hladd_form .dom_input input{ width:300px; height: 38px; line-height: 38px; vertical-align: middle;}
+	.hladd_form .dom_input select{vertical-align: middle;}
+	.hladd_form h3{padding-left: 10px; color: #333; font-size: 15px;line-height: 30px; margin:0; font-weight: bold;}
+	.hladd_form label{display:inline-block;line-height: 38px;height: 38px; position: absolute; padding-right: 10px; color: #666;width:120px;text-align: right;}
+	.hladd_form .crowd_nav{display:inline-block;vertical-align: middle; padding-left: 135px;}
+	.hladd_form .crowd_nav span{line-height: 38px; height: 38px; border: 1px solid #ddd;width: 90px; text-align: center; display: inline-block; cursor: pointer;float: left;}
+    .hladd_form .crowd_nav span:first-child{margin-right: -1px}
+    .hladd_form .crowd_nav span:last-child{margin-left: -1px}
+	.hladd_form .crowd_nav span.cur{border: 1px solid #1e90ff; color: #1e90ff; position: relative;}
+	.commit-box{padding:30px 0 ;text-align: center;}
+	.commit-box .bm-btn{width: 200px;height: 42px;line-height: 42px;}
+    .crowd_box{position: initial;width: 720px;border: 1px solid #ddd;padding: 10px;margin-left: 246px; margin-top: 10px; display: none;}
+    .crowd_box ul{padding: 0;margin:0;}
+    .crowd_box ul li{cursor: pointer;line-height: 30px;padding: 0 10px 0 0; height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; width: auto;display: inline-block;}
+	.crowd_box ul li.cur{background: #dfecfc;}
+	.crowd_box ul li:hover{ background: #dfecfc;}
+	.crowd_box ul li.chose{ background: #dfecfc;}
+	.crowd_box li input[type="checkbox"]{display: none;}
+	.crowd_box li em.checkbox{ display: inline-block;margin: -3px 10px 0 0;vertical-align:middle; width: 30px; height: 100%; background: url(/public/img/checkbox.png) 8px 50% no-repeat;}
+	.crowd_box li em.checkbox.childchose{ background: url(/public/img/checkboxchildchose.png) 8px 50% no-repeat;}
+	.crowd_box li em.checkbox.chose{ background: url(/public/img/checkboxchose.png) 8px 50% no-repeat;}
+    .checkbox_box{width: 700px;height: 40px; float: left;margin-left: 20px;padding: 0;border: none; margin: 0 0 0 20px;}
+    .checkbox_box ul li{cursor: pointer;line-height: 38px;height: 38px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: inline-block;border: 1px solid #ddd;margin: 0 8px;width: 90px;text-align: center; padding: 0;}
+    .checkbox_box ul li.active{border-color: #4c94f5; background: #4c94f5; color: #fff;}
+	.crowd_box .box_list{position: initial;display: inline-block; float: left;}
+	.crowd_box .box_list li{width: 142px;text-align: left;}
+	.crowd_area{border: none;padding: 0;}
+    .crowd_area ul li{cursor: pointer;line-height: 30px;padding: 0 10px; height: 30px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+    .header_nav {padding: 10px 0; display: none;}
+
+    .mat_list { margin-left: 120px;margin: 20px 0 20px 135px;}
+    .mat_list .exp_img{width: 260px;}
+    .mat_list .file_input{margin: 0;background: #ececec;}
+    .mat_list .file_box .file_input{ float: left; }
+    .mat_list .box_sm .file_input{ width: 200px; margin-right: 10px;}
+    .mat_list .box_sm .file_input>img{ width: 200px;}
+    .wd200{width: 200px;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span><a href="/v1.2/headline/indexview">< 返回</a></span>
+        </div>
+        <form>
+            <div class="hladd_form mb30">
+                <h3>广告组</h3>
+                <div class="from-row">
+                    <label>推广目的：</label>
+                    <div class="crowd_nav">
+                        <span class="cur" type="0">落在页</span>
+                    </div>
+                    <div class="crowd_box"><ul class="clearfix"></ul></div>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>广告组名称：</label>
+                    <input type="text" value="" class="bm-input" name="campaign_name" placeholder="广告组名称长度为1-100个字符">
+                </div>
+            </div>
+            <div class="hladd_form mb30">
+                <h3>广告计划</h3>
+                <div class="box_name">投放条件</div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>链接地址：</label>
+                    <input type="text" value="" class="bm-input" name="delivery_url" placeholder="请输入链接地址">
+                    <a href="javascript:;" class="bm-btn bm-btn-blue">白名单</a>
+                </div>
+                <div class="from-row" id="region">
+                    <label>地域：</label>
+                    <div class="crowd_nav">
+                    	<span class="cur" type="0">不限</span>
+                    	<span class="" type="1" id="crowd_id" _id='0'>自定义</span>
+                    </div>
+                    <div class="crowd_box crowd_area clearfix" style="display: none">
+    	            	<div id="province_list" class="box_list" style="display: none"></div>
+    			        <div id="city_list" class="box_list" style="display: none"></div>
+    			        <div id="area_list" class="box_list" style="display: none"></div>
+    	            </div>
+                </div>
+                <div class="from-row" id="sex">
+                    <label>性别：</label>
+                    <div class="crowd_nav">
+                        <span class="cur" data="0" type="2">不限</span>
+                        <span class="" data="1" type="2">男</span>
+                        <span class="" data="2" type="2">女</span>
+                    </div>
+                    <input type="hidden" id="sexInput" value="0">
+                </div>
+                <div class="from-row" id="age">
+                    <label>年龄：</label>
+                    <div class="crowd_nav">
+                    	<span class="cur" type="0">不限</span>
+                    	<span class="" type="3">自定义</span>
+                        <div class="crowd_box checkbox_box">
+                            <ul class="clearfix">
+                                <li class="" data="1"> &lt;18 </li>
+                                <li class="" data="2"> 18-23 </li>
+                                <li class="" data="3"> 24-30 </li>
+                                <li class="" data="4"> 31-40 </li>
+                                <li class="" data="5"> 41-49 </li>
+                                <li class="" data="6"> 50+ </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="box_name">投放条件</div>
+                 <div class="from-row dom_input">
+                    <label><em class="emp">*</em>预算：</label>
+                    <select class="bm-select" name="money_type">
+                        <option value="2">日预算</option>
+                        <option value="1">总预算</option>
+                    </select>
+                    <input type="text" value="" class="bm-input" name="money" placeholder="最低预算100">
+                </div>
+                <div class="from-row">
+                    <label>投放时间：</label>
+                    <div class="crowd_nav mod_data">
+                        <span class="cur" data="1" type="0">长期投放</span>
+                        <span class="" data="2" type="4">自定义</span>
+                        <div class="crowd_box checkbox_box">
+                            <input type="text" value="" class="bm-input wd200" id="dataInput" placeholder="选择开始与截止日期">
+                        </div>
+                        <input type="hidden" value="" name="delivery_start_date">
+                        <input type="hidden" value="" name="delivery_end_date">
+                        <input type="hidden" value="1" name="delivery_time_type">
+                    </div>
+                </div>
+                <div class="from-row" >
+                    <label>投放时段：</label>
+                    <div class="crowd_nav mod_time">
+                    	<span class="cur" data="1" type="0">不限</span>
+                    	<span class="" data="2" type="5">自定义</span>
+                        <div class="crowd_box checkbox_box">
+                            <input type="text" value="" class="bm-input wd200" name="" id="timeInput" placeholder="选择开始与截止时间">
+                        </div>
+                    </div>
+                    <input type="hidden" value="00:00:00" name="delivery_start_time">
+                    <input type="hidden" value="23:59:59" name="delivery_end_time">
+                    <input type="hidden" value="1" id="timeType">
+                </div>
+                <div class="from-row" >
+                    <label>出价方式：</label>
+                    <div class="crowd_nav mod_bid">
+                        <span class="cur" data="2" cost="0.2">CPC</span>
+                        <span class="" data="1" cost="4">CPM</span>
+                    </div>
+                    <input type="hidden" name="bid_type" value="2">
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>出价：</label>
+                    <input type="text" value="" class="bm-input" name="bid_money" placeholder="最低出价0.2元"> <!-- cpc 0.2,cpm4 -->
+                </div>
+                <div class="from-row dom_input">
+                    <label>广告计划名称：</label>
+                    <input type="text" value="" class="bm-input" name="delivery_name" placeholder="广告计划名称长度为1-100个字符">
+                </div>
+            </div>
+            <div class="hladd_form mb30">
+                <h3>广告创意</h3>
+                <div class="from-row" >
+                    <label>选择素材：</label>
+                    <div class="crowd_nav mod_mat">
+                        <span class="cur" data="1">小图</span>
+                        <span class="" data="2">大图</span>
+                        <span class="" data="3">组图</span>
+                    </div>
+                    <input type="hidden" name="img_type" value="1">
+                    <div class="mat_list">
+                        <ul>
+                            <li>
+                                <img class="exp_img" src="../../../../../public/img/headline_exp1.png" alt="">
+                                <div class="file_input">
+                                    <img id="previewImg1_1">
+                                    <div class="file_text">
+                                            素材大小：228*150  <br>
+                                            <b>点击上传</b>  <br>
+                                            (JPG / PNG，小于500KB)
+                                    </div>
+                                    <input id="fileImg1_1" type="file" name="file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg1_1')">
+                                </div>
+                            </li>
+                            <li style="display: none">
+                                <img class="exp_img" src="../../../../../public/img/headline_exp2.png" alt="">
+                                <div class="file_input">
+                                    <img id="previewImg2_1">
+                                    <div class="file_text">
+                                            素材大小：1280*720  <br>
+                                            <b>点击上传</b>  <br>
+                                            (JPG / PNG，小于500KB)
+                                    </div>
+                                    <input id="fileImg2_1" type="file" name="file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg2_1')">
+                                </div>
+                            </li>
+                            <li style="display: none">
+                                <img class="exp_img" src="../../../../../public/img/headline_exp3.png" alt="">
+                                <div class="file_box box_sm clearfix">
+                                    <div class="file_input">
+                                        <img id="previewImg3_1">
+                                        <div class="file_text">
+                                                素材大小：228*150  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg3_1" type="file" name="file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg3_1')">
+                                    </div>
+                                    <div class="file_input">
+                                        <img id="previewImg3_2">
+                                        <div class="file_text">
+                                                素材大小：228*150  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg3_2" type="file" name="file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg3_2')">
+                                    </div>
+                                    <div class="file_input">
+                                        <img id="previewImg3_3">
+                                        <div class="file_text">
+                                                素材大小：228*150  <br>
+                                                <b>点击上传</b>  <br>
+                                                (JPG / PNG，小于500KB)
+                                        </div>
+                                        <input id="fileImg3_3" type="file" name="file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this,'previewImg3_3')">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>创意标签：</label>
+                    <input type="text" value="" class="bm-input" name="img_tag" placeholder="广告计划名称长度为1-100个字符">
+                </div>
+            </div>
+             <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-blue" id="commit_btn">提交申请</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/laydate/laydate.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript">
+        //时间范围选择
+        laydate.render({
+            elem: '#dataInput',
+            range: true, //或 range: '~' 来自定义分割字符
+            done: function(value, date, endDate){
+                var dataVal = value.split(' - ');
+                $('input[name="delivery_start_date"]').val(dataVal[0]);
+                $('input[name="delivery_end_date"]').val(dataVal[1]);
+            }
+
+        });
+        laydate.render({
+          elem: '#timeInput',
+          type: 'time',
+          range: true ,//或 range: '~' 来自定义分割字符
+          done: function(value, date, endDate){
+                 var timeVal = value.split(' - ');
+                $('input[name="delivery_start_time"]').val(timeVal[0]);
+                $('input[name="delivery_end_time"]').val(timeVal[1]);
+            }
+        });
+    </script>
+    <script type="text/javascript" src="../../../../../public/js/headline.js"></script>
+	</body>
+</html>

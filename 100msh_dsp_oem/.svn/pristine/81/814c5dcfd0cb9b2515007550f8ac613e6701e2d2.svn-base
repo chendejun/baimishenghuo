@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../public/css/tencent_ad.css">
+</head>
+<style type="text/css">
+    .layer_box{padding: 20px;}
+    .layer_box .layer_btn{text-align: center; margin-top: 26px;}
+    .layer_box .layer_btn button{margin: 0 5px;}
+</style>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form mt20">
+        <div class="flow_steps gdt_create">
+            <ul class="clearfix">
+                <li>广告计划</li>
+                <li>投放人群</li>
+                <li class="current_pre">创意和文案</li>
+                <li class="last current">排期和出价</li>
+            </ul>
+        </div>
+        <div class="step_box">
+            <article class="step4 on" type="4">
+                <div class="from-row">
+                    <label>投放日期：</label>
+                    <input type="text" id="sd_text" class="bm-input Wdate"  onFocus="var ed=$dp.$('ed_text');WdatePicker({onpicked:function(){ed.focus();}, minDate:'%y-%M-%d', dateFmt:'yyyy-MM-dd',startDate:'%y-%M-%d',alwaysUseStartDate:true})" value="" placeholder="开始日期" />
+                    &nbsp;&nbsp;至&nbsp;&nbsp;
+                    <input type="text" id="ed_text" class="bm-input Wdate" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'sd_text\')}',dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'sd_text\',{M:1,d:-1})}'})" value="" placeholder="结束日期" />
+                </div>
+                <div class="from-row">
+                    <label>投放时间：</label>
+                    <div class="">
+                        <label for="allTime" class="c-label"><input type="radio" id="allTime" name="chioceTime" value="0" checked="checked"/>&nbsp;&nbsp;全时段</label>
+                        <label for="customTime" class="c-label"><input type="radio" id="customTime" name="chioceTime" value="1" />&nbsp;&nbsp;自定义时间</label>
+                        <span style="display: none;" id="customTimeBox">
+                            <select id="timeAear1" class="bm-select" style="width: 80px;"></select>
+                            <select id="timeAear2" class="bm-select" style="width: 80px;"></select>
+                        </span>
+                    </div>
+                </div>
+                <div class="from-row">
+                    <label>出价方式：</label>
+                    <select id="way" class="bm-select" minamt="1.5" maxamt="100">
+                        <option value="1" minamt="1.5" maxamt="100">CPM</option>
+                        <option value="2" minamt="0.1" maxamt="100">CPC</option>
+                    </select>
+                </div>
+                <!-- <div class="from-row tip_row">
+                    <label>底价：</label>
+                    <p class="input-tip" id="way_tip" style="line-height: 40px;">CPM每千人次曝光1元，加价0.01元起<p>
+                </div> -->
+                <div class="from-row">
+                    <label>出价：</label>
+                    <input type="text" id="charge" class="bm-input wd300" value="" placeholder="￥" />
+                    <p class="input-tip tip_span gray">出价在1.5~100元之间</p>
+                </div>
+                <div class="from-row">
+                    <label>广告名称：</label>
+                    <input type="text" value="" id="delivery_name" class="bm-input wd300" placeholder="请输入广告名称" />
+                </div>
+                <div class="commit-box">
+                    <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="preStepPage4()">上一步</button>
+                    <button type="button" class="bm-btn bm-btn-blue btn_submit" id="btn_submit">确定投放</button>
+                </div>
+            </article>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../public/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="../../../public/js/layer/layer.js"></script>
+    <script type="text/javascript">
+        var storageInfo1 = sessionStorage.getItem('storageInfo1') ? JSON.parse(sessionStorage.getItem('storageInfo1')) : '',//页面缓存
+            storageInfo2 = sessionStorage.getItem('storageInfo2') ? JSON.parse(sessionStorage.getItem('storageInfo2')) : '',
+            storageInfo3 = sessionStorage.getItem('storageInfo3') ? JSON.parse(sessionStorage.getItem('storageInfo3')) : '',
+            storageInfo4 = sessionStorage.getItem('storageInfo4') ? JSON.parse(sessionStorage.getItem('storageInfo4')) : '',
+            targetingData = sessionStorage.getItem('targetingData') ? JSON.parse(sessionStorage.getItem('targetingData')) : '',//广点通包数据
+            definedName = sessionStorage.getItem('definedName') ? sessionStorage.getItem('definedName') : '',
+            targetingType = storageInfo2.targeting_type,//广点通包类型 1新建 2 选择
+            compAmount = storageInfo1.comp_amount,//账户余额
+            dayMoney = storageInfo1.day_money,//日预算
+            regionLevel = storageInfo2.targeting_level,//城市级别
+            product_type = storageInfo1.product_type, //推广目标4是微信品牌页 6普通链接
+            campaign_isadd = storageInfo1.campaign_isadd; //广告计划 1新建 2选择
+        var domTimeAear1 = $("#timeAear1"), //步骤4
+            domTimeAear2 = $("#timeAear2"),
+            inputChioceTime = $('input[name=chioceTime]'),
+            domSdText = $("#sd_text"),
+            domWay = $("#way"),
+            domEdText = $("#ed_text"),
+            domCharge = $("#charge"),
+            domDelName = $("#delivery_name");
+
+        //初始化
+        function init(){
+            domDelName.val(definedName);
+            reanderTimeAear();//初始化自定义时间
+            if(storageInfo4){ //缓存渲染
+                readPageInfo(storageInfo4);
+            }
+            if(product_type == 4 && regionLevel){
+                var setChargeObj = {'CITY_LEVEL_CORE':['100','300'],'CITY_LEVEL_IMPORTANT':['60','200'],'CITY_LEVEL_OTHER':['30','200']};
+                var setChargeTip = {'CITY_LEVEL_CORE':'核心城市','CITY_LEVEL_IMPORTANT':'重点城市','CITY_LEVEL_OTHER':'其他城市'};
+                domWay.attr('minamt',setChargeObj[regionLevel][0]).attr('maxamt',setChargeObj[regionLevel][1]).change();
+                $('.tip_span').text('选择区域为“'+setChargeTip[regionLevel]+'”，出价在'+setChargeObj[regionLevel][0]+'~'+setChargeObj[regionLevel][1]+'元之间');
+                domWay.find('option[value="2"]').attr('disabled','disabled');
+            }
+        }
+        init();
+        //页面校验
+        function checkDataStept4(type){
+            var way = domWay.val(),
+                costMin = domWay.attr('minamt'),
+                costMax = domWay.attr('maxamt'),
+                charge = domCharge.val(),
+                startTime = domSdText.val(),
+                endTime = domEdText.val(),
+                deliveryName = domDelName.val(),
+                timeSlot = $("input[name=chioceTime]:checked").val(),
+                valdBudge = dayMoney,//日预算
+                userAmount = compAmount,//账户余额
+                diffDateVal = DateDiff(startTime,endTime); //投放日期间隔
+            if(timeSlot ==0){
+                var delivery_start_time ="00:00:00";
+                var delivery_end_time ="24:00:00";
+            }else{
+                var delivery_start_time = domTimeAear1.val()+':00:00';
+                var delivery_end_time = domTimeAear2.val()+':00:00';
+            }
+            if(type==2){
+                if(!startTime || !endTime){
+                    return {"success":false,msg:"请选择投放开始日期或结束日期"};
+                }
+                if(startTime < get_date(0)){
+                    return {"success":false,msg:"投放开始日期不能小于当前日期"};
+                }
+                if(campaign_isadd ==1 && (parseFloat(userAmount) < parseFloat(valdBudge*diffDateVal))){
+                    return {"success":false,msg:"总预算金额不能大于账户余额"};
+                }
+                if(!way){
+                    return {"success":false,msg:"请选择出价方式"};
+                }
+                if(!charge){
+                    return {"success":false,msg:"请输入出价"};
+                }
+                if(!(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/.test(charge))){
+                    return {"success":false,msg:"请输入正确的出价金额！"};
+                }
+                if(parseFloat(charge)< parseFloat(costMin) || parseFloat(charge) > parseFloat(costMax)){
+                    return {"success":false,msg:"请输入在"+costMin+"~"+costMax+"元之间的出价"};
+                }
+                if(!deliveryName){
+                    return {'success':false,msg:'请输入广告名称'}
+                }
+            }
+            return {"success":true,"data":{"delivery_name":deliveryName,"delivery_start_date":startTime,"delivery_end_date":endTime,"delivery_start_time":delivery_start_time,"delivery_end_time":delivery_end_time,"bid_type":way,"bid_money":charge}};
+        }
+        //上一步
+        function preStepPage4(){
+            var res = checkDataStept4(1);
+            sessionStorage.setItem('storageInfo4',JSON.stringify(res.data));
+            location.href='/v1.2/gdtdelivery/create3'
+        }
+        //广点通数据提交
+        function getGdtDataAjax(fn,gdtid,gdtName,comp_id){
+            var postData = {},
+                dataUrl = '',
+                gdtid = gdtid ? gdtid :'',
+                timestamp=Math.floor(+new Date()/1000);
+                gdtName = gdtName ? gdtName :'';
+                comp_id = comp_id ? comp_id :'';
+            if(gdtid){ //dmp包转人群包定向提交
+                var dmpTar ={};
+                if(product_type==4){
+                    dmpTar.geo_location = targetingData.geo_location;
+                }
+                dmpTar.custom_audience =[gdtid];
+                postData = {'targeting':JSON.stringify(dmpTar),'targeting_name':gdtName+timestamp,'type':'3','comp_id':comp_id,'targeting_level':'','city_info':''};
+                dataUrl = '/v1.2/Materiald/addtarget';
+            }else{
+                var target_type = targetingType, //1新建 2搜索
+                    postData = targetingData;
+                if(target_type==1){
+                    dataUrl = '/v1.2/Materiald/addtarget';
+                }else if(target_type==2){
+                    dataUrl = '/v1.2/Materiald/edittarget';
+                }
+            }
+            $.ajax({
+                type: "POST",
+                url: dataUrl,
+                dataType:'json',
+                data : postData,
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.api_code == 0){         //如果查询成功
+                        fn.call(this,rs.targeting_id);
+                    }else{
+                        tipTopShow(rs.msg);
+                        $('#btn_submit').removeAttr('disabled');
+                    }
+              },
+                error:function(rs){
+                    $('#btn_submit').removeAttr('disabled');
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        //dmp包转腾讯包
+        function dmpChangeGdtId(comp_id,id,fn){
+            var postData = {'comp_id':comp_id,'crowd_id':id};
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Materiald/addcustom',
+                dataType:'json',
+                data : postData,
+                success: function(rs){
+                    if(rs.api_code == 0){         //如果查询成功
+                        fn.call(this,rs.data.audience_file_id);
+                    }else{
+                        tipTopShow(rs.msg);
+                        $('#btn_submit').removeAttr('disabled');
+                    }
+              },
+                error:function(rs){
+                    $('#btn_submit').removeAttr('disabled');
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+        //提交数据
+        function pageStorageData(lastdata){
+            var data = $.extend({},storageInfo1, storageInfo2, storageInfo3, lastdata);
+            return data;
+        }
+        //确定投放
+        $('#btn_submit').on('click',function(){
+            var res = checkDataStept4(2);
+            if(!res.success){
+                tipTopShow(res.msg);
+                return;
+            }
+            $('#btn_submit').attr('disabled','disabled');
+            var postData = pageStorageData(res.data);
+            if(postData.crowd_type==2){
+                dmpChangeGdtId(postData.comp_id,postData.audience_file_id,function(gdtid){ //取dmp包转化腾讯包ID
+                    /*postData.audience_file_id = gdtid;
+                    addDelivery(postData);*/
+                    getGdtDataAjax(function(id){
+                        postData.crowd_id = id;
+                        postData.audience_file_id = gdtid;
+                        addDelivery(postData);
+                    },gdtid,postData.audience_name,postData.comp_id);
+                })
+            }else{
+                getGdtDataAjax(function(id){
+                    postData.crowd_id = id;
+                    addDelivery(postData);
+                })
+            }
+
+        })
+        //创建广告
+        function addDelivery(postData){
+            var content = '<div class="layer_box"><p>确认操作，确定后将立即生效并提交到腾讯广告审核。</p><div class="layer_btn"><button type="button" class="bm-btn bm-btn-blue sure_btn">确定投放</button><button type="button" class="bm-btn bm-btn-disable edit_btn">返回修改</button></div></div>';
+            layer.open({
+                type: 1,
+                title:'确认操作',
+                area : ['400px', '180px'],
+                closeBtn:0,
+                shadeClose: false, //点击遮罩关闭
+                content: content
+            });
+            $('.sure_btn').on('click',function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/v1.2/Gdtdelivery/addDelivery",
+                    data : postData,
+                    dataType:'json',
+                    async : false,
+                    beforeSend:function(){
+                        $('#btn_submit').attr('disabled','disabled');
+                        $('.sure_btn').attr('disabled','disabled');
+                    },
+                    success: function(rs){
+                        var data = rs.data;
+                        if(rs.state == 1){
+                            location.href="/v1.2/gdtdelivery/index";
+                            layer.closeAll();
+                        }else{
+                           tipTopShow(rs.msg);
+                        }
+                        $('#btn_submit').removeAttr('disabled');
+                        $('.sure_btn').removeAttr('disabled');
+                    },
+                    error:function(rs){
+                        $('#btn_submit').removeAttr('disabled');
+                        $('.sure_btn').removeAttr('disabled');
+                        tipTopShow("操作失败请重试！");
+                        setTimeout("layer.closeAll()", 100);
+                    }
+                });
+            })
+            $('.edit_btn').on('click',function(){
+                $('#btn_submit').removeAttr('disabled');
+                layer.closeAll();
+            })
+        }
+
+        // 页面详情读取渲染
+        function readPageInfo(data){
+            var costPay = {'1':['1.5','100'],'2':['0.1','100']};
+            domWay.val(data.bid_type).attr('minamt',costPay[data.bid_type][0]).attr('maxamt',costPay[data.bid_type][1]);
+            $('.tip_span').text('出价在'+costPay[data.bid_type][0]+'~'+costPay[data.bid_type][1]+'元之间');
+            domWay.change();
+            domCharge.val(data.bid_money);
+            domSdText.val(data.delivery_start_date);
+            domEdText.val(data.delivery_end_date);
+            domDelName.val(data.delivery_name);
+            var sTimer = data.delivery_start_time,
+                eTimer = data.delivery_end_time,
+                inputChioceTime =$("input[name=chioceTime]");
+            if(sTimer=='00:00:00' && eTimer=='24:00:00'){
+                inputChioceTime.eq(0).attr('checked',true);
+            }else if(sTimer && eTimer){
+                var sTimer = sTimer.split(':')[0]-10<0?'0'+sTimer.split(':')[0]:sTimer.split(':')[0],
+                    eTimer = eTimer.split(':')[0]-10<0?'0'+eTimer.split(':')[0]:eTimer.split(':')[0];
+                inputChioceTime.eq(1).attr('checked',true);
+                $('#customTimeBox').show();
+                domTimeAear1.find("option[title='"+sTimer+"']").attr("selected",true);
+                domTimeAear2.find("option[title='"+eTimer+"']").attr("selected",true);
+            }else{
+                inputChioceTime.eq(0).attr('checked',true);
+            }
+        }
+        //出价方式选择
+        domWay.change(function(){
+            var th = $(this),
+                costMin = th.find("option:selected").attr("minamt");
+                costMax = th.find("option:selected").attr("maxamt");
+            th.attr('minamt',costMin).attr('maxamt',costMax);
+            $('.tip_span').text('出价在'+costMin+'~'+costMax+'元之间');
+        })
+
+        //自定义时间变化
+        domTimeAear1.bind("change",function(){
+            var k = this.value,str = "",v=domTimeAear1.val();
+            for(var i = parseInt(k)+1; i<=24; i++){
+                str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+            }
+            domTimeAear2.html(str);
+            if(k < v){
+                domTimeAear2.val(v);
+            }
+        });
+        domTimeAear2.bind("change",function(){
+            var k = this.value,str = "",v=domTimeAear1.val();
+            for(var i = 0; i<k; i++){
+                str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+            }
+            domTimeAear1.html(str);
+            domTimeAear1.val(v);
+        });
+        //渲染自定义时间
+        function reanderTimeAear(){
+            var str1 = "",str2="";
+            for(var i=0; i<=24; i++){
+                str1 += i !=24 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+                str2 += i !=0 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+            }
+            domTimeAear1.html(str1);
+            domTimeAear2.html(str2);
+        }
+
+        //投放时间段切换
+        inputChioceTime.bind("change",function(){
+            if(this.value == 1){
+                $("#customTimeBox").show();
+            }else{
+                $("#customTimeBox").hide();
+            }
+        });
+
+
+        //间隔天数
+        function  DateDiff(sDate1,  sDate2){    //sDate1和sDate2是2006-12-18格式
+            var aDate,oDate1,oDate2,iDays ;
+            aDate  =  sDate1.split("-");
+            oDate1  =  new  Date(aDate[1]  +  '-'  +  aDate[2]  +  '-'  +  aDate[0]);    //转换为12-18-2006格式
+            aDate  =  sDate2.split("-");
+            oDate2  =  new  Date(aDate[1]  +  '-'  +  aDate[2]  +  '-'  +  aDate[0]);
+            iDays  =  parseInt(Math.abs(oDate1  -  oDate2)  /  1000  /  60  /  60  /24)    //把相差的毫秒数转换为天数
+            return  iDays+1;
+       }
+
+    </script>
+</body>
+</html>

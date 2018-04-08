@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- 搜索热点 -->
+    <meta charset="UTF-8">
+    <title>DMP-客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/echarts.common.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <!-- <script type="text/javascript" src="../../../../../public/js/superslide.2.1.js"></script> -->
+    <style type="text/css">
+        .content {overflow: hidden;}
+        #tip_box {background-color:#FAEBD7;border:1px solid #FFE4C4;color:#FFA500;height:40px;line-height:40px;}
+        #tip_box i {background:url("../../../../../public/img/tip_icon.png") no-repeat top center;width:20px;height:20px;display:inline-block;vertical-align:middle;position:relative;top:12px;left:10px;}
+        #tip_box p {padding-left:15px;height:40px;line-height:40px;font-size:12px;float:left;}
+        #tip_box a {margin-right:10px;}
+        .type_box{padding-top: 30px;}
+        .crowd_table{width: 40%;margin: 1% 4%;}
+        .crowd_table>ul li{float: left;background-color: #f5f5f5}
+        .crowd_table li{height: 40px;line-height: 40px;}
+        .crowd_table li:nth-child(1){width: 15%;}
+        .crowd_table li:nth-child(2){width: 17%;padding-right: 3%;}
+        .crowd_table li:nth-child(3){width: 65%}
+        .crowd_table li .layui-progress-bar{position: initial;background-color:#618cff;}
+        .crowd_table li .layui-progress{position: relative;top: 16px;margin-right:20%;height: 10px;border-radius:0;}
+        .crowd_table li .layui-progress-bar{height: 10px;border-radius:0;}
+        .crowd_table li span{position: absolute;right: -18%;top: -5px;}
+        .crowd_table b{color: #333;font-size: 14px;padding: 10px 0;display: inline-block;}
+        .crowd_table .up::after,.crowd_table .down::after{content: '';display: inline-block;width: 10px;height: 10px;margin-left: 10px;}
+        .crowd_table .up::after{background-image: url('../../../../../public/img/crow_analysis.png');background-position:-107px 0;}
+        .crowd_table .down::after{background-image: url('../../../../../public/img/crow_analysis.png');background-position:-87px 0;}
+        .crowd_table li{text-align: center} 
+        .table_content{max-height: 400px;overflow-y: auto;}
+        .table_content ul{clear: both;overflow:hidden;zoom:1;width: 100%;color: #666}
+        .table_content ul li{float: left;}
+        .crowd_table>ul li:nth-child(1),.table_content ul li:nth-child(1){text-align: center}
+        .table_content ul:nth-child(1) li:nth-child(1) i,.table_content ul:nth-child(2) li:nth-child(1) i,.table_content ul:nth-child(3) li:nth-child(1) i{background-color: #f56c6c;color: #fff;width: 18px;height: 16px;display: inline-block;line-height: 16px;}
+        .hot_box  {width: 40%;margin: 1% 4%; border: none;}
+        .hot_box b {color: #333;font-size: 14px;padding: 10px 0;display: inline-block; padding: 10px;}
+        .slider_box{ border:1px solid #ddd; text-align:left; }
+        .slider_box .hd{ height:45px; line-height:45px; background:#f4f4f4; border-bottom:1px solid #ddd;  position:relative;  overflow: hidden; }
+        .slider_box .hd ul{ float:left;  position:absolute; left:0px; top:0px; height:45px; width:4000px;}
+        .slider_box .hd ul li{ float:left; cursor:pointer;  display: block; height: 45px;line-height: 45px; width: 120px; text-align: center;}
+        .slider_box .hd ul li.on{ height:45px;  background:#fff; border:1px solid #ddd; border-bottom:2px solid #fff;}
+        .slider_box .hd ul li.active{height:45px;  background:#fff; border:1px solid #ddd; border-bottom:2px solid #fff;}
+        .slider_box .tab_title {height:40px; line-height:40px; background:#e2e2e2;  border-bottom:1px solid #ddd;  position:relative;}
+        .slider_box .tab_title ul {width: 100%; float:left;  position:absolute; left:0px; top:0px; height:40px;}
+        .slider_box .tab_title ul li{float:left;cursor:pointer;  display: block;  text-align: center;}
+        .slider_box .tab_title ul li:nth-child(1){width: 20%;}
+        .slider_box .tab_title ul li:nth-child(2){width: 45%}
+        .slider_box .tab_title ul li:nth-child(3){width: 35%}
+        .slider_box .arrow{ position:absolute; right:10px; top:0px;padding-top: 8px;}
+        .slider_box .arrow a{ display:block;  width:10px; height:40px; float:right; margin-top:10px;  overflow:hidden;
+             cursor:pointer; background:url("../../../../../public/img/arrow.png") 0 0 no-repeat; }
+        .slider_box .arrow .next{ background-position:0 -50px;  }
+        .slider_box .arrow .prevStop{ background-position:-60px 0; }
+        .slider_box .arrow .nextStop{ background-position:-60px -50px; }
+        .slider_box .up::after,.crowd_table .down::after{content: '';display: inline-block;width: 10px;height: 10px;margin-left: 10px;}
+        .slider_box .up::after{background-image: url('../../../../../public/img/crow_analysis.png');background-position:-107px 0;}
+        .slider_box .down::after{background-image: url('../../../../../public/img/crow_analysis.png');background-position:-87px 0;}
+        .slider_box li{text-align: center} 
+        .tab_content{height: 400px; border: 1px soild #ddd,width: 4000px;}
+        .main{clear: both;overflow:hidden;zoom:1;width: 100%;color: #666}
+        .main li{float: left; height: 30px; line-height: 30px; width: 100%;}
+        .main li p {float: left; text-align:center;overflow: hidden;text-overflow:ellipsis;height: 30px; line-height: 30px;}
+        .main li:nth-child(1) i, .main li:nth-child(2) i,.main li:nth-child(3) i{background-color: #f56c6c;color: #fff;width: 18px;height: 16px;display: inline-block;line-height: 16px;}
+        .main li p:nth-child(1){width: 20%;}
+        .main li p:nth-child(2){width: 45%;}
+        .main li p:nth-child(3){width: 35%}
+        .main{float: left;display: none;}
+        .main.selected{display: block;}
+        .main img {height: 400px; width: 400px; display: block;margin: 0 auto;}
+        .time_filter .ta_date{width: 198px; height:38px;line-height: 38px;cursor: pointer;text-align: center;border: non; border-radius: 5px}
+        .ulbox {width: 350px;height: 45px;overflow: hidden;position: relative;}
+        .analys_box,.tip_box{display: none;}
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Scenes/index">&lt; 返回人群画像</a>
+            </span>
+        </div>
+        <div id="tip_box">
+            <i class="fl"></i>
+            <p>温馨提示：提交开通后，首次开通到生成数据分析报表需1~2个工作日，不便之处敬请理解。</p>
+            <a class="fr" href="javascript:" id="closeTip">关闭</a>
+        </div>
+        <div class="tab_box clearfix">
+            <div class="menu_box fl ">
+                <a href="/v1.2/Scenes/flowanalysis">客流分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cuspropety">客群属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <!-- <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a> -->
+                <a href="/v1.2/Scenes/cussource">客流来源
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">搜索热点
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/appanalysis">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="/v1.2/Scenes/changeanalysis" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        </div>
+
+        <div class="content">
+            <div class="type_box clearfix ">
+                <!--  <select class="bm-select select_box fl" id="select_box">
+                    <option value="">昨日</option>
+                    <option value="1">近7天</option>
+                    <option value="2">近30天</option>
+                    <option value="3">指定日期</option>
+                </select>
+                <ul class="item_ul fl" id="item_ul">
+                    <li type="1" class="cur">全部</li>
+                    <li type="2">新访客</li>
+                    <li type="3">老访客</li>
+                </ul>
+                <p class="fl">查询搜索热点需跨度3天以上</p> -->
+                <div class="layui-form fl" id="select_box">
+                    <select name="dategroup" lay-filter="dategroup">
+                        <option value="1" selected="">近3天</option>
+                        <option value="2">近7天</option>
+                        <option value="3">近30天</option>
+                        <option value="4">指定日期</option>
+                    </select>
+                </div>
+
+                <div class="time_filter layui-input-block fl " id="time_filter" style="display: none;">
+                    <div class="ta_date" style="margin-left: -100px">
+                        <input type="text" class="layui-input" id="date_day" placeholder=" 至 ">
+                    </div>
+                </div>
+
+                <div class="cus_filter fl">
+                    <ul class="item_ul fl" id="item_ul">
+                        <li type="3" class="cur">全部</li>
+                        <li type="1">新访客</li>
+                        <li type="2">老访客</li>
+                    </ul>
+                    <p class="fl">查询搜索热点分析需跨度3天以上</p>
+                </div>
+            </div>
+
+            <div class="analys_box">
+
+            </div>
+            <!-- 人群地区属性 -->
+            <!--  <div class="hot_box fl">
+               <b>热点话题</b>
+            <div class="slider_box">
+                <div class="hd clearfix">
+                    <span class="arrow"><a class="next"></a><a class="prev"></a></span>
+                    <ul class ="slider_tab">
+                    </ul>
+                </div>
+             <div class="tab_title">
+                 <ul class="clearfix">
+                    <li>排名</li>
+                    <li>关键词</li>
+                    <li>搜索指数</li>
+                </ul>
+             </div>
+            <div class="hot_content "></div>
+
+                </div>
+            </div>
+        </div> -->
+
+
+            <div class="tip_box" style="display: none">
+                <p class="tip_title">本功能为高级版本付费功能</p>
+                <p class="tip_subtitle">点击下方“修改”按钮，进入本场景修改页面,选择开通“高级版”，完成支付后等待开通，预计完成需要1~2个工作日。</p>
+                <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="/v1.2/Scenes/changeanalysis">修改</a>
+            </div>
+        </div>
+</body>
+
+</html>
+<script type="text/javascript">
+    var scene_id, start_date, end_date, customer_type, category_type;
+    scene_id = cookie.get('scenesId'), type = 7, start_date = getBeforeDate(3), end_date = getBeforeDate(1),
+        customer_type = 3;
+    scene_Type = cookie.get('scenesType');
+    //场景类型： 1 普通版 2高级版
+    if (scene_Type == 1) {
+        $('.tip_box').css('display', 'block');
+        $('.anlysis_box').css('display', 'none');
+        $('.type_box').css('display', 'none');
+    } else if (scene_Type == 2 || customer_type == 3) {
+        $('.tip_box').css('display', 'none');
+        $('.analys_box').css('display', 'block');
+        $('.type_box').css('display', 'block');
+    }
+
+    layui.use(['form', 'layer', 'element', 'laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            element = layui.element,
+            laydate = layui.laydate;
+
+        var active = {
+            tabChange: function () {
+                //切换到指定Tab项
+                element.tabChange('demo', '22'); //切换到：用户管理
+            }
+        };
+
+        $("#item_ul li").on("click", function () {
+            $("#item_ul li").removeClass("cur");
+            $(this).addClass("cur");
+            var type = $(this).attr("type");
+            customer_type = type;
+            loadHotData(scene_id, start_date, end_date, customer_type);
+
+        });
+
+        //日期
+        laydate.render({
+            elem: '#date_day',
+            format: 'yyyy-MM-dd',
+            range: true,
+            min: -30,
+            max: -1,
+            done: function (value, date, endDate) {
+                console.log(value); //得到日期生成的值，如：2017-08-18
+                if (value) {
+                    start_date = value.substr(0, 10);
+                    end_date = value.substr(13, 10);
+                    loadHotData(scene_id, start_date, end_date, customer_type);
+                }
+            }
+        });
+
+        //日期选择
+        form.on('select(dategroup)', function (data) {
+            console.log(data.value);
+            var val = data.value;
+            if (val == 1) {
+                //近3天
+                start_date = getBeforeDate(3);
+                end_date = getBeforeDate(1);
+                loadHotData(scene_id, start_date, end_date, customer_type);
+           
+            } else if (val == 2) {
+                //近7天
+                start_date = getBeforeDate(7);
+                end_date = getBeforeDate(1);
+                loadHotData(scene_id, start_date, end_date, customer_type);
+        
+            } else if (val == 3) {
+                //进30天
+                start_date = getBeforeDate(30);
+                end_date = getBeforeDate(1);
+                loadHotData(scene_id, start_date, end_date, customer_type);
+        
+            }
+
+            var display = val == 4 ? 'block' : 'none';
+            $('#time_filter').css('display', display);
+        });
+    })
+
+    var baidu_state = cookie.get('baidu_state');
+    if (baidu_state == 0) {
+        $('#tip_box p').html('您已申请开通，请耐心等待结果，预计在1~2个工作日完成。')
+    }
+
+
+    loadHotData(scene_id, start_date, end_date, customer_type);
+
+    //加载热点数据
+    function loadHotData(scene_id, s_date, e_date, cus_type) {
+        var bValue = ["热点话题", "影视动漫", "热门人物", "书籍文档", "娱乐游戏", "金融理财", "旅游出行", "网络购物", "生活服务"];
+        tipTopShow("查询中...");
+        for (var i = 1; i < 10; i++) {
+            category_type = i * 10;
+            var cate_type = category_type;
+            var className = "content_" + cate_type;
+            $("." + className).html('');
+
+            if (!$('div').hasClass(className)) {
+                createBox(cate_type, bValue[i - 1]);
+            }
+
+            getProperty(scene_id, s_date, e_date, cus_type, cate_type);
+        }
+    }
+
+    function getProperty(scene_id, s_date, e_date, cus_type, cate_type) {
+        $.ajax({
+            type: "GET",
+            url: '/v1.2/scenes/passenger/scene_id/' + scene_id + "/start_date/" + s_date + "/end_date/" +
+                e_date + "/customer_type/" + cus_type + "/category_type/" + cate_type + "/type/11",
+            dataType: 'json',
+            success: function (rs) { 
+                if (rs.code == 10000) { //如果查询成功
+                    var data = rs.data; //返回数据赋值
+                    // console.log(data);
+                    fillRangeData(data, cate_type);
+
+                } else {
+                    tipTopShow(rs.msg);
+
+                }
+            },
+            error: function (rs) {
+                tipTopShow("查询信息失败，请重试..."); //显示提示框
+                console.log(rs);
+            }
+        });
+    }
+
+
+    //填充表格数据
+    function fillRangeData(data, cate_type) {
+
+        var className = ".content_" + cate_type;
+        var tabName = '.slider_tab_' + cate_type;
+        var title = '',
+            ul = '';
+        var isFirst = true;
+        var firstI = true;
+        $(className).html('');
+
+        if (data.length == 0){
+            //数据为空
+            var str = "<img src='../../../../../public/img/no_data.png'>";
+            $(className).append("<ul class='main selected'>" + str + "</ul>");
+
+        }else {
+
+            for (i in data) {
+            if (firstI) {
+                firstI = false;
+                title += "<li class='active'>" + i + "</li>";
+            } else {
+                title += "<li>" + i + "</li>";
+            }
+
+            $(tabName).html(title);
+
+            var str = '';
+            var conArrCount = data[i].length;
+
+            if (conArrCount <= 0) {
+
+                str += "<img src='../../../../../public/img/no_data.png'>";
+
+            } else {
+
+                for (var j = 0; j < conArrCount; j++) {
+                    var obj = data[i][j];
+                    var rank = j + 1;
+                    str += "<li>";
+                    str += "<p>";
+                    str += "<i>" + rank + "</i>";
+                    str += "</p>";
+                    str += "<p>" + obj.query + "</p>";
+                    str += "<p class='up'>" + obj.index + "</p>";
+                    str += "</li>";
+                }
+
+            }
+
+            if (isFirst) {
+                isFirst = false;
+                $(className).append("<ul class='main selected'>" + str + "</ul>");
+            } else {
+
+                $(className).append("<ul class='main'>" + str + "</ul>");
+            }
+
+        }
+
+        //头部tab栏点击事件
+        tabClick(tabName, className);
+        // jQuery(".slider_box").slide({effect:"fold",autoPlay:false,easing:"easeOutCirc",delayTime:200});
+
+        var next = '.next_' + cate_type;
+        var prev = '.prev_' + cate_type;
+        tabMoveClick(next, prev, tabName, className);
+
+        }
+        
+
+    }
+
+    function tabClick(tabName, conName) {
+        var clickTab = tabName + " li";
+        var content = conName + " ul"
+
+        $(clickTab).on('click', function () {
+
+            var $this = $(this);
+            index = $this.index();
+            $this.addClass("active").siblings("li").removeClass("active");
+            $(content).eq(index).addClass("selected").siblings("ul").removeClass("selected");
+        });
+
+    }
+
+
+    //菜单左右点击选择
+    function tabMoveClick(nextName, prevName, tabname, contname) {
+        var target = 0;
+        $(nextName).click(function () {
+            // target -= 120;
+            moveTab(tabname, contname, true, target);
+        });
+
+        $(prevName).click(function () {
+            // target += 120;
+            moveTab(tabname, contname, false, target);
+        });
+    }
+
+
+    var leader = 0;
+
+    function moveTab(tabname, contname, isNext, target) {
+
+        var tabCount = $(tabname).children().length;
+        var maxLeft = tabCount * 120;
+        var index = 0;
+        var curObj = null;
+        for (var i = 0; i < tabCount; i++) {
+            if ($(tabname).children()[i].className == 'active') {
+                current = i;
+                var index = 0;
+                if (isNext) {
+                    index = i + 1;
+                } else {
+                    index = i - 1;
+                }
+
+                //临界值限制
+                if (index < 0) {
+                    index = 0;
+                }
+
+                if (index > tabCount || index == tabCount) {
+                    index = tabCount - 1;
+                }
+                curObj = $(tabname).children()[index];
+                break;
+            }
+        }
+        if (index > 2) {
+            target -= (index - 2) * 120;
+        }
+        target > 0 ? target = 0 : target = target;
+        var str = target + "px";
+        $(tabname).animate({
+            'left': str
+        });
+        curObj.click();
+    }
+
+
+    // //创建大盒子容器
+    // function createBox(cate_type,boxName){
+    //           var str = '';
+    //               str += "<div class='hot_box fl'>";
+    //               str += "<b>" + boxName +  "</b>";
+    //               str += "<div class= 'slider_box'>";
+    //               str +=  "<div class='hd clearfix'>";
+    //               str +=  "<span class='arrow'><a class='next'></a><a class='prev'></a></span>";
+    //               str +=  "<ul class='slider_tab_" + cate_type + "'>";
+    //               str += "</ul>";
+    //               str += "</div>";
+    //               str += "<div class='tab_title'>";
+    //               str += "<ul class='clearfix'>";
+    //               str += "<li>排名</li>";
+    //               str += "<li>关键词</li>";
+    //               str += "<li>搜索指数</li>";
+    //               str += "</ul>";
+    //               str += "</div>";
+    //               str += "<div class= 'tab_content content_" + cate_type + "''></div>";
+    //               str += "</div>";
+    //               str += "</div>";
+    //               str += "</div>";
+    //     $(".content").append(str);
+    // }
+
+    //创建大盒子容器
+    function createBox(cate_type, boxName) {
+        var str = '';
+        str += "<div class='hot_box fl'>";
+        str += "<b>" + boxName + "</b>";
+        str += "<div class= 'slider_box'>";
+        str += "<div class='hd clearfix'>";
+        // str += "<span class='arrow'><a class='next'></a><a class='prev'></a></span>";
+        str += "<span class='arrow'><a class='next next_" + cate_type + "'></a><a class='prev prev_" + cate_type +
+            "''></a></span>";
+        str += "<div class='ulbox'>";
+        // str += "<ul class='tab_content slider_tab_" + cate_type + "'>";
+        str += "<ul id='slider_tab_" + cate_type + "' class='tab_content slider_tab_" + cate_type + "'>";
+        str += "</ul>";
+        str += "</div>";
+        str += "</div>";
+        str += "<div class='tab_title'>";
+        str += "<ul class='clearfix'>";
+        str += "<li>排名</li>";
+        str += "<li>关键词</li>";
+        str += "<li>搜索指数</li>";
+        str += "</ul>";
+        str += "</div>";
+        str += "<div class='tab_content content_" + cate_type + "'></div>";
+        str += "</div>";
+        str += "</div>";
+        str += "</div>";
+        $(".analys_box").append(str);
+    }
+
+    //关闭提示
+    $('#closeTip').on('click', function () {
+        $('#tip_box').toggle();
+    });
+</script>

@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/bhdelivery.css">
+</head>
+<style type="text/css">
+    .customTimeBox .yui-input-inline{width: 80px; display: inline-block;}
+</style>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step5">
+            <div class="from-row">
+                <label>广告名称：</label>
+                <input type="text" class="bm-input layui-input" placeholder="输入广告名称" value="" autocomplete="off">
+            </div>
+            <div class="from-row">
+                <label>投放日期：</label>
+                <input type="text" value="" class="bm-input layui-input mid_ipt" id="ad_startDate"/> <b>至</b>
+                <input type="text" value="" class="bm-input layui-input mid_ipt" id="ad_endDate" />
+                <span class="ml10">节假日安排</span>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="ad_plan" lay-verify="required">
+                        <option value="">不限</option>
+                        <option value="1">排除节假日</option>
+                        <option value="2">只节假日投放</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>投放时间：</label>
+                <div class="ad_format">
+                    <input type="radio" name="ad_time_type" value="1" title="全时段" checked lay-filter="edition">
+                    <input type="radio" name="ad_time_type" value="1" title="自定义时段" lay-filter="edition">
+                </div>
+                <span id="customTimeBox" class="customTimeBox">
+                    <div class="layui-input-inline">
+                        <select id="timeAear1" class="bm-select"></select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select id="timeAear2" class="bm-select"></select>
+                    </div>
+                </span>
+            </div>
+            <div class="from-row">
+                <label>出价方式：</label>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="ad_way" lay-verify="required">
+                        <option value="1">CPM</option>
+                        <option value="2">CPC</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>出价：</label>
+                <input type="text" class="bm-input layui-input" placeholder="出价在0.1~100之间" value="" autocomplete="off">
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(4)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="postData()">确定投放</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/underscore-min.js"></script>
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            var today = get_date(0),
+                domTimeAear1 = $("#timeAear1"),
+                domTimeAear2 = $("#timeAear2");
+
+            $('#ad_startDate').val(today);
+             //日期
+            laydate.render({
+                elem: '#ad_startDate',
+                type: 'date',
+                min: today
+            });
+            //日期
+            laydate.render({
+                elem: '#ad_endDate',
+                type: 'date',
+                min: today
+            });
+            //自定义时间变化
+            domTimeAear1.bind("change",function(){
+                var k = this.value,str = "",v=domTimeAear1.val();
+                for(var i = parseInt(k)+1; i<=24; i++){
+                    str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+                }
+                domTimeAear2.html(str);
+                if(k < v){
+                    domTimeAear2.val(v);
+                }
+                form.render();
+            });
+            domTimeAear2.bind("change",function(){
+                var k = this.value,str = "",v=domTimeAear1.val();
+                for(var i = 0; i<k; i++){
+                    str += '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+                }
+                domTimeAear1.html(str);
+                domTimeAear1.val(v);
+                form.render();
+            });
+            //渲染自定义时间
+            function reanderTimeAear(){
+                var str1 = "",str2="";
+                for(var i=0; i<=24; i++){
+                    str1 += i !=24 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+                    str2 += i !=0 && '<option value="'+ i +'" title="'+(i>9?i:'0'+i)+'">'+ i +' : 00</option>'
+                }
+                domTimeAear1.html(str1);
+                domTimeAear2.html(str2);
+                form.render();
+            }
+            reanderTimeAear();
+        })
+    </script>
+</body>
+</html>

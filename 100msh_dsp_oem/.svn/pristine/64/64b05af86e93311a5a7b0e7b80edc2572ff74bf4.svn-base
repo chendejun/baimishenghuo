@@ -1,0 +1,196 @@
+<style type="text/css">
+    .set_bottom {
+        padding-left: 90px;
+    }
+
+    .set_bottom a {
+        text-align: center;
+        display: inline-block;
+        height: 35px;
+        line-height: 35px;
+        width: 120px;
+        border-radius: 5px;
+        background-color: #f08519;
+        color: #FFF;
+    }
+
+    .set_bottom a:first-child {
+        background-color: #bbbbbb;
+        margin-right: 15px;
+    }
+
+    .code_tip {
+        font-size: 14px;
+        margin-top: 10px;
+        color: #ff5555;
+    }
+
+    .content_box .form .from-spec {
+        height: 38px;
+        margin-top: 20px
+    }
+
+    .content_box .form .from-spec b {
+        font-weight: normal;
+        margin-left: 10px;
+    }
+
+    .content_box .form .from-row {
+        margin-top: 20px
+    }
+
+    .code_btn {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .code_btn.bm-btn:disabled {
+        background: #fff;
+    }
+
+    .regtype_wrap,
+    .account_wrap {
+        width: auto;
+        height: 38px;
+        position: relative;
+        float: left;
+        margin-right: 20px;
+    }
+
+    .regtype_span{position: relative;}
+    .account_span {
+        float: left;
+        width: 18px;
+        height: 18px;
+        position: relative;
+        left: 0;
+        top: 50%;
+        margin-top: -9px;
+        margin-right: 5px;
+    }
+
+    .regtype_span>.regType{opacity: 0;}
+    .account_span>.accountValue {
+        position: absolute;
+        left: 1px;
+        top: 1px;
+        z-index: 2;
+        opacity: 0;
+    }
+
+    .regicon {
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        left: 0;
+        top: 1px;
+        background: url(/public/img/radio_icons.png);
+        background-position: 0 0;
+        background-size: cover;
+        z-index: 1;
+        opacity: 1;
+    }
+
+    .from-row label {
+        width: 84px !important;
+    }
+
+    .regmoneyTip {
+        width: 280px;
+        height: 22px;
+        line-height: 22px;
+        border: 1px solid #faccc6;
+        background: #ffebeb;
+        color: #fac2ba;
+        font-size: 12px;
+        padding: 0 10px;
+        margin: 5px 0 10px 0;
+    }
+
+    .status_tip {
+        text-align: center;
+        line-height: 16px;
+        font-weight: 900;
+    }
+
+    .layui-layer-setwin {
+        display: none;
+    }
+    .regmoneyTip{
+        display: none;
+    }
+    .invoice_type{ height: 56px; }
+    .invoice_type .regtype_wrap{width: 150px;}
+    .invoice_type .regtype_wrap p{ line-height: 20px;color: green; display: none; margin: 0;text-indent: 20px;font-size: 14px;}
+    .invoice_type .regtype_wrap b{font-weight: normal;}
+</style>
+
+<div class="invoice_form">
+    <div class="form" style="width:710px;">
+        <div class="from-spec invoice_type">
+            <span>充值类型</span>
+            <div class="regtype_wrap">
+                <label class="regtype_span">
+                    <i class="regicon"></i>
+                    <input class="regType" type="radio" name="regType" value="1"/>
+                    现金账户充值
+                </label>
+                <p>余额 <b class="cash_num"></b></p>
+            </div>
+            <div class="regtype_wrap">
+                <label class="regtype_span">
+                    <i class="regicon"></i>
+                    <input class="regType" type="radio" name="regType" value="2"/>
+                    赠送账户
+                </label>
+                <p>余额 <b class="give_num"></b></p>
+            </div>
+            <div class="regtype_wrap">
+                <label class="regtype_span">
+                    <i class="regicon"></i>
+                    <input class="regType" type="radio" name="regType" value="0"/>
+                    虚拟账户充值
+                </label>
+                <p>余额 <b class="virtual_num"></b></p>
+            </div>
+        </div>
+        <div class="from-spec">
+            <span>广告主名称</span>
+            <label class="reg_name"></label>
+        </div>
+        <div class="from-spec">
+            <span>广告主账户</span>
+            <div class="account_wrap">
+                <div class="account_span">
+                    <i class="regicon"></i>
+                    <input class="accountValue" type="radio" name="accountValue" value="0" checked="checked" />
+                </div>
+                直充到DSP账户
+            </div>
+            <div class="account_wrap">
+                <div class="account_span">
+                    <i class="regicon"></i>
+                    <input class="accountValue" type="radio" name="accountValue" value="1"/>
+                </div>
+                充入腾讯广告账户
+                <em class="status_tip" id="status_tip" data="腾讯原账户指用户关联的广告账户,只能采用现金充值，且账户内金额只能投放腾讯广告">?</em>
+            </div>
+        </div>
+        <div class="from-row">
+            <label>本次充值金额</label>
+            <input type="text" id="recharge_money" value="" class="bm-input" placeholder="充值金额"> 元
+            <div class="regmoneyTip">请输入正确金额，输入格式为0.01~999999.99</div>
+        </div>
+        <div class="from-row">
+            <label>短信验证码</label>
+            <input type="text" id="recharge_code" value="" class="bm-input" placeholder="验证码" style="width: 150px">
+            <button type="button" id="cod_btn" class="code_btn bm-btn bm-btn-white" onclick="sendCode(this)">获取验证码</button>
+            <div class="code_tip"></div>
+        </div>
+        <input type="hidden" id="input_comp_id" value="">
+        <div class="set_bottom mt20">
+            <a href="javascript:;" class="set_rate_btn" onclick="javascript:layer.closeAll();">取消</a>
+            <a href="javascript:;" class="bm-btn bm-btn-blue" onclick="rechargeFn()">确定</a>
+        </div>
+    </div>
+</div>

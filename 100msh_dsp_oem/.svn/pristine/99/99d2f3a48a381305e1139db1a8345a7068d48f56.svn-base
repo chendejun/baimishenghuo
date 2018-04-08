@@ -1,0 +1,416 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信推广</title>
+    <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <style type="text/css">
+        .putForm{background-color: #FFF;padding:20px;}
+        .putForm .from-row, .putForm .from-spec{padding-left: 170px;margin-top: 20px;min-height: 40px;}
+        .putForm .from-row label,.putForm .from-spec span{font-weight: normal; color: #333333;font-family: "微软雅黑";line-height: 40px;width: 150px;}
+        .putForm .from-spec label{margin-right: 10px;}
+        .putForm .from-row .bm-input{height: 40px;line-height: 40px;}
+        .putForm .from-row .bm-select{height: 40px;line-height: 40px;}
+        .putForm .from-row .bm-input.Wdate{width: 160px;}
+        .wd300{width: 300px;}
+        .commit-box{padding:20px;margin: 10px 0 0 58px;}
+        .commit-box .bm-btn{width:150px;height: 42px;line-height: 42px;display: block; margin-top: 15px;}
+        .p-load-more{width: 100%;display: block;text-align: center;color: #356bb7;height: 45px;line-height: 45px;}
+        .user_list{position: absolute;display: block;height: 200px;width:300px;z-index: 10;background: #fff;overflow-y: scroll;border: 1px solid #dddddd;margin: -1px;}
+        .user_list ul{padding: 10px;}
+        .user_list ul li{line-height: 30px; cursor: pointer;}
+        .pn_info{cursor: pointer;color: #356bb7; margin-left: 10px; display: none;}
+        .cost_amount em{font-size: 14px;}
+        .cost_amount b{font-weight: normal; font-size: 20px;line-height: 40px;display: inline-block;}
+        .tip_box{position: relative;margin-top: 20px; display: none;}
+        .tip_box p {background: #fff8e7;line-height: 30px;height: 30px;color: #666;border: 1px solid #efd6b6;text-align: left;padding-left: 26px;}
+        .tip_box i {width: 16px;height: 16px;position: absolute;left: 0;margin: 7px;background: url(/public/img/tip_icon.png);background-repeat: no-repeat;}
+        .agent_box, .geo_box{display: none;}
+    </style>
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <i class="info_icon icon1"></i>
+        <span><a href="/v1.2/plan/indexpage">微信推广</a> / 涨粉计划 / <a href="javascript:;" class="title_name">新增计划<a></span>
+    </div>
+    <div class="tip_box" id="tip_box">
+        <i></i>
+        <p></p>
+    </div>
+    <form id="putForm" class="form putForm mt20">
+        <div class="from-row">
+            <label>计划名称：</label>
+            <input type="text" class="bm-input wd300" name="plan_name" id="plan_name" placeholder="请输入计划名称" />
+        </div>
+        <div class="from-row">
+            <label>公众号选择：</label>
+            <select class="bm-select" id="pn_select">
+                <option value="">请选择公众号</option>
+            </select>
+            <span class="pn_info" id="pn_info">查看公从号详情</span>
+        </div>
+         <div class="from-spec">
+            <span>结算类型：</span>
+            <label>
+                <input type="radio" name="settlement_type" value="1" checked="checked"/>净增粉丝
+            </label>
+            <label>
+                <input type="radio" name="settlement_type" value="2"/>新增粉丝
+            </label>
+        </div>
+        <div class="from-row">
+            <label>投放日期：</label>
+            <input type="text" id="sd_text" class="bm-input Wdate" value="" placeholder="开始日期" />
+            &nbsp;&nbsp;至&nbsp;&nbsp;
+            <input type="text" id="ed_text" class="bm-input Wdate" value="" placeholder="结束日期" />
+        </div>
+        <div class="agent_box from-row">
+            <label>代理公司：</label>
+            <input type="text" value="" class="bm-input wd300" name="comp_name" id="comp_name" placeholder="请输入代理公司"/>
+        </div>
+        <div class="geo_box from-row">
+            <label>推广区域：</label>
+            <select class="bm-select" name="geo_type" id="geo_sp">
+                <option value="">请选择省份</option>
+            </select>
+            <select class="bm-select" name="geo_type" id="geo_sc">
+                <option value="">请选择城市</option>
+            </select>
+        </div>
+        <div class="from-row">
+            <label>增加粉丝：</label>
+            <input type="text" class="bm-input wd300" name="person_num" id="person_num" placeholder="请输入增加粉丝数" value="" />
+        </div>
+        <div class="from-row">
+            <label>预计消耗：</label>
+            <div class="cost_amount"><em>￥</em><b id="refer_amount">0</b></div>
+        </div>
+        <div class="commit-box">
+            <label><input type="checkbox" checked disabled><span>我已阅读并接受<a href="javascript:;">《用户吸粉协议》</a></span></label>
+            <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="submit()">投放</a>
+        </div>
+    </form>
+    </div>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+        laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+        var plan_id = getUrlParams('plan_id') ? getUrlParams('plan_id') : '', //计划ID
+            is_renew = getUrlParams('is_renew') ? getUrlParams('is_renew') : '0',//1重新投放，否0
+            agentType = getUrlParams('agent_type') ? getUrlParams('agent_type') : null;//1全国代理 2 区域代理
+
+        function init(){//初始化
+            getGeographyInfo(0);//城市信息
+            getAccountAgent();//获取代理商
+            getAllList();//得到账户公众号
+            if(agentType==1){
+                $('.geo_box').show();
+            }else if(agentType ==2){
+                $('.agent_box').show();
+            }
+            if(plan_id){//重新投放
+                getPlanInfo(plan_id);//详情
+            }
+        }
+        init();
+
+        //时间选择
+        $('#sd_text').bind('focus',function(e){
+            var ed=$dp.$('ed_text');
+            WdatePicker({
+                onpicked:function(){ed.focus();},
+                minDate:'%y-%M-%d 00:00:00',
+                dateFmt:'yyyy-MM-dd HH:mm:ss',
+                startDate:'%y-%M-%d 00:00:00',
+                alwaysUseStartDate:true
+            })
+        });
+        $('#ed_text').bind('focus',function(e){
+            WdatePicker({
+                minDate:'#F{$dp.$D(\'sd_text\')}',
+                dateFmt:'yyyy-MM-dd HH:mm:ss',
+                maxDate:'#F{$dp.$D(\'sd_text\',{M:1,d:-1})}'
+            })
+        });
+        //投放
+        function submit(){
+            var plan_name = $('#plan_name').val(),
+                pn_id = $('#pn_select').val(),
+                settlement_type = $('input[name="settlement_type"]:checked').val(),
+                start_date = $('#sd_text').val(),
+                end_date = $('#ed_text').val(),
+                gaining_followers = $('#person_num').val(),
+                agency_company = $('#comp_name').val(),
+                sc_id = $('#geo_sc').val();
+                if(!plan_name){
+                    tipTopShow('请输入计划名称！');
+                    return;
+                }
+                if(!pn_id){
+                    tipTopShow('请选择公众号！');
+                    return;
+                }
+                if(!settlement_type){
+                    tipTopShow('请选择结算类型！');
+                    return;
+                }
+                if(!start_date){
+                    tipTopShow('请选择投放开始时间！');
+                    return;
+                }
+                if(!end_date){
+                    tipTopShow('请选择投放结束时间！');
+                    return;
+                }
+                if(start_date > end_date){
+                    tipTopShow('开始时间不能大于结束时间！');
+                    return;
+                }
+                if(agentType ==2 && !agency_company){
+                    tipTopShow('请输入代理公司！');
+                    return;
+                }
+                if(agentType ==1 && !sc_id){
+                    tipTopShow('请选择推广区域！');
+                    return;
+                }
+                if(!gaining_followers){
+                    tipTopShow('请输入增加粉丝数！');
+                    return;
+                }
+                var postData={'plan_name':plan_name,'pn_id':pn_id,'settlement_type':settlement_type,'start_date':start_date,'end_date':end_date,'gaining_followers':gaining_followers};
+                if(agentType ==1){
+                    postData.sc_id = sc_id;
+                }else if(agentType ==2){
+                    postData.agency_company = agency_company;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/v1.2/Plan/create',
+                    dataType: 'json',
+                    data: postData,
+                    success: function(rs){
+                        if(rs.state == 1){
+                            tipTopShow(rs.msg);
+                            location.href = '/v1.2/plan/indexpage';
+                        }else{
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error: function(){
+                        tipTopShow("查询信息失败，请重试...");
+                    }
+                })
+
+        }
+
+        //参考金额
+        function getReferenceAmount(num,type,sc_id,fn){
+            var scId = sc_id ?('/sc_id/'+sc_id) :'';
+            $.ajax({
+                type: 'GET',
+                url: '/v1.2/Plan/referenceAmountApi/gaining_followers/'+num+'/settlement_type/'+type + scId,
+                dataType: 'json',
+                success: function(rs){
+                    if(rs.state == 1){
+                        fn.call(this,rs.data);
+                    }else{
+                        $('#refer_amount').text('0');
+                    }
+                },
+                error: function(){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+        var getAmountTimer;
+        $('#person_num').on('keyup',function(){
+            var keyVal = $(this).val();
+            if(/[^\d]/.test(keyVal)){//替换非数字字符
+               var v = keyVal.replace(/[^\d]/g,'');
+               $(this).val(v);
+            }
+        }).on('input',function(e){
+            var keyVal = $(this).val();
+            if(/[^\d]/.test(keyVal)){//替换非数字字符
+                return false;
+            }
+            var num = keyVal ? keyVal:'',
+                type = $('input[name="settlement_type"]:checked').val(),
+                sc_id = (agentType == 1) ? $('#geo_sc').val() :'';
+
+            getAmountTimer && clearTimeout(getAmountTimer);
+            getAmountTimer = setTimeout(function(){
+                getReferenceAmount(num,type,sc_id,function(res){
+                    $('#refer_amount').text(res);
+                });
+            })
+        })
+        //得到账户公众号
+        function getAllList(){
+            $.ajax({
+                type: 'GET',
+                url: '/v1.2/Officialaccount/getAllList',
+                dataType: 'json',
+                async : false,
+                success: function(rs){
+                    if(rs.state == 1){
+                        var data = rs.data,str='';
+                        $.each(data, function (k, v) {
+                            str+= '<option value="'+ v.pn_id +'">'+ v.pn_name+'</option>'
+                        })
+                        $('#pn_select').append(str);
+                    }
+                },
+                error: function(){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+        //公众号选择
+        $('#pn_select').change(function(){
+            var id = $(this).val(),
+                val = $("#pn_select option:selected").text();
+            console.log(id,val);
+            if(id){
+                $('#pn_info').show().attr('_id',id).attr('_name',val);
+            }else{
+                $('#pn_info').hide();
+            }
+        })
+
+        //查看公众号详情
+         $('body').on('click', '#pn_info', function (){
+            var id = $(this).attr('_id');
+            if(!id){
+                tipTopShow('请选择公众号！');
+                return false;
+            }
+            $.ajax({
+                type: 'GET',
+                url: '/V1.2/Officialaccount/getInfo/pn_id/'+id,
+                dataType: 'json',
+                success: function(rs){
+                    if(rs.state==1){
+                        tempViewInfo(rs.data);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(rs){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        })
+        function tempViewInfo(vdata){
+            var url = '/V1.2/Officialaccount/viewpage';
+            vcacheDOM = getshopHTML(url);
+            if (vcacheDOM == '') { return; }        //加载失败
+            if (vdata == '') { return; }    //加载失败
+            laytpl(vcacheDOM).render(vdata, function (result) {         //laytpl异步渲染调用
+                layer.open({        //店铺详细信息弹框
+                    type: 1,
+                    closeBtn:2,
+                    title: '绑定公众号',
+                    area: ['750px', ($('body').height() * 0.886) + 'px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        }
+        //获取代理商
+        function getAccountAgent(){
+            $.ajax({
+                type: 'GET',
+                url: '/v1.2/Plan/getAccountAgent',
+                dataType: 'json',
+                success: function(rs){
+                    if(rs.state == 1){
+                        $('#comp_name').val(rs.data.comp_name).attr('disabled','disabled');
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+        //获取详情
+        function getPlanInfo(id){
+            $.ajax({
+                type: 'GET',
+                url: '/v1.2/Plan/getPlanInfo/plan_id/'+id,
+                dataType: 'json',
+                success: function(rs){
+                    if(rs.state == 1){
+                        var data = rs.data;
+                        $('#plan_name').val(data.plan_name);
+                        $('#pn_select').val(data.pn_id);
+                        $('input[value="'+data.settlement_type+'"]:checked');
+                        $('#sd_text').val(data.start_date);
+                        $('#ed_text').val(data.end_date);
+                        $('#person_num').val(data.gaining_followers);
+                        $('#refer_amount').text(data.order_amount)
+                        if(data.agent_type ==1){//全国代理
+                            $('.geo_box').show();
+                            $('#geo_sp').val(data.sc_pid);
+                            $('#geo_sc').val(data.sc_id);
+                        }else if(data.agent_type ==2){
+                            $('agent_box').show();
+                            $('#comp_name').val(data.agent_name);
+                        }
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+
+        //城市信息 0省份
+        function getGeographyInfo(id){
+            $.ajax({
+                type: 'GET',
+                url: '/v1.2/Plan/getGeographyInfo/sc_id/'+ id,
+                dataType: 'json',
+                success: function(rs){
+                    if(rs.state == 1){
+                        var data = rs.data;
+                        var str ='';
+                        $.each(data, function (k, v) {
+                            str += '<option value="' + v.sc_id + '">'+ v.sc_name + '</option>'
+                        })
+                        if(id =='0'){
+                            $('#geo_sp').append(str);
+                        }else if(id!=''){
+                            var html ='<option value="">请选择城市</option>';
+                            $('#geo_sc').html(html+str);
+                        }
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function(){
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            })
+        }
+        $('#geo_sp').change(function(){
+            var scId = $(this).val();
+            if(!scId){
+                getGeographyInfo(scId)
+            }else{
+                $('#geo_sc').html('<option value="">请选择城市</option>');
+            }
+        })
+    </script>
+</body>
+</html>

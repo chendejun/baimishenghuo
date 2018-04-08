@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+素材名称：{{$materialInfo.material_name}}
+素材跳转的url:{{$materialInfo.material_url}}</td>
+素材的类型：{{$materialInfo.adgroup_name}}</td>
+创建人：{{$materialInfo.add_staff}}</td>
+创建时间{{$materialInfo.add_time|date_format:"%Y-%m-%d %H:%M:%S"}}
+素材图片：
+{{foreach from=$materialSizeInfo  key=key item=val}}
+图片url:{{$val.img_url}}素材规格：{{$val.ad_size_name}}
+{{/foreach}}
+
+</body>
+</html>

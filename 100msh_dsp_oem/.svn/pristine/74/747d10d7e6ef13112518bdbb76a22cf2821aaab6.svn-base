@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/css/flow.css">
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <style>
+        .tab_box {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .tip_box {
+            overflow: hidden;
+        }
+
+        .tip_btn {
+            margin-top: 5px;
+        }
+
+        .senior,
+        .ordinary,.examine {
+            width: 100%;
+            overflow: hidden;
+            display: none;
+        }
+        .tip_box .tip_title {
+            height: auto;
+            line-height: 25px;
+            padding-top: 16px;
+        }
+
+        .tip_box .tip_title:nth-of-type(1) {
+            margin-top: 80px;
+        }
+
+        .senior {
+            margin-top: 80px;
+        }
+
+        .senior>span {
+            color: #fff;
+        }
+
+        #tip_box {
+            background-color: #FAEBD7;
+            border: 1px solid #FFE4C4;
+            color: #FFA500;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        #tip_box i {
+            background: url("../../../../../public/img/tip_icon.png") no-repeat top center;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            top: 12px;
+            left: 10px;
+        }
+
+        #tip_box p {
+            padding-left: 15px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 12px;
+            float: left;
+        }
+
+        #tip_box a {
+            margin-right: 10px;
+        }
+        .examine .tip_title{
+            margin-top: 180px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Scenes/index">&lt; 返回人群画像</a>
+            </span>
+        </div>
+        <!-- <div class="title_box">
+            <span>百米DMP / 客流人群分析</span>
+        </div> -->
+        <!-- <div id="tip_box">
+            <i class="fl"></i>
+            <p>温馨提示：提交开通后，首次开通到生成数据分析报表需1~2个工作日，不便之处敬请理解。</p>
+            <a class="fr" href="javascript:" id="closeTip">关闭</a>
+        </div> -->
+        <div class="tab_box ">
+            <div class="menu_box fl ">
+                <a href="/v1.2/Scenes/flowanalysis">客流分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cuspropety">客群属性
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cusprefrence">消费偏好
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/tradeanalysis">商圈分析
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/cussource">客流来源
+                    <p></p>
+                </a>
+                <a href="/v1.2/Scenes/hotsearch">搜索热点
+                    <p></p>
+                </a>
+                <a href="javascript:;" class="cur">常用APP分析
+                    <p></p>
+                </a>
+                <div class="menu_bottom"></div>
+            </div>
+            <a href="createanalysis" class="btn_link bm-btn bm-btn-blue fr">修改场景</a>
+        </div>
+
+        <div class="tip_box">
+            <div class="senior">
+                <p class="tip_title">您的高级版本已申请开通，请耐心等待结果，预计在1~2个工作日完成。</p>
+                <p class="tip_title">本功能需单独开通，￥1000/年</p>
+                <a class="btn_link bm-btn bm-btn-blue fl tip_btn" href="createanalysis">我要开通</a>
+            </div>
+            <div class="ordinary">
+                <p class="tip_title">本功能需先开通高级版本后再行开通，费用：
+                    <span>￥1000/年。</span>
+                </p>
+                <p class="tip_title">点击右上角“修改”按钮，进入本场景修改页面，选择开通“高级版”，完成支付后
+                    <br/>等待开通高级版本，预计完成需要1~2个工作日。</p>
+            </div>
+            <div class="examine">
+                <p class="tip_title">本功能需单独开通，￥1000/年
+                    <span>￥1000/年。</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../../../../../public/js/common.js"></script>
+<script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+<script type="text/javascript" src="../../../../../public/js/layer/layer.js"></script>
+<script>
+    var Id = cookie.get('scenesId'), //场景ID
+        scenesType = cookie.get('scenesType');  //场景类型  1普通版，2高级版
+        scenesType=2
+    if (scenesType == 2) {    //高级版
+        $('.senior').show();
+    } else if(scenesType == 1) {     //普通版
+        $('.ordinary').show();
+    }else{
+        $('.examine').show();
+        var baidu_state = cookie.get('baidu_state');
+        console.log(baidu_state)
+        if (baidu_state == 0) {
+            $('.senior').show();
+        }else{
+            $('.examine').show();
+        }
+    }
+    // var baidu_state = cookie.get('baidu_state');
+    // if (baidu_state == 0) {
+    //     $('#tip_box p').html('您已申请开通，请耐心等待结果，预计在1~2个工作日完成。')
+    // }
+
+
+    function PayAction() {
+        $.ajax({
+            type: "POST",
+            url: '/v1.2/Scenes/checkAmountSufficientApi/scene_id/' + Id + '/scene_type/' + 3,
+            dataType: 'json',
+            success: function (res) {
+                if (res.state == 1) { //验证成功
+                    layer.open({
+                        type: 1,
+                        title: '支付确认',
+                        content: '<div style="padding: 20px;color:#333;font-size:14px;">本次费用将从服务商账户中扣除支付。您的余额可支付本次付款。<p style="text-align:center;margin:20px;">请输入服务商管理员收到的确认短信验证码</p><div style="margin: 0 auto;width: 220px;"><input type="text" id="msg" style="width:90px;height:36px;text-align: center;"><input type="button" style="width:100px;height:42px;background-color:#1E9FFF;border:none;color:#fff;margin-left:20px;" id="sendMsg" value="获取验证" onclick="sendMsg()"></div></div>',
+                        btn: '确定支付',
+                        btnAlign: 'c',
+                        shade: 0.6,
+                        yes: function () {
+                            var code = $.trim($('#msg').val());
+                            if (!code) {
+                                layui.layer.msg("请输入验证码");
+                                return false;
+                            }
+                            upgradeToAppFn(code);
+                        }
+                    });
+                } else if (res.state == 0) {  //验证失败
+                    tipTopShow("验证金额失败，请重试...");
+                    return;
+                } else if (res.state == -1) {   //金额不足
+                    layer.open({
+                        type: 1,
+                        title: '支付确认',
+                        content: '<div style="padding: 20px 20px 0;color:#333;font-size:14px;">本次费用将从服务商账户中扣除支付。你的余额不足。</div>',
+                        btn: '确定',
+                        btnAlign: 'c',
+                        shade: 0.6,
+                        yes: function () {
+                            location.href = '/v1.2/account/index';
+                        }
+                    });
+                }
+            },
+            error: function (err) {
+                tipTopShow("验证金额失败，请重试...");
+            }
+        });
+    }
+    //升级App分析版本
+    function upgradeToAppFn(code) {
+        $.ajax({
+            type: "POST",
+            url: '/v1.2/Scenes/upgradeToApp',
+            dataType: 'json',
+            data: {
+                'scene_id': Id,
+                'code': code
+            },
+            success: function (res) {
+               // console.log(res)
+                if (res.state == 1) {
+                    tipTopShow(res.msg)
+                    setTimeout(() => {
+                        location.href = '/v1.2/Scenes/index';
+                    }, 1500); 
+                } else {
+                    tipTopShow(rs.msg);
+                }
+            },
+            error: function (err) {
+                tipTopShow("查询信息失败，请重试...");
+            }
+        });
+    }
+
+
+
+    //发送短信
+    function sendMsg() {
+        $.ajax({
+            type: "POST",
+            url: '/v1.2/scenes/sendShortMessage',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res)
+                if (res.state == 1) {
+                    tipTopShow('验证码发送成功');
+                    settime();
+                    //发送验证码倒计时  
+                    var countdown = 90;
+                    $('#sendMsg').val("重新发送(" + countdown + ")");
+                    function settime() {
+                        if (countdown == 0) {
+                            $('#sendMsg').removeAttr('disabled');
+                            $('#sendMsg').css('background-color', '#1E9FFF');
+                            $('#sendMsg').val("获取验证码");
+                            countdown = 90;
+                            return;
+                        } else {
+                            $('#sendMsg').attr('disabled', 'disabled');
+                            $('#sendMsg').css('background-color', '#bbb');
+                            $('#sendMsg').val("重新发送(" + countdown + ")");
+                            countdown--;
+                        }
+                        setTimeout(function () {
+                            settime()
+                        }, 1000)
+                    }
+                } else {
+                    tipTopShow(rs.msg);
+                }
+            },
+            error: function (err) {
+                tipTopShow("验证码发送失败");
+            }
+        });
+    }
+
+    //关闭提示
+    $('#closeTip').on('click', function () {
+        $('#tip_box').toggle();
+    });
+
+</script>
+
+</html>

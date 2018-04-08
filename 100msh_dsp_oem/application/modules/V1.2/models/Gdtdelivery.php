@@ -1,0 +1,363 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/12/1
+ * Time: 15:53
+ */
+Class GdtdeliveryController extends  BasicController{
+
+
+    //获取计划列表
+    public function indexAction()
+    {
+        $this->config = Yaf_Registry::get('config');
+        $page = Helper::clean($this->getRequest()->getParam('page', ''));
+        $limit = Helper::clean($this->getRequest()->getParam('limit', ''));
+        $name = Helper::clean($this->getRequest()->getParam('name', ''));
+        $status = Helper::clean($this->getRequest()->getParam('status', ''));
+        $date = Helper::clean($this->getRequest()->getParam('date', ''));
+        $comp_id = Helper::clean($this->getRequest()->getParam('comp_id', ''));
+        $platform_id = Helper::clean($this->getRequest()->getParam('platform_id', ''));
+        $comp_pid = $this->uinfo['comp_id'];
+      //  $comp_pid = 0;
+        $access_token = $this->getTokenAction();
+        $url = $this->config['dsp']['url'] . "delivery/getList?access_token=" . $access_token . "&page=$page&limit=$limit&name=$name&platform_id=$platform_id&comp_pid=$comp_pid&comp_id=$comp_id";
+        if($status!=''){
+            $url = $url."&status=$status";
+        }
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res, true);
+        if($page>0){
+            if ($api_res['api_code'] == 0) {
+                Helper::outJson(array('state' => 1, 'msg' => '', 'data' => $api_res['data']));
+            } else {
+                Helper::outJson(array('state' => 2, 'msg' => '请求失败'));
+            }
+        }
+
+
+
+    }
+    //获取广告主列表
+    public function getCompListAction(){
+        $this->config = Yaf_Registry::get('config');
+        $name = Helper::clean($this->getRequest()->getParam('name' , ''));
+        $comp_pid = $this->uinfo['comp_id'];
+        $access_token = $this->getTokenAction();
+        $url = $this->config['dsp']['url']."delivery/getCompList?access_token=$access_token&comp_pid=$comp_pid&name=$name";
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>'请求失败'));
+        }
+
+    }
+    //添加投放
+    public function addDeliveryAction(){
+        $this->config = Yaf_Registry::get('config');
+        $access_token = $this->getTokenAction();
+        $data['campaign_isadd'] = Helper::clean($this->getRequest()->getPost('campaign_isadd'));
+        if( $data['campaign_isadd']==1){
+            $data['campaign_name'] = Helper::clean($this->getRequest()->getPost('campaign_name'));
+            $data['product_type'] = Helper::clean($this->getRequest()->getPost('product_type'));
+            if( $data['product_type']==1||$data['product_type']==2|| $data['product_type']==3||$data['product_type']==6){
+                $data['campaign_type'] =1;
+            }else{
+                $data['campaign_type'] =3;
+            }
+            $data['campaign_more'] = Helper::clean($this->getRequest()->getPost('campaign_more'));
+            if(empty($data['campaign_name'])||empty($data['campaign_type'])||empty($data['product_type'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '推广计划名称,推广计划类型，商品类型,是否加速投放都不能为空！'));
+            }
+
+        } elseif ($data['campaign_isadd']==2){
+            $data['campaign_id'] = Helper::clean($this->getRequest()->getPost('campaign_id'));
+            if(empty($data['campaign_id'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '请选择推广计划'));
+            }
+        }
+        $data['crowd_type'] =  Helper::clean($this->getRequest()->getPost('crowd_type'));
+       // $data['crowd_info'] =  Helper::clean($this->getRequest()->getPost('crowd_info'));
+        $data['crowd_id'] =  Helper::clean($this->getRequest()->getPost('crowd_id'));
+        if($data['crowd_type']==5){
+            if(empty($data['crowd_id'])){
+                    Helper::outJson(array('state'=>0 , 'msg' => '请选择腾讯定向包'));
+            }
+        }
+        $data['delivery_name'] = Helper::clean($this->getRequest()->getPost('delivery_name'));
+        $data['material_id'] = Helper::clean($this->getRequest()->getPost('material_id'));
+        $data['jump_url'] = Helper::clean($this->getRequest()->getPost('jump_url'));
+        $data['ad_pos_id'] = Helper::clean($this->getRequest()->getPost('ad_pos_id'));
+        $data['delivery_desc'] = Helper::clean($this->getRequest()->getPost('delivery_desc'));
+        $data['bid_type'] = Helper::clean($this->getRequest()->getPost('bid_type'));
+        //$data['goal_type'] = Helper::clean($this->getRequest()->getPost('goal_type'));
+        $data['bid_money'] = Helper::clean($this->getRequest()->getPost('bid_money'));
+        $data['day_money'] = Helper::clean($this->getRequest()->getPost('day_money'));
+        $data['delivery_start_date'] = Helper::clean($this->getRequest()->getPost('delivery_start_date'));
+        $data['delivery_end_date'] = Helper::clean($this->getRequest()->getPost('delivery_end_date'));
+        $data['delivery_start_time'] = Helper::clean($this->getRequest()->getPost('delivery_start_time'));
+        $data['delivery_end_time'] = Helper::clean($this->getRequest()->getPost('delivery_end_time'));
+        $data['audience_file_id'] = Helper::clean($this->getRequest()->getPost('audience_file_id'));//文件id
+        $data['link_name_type'] = Helper::clean($this->getRequest()->getPost('link_name_type'));//落地页url
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));
+        $data['comp_pid'] = $this->uinfo['comp_id'];
+        $data['staff_id'] = $this->uinfo['staff_id'];
+        $data['add_time'] = time();
+        $data['platform_id'] = 2;
+        $data['delivery_type']=0;
+        $data['access_token'] = $access_token;
+
+        if(empty($data['material_id'])){
+            Helper::outJson(array('state'=>0 , 'msg' => '请选择素材'));
+        }
+        if(empty($data['comp_id'])){
+            Helper::outJson(array('state'=>0 , 'msg' => '广告主id不能为空'));
+        }
+        if( $data['day_money']<150||  $data['day_money']>4000000){
+            Helper::outJson(array('state'=>0 , 'msg' => '日预算应该在150~4000000之间'));
+        }
+        $url = $this->config['dsp']['url']."delivery/addDelivery";
+        $api_res = DoNetwork::makeRequest($url,'POST',$data);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0&&!empty($api_res)){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>$api_res));
+        }
+
+
+
+    }
+	/**
+	 * skylon
+	 * 获取推广计划下的投放列表
+	 * Enter description here ...
+	 */
+	public function  getgdtAdListAction(){
+        $access_token = $this->getTokenAction();
+        $campaign_id = Helper::clean($this->getRequest()->getParam('campaign_id'));//推广计划ID
+        $camp_status = Helper::clean($this->getRequest()->getParam('camp_status'));//推广计划状态
+        $url = $this->config['dsp']['url']."stat/GetgdtAdList?access_token=$access_token&campaign_id=$campaign_id&camp_status=$camp_status";
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>'请求失败'));
+        }
+
+    }
+	/**
+	 * skylon
+	 * 获取广告投放统计信息
+	 * Enter description here ...
+	 */
+	public function  getAdStatAction(){
+        $access_token = $this->getTokenAction();
+        $delivery_id =  Helper::clean($this->getRequest()->getParam('delivery_id'));//投放ID
+        $start_date =  Helper::clean($this->getRequest()->getParam('start_date'));//查询开始时间
+        $end_date =  Helper::clean($this->getRequest()->getParam('end_date'));//查询结束时间
+        $url = $this->config['dsp']['url']."stat/GetAdStat?access_token=$access_token&delivery_id=$delivery_id&start_date=$start_date&end_date=$end_date";
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>'请求失败'));
+        }
+
+    }
+    
+	/**
+     * skylon
+     * 获取广投放和统计消耗信息
+     */
+    public function  deliveryStatInfoAction(){
+        $this->config = Yaf_Registry::get('config');
+        $access_token = $this->getTokenAction();
+        $delivery_id =  Helper::clean($this->getRequest()->getParam('delivery_id'));
+        $url = $this->config['dsp']['url']."delivery/getDeliveryStatInfo?access_token=$access_token&delivery_id=$delivery_id";
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>'请求失败'));
+        }
+
+    }
+    /**
+     * 
+     * 获取广投放详细信息
+     */
+    public function  deliveryInfoAction(){
+        $this->config = Yaf_Registry::get('config');
+        $access_token = $this->getTokenAction();
+        $delivery_id =  Helper::clean($this->getRequest()->getParam('delivery_id'));
+        $url = $this->config['dsp']['url']."delivery/getDeliveryInfo?access_token=$access_token&delivery_id=$delivery_id";
+        $api_res = DoNetwork::makeRequest($url);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>'请求失败'));
+        }
+
+    }
+    //修改广告投放
+    public function  updateDeliveryAction(){
+        $this->config = Yaf_Registry::get('config');
+        $access_token = $this->getTokenAction();
+        $data['access_token'] = $access_token;
+        $data['delivery_id'] = Helper::clean($this->getRequest()->getPost('delivery_id'));
+        $data['delivery_name'] = Helper::clean($this->getRequest()->getPost('delivery_name'));
+        $data['campaign_isadd'] = Helper::clean($this->getRequest()->getPost('campaign_isadd'));
+        if( $data['campaign_isadd']==1){
+            $data['campaign_name'] = Helper::clean($this->getRequest()->getPost('campaign_name'));
+            $data['product_type'] = Helper::clean($this->getRequest()->getPost('product_type'));
+            if( $data['product_type']==1||$data['product_type']==2|| $data['product_type']==3||$data['product_type']==6){
+                $data['campain_type'] =1;
+            }
+            $data['product_type'] = Helper::clean($this->getRequest()->getPost('product_type'));
+            $data['campaign_more'] = Helper::clean($this->getRequest()->getPost('campaign_more'));
+            if(empty($data['campaign_name'])||empty($data['campaign_type'])||empty($data['product_type'])||empty($data['campaign_more'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '推广计划名称,推广计划类型，商品类型,是否加速投放都不能为空！'));
+            }
+
+        } elseif ($data['campaign_isadd']==2){
+            $data['campaign_id'] = Helper::clean($this->getRequest()->getPost('campaign_id'));
+            if(empty($data['campaign_id'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '请选择推广计划'));
+            }
+        }
+        if( empty($data['comp_id'])){
+            Helper::outJson(array('state'=>0 , 'msg' => '广告主id不能为空'));
+        }
+        $data['crowd_type'] =  Helper::clean($this->getRequest()->getPost('crowd_type'));
+       // $data['crowd_info'] =  Helper::clean($this->getRequest()->getPost('crowd_info'));
+        $data['crowd_id'] =  Helper::clean($this->getRequest()->getPost('crowd_id'));
+        if($data['crowd_type']==5){
+            if(empty($data['crowd_id'])){
+                Helper::outJson(array('state'=>0 , 'msg' => '请选择腾讯定向包'));
+            }
+        }
+        $data['material_id'] = Helper::clean($this->getRequest()->getPost('material_id'));
+        $data['jump_url'] = Helper::clean($this->getRequest()->getPost('jump_url'));
+        $data['ad_pos_id'] = Helper::clean($this->getRequest()->getPost('ad_pos_id'));
+        $data['delivery_desc'] = Helper::clean($this->getRequest()->getPost('delivery_desc'));
+        $data['bid_type'] = Helper::clean($this->getRequest()->getPost('bid_type'));
+        $data['bid_money'] = Helper::clean($this->getRequest()->getPost('bid_money'));
+        $data['day_money'] = Helper::clean($this->getRequest()->getPost('day_money'));
+        $data['delivery_start_date'] = Helper::clean($this->getRequest()->getPost('delivery_start_date'));
+        $data['delivery_end_date'] = Helper::clean($this->getRequest()->getPost('delivery_end_date'));
+        $data['delivery_start_time'] = Helper::clean($this->getRequest()->getPost('delivery_start_time'));
+        $data['delivery_end_time'] = Helper::clean($this->getRequest()->getPost('delivery_end_time'));
+        $data['audience_file_id'] = Helper::clean($this->getRequest()->getPost('audience_file_id'));//文件id
+        $data['link_name_type'] = Helper::clean($this->getRequest()->getPost('link_name_type'));//落地页url
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));
+        $data['platform_id'] = 2;
+        $data['delivery_type']=0;
+        if(empty($data['material_id'])){
+            Helper::outJson(array('state'=>0 , 'msg' => '请选择素材'));
+        }
+        if(empty($data['comp_id'])){
+            Helper::outJson(array('state'=>0 , 'msg' => '广告主id不能为空'));
+        }
+        if( $data['day_money']<150||  $data['day_money']>4000000){
+            Helper::outJson(array('state'=>0 , 'msg' => '日预算应该在150~4000000之间'));
+        }
+
+        $url = $this->config['dsp']['url']."delivery/updateDelivery";
+        $api_res = DoNetwork::makeRequest($url,'POST',$data);
+        $api_res = json_decode($api_res,true);
+
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>$api_res));
+        }
+
+
+    }
+    public function updateCampaignAction(){
+     $this->config = Yaf_Registry::get('config');
+     $access_token = $this->getTokenAction();
+     $data['update_type'] = Helper::clean($this->getRequest()->getPost('update_type'));
+     $data['update_data'] = Helper::clean($this->getRequest()->getPost('update_data'));
+     $data['campaign_id'] = Helper::clean($this->getRequest()->getPost('campaign_id'));
+     $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));
+     $data['staff_id'] = $this->uinfo['staff_id'];
+     $data['access_token'] = $access_token;
+     $url = $this->config['dsp']['url']."delivery/updateCampaign";
+     $api_res = DoNetwork::makeRequest($url,'POST',$data);
+     $api_res = json_decode($api_res,true);
+
+     if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>$api_res['error']));
+        }
+
+    }
+    public function updateDeliveyInfoAction(){
+        $this->config = Yaf_Registry::get('config');
+        $access_token = $this->getTokenAction();
+        $data['update_type'] = Helper::clean($this->getRequest()->getPost('update_type'));
+        $data['update_data'] =  ($_POST['update_data']);
+        $data['delivery_id'] = Helper::clean($this->getRequest()->getPost('delivery_id'));
+        $data['comp_id'] = Helper::clean($this->getRequest()->getPost('comp_id'));
+        $data['staff_id'] = $this->uinfo['staff_id'];
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."delivery/updateDeliveyInfo";
+       $data = http_build_query($data);
+        $api_res = DoNetwork::makeRequest($url,'POST',$data);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>$api_res));
+        }
+    }
+    public function updateDeliveryStatusAction(){
+        $this->config = Yaf_Registry::get('config');
+        $access_token = $this->getTokenAction();
+        $data['status'] = Helper::clean($this->getRequest()->getPost('status'));
+        $data['delivery_id'] = Helper::clean($this->getRequest()->getPost('delivery_id'));
+        $data['comp_id'] = $this->uinfo['comp_id'];
+        $data['staff_id'] = $this->uinfo['staff_id'];
+        $data['access_token'] = $access_token;
+        $url = $this->config['dsp']['url']."delivery/updateDeliveryStatus";
+        $api_res = DoNetwork::makeRequest($url,'POST',$data);
+        $api_res = json_decode($api_res,true);
+        if($api_res['api_code']==0&&!empty($api_res)){
+            Helper::outJson(array('state'=>1,'msg'=>'','data'=>$api_res['data']));
+        }else {
+            Helper::outJson(array('state'=>2,'msg'=>$api_res));
+        }
+    }
+
+    //新建
+    public function  createAction(){}
+    //新建
+    public function  create1Action(){}
+    //新建
+    public function   create2Action(){}
+    //新建
+    public function   create3Action(){}
+    //新建
+    public function   create4Action(){}
+    //获取token
+    public function getTokenAction(){
+        $this->config = Yaf_Registry::get('config');
+        $token_url = $this->config['dsp']['token_url'];//token的url
+        $result =  json_decode(file_get_contents($token_url),true);
+        $access_token = $result['data']['access_token'];
+        return $access_token;
+
+    }
+
+
+}

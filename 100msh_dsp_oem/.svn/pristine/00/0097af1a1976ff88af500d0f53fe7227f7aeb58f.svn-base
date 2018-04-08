@@ -1,0 +1,5 @@
+服务商名称：{{$data.comp_name}}<br/>
+Ⅰ类账户：{{$data.am_1}}<br/>
+Ⅱ类账户：{{$data.am_2}}<br/>
+人群分析次数：{{$data.rq_count}}<br/>
+APP次数：{{$data.app_count}}<br/>

@@ -1,0 +1,89 @@
+<?php
+/**
+ * restful 核心认证类 
+ * @author :wzw
+ **/
+class Notice extends  Model{
+
+
+    /*
+     * 获取所有通知
+     * @author cdj
+     *
+     */
+    public function getnoticeList(){
+
+        $data = $this->db->dsp->query("SELECT *   FROM `dsp_sys_notice` ");
+        return $data;
+
+
+    }
+    /*
+     * 获取员工
+     */
+    public function  getUser($comp_id){
+        $data = $this->db->dsp->query("SELECT  *    FROM `dsp_staff_rel`  WHERE comp_id = ".$comp_id);
+        return $data;
+    }
+    /*
+     * 获取代理商
+     */
+    public function getComplists(){
+        $data = $this->db->dsp->query("SELECT  comp_id    FROM `dsp_company`  WHERE comp_type = 2");
+        return $data;
+    }
+
+    /*
+     * 添加通知
+     */
+     public function  add($data){
+         $notic_id= $this->db->dsp->table( 'dsp_sys_notice')->data ( $data )->insert ();
+         return $notic_id;
+     }
+    /*
+    * 添加人群
+     * 通知
+    */
+    public function  addRead($data){
+        $notic_id= $this->db->dsp->table( 'dsp_sys_notice_readstate')->data ( $data )->insert ();
+        return $notic_id;
+    }
+    /*
+     * 用户的未读通知
+     */
+    public function  getUserNotice($user_id){
+
+        $data = $this->db->dsp->query("SELECT  dsp_sys_notice.*,dsp_sys_notice_readstate.rid,dsp_sys_notice_readstate.read_status   FROM `dsp_sys_notice_readstate` 
+                                    LEFT JOIN dsp_sys_notice ON  dsp_sys_notice_readstate.notice_id = dsp_sys_notice.notice_id   WHERE   dsp_sys_notice_readstate.user_id=".$user_id);
+        return $data;
+    }
+    /*
+     * 设置已读
+     */
+    public  function read($par,$data){
+        $result=  $this->db->dsp->table('dsp_sys_notice_readstate')->where($par)->data($data)->update();
+        return $result;
+    }
+    /*
+     * 获取网站风格
+     */
+    public function getCompanySite($comp_pid){
+
+        $result=  $this->db->dsp->query("SELECT  *    FROM `dsp_company_site`  WHERE comp_pid = ".$comp_pid);
+        return $result;
+    }
+    /*
+     * 添加网站风格
+     */
+    public function addSite($data){
+        $notic_id= $this->db->dsp->table( 'dsp_company_site')->data ( $data )->insert ();
+        return $notic_id;
+    }
+    /*
+     * 修改网站风格
+     */
+    public function editSite($site_id,$data){
+        $result=  $this->db->dsp->table('dsp_company_site')->where(array('site_id'=>$site_id))->data($data)->update();
+        return $result;
+    }
+}

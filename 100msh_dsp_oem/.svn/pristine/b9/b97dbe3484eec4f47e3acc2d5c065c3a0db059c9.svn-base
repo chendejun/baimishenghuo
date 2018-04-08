@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>DMP-自定义人群</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+	<link rel="stylesheet" href="../../../../../public/css/common.css">
+</head>
+<style>
+	/* *{ -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-click-highlight-color:rgba(0,0,0,0);} */
+    .wd200{width: 200px;}
+    .from-row span b{font-weight: normal; margin-right: 10px;}
+    .mat_list li{float: left; margin-right: 10px;}
+    .mat_list li img{ max-width: 350px; height: auto;}
+    .headline_form .dom_input label,.headline_form label{position: absolute;}
+    .headline_form .dom_input span,.headline_form span{max-width:900px;padding-left: 135px;display: block;top: 0;line-height: 35px;    min-height: 35px;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span><a href="/v1.2/headline/indexview">< 返回</a></span>
+        </div>
+        <form>
+            <div class="headline_form mb30">
+                <h3>广告组</h3>
+                <div class="from-row">
+                    <label>推广目的：</label>
+                    <span>落地页</span>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>广告组名称：</label>
+                    <span id="campaign_name"></span>
+                </div>
+            </div>
+            <div class="headline_form mb30">
+                <h3>广告计划</h3>
+                <div class="box_name">投放条件</div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>链接地址：</label>
+                    <span id="delivery_url"></span>
+                </div>
+                <div class="from-row">
+                    <label>地域：</label>
+                    <span id="regionVal"></span>
+                </div>
+                <div class="from-row">
+                    <label>性别：</label>
+                    <span id="sex"></span>
+                </div>
+                <div class="from-row">
+                    <label>年龄：</label>
+                    <span id="age"></span>
+                </div>
+                <div class="box_name">预算和出价</div>
+                 <div class="from-row dom_input">
+                    <label><em class="emp">*</em>预算：</label>
+                    <span><b id="money_type"></b><b id="money"></b></span>
+                </div>
+                <div class="from-row">
+                    <label>投放时间：</label>
+                    <span id="delivery_date"></span>
+                </div>
+                <div class="from-row" >
+                    <label>投放时段：</label>
+                    <span id="delivery_time"></span>
+                </div>
+                <div class="from-row" >
+                    <label>出价方式：</label>
+                    <span id="bid_type"></span>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>出价：</label>
+                    <span id="bid_money"></span>
+                </div>
+                <div class="from-row dom_input">
+                    <label>广告计划名称：</label>
+                    <span id="delivery_name"></span>
+                </div>
+            </div>
+            <div class="headline_form mb30">
+                <h3>广告创意</h3>
+                <div class="from-row" >
+                    <label>选择素材：</label>
+                    <span id="img_type"></span>
+                </div>
+                <div class="from-row" >
+                    <ul class="mat_list clearfix"></ul>
+                </div>
+                <div class="from-row dom_input">
+                    <label><em class="emp">*</em>创意标签：</label>
+                    <span id="img_tag"></span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript">
+        var infoId = getUrlParams('id') ? getUrlParams('id') : null; //详情查询ID
+        function getInfo(infoId){
+            var data='';
+            $.ajax({
+                type: "POST",
+                url: '/v1.2/Headline/getInfo',
+                dataType:'json',
+                data:{'jr_delivery_id':infoId},
+                success: function(rs){
+                    tipTopHide();       //隐藏提示框
+                    if(rs.api_code == 1){         //如果查询成功
+                        var data = rs.data[0];     //返回数据赋值
+                        readerHtml(data);
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                 },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+            return data;
+        }
+        getInfo(infoId);
+
+        //渲染
+        function readerHtml(data){
+            var bidTy = {'1':'CPM','2':'CPC'},
+                ageTy = {'1':'&lt;18','2':'18-23','3':'24-30','4':'31-40','5':'41-49','6':'50+'},
+                sexTy = {'0':'不限','1':'男','2':'女'},
+                imgTy = {'1':'小图','2':'大图','3':'组图'},
+                moneyTy = {'1':'总预算','2':'日预算'};
+            var delivery_info = JSON.parse(htmlDecode(data.delivery_info)),
+                img_info = JSON.parse(htmlDecode(data.img_info)),
+                age = delivery_info.age,
+                regionVal = delivery_info.regionVal;
+                console.log(delivery_info.sex);
+            $('#campaign_name').html(data.campaign_name);
+            $('#delivery_url').html(data.delivery_url);
+            $('#delivery_name').html(data.delivery_name);
+            $('#bid_money').html(data.bid_money);
+            $('#bid_type').html(bidTy[data.bid_type]);
+            $('#sex').html(sexTy[delivery_info.sex]);
+            $('#money_type').html(moneyTy[data.money_type]);
+            $('#img_type').html(imgTy[data.img_type]);
+            $('#money').html(data.money);
+            $('#img_tag').html(data.img_tag);
+            $('#delivery_date').html(data.delivery_time_type== 1 ?'长期投放': data.delivery_start_date+' ~ '+ data.delivery_end_date);
+            $('#delivery_time').html(data.delivery_start_time+' ~ '+ data.delivery_end_time);
+            if(age.length==0){
+                $('#age').html('不限');
+            }else{
+                var ageVal ='';
+                $.each(age,function(k,v){
+                    ageVal += ageTy[v]+'、';
+                })
+                $('#age').html(ageVal.substr(0,ageVal.length-1));
+            }
+
+            if(regionVal.length==0){
+                $('#regionVal').html('不限');
+            }else{
+                var rval ='';
+                $.each(regionVal,function(k,v){
+                    rval += v+'、';
+                })
+                $('#regionVal').html(rval.substr(0,rval.length-1));
+            }
+            if(img_info.length>0){
+                var imgli='';
+                $.each(img_info,function(k,v){
+                    imgli += '<li><img src="'+v.img_url+'"></li>';
+                })
+                $('.mat_list').html(imgli);
+            }
+        }
+        function htmlDecode(value){
+            var div = $('<div/>').html(value).text();
+            return div;
+        }
+    </script>
+	</body>
+</html>

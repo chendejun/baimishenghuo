@@ -1,0 +1,28 @@
+总页数:{{$page}}
+<table border="1">
+	<tr><td>申请日期</td><td>开票金额</td><td>开票项目</td><td>状态</td></tr>
+	{{foreach from=$list  key=key item=val}}
+	<tr>
+		<td>{{$val.apply_time}}</td>
+		<td>{{$val.amount}}</td>
+		<td>
+			{{if $val.invoice_type == 0}}
+				广告费
+			{{elseif $val.invoice_type==1}}
+				服务费
+			{{/if}}
+		</td>
+		<td>
+			{{if $val.status == 0}}
+				待审核
+			{{elseif $val.status==1}}
+				待开票
+			{{elseif $val.status==2}}
+				已开票<span onclick="msg('{{$val.express_type}}','{{$val.express_no}}','{{$val.invoice_no}}',{{$key}})" id = "s{{$key}}"></span>
+			{{elseif $val.status==3}}
+				拒绝开票
+			{{/if}}
+		</td>
+	</tr>
+	{{/foreach}}
+</table> 

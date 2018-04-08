@@ -1,0 +1,400 @@
+<?php
+class AdvertiserController extends BasicController {
+    /**
+     * 我的广告主
+     * @return [type] [description]
+     */
+    public function indexAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        if($this->uinfo['user_group'] == ROLE_OPERATED){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        //var_dump($this->uinfo);
+        $result = BmDspApi::request('advertiser/dlsStatInfo',$data,'GET');
+       // var_dump($result);
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求代理商统计接口失败'));
+        }
+       //var_dump($result['data']);
+        if($result['api_code'] == 0){
+            $account['today_disburse']=$account['yes_disburse']=$account['week_disburse']=$account['today_reg']=$account['yes_reg']=$account['week_reg']='0.00';
+            $account['today_disburse'] = Helper::transAmount($result['data']['today_disburse'], 1);
+            $account['yes_disburse'] = Helper::transAmount($result['data']['yes_disburse'], 1);
+            $account['week_disburse'] = Helper::transAmount($result['data']['week_disburse'], 1);
+            $account['today_reg'] = Helper::transAmount($result['data']['today_reg'], 1);
+            $account['yes_reg'] = Helper::transAmount($result['data']['yes_reg'], 1);
+            $account['week_reg'] = Helper::transAmount($result['data']['week_reg'], 1);
+            $account['cash_amount']=$account['virtual_amount']=$account['give_amount']='0.00';
+            $acc=$result['data']['acc_info'];
+            foreach ($acc as $k=>$v){
+                if($k == 0){
+                    $account['virtual_amount']=Helper::transAmount($v['usable_amount'],1);
+                }else if($k == 1){
+                    $account['cash_amount']=Helper::transAmount($v['usable_amount'],1);
+                }else if($k == 2){
+                    $account['give_amount']=Helper::transAmount($v['usable_amount'],1);
+                }
+            }
+            //var_dump($account);
+            $this->getView()->assign('account' , $account);
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+
+        //$this->getView()->assign('name' , $name);
+    }
+    /**
+     * 广告主列表
+     * @return [type] [description]
+     */
+    public function listAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        if($this->uinfo['user_group'] == ROLE_OPERATED){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+        $data['name']=Helper::clean($this->getRequest()->getParam('name' , ''));
+        $data['gdt_status']=Helper::clean($this->getRequest()->getParam('gdt_status' , ''));
+        $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+        $result = BmDspApi::request('advertiser/advList',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取行业分类接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+
+    }
+    /**
+     * 新增广告主
+     * @return [type] [description]
+     */
+    public function addAction(){
+        $adv = Helper::M('Advertiser');
+        if(isset($_POST)&&!empty($_POST)) {
+            $data['comp_pid'] = $this->uinfo['comp_id'];
+            $data['staff_id'] = $this->uinfo['staff_id'];
+            $data['comp_name'] = Helper::clean($this->getRequest()->getPost('comp_name'));
+            $data['cate_pid'] = intval($this->getRequest()->getPost('cate_pid'));
+            $data['cate_id'] = intval($this->getRequest()->getPost('cate_id'));
+            $data['contacts'] = Helper::clean($this->getRequest()->getPost('contacts'));
+            $data['mobile_phone'] = Helper::clean($this->getRequest()->getPost('mobile_phone'));
+            $data['website_url'] = Helper::clean($this->getRequest()->getPost('website_url'));
+            $data['sc_pro'] = intval($this->getRequest()->getPost('sc_pro'));
+            $data['sc_pid'] = intval($this->getRequest()->getPost('sc_pid'));
+            $data['sc_id'] = intval($this->getRequest()->getPost('sc_id'));
+            $data['comp_addr'] = Helper::clean($this->getRequest()->getPost('comp_addr'));
+            $data['gdt_apply_status'] = Helper::clean($this->getRequest()->getPost('gdt_apply_status'));
+            $data['trademark_img']=Helper::clean($this->getRequest()->getPost('trademark_img',''));
+            $data['business_img']=Helper::clean($this->getRequest()->getPost('business_img',''));
+            $data['front_card']=Helper::clean($this->getRequest()->getPost('front_card',''));
+            $data['back_card']=Helper::clean($this->getRequest()->getPost('back_card',''));
+            $data['icp_img']=Helper::clean($this->getRequest()->getPost('icp_img',''));
+            $data['industry_img']=Helper::clean($this->getRequest()->getPost('industry_img',''));
+            $data['apt_more']=$this->getRequest()->getPost('apt_more','');
+            if(empty(trim($data['comp_name']))){
+                Helper::outJson(array('state'=>0 , 'msg' =>'广告主名称为空或过长！'));
+            }
+            if(empty($data['contacts'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'联系人为空或过长！'));
+            }
+            $result = BmDspApi::request('advertiser/add',$data,'POST');
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求api新增接口失败'));
+            }
+            if($result['api_code'] == 0){
+                //添加操作日志
+                $log_content[] = "我的广告主 :". "广告主添加";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('广告主添加',$log_content_str,'LC006',"LOT001");
+                Helper::outJson(array('state' => 1, 'msg' => '添加成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }
+    }
+    /**
+     * 新增广告主
+     * @return [type] [description]
+     */
+    public function editAction(){
+        $comp_id=Helper::clean($this->getRequest()->getParam('comp_id' , 0));
+        if(!$comp_id){Helper::outJson(array('state'=>0 , 'msg' =>'请求参数错误'));}
+        if(isset($_POST)&&!empty($_POST)) {
+            $data['comp_id'] = $comp_id;
+            $data['comp_pid'] = $this->uinfo['comp_id'];
+            $data['staff_id'] = $this->uinfo['staff_id'];
+            $data['comp_name'] = Helper::clean($this->getRequest()->getPost('comp_name'));
+            $data['cate_pid'] = intval($this->getRequest()->getPost('cate_pid'));
+            $data['cate_id'] = intval($this->getRequest()->getPost('cate_id'));
+            $data['contacts'] = Helper::clean($this->getRequest()->getPost('contacts'));
+            $data['website_url'] = Helper::clean($this->getRequest()->getPost('website_url'));
+            $data['sc_pro'] = intval($this->getRequest()->getPost('sc_pro'));
+            $data['sc_pid'] = intval($this->getRequest()->getPost('sc_pid'));
+            $data['sc_id'] = intval($this->getRequest()->getPost('sc_id'));
+            $data['comp_addr'] = Helper::clean($this->getRequest()->getPost('comp_addr'));
+//            $data['trademark_img']=Helper::clean($this->getRequest()->getPost('trademark_img',''));
+//            $data['business_img']=Helper::clean($this->getRequest()->getPost('business_img',''));
+//            $data['front_card']=Helper::clean($this->getRequest()->getPost('front_card',''));
+//            $data['back_card']=Helper::clean($this->getRequest()->getPost('back_card',''));
+//            $data['icp_img']=Helper::clean($this->getRequest()->getPost('icp_img',''));
+//            $data['industry_img']=Helper::clean($this->getRequest()->getPost('industry_img',''));
+//            $data['apt_more']=Helper::clean($this->getRequest()->getPost('apt_more',''));
+            if(empty(trim($data['comp_name']))){
+                Helper::outJson(array('state'=>0 , 'msg' =>'广告主名称为空或过长！'));
+            }
+            if(empty($data['contacts'])){
+                Helper::outJson(array('state'=>0 , 'msg' =>'联系人为空或过长！'));
+            }
+            //var_dump($data);exit;
+            $result = BmDspApi::request('advertiser/edit',$data,'POST');
+            if(empty($result)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'请求api新增接口失败'));
+            }
+            if($result['api_code'] == 0){
+                //添加操作日志
+                $log_content[] = "我的广告主 :". "广告主修改";
+                $log_content_str = implode(" , ",$log_content);
+                $log_obj = Helper::M('Log');
+                $log_obj->create_log('广告主修改',$log_content_str,'LC006',"LOT001");
+                Helper::outJson(array('state' => 1, 'msg' => '修改成功'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+            }
+        }else{
+
+        }
+    }
+    function openGdtAction(){
+        $data=array();
+        $data['comp_id']=Helper::clean($this->getRequest()->getParam('comp_id' , 0));
+        /*$data['trademark_img']=Helper::clean($this->getRequest()->getPost('trademark_img',''));
+        $data['business_img']=Helper::clean($this->getRequest()->getPost('business_img',''));
+        $data['cate_id'] = intval($this->getRequest()->getPost('cate_id'));
+        $data['comp_name'] = Helper::clean($this->getRequest()->getPost('comp_name'));
+        $data['website_url'] = Helper::clean($this->getRequest()->getPost('website_url'));*/
+        $data['staff_id'] = $this->uinfo['staff_id'];
+        $result = BmDspApi::request('advertiser/openGdt',$data,'GET');
+        // print_r($result['data']);
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取新开广点通接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功'));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    function upImgAction(){
+        $data=array();
+        $data['filename']=Helper::clean($this->getRequest()->getPost('filename'));
+        $ext = strtolower(strrchr($_FILES[$data['filename']]["name"], "."));
+        rename($_FILES[$data['filename']]['tmp_name'],$_FILES[$data['filename']]['tmp_name'].$ext);
+        $data[$data['filename']]=new CURLFile($_FILES[$data['filename']]['tmp_name'].$ext);
+        $imgOld=Helper::clean($this->getRequest()->getPost('imgOld'));
+        if($imgOld){
+            $img=$this->config['config']['ACCESSORY_FOLDER'].substr($imgOld,strlen( $this->config['config']['ACCESSORY_URL']));
+            if(file_exists($img)){
+                if(md5_file($imgOld) == md5_file($_FILES[$data['filename']]['tmp_name'].$ext)){
+                    Helper::outJson(array('state'=>0 , 'msg' =>'请不要重复上传原图！'));
+                }
+            }
+        }
+        $data['comp_id']=intval($this->getRequest()->getPost('comp_id'));
+        $result = BmDspApi::request('advertiser/upImg',$data , 'post');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求广告主图片上传接口失败'));
+        }
+        if($result['api_code'] == 0){
+            //删除临时文件
+            @unlink($_FILES[$data['filename']]['tmp_name'].$ext);
+            Helper::outJson(array('state'=>1,'msg'=>'图片上传成功','url'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    /**
+     * 获取行业分类
+     * @return [type] [description]
+     */
+    public function getCateAction(){
+        $data=array();
+        $data['cate_id']=intval($this->getRequest()->getParam('cate_id'));
+        $result = BmDspApi::request('advertiser/getCate',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取行业分类接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','cate_list'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    /**
+     * 获取区域地址
+     * @return [type] [description]
+     */
+    public function getScListAction(){
+        $data=array();
+        $data['sc_id']=intval($this->getRequest()->getParam('sc_id'));
+        $result = BmDspApi::request('advertiser/getScList',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取区域地址接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','sc_list'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    //广告主资质详情
+    public function viewAction(){
+        $data=array();
+        $data['comp_id']=intval($this->getRequest()->getParam('comp_id'));
+        //var_dump($this->uinfo);exit;
+        $result = BmDspApi::request('advertiser/view',$data,'GET');
+        //print_r($result);
+        if(empty($result['data'])){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求查看广告主资质详情接口失败'));
+        }
+        if($result['api_code'] == 0){
+            $this->getView()->assign('data' , $result['data']);
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    //广告主详情
+    public function infoAction(){
+        $data=array();
+        $data['comp_id']=intval($this->getRequest()->getParam('comp_id'));
+        if($this->uinfo['user_group'] == ROLE_ROOT || $this->uinfo['user_group'] == ROLE_MANAGER){
+            $data['if_operate']=1;
+        }else{
+            $data['if_operate']=0;
+        }
+        //var_dump($this->uinfo);exit;
+        $result = BmDspApi::request('advertiser/info',$data,'GET');
+        //print_r($result);
+        if(empty($result['data'])){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求查看广告主详情接口失败'));
+        }
+        if($result['api_code'] == 0){
+            //var_dump(json_encode($result['data']));
+            $this->getView()->assign('data' , $result['data']);
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    //获取服务商下的投放组员工
+    public function operateAction(){
+        $data=array();
+        $data['comp_pid'] = $this->uinfo['comp_id'];
+        $result = BmDspApi::request('advertiser/operate',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求获取投放组员工接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    //投放人员设置
+    public function setOperateAction(){
+        $data=array();
+        $data['comp_id']=intval($this->getRequest()->getPost('comp_id'));
+        $data['ascription_staff_id']=intval($this->getRequest()->getPost('ascription_staff_id'));
+        $data['move_staff_id']=intval($this->getRequest()->getPost('staff_id'));
+        if(!$data['comp_id'] || !$data['ascription_staff_id'] || !$data['move_staff_id']){
+            Helper::outJson(array('state'=>0 , 'msg' =>'参数错误'));
+        }
+        $data['staff_id'] = $this->uinfo['staff_id'];
+        if($data['ascription_staff_id'] == $data['move_staff_id']){
+            Helper::outJson(array('state'=>0 , 'msg' =>'设置的投放人员和原来一样，请不要重复设置！'));
+        }
+        $result = BmDspApi::request('advertiser/setOperate',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求投放人员设置接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    //广告主最近6个月充值记录
+    public function advRechargeAction(){
+        $data=array();
+        $data['comp_id']=intval($this->getRequest()->getParam('comp_id'));
+        if(!$data['comp_id']){
+            Helper::outJson(array('state'=>0 , 'msg' =>'参数错误'));
+        }
+        $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+        $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+        //var_dump($this->uinfo);exit;
+        $result = BmDspApi::request('advertiser/advRecharge',$data,'GET');
+        //print_r($result);
+        if(empty($result['data'])){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求查看广告主详情接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    /* 服务商下广告主充值记录（含最近5条）
+   * @return [type] [description]
+   */
+    public function advRecharListAction(){
+        $data=array();
+        $data['comp_pid']=$this->uinfo['comp_id'];
+        if($this->uinfo['user_group'] == ROLE_OPERATED){
+            $data['staff_id']=$this->uinfo['staff_id'];
+        }else{
+            $data['staff_id']=0;
+        }
+        $data['page']=Helper::clean($this->getRequest()->getParam('page' , 1));
+        $data['limit']=Helper::clean($this->getRequest()->getParam('limit' , 15));
+        $data['if_five']=intval($this->getRequest()->getParam('if_five',0));
+        $data['start_date']=Helper::clean($this->getRequest()->getParam('start_date',''));
+        $data['end_date']=Helper::clean($this->getRequest()->getParam('end_date',''));
+        $data['name']=Helper::clean($this->getRequest()->getParam('name',''));
+        $result = BmDspApi::request('advertiser/advRecharList',$data,'GET');
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求广告主充值最近5条记录接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function getZkBalanceAction(){
+        $data=array();
+        $data['comp_id']=intval($this->getRequest()->getParam('comp_id'));
+        if(!$data['comp_id']){Helper::outJson(array('state'=>0 , 'msg' =>'请求参数错误'));}
+        $data['gdt_account_id']=intval($this->getRequest()->getParam('gdt_account_id'));
+        //var_dump($this->uinfo);exit;
+        $result = BmDspApi::request('advertiser/getZkBalance',$data,'GET');
+        //print_r($result);
+        if(empty($result)){
+            Helper::outJson(array('state'=>0 , 'msg' =>'请求刷新广点通账号余额接口失败'));
+        }
+        if($result['api_code'] == 0){
+            Helper::outJson(array('state'=>1,'msg'=>'操作成功','data'=>$result['data']));
+        }else{
+            Helper::outJson(array('state'=>0 , 'msg' =>$result['error']));
+        }
+    }
+    public function rechargeAction(){}
+}

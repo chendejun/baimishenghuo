@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的广告主-新建广告主</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/font/iconfont.css">
+    <link rel="stylesheet" href="/public/css/advertiser.css">
+    <style>
+        .content_box {min-width: 1200px;}
+        .notice {width: 14px;height: 14px;display: inline-block;vertical-align: middle;text-align: center;line-height: 14px;font-size: 8px;font-style: normal;color: #ff9e05;border-radius: 50%;margin: 0 6px;border: 1px solid #ff9e05;}
+        .promptinfobox {height: 33px;line-height: 33px;background: #fff8e7;border: 1px solid #efd6b6;color: #666666;font-size: 14px;}
+        .addinput_box {overflow: hidden;background: #fff;}
+        .add_line {min-height: 38px;margin-top: 26px;}
+        .add_line:first-of-type {margin-top: 0;}
+        .add_title {width: 122px;height: 38px;line-height: 38px;float: left;margin-right: 6px;text-align: right;}
+        .add_info {height: 38px;float: left;min-width: 750px;}
+        .tr_input {width: 288px;height: 26px;border: 1px solid #dddddd;border-radius: 5px;padding: 5px;}
+        .f_right {float: left;}
+        .top10 {margin-top: 10px;}
+        .photos_div>span {display: table-cell !important;vertical-align: middle;text-align: center;padding: 15px;}
+        .add_photoswrapper .photos_div>span,
+        .add_photoswrapper .photosMore_div>span {display: block;}
+        .bm_red {border: 1px solid red;}
+        .layui-layer-dialog {width: 399px;}
+        .layui-layer-btn0 {border: 1px solid #cccccc !important;color: #999999 !important;background: #fff !important;border-radius: 4px;}
+        .layui-layer-content {padding: 10px 20px !important;}
+        .layui-layer-btn1 {border: 1px solid #5877a4 !important;color: #fff !important;background: #5877a4 !important;border-radius: 4px;}
+        .tip_title {font-size: 18px;color: #333;text-align: center;margin-bottom: 10px;font-weight: 900;}
+        .tip_content {text-align: center;margin-bottom: 0;}
+    </style>
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laytpl/laytpl.js"></script>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <i class="info_icon icon1"></i>
+            <span>
+                <a href="index.html">我的平台</a> /
+                <a href="/V1.2/Advertiser/index">我的广告主</a> / 新建广告主</span>
+        </div>
+        <div class="promptinfobox mt20">
+            <i class="notice">!</i>请注意：系统暂不支持个人广告主开户，必须以企业身份开户，不便之处，敬请谅解。
+        </div>
+        <div class="box_table addinput_box mt20">
+            <div class="add_line">
+                <div class="add_title">广告主名称：</div>
+                <div class="add_info">
+                    <input type="text" class="tr_input add_adname" placeholder="最长不超过60个字符" />
+                </div>
+            </div>
+            <div class="add_line">
+                <div class="add_title">所属行业：</div>
+                <div class="add_info">
+                    <select class="tr_select bm_right add_industry" onchange="getSecondIndustryValue('.add_industry')"></select>
+                    <select class="tr_select bm_right add_indeatils"></select>
+                </div>
+            </div>
+            <div class="add_line">
+                <div class="add_title">联系人：</div>
+                <input type="text" class="tr_input f_right contacts" placeholder="最长不超过10个字符" />
+                <div class="add_title">联系手机号：</div>
+                <input type="text" class="tr_input f_right contactsphone" placeholder="请填写手机号码" />
+            </div>
+            <div class="add_line">
+                <div class="add_title">广告主网址：</div>
+                <div class="add_info">
+                    <select class="tr_select bm_right url_hd"><option>http://</option><option>https://</option></select>
+                    <input type="text" class="tr_input ad_url" placeholder="请填写广告主网站地址" />
+                </div>
+            </div>
+            <div class="add_line">
+                <div class="add_title">所在区域：</div>
+                <div class="add_info" style="position:relative;z-index:2">
+                    <div class="select_wrap">
+                        <div class="tr_selectdiv add_provincetitle" data-value="">请选择</div>
+                        <ul class="tr_selectlist add_province" onchange="getSecondRegionValue('.add_province')">
+                            <li data-value="">请选择</li>
+                        </ul>
+                    </div>
+                    <div class="select_wrap">
+                        <div class="tr_selectdiv add_citystitle" data-value="">请选择</div>
+                        <ul class="tr_selectlist add_citys" onchange="getSecondRegionValue('.add_citys')">
+                            <li data-value="">请选择</li>
+                        </ul>
+                    </div>
+                    <div class="select_wrap">
+                        <div class="tr_selectdiv add_countytitle" data-value="">请选择</div>
+                        <ul class="tr_selectlist add_county">
+                            <li data-value="">请选择</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="add_line top10">
+                <div class="add_title"></div>
+                <div class="add_info">
+                    <input type="text" class="tr_input add_detailsaddress" placeholder="详细地址，如广东路135号成花大厦" style="width:575px;" />
+                    <a href="#" class="iconfont bd_Map" style="display:none">&#xe633;</a>
+                </div>
+            </div>
+            <div class="add_line top10">
+                <div class="add_title">腾讯广告开通</div>
+                <div class="add_info">
+                    <div class="synchroTbox">
+                        <span class="checkbox_focus">
+                            <em class="statusBg"></em>
+                            <input type="checkbox" checked="checked" name="synchroT" class="synchroT" onclick="checkedBg('.synchroT')" />
+                        </span>同步开通腾讯广告主
+                    </div>
+                </div>
+            </div>
+            <div class="add_line top10">
+                <div class="add_title">广告主资质</div>
+            </div>
+            <div class="add_photoswrapper" comp-id="0">
+                <div class="photos_div">
+                    <span>
+                        <h4>企业商标</h4>(JPG\PNG，512*512像素，大小不超过400k)
+                    </span>
+                    <input type="file" class="pushImg" id="logo" name="logo" onchange="AjaxUploadImg('logo','#logo')" />
+                </div>
+                <div class="photos_div">
+                    <span>
+                        <h4>店铺营业执照图片</h4>
+                    </span>
+                    <input type="file" class="pushImg" name="business" id="business" onchange="AjaxUploadImg('business','#business')" />
+                </div>
+                <div class="photos_div">
+                    <span>
+                        <h4>法人证件（正面）</h4>
+                    </span>
+                    <input type="file" class="pushImg" name="personID1" id="personID1" onchange="AjaxUploadImg('personID1','#personID1')" />
+                </div>
+                <div class="photos_div">
+                    <span>
+                        <h4>法人证件（反面）</h4>
+                    </span>
+                    <input type="file" class="pushImg" name="personID2" id="personID2" onchange="AjaxUploadImg('personID2','#personID2')" />
+                </div>
+                <div class="photos_div">
+                    <span>
+                        <h4>点击上传行业资质</h4>(JPG\PNG，大小不超过2M) 开通腾讯广告时必须要上传
+                    </span>
+                    <input type="file" class="pushImg" id="aptitude" name="aptitude" onchange="AjaxUploadImg('aptitude','#aptitude')" />
+                </div>
+                <div class="photos_div">
+                    <span>
+                        <h4>点击上传ICP站点备案证明</h4>(JPG\PNG，大小不超过2M) 开通腾讯广告时必须要上传
+                    </span>
+                    <input type="file" class="pushImg" id="icpImg" name="icpImg" onchange="AjaxUploadImg('icpImg','#icpImg')" />
+                </div>
+            </div>
+            <div class="add_line" style="margin-left:50px;min-height:1px;margin-top:0;">
+                <span class="checkbox_focus iconfont">
+                    <em class="statusBg"></em>
+                    <input type="checkbox" name="pushmore" class="pushmore" onclick="checkedBg('.pushmore')" />
+                </span>
+                上传更多资质照片
+            </div>
+            <div class="add_line" style="margin-left:50px;min-height:1px;margin-top:30px;">
+                <button class="bm-btn bm-btn-blue" id="pushData" onclick="postData()">确定</button>
+            </div>
+        </div>
+        <div id="mask"></div>
+    </div>
+</body>
+<script src="/public/js/ajaxfileupload.js"></script>
+<script src="/public/js/advertiser.js"></script>
+<script type="text/javascript">
+    checkedBg('.synchroT');
+    checkedBg('.pushmore');
+    getIndustryData(0);   //页面加载完成获取行业分类
+    getRegionData(0, '.add_province')
+    function postData() {
+        $(":text").removeClass('bm_red');
+        $('.tr_selectdiv').removeClass('bm_red');
+        $('.photos_div').removeClass('bm_red');
+        $('.tr_select').removeClass('bm_red')
+        var adname = $('.add_adname').val(),   //广告主名称
+            industry = $('.add_industry').val(),  //所属行业
+            indeatils = $('.add_indeatils').val(),  //所属行业
+            contacts = $('.contacts').val(),  //联系人
+            contactsphone = $('.contactsphone').val(),   //联系手机号    
+            province = $('.add_provincetitle').attr('data-value'), //省、市、区
+            citys = $('.add_citystitle').attr('data-value'),//省、市、区
+            county = $('.add_countytitle').attr('data-value'),//省、市、区
+            add_detailsaddress = $('.add_detailsaddress').val(), //详情地址
+            //网址
+            urlhd = $('.url_hd').val(),
+            weburl = $('.ad_url').val(),
+            adurl = $('.ad_url').val().substr($('.ad_url').val().length - 1) == "/" ? $('.ad_url').val().substring(0, $('.ad_url').val().length - 1) : $('.ad_url').val();
+        adurl=urlhd+adurl;
+        weburl=urlhd+weburl;
+        //是否同步开通腾讯广告主   true 1   / false 0
+        if ($('.synchroT').prop('checked') == true) {
+            var tencentad = 1
+        } else {
+            var tencentad = 0
+        }
+        console.log(weburl);
+       
+        //图片
+        var logo = $('#logo').siblings('img').attr('src'),
+            business =$('#business').siblings('img').attr('src'),
+            personID1 = $('#personID1').siblings('img').attr('src'),
+            personID2 = $('#personID2').siblings('img').attr('src'),
+            aptitude = $('#aptitude').siblings('img').attr('src'),
+            icpImg = $('#icpImg').siblings('img').attr('src')
+        function splitSrc(src) {
+            return src
+        }
+        //更多图片
+        var moreimg = $('.photosMore_div').find('img');
+        var ImgArr = []
+        for (var i = 0, len = moreimg.length; i < len; i++) {
+            ImgArr.push(splitSrc(moreimg[i].src))
+        }
+       // console.log(ImgArr)
+        var reg = /^1[3|4|5|6|7|8|9][0-9]{9}$/;  //电话号码正则
+        if (adname.length == 0) {
+            tipTopShow('广告主名称不能为空');
+            $('.add_adname').addClass('bm_red')
+            return;
+        }
+        if (adname.length > 60) {
+            tipTopShow('广告主名称最长不超过60个字符');
+            $('.add_adname').addClass('bm_red')
+            return;
+        }
+        if (industry == "" || indeatils == "") {
+            tipTopShow('所属行业不能为空');
+            $('.add_industry').addClass('bm_red')
+            $('.add_indeatils').addClass('bm_red')
+            return;
+        }
+        if (contacts.length == 0 || contacts.length > 10) {
+            tipTopShow('联系人不能为空，且最长不超过10个字符');
+            $('.contacts').addClass('bm_red');
+            return;
+        }
+        if (!reg.test(contactsphone)) {
+            tipTopShow('请输入正确的手机号码！');
+            $('.contactsphone').addClass('bm_red');
+            return;
+        }
+        var reg2 = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/){1}(www.|[a-zA-Z].)[a-zA-Z0-9\-\.]+\.(com|edu|gov|mil|net|cn|org|biz|info|name|museum|us|ca|uk)(\:[0-9]+)*(\/[a-zA-Z0-9._\=\%\&\,\;\?\'\"\$\#\-]+)*$/g;
+        console.log(adurl);
+        if (adurl == "" || reg2.test(adurl) == false) {
+            tipTopShow('请输入正确的网址');
+            $('.ad_url').addClass('bm_red');
+            return;
+        }
+        if (province == "") {
+            tipTopShow('所在省份不能为空！');
+            $('.add_provincetitle').addClass('bm_red');
+            return;
+        }
+        if (citys == "") {
+            tipTopShow('所在城市不能为空！');
+            $('.add_citystitle').addClass('bm_red');
+            return;
+        }
+        if (county == "") {
+            tipTopShow('所在区县不能为空！');
+            $('.add_countytitle').addClass('bm_red');
+            return;
+        }
+        if (add_detailsaddress == "") {
+            tipTopShow('详细地址不能为空！');
+            $('.add_detailsaddress').addClass('bm_red');
+            return;
+        }
+
+        var logoImg ="",
+            businessImg ="",
+            personID1Img ="",
+            personID2Img = "",
+            aptitudeImg = "",
+            icpImgs = "";
+        if (tencentad == 0) {
+            if(logo){
+                logoImg = splitSrc(logo);
+            }
+            if(business){
+                businessImg= splitSrc(business);
+            }else{
+                tipTopShow('请上传营业执照');
+                return;
+            }
+            if(personID1){
+                personID1Img= splitSrc(personID1);
+            }else{
+                tipTopShow('请上传法人证件正面');
+                return;
+            }
+            if(personID2){
+                personID2Img = splitSrc(personID2);
+            }else{
+                tipTopShow('请上传法人证件反面');
+                return;
+            }
+            if (aptitude) {
+                aptitudeImg=splitSrc(aptitude);
+            }
+            if (icpImg) {
+                icpImgs=splitSrc(icpImg)
+            }
+        } else {
+            if (!logo) {
+                tipTopShow('请上传企业商标');
+                return;
+            }else{
+                logoImg = splitSrc(logo);
+            }
+            if (!business) {
+                tipTopShow('请上传营业执照');
+                return;
+            }else{
+                businessImg = splitSrc(business)
+            }
+            if (!personID1) {
+                tipTopShow('请上传法人证件正面');
+                return;
+            }else{
+                personID1Img=splitSrc(personID1)
+            }
+            if (!personID2) {
+                tipTopShow('请上传法人证件反面');
+                return;
+            }else{
+                personID2Img = splitSrc(personID2)
+            }
+            if (!aptitude) {
+                tipTopShow('请上传行业资质');
+                return;
+            }else{
+                aptitudeImg = splitSrc(aptitude)
+            }
+            if (!icpImg) {
+                tipTopShow('请上传ICP站点备案证明');
+                return;
+            }else{
+                icpImgs = splitSrc(icpImg)
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/V1.2/Advertiser/add",
+            dataType: 'json',
+            data: {
+                "comp_name": adname,
+                "cate_pid": industry,
+                "cate_id": indeatils,
+                "contacts": contacts,
+                "mobile_phone": contactsphone,
+                "website_url": weburl,
+                "sc_pro": province,
+                "sc_pid": citys,
+                "sc_id": county,
+                "comp_addr": add_detailsaddress,
+                "gdt_apply_status": tencentad,
+                "trademark_img":logoImg,
+                "business_img":businessImg,
+                "front_card":personID1Img,
+                "back_card":personID2Img,
+                "industry_img":aptitudeImg,
+                "icp_img":icpImgs,
+                "apt_more": JSON.stringify(ImgArr)
+            },
+            success: function (res) {
+                console.log(this.data)
+                console.log(res)
+                if (res.state == 1) {
+                    postDataSuccess();
+                } else {
+                    tipTopShow(res.msg);
+                }
+            },
+            error: function (err) {
+                console.log(err)
+                tipTopShow(err.msg);
+            }
+        });
+    }
+    function postDataSuccess(){
+        layer.confirm('', {
+            btn: ['继续新开户', '好的'],
+            title: "    ",
+            content: "<div class='tip_title'>请确认</div><p class='tip_content'>广告主已提交审核，请等待审核结果。<br/>审核时间大约1个工作日。</p>"
+        }, function() {
+            location.href = "/v1.2/Advertiser/add";
+        },function(){
+            location.href = "/v1.2/Advertiser/index";
+        })
+    }
+</script>
+
+</html>

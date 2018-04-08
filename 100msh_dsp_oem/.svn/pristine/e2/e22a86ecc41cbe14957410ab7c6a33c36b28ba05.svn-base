@@ -1,0 +1,106 @@
+<?php
+class Device extends Model
+{
+
+    public function getDeviceList($where , $start = 0 , $limit = '')
+    {
+
+        $limit_str = '';
+        if (!empty($limit)) {
+            $limit_str = ' limit '.$start.','.$limit;
+        }
+
+        $field = 'a.mac_id,a.comp_id,a.mac_addr,a.mac_status,a.mac_set,a.day_user_num,a.yes_user_num,a.old_user_num,b.comp_name';
+
+        $sql = 'select '.$field.' from dsp_mac_list as a inner join dsp_company as b on a.comp_id = b.comp_id
+        where a.bind_status = 1 '.$where.' group by a.mac_addr order by a.add_time desc '.$limit_str;
+
+        $rel = $this->db->dsp->query($sql);
+
+        return $rel;
+
+
+    }
+
+
+    public function addDevice($data)
+    {
+        $id = $this->db->dsp->table('dsp_mac_list')->data($data)->insert();
+        return $id;
+
+    }
+
+    // 得到广告主配置
+    public function getCompanyConfig($where)
+    {
+        $rel = $this->db->dsp->table('dsp_company')->where($where)->find();
+
+        return $rel;
+    }
+
+    public function getDeviceConfig($where)
+    {
+        $rel = $this->db->dsp->table('dsp_mac_list')->where($where)->find();
+
+        return $rel;
+
+    }
+
+
+    /**
+     * [deviceUpdate 更新设备]
+     * @param  [type] $data  [数据]
+     * @param  [type] $where [条件]
+     * @return [type]        [设备id]
+     */
+    public function deviceUpdate($data,$where)
+    {
+        $id = $this->db->dsp->table('dsp_mac_list')->data($data)->where($where)->update();
+        return $id;
+
+    }
+
+    // 解绑
+    public function relieve($mac_id)
+    {
+        $uinfo = $_SESSION['uinfo'];
+        $data = [
+            'bind_status'=>2,
+            'edit_time'=>strtotime(date('Y-m-d H:i:s',time())),
+            'edit_staff_id'=>$uinfo['staff_id']
+        ];
+        $where = ' mac_id= '.$mac_id;
+        $id = $this->deviceUpdate($data,$where);
+        return $id;
+
+    }
+
+    public function getAllCompanyCount($where)
+    {
+        
+        $rel = $this->db->dsp->table('dsp_company')->where($where)->count();
+        return $rel;
+
+    }
+
+    public function getBindingCompany($where)
+    {
+        $sql = 'select a.comp_id as count from dsp_company as a inner join dsp_mac_list as b on a.comp_id=b.comp_id
+        where b.bind_status = 1 '.$where.' group by a.comp_id ';
+        $rel = $this->db->dsp->query($sql);
+        return $rel;
+    }
+
+
+    public function getDetectionNumber($where)
+    {
+        $field = 'ifnull(sum(day_user_num),0) as day_user_num,
+        ifnull(sum(yes_user_num),0) as yes_user_num,
+        ifnull(sum(old_user_num),0) as old_user_num
+        ';
+        $rel = $this->db->dsp->table('dsp_mac_list')->field($field)->where($where)->find();
+
+        return $rel;
+    }
+
+}

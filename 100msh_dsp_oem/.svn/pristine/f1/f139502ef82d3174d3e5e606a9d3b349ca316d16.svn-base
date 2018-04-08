@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>短信营销</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <!-- <link rel="stylesheet" href="../../../../../public/layui/css/layui.css" /> -->
+</head>
+<style>
+    *{ -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-click-highlight-color:rgba(0,0,0,0);}
+    .div_hidden{display: none;}
+    .div_show{display: block;}
+    .layui-form-select dl dd.layui-this { background-color: #4c94f5;}
+    .layui-laydate .layui-this{background-color: #4c94f5 !important;}
+    .layui-input{height: 40px; line-height: 40px;}
+    .msg_crowd .layui-form-select .layui-input{border: none}
+    .msg_box{width: 728px;}
+    .sign_name{display: none;}
+    .send_temp{padding: 0 10px;}
+    .send_temp .row{line-height: 20px; min-height: 20px; padding:7px 0;position: relative;}
+    .send_temp .row .pn{ position: absolute; width: 72px; }
+    .send_temp .row .pv{ margin-left: 72px; }
+    .send_temp .row .pvbox{padding:10px;border: 1px solid #ccc; color: #999; border-radius: 3px; min-height: 90px; }
+    .send_temp .send_notice{ font-size: 12px; color: #999;}
+    .msg_crowd.cbox2{height: 240px;text-align: center;}
+    .msg_crowd.cbox2 .tab_tip{padding-top: 85px; margin-top:0;}
+    .msg_crowd.cbox2 span,.msg_crowd.cbox2 a{display: block; text-align: center; margin: 0 auto;}
+</style>
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span><a href="javascript:history.go(-1)">< 返回</a></span>
+        </div>
+        <form class="msg_form">
+            <ul class="mod_nav clearfix radio_ul">
+                <li class="cur" type="1">新建短信</li>
+                <li class="" type="2">历史短信</li>
+            </ul>
+            <div class="msg_box box1 div_show">
+                <div class="label_row mod_name">
+                    <label class="row_label">短信名称：</label>
+                    <input type="text" value="" class="bm-input wd300" name="crowd_name" id="crowd_name" placeholder="请输入长度为1-30位的短信名称">
+                </div>
+                <div class="label_row mod_sign">
+                    <label class="row_label">短信签名：</label>
+                    <ul class="clearfix radio_ul mb20">
+                        <li class="cur" type="1">已备案签名</li>
+                        <li class="" type="2">新建签名</li>
+                    </ul>
+                    <div class="layui-form-item layui-form sign_selt">
+                        <select name="sign_list" lay-verify="required" lay-filter="sign_list" class="sign_list">
+                            <option value="">请选择您的短信签名</option>
+                            <option value="1">短信签名1</option>
+                            <option value="2">短信签名2</option>
+                        </select>
+                    </div>
+                    <input type="text" value="" class="bm-input wd300 sign_name" name="sign_name" minlength="3" maxlength="8" placeholder="请输入长度为3-8位的短信签名">
+                </div>
+                <div class="label_row">
+                    <label class="row_label">短信内容：</label>
+                    <dl class="msg_cont mb20">
+                        <dt>
+                            <strong id="sign_tag"></strong>
+                            <textarea rows="3" style="text-indent: 80px;" id="sign_cont" placeholder="请输入短信内容,70字以内（含70字）计1条，超过70字按67字/条计费" maxlength=""></textarea>
+                        </dt>
+                        <dd><b id="num_count">0</b>/300字：签名(<b id="num_sign"></b>) + 内容(<b id="num_main"></b>) + 回T退订(<b>4</b>)，按<b id="num_rate">0</b>条计费</dd>
+                    </dl>
+                    <div class="msg_preview mb20">
+                        <span>短信预览</span>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="msg_box box2 div_hidden">
+                <div class="label_row">
+                    <label class="row_label">短信选择：</label>
+                    <div class="layui-form-item layui-form">
+                        <select name="msg_list" lay-verify="required" lay-filter="msg_list" class="msg_list">
+                            <option value="">请选择历史短信</option>
+                            <option value="1">短信1</option>
+                            <option value="2">短信2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="label_row hty_sign">
+                    <label class="row_label">短信签名：</label>
+                    <input type="text" value="" class="bm-input wd300" placeholder="请选择历史短信" >
+                </div>
+                <div class="label_row hty_cont">
+                    <label class="row_label">短信内容：</label>
+                    <div class="msg_cont mb20">
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            <div class="label_row">
+                <a href="javascript:;" class="bm-btn bm-btn-blue" id="send_msg">短信测试</a>
+            </div>
+            <div class="label_row mod_crowd">
+                <label class="row_label">接收人群：</label>
+                <ul class="clearfix radio_ul mb20">
+                    <li class="cur" type="1" cost="0.3">人群包投放</li>
+                    <li class="" type="2" cost="0.15">手动上传</li>
+                </ul>
+                <div class="msg_crowd cbox1">
+                    <div class="crowdBox">
+                        <div class="layui-form-item layui-form">
+                            <select name="crowd_list" lay-verify="required" lay-filter="crowd_list" class="crowd_list">
+                                <option value="">请选择人群包</option>
+                                <option value="1">dfdf</option>
+                            </select>
+                        </div>
+                        <div class="crowd_tab" id="crowd_tab" data_num="0">
+                            <table class="base_table mb20">
+                                <thead>
+                                    <tr>
+                                        <th width="44px">序列</th>
+                                        <th>用户标签</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <!-- <div class="tab_num">
+                                <label>覆盖人群：</label>
+                                <input type="text" class="bm-input wd300" placeholder="请填写需要覆盖人群数量">
+                                <span>最大覆盖500000人</span>
+                            </div> -->
+                            <div class="tab_tip">
+                                <span class="res_num1" style="display: none"></span>
+                                <button type="button" class="layui-btn bm-btn" id="file_btn1" data_num="0">上传文件</button>
+                                <!-- <div class="file_box">
+                                    <p>点击上传</p>
+                                    <input type="file" class="layui-btn" id="file_btn" accept=".txt">
+                                </div>  -->
+                                <a href="javascript:;" class="download_btn">txt模板下载</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="crowd_res">
+                        <p>覆盖人群<b class="crowd_users1">0</b>人，每人按<b class="msg_rate">0</b>条计费</p>
+                    </div>
+                </div>
+                <div class="msg_crowd cbox2" style="display:none">
+                    <div class="crowdBox">
+                        <div class="tab_tip">
+                            <button type="button" class="layui-btn bm-btn" id="file_btn2" data_num="0">上传文件</button>
+                            <a href="javascript:;" class="download_btn">txt模板下载</a>
+                            <span class="res_num2" style="display: none"></span>
+                        </div>
+                    </div>
+                    <div class="crowd_res">
+                        <p>覆盖人群<b class="crowd_users2">0</b>人，每人按<b class="msg_rate">0</b>条计费</p>
+                    </div>
+                </div>
+            </div>
+            <div class="label_row">
+                <label class="row_label">定时发送：</label>
+                <ul class="clearfix radio_ul time_ul">
+                    <li class="cur" type="1">默认</li>
+                    <li class="" type="2">算定义</li>
+                </ul>
+                <input type="text" class="bm-input timeInput" id="timeInput" placeholder="选择日期用时间" style="display: none">
+            </div>
+            <div class="label_row">
+                <label class="row_label">短信单价：</label>
+                <span>￥<b id="per_momey">0.3</b>/条</span>
+            </div>
+            <div class="label_row">
+                <label class="row_label">总价：</label>
+                <span>￥<b id="total_momey">0</b></span>
+            </div>
+            <div class="commit_row">
+                <a href="javascript:'" class="bm-btn bm-btn-blue">提交</a>
+            </div>
+        </form>
+        <div id="tempSend" style="display: none">
+            <div class="send_temp">
+                <div class="row">
+                    <div class="pn">手机号码：</div>
+                    <div class="pv">13437548563</div>
+                </div>
+                <div class="row">
+                    <div class="pn">短信内容：</div>
+                    <div class="pv pvbox"><p></p></div>
+                </div>
+                <p class="send_notice">短信软件拦截，退订可能导致您收不到对应的测试短信。如有疑问可联系客服0755-55558888。</p>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+<!--     <script type="text/javascript" src="../../../../../public/js/laydate/laydate.js"></script>
+     -->    <!-- <script type="text/javascript" src="../../../../../public/layui/layui.js"></script> -->
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+
+    <script type="text/javascript">
+        var backType = getUrlParams('type') ? getUrlParams('type'):'';//url参数来源于新增投
+        layui.use(['form','layer', 'laydate','upload'], function () {
+            //短信类别选择
+            $('.mod_nav').on('click','li',function(){
+                var th = $(this),
+                    type = th.attr('type');
+                th.addClass('cur').siblings().removeClass('cur');
+                if(type==1){
+                    $('.div_hidden').hide();
+                    $('.div_show').show();
+                }else if(type==2){
+                    $('.div_hidden').show();
+                    $('.div_show').hide();
+                }
+            })
+            //短信签名选择
+            $('.mod_sign ul').on('click','li',function(){
+                var th = $(this),val='',
+                    type = th.attr('type');
+                th.addClass('cur').siblings().removeClass('cur');
+                if(type==1){
+                    $('.sign_selt').show();
+                    $('.sign_name').hide();
+                    val = $('.sign_list').val() ? $('.sign_list option:selected').text():'';
+                    $('.sign_list').attr('disabled',false);
+                }else if(type==2){
+                    $('.sign_selt').hide();
+                    $('.sign_name').show();
+                    val = $('input[name="sign_name"]').val();
+                    $('.sign_list').attr('disabled',true);
+                }
+                form.render();
+                countSign(val);
+            })
+            //人群方式选择
+            $('.mod_crowd ul').on('click','li',function(){
+                var th = $(this),val='',
+                    type = th.attr('type');
+                th.addClass('cur').siblings().removeClass('cur');
+                if(type==1){
+                    $('.cbox1').show();
+                    $('.cbox2').hide();
+                }else if(type==2){
+                    $('.cbox1').hide();
+                    $('.cbox2').show();
+                }
+                userCover();
+
+            })
+            //时间方式选择
+            $('.time_ul').on('click','li',function(){
+                var th = $(this),val='',
+                    type = th.attr('type');
+                th.addClass('cur').siblings().removeClass('cur');
+                if(type==1){
+                    $('#timeInput').hide();
+                }else if(type==2){
+                    $('#timeInput').show();
+                }
+
+            })
+
+            var form = layui.form,
+                laydate = layui.laydate,
+                layer = layui.layer,
+                upload = layui.upload;
+            //日期时间范围选择
+            laydate.render({
+                elem: '#timeInput',
+                type: 'datetime',
+                min : get_date(-1),
+                format: 'yyyy-MM-dd HH:mm'
+            });
+            //初始化
+            function init(){
+                getSignList();//签名列表
+                getCrowdList();//人群包列表
+                countSign();//签名长度计算
+                getMsgList();//短信列表
+                form.render();
+            }
+            init();
+            //短信测试触发绑定
+            $('#send_msg').on('click',sendMsg);
+
+            //选择短信
+            form.on('select(msg_list)',function(data){
+                if(data.value){
+                    seltReaderMsg(data.value);
+                }
+            })
+            //选择短信
+            form.on('select(crowd_list)',function(data){
+                if(data.value){
+                    seltReaderCrowd(data.value);
+                }
+            })
+            //选择签名
+            form.on('select(sign_list)',function(data){
+                var tsText = data.elem[data.elem.selectedIndex].text,
+                    tsVal = data.value;
+                if(tsVal){
+                    countSign(tsText);
+                }else{
+                    countSign('');
+                }
+            })
+             //设置签名
+            function countSign(v){
+                var signType = $('.mod_sign').find('li.cur').attr('type');
+                $('#sign_tag').html(v?'【'+v+'】':'');
+                var tagW = $('#sign_tag').width();
+                $('#sign_cont').css('text-indent',tagW);
+                countWord();//计数
+            }
+            //新建签名
+            $('.sign_name').on('input',function(e){
+                var val = $(this).val() ? $(this).val():'';
+                countSign(val);
+            })
+            //短信内容编辑
+            $('#sign_cont').on('input',function(e){
+                var val = $(this).val() ? $(this).val():'',
+                    sign_tag = $('#sign_tag').text(),
+                    msg_last = '回T退订';
+                $(this).attr('maxlength',300-parseInt(sign_tag.length)-parseInt(msg_last.length));
+               countWord(val.length);
+            })
+
+            //字数计算 短信预览
+            function countWord(contNum){
+                var msg_last = '回T退订',
+                    num_rate = $('#num_rate'),
+                    msg_rate = $('.msg_rate'),
+                    num_count =  $('#num_count'),
+                    num_sign =  $('#num_sign'),
+                    num_main =  $('#num_main'),
+                    sign_tag = $('#sign_tag').text(),
+                    cont = $('#sign_cont').val(),
+                    msg_len = null,
+                    msg_view = $('.msg_preview p');
+                    contNum = contNum ? contNum : cont.length;
+                msg_len = parseInt(sign_tag.length) + parseInt(contNum)+ parseInt(msg_last.length);
+                num_count.text(msg_len);
+                num_sign.text(sign_tag.length);
+                num_main.text(contNum);
+                if(msg_len <=70){
+                    num_rate.text('1');
+                    msg_rate.text('1');
+                }else if(msg_len <= 300){
+                    var n = Math.ceil((msg_len-70)/67)+parseInt(1);
+                    num_rate.text(n);
+                    msg_rate.text(n);
+                }
+                if(cont || sign_tag){
+                    msg_view.html(sign_tag + cont +msg_last).parent().show();
+                }else{
+                    msg_view.parent().hide();
+                }
+            }
+            //短信内容读取
+            function seltReaderMsg(id){
+                var cid = $('.msg_list option:selected').attr('cid');
+                $.ajax({
+                    type:'POST',
+                    url: '/v1.2/Market/getInfo',
+                    dataType: 'json',
+                    data: {'market_id':id,'comp_id':cid},
+                    success: function(rs){
+                        var data= rs.data;
+                        if(rs.api_code == 1){
+                            $('.hty_sign input').val(data.sign_name).attr('disabled','disabled');
+                            $('.hty_cont p').html(data.content);
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error:function(rs){
+                         layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                    }
+                })
+            }
+
+            //上传文件
+            var uploadInst = upload.render({
+                elem: '.layui-btn',
+                url: '/material/uploadsms',
+                accept: 'file',
+                method: 'POST',
+                before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                    layer.load(); //上传loading
+                },
+                choose: function(obj){
+                    obj.preview(function(index, file, result){
+                      //对上传失败的单个文件重新上传，一般在某个事件中使用
+                      //obj.upload(index, file);
+                    });
+                },
+                done: function(res){//上传完毕回调
+                    var data = res.data;
+                    if(res.api_code == 1){
+                        var result = '共导入<b>'+data.file_z_num+'</b>个联系人，已过滤重复<b>'+ data.remove_num +'</b>条，格式错误<b>'+ data.y_num+'</b>条';
+                        var fg_num = parseInt(data.file_z_num)- parseInt(data.remove_num)- parseInt(data.y_num);
+                        this.item.parent().find('span').show().html(result);
+                        this.item.attr('_id',data.market_file_id).attr('data_num',fg_num).text('重新上传');
+                        userCover();
+                    }else{
+                        layui.layer.msg(rs.msg);
+                    }
+                    layer.closeAll('loading'); //关闭loading
+                }
+                ,error: function(){
+                  //请求异常回调
+                  this.item.parent().find('span').hide();
+                  layui.layer.msg("请检查上传文件格式是否正确！");
+                  layer.closeAll('loading'); //关闭loading
+                }
+            });
+
+            //重新上传的方法，一般在某个事件中使用
+            uploadInst.upload();
+
+            //覆盖人群&价格
+            function userCover(){
+                var crowDom = $('.mod_crowd li.cur'),
+                    crowTy = crowDom.attr('type'),
+                    crowCost = crowDom.attr('cost'),
+                    num1 = $('#crowd_tab').attr('data_num'),
+                    num2 = $('#file_btn'+crowTy).attr('data_num'),
+                    coverTotal = parseInt(num1)+ parseInt(num2),//总覆盖
+                    rate = $('#num_rate').text();//条数
+                $('.crowd_users'+crowTy).text(coverTotal);
+                $('#per_momey').text(crowCost);//单价
+                $('#total_momey').text(parseFloat(parseFloat(crowCost)*parseInt(rate)*coverTotal).toFixed(2));//总价
+            }
+
+            //短信测试
+            function sendMsg(){
+                var navType = $('.mod_nav .cur').attr('type'),
+                    msgCont ='',
+                    msgtip ='';
+                if(navType==1){
+                    msgCont = $('.msg_preview p').text();
+                    msgtip = '请输入短信内容';
+                }else{
+                    msgCont = $('.hty_cont p').text();
+                    msgtip = '请选择短信';
+                }
+                if(!msgCont){
+                    tipTopShow(msgtip);
+                    return;
+                }
+                $('#tempSend').find('.pvbox p').html(msgCont);
+                var html = $('#tempSend').html();
+                layer.confirm(html, {
+                    title:'短信测试',
+                    area: ['580px', '320px'],
+                    btn: ["发送","取消"] //按钮
+                    }, function(){
+                        $.ajax({
+                            type:'POST',
+                            url:'/v1.2/Plan/stopPlan',
+                            dataType:'json',
+                            data:{'plan_id':id},
+                            success: function(rs){
+                                if (rs.state == 1) {
+                                    layui.layer.msg(rs.msg);
+                                    setTimeout("layer.closeAll()", 100);
+                                } else {
+                                    layui.layer.msg(rs.msg);
+                                }
+                            },
+                            error: function (rs) {
+                                layui.layer.msg("查询信息失败，请重试...");
+                                setTimeout("layer.closeAll()", 100);
+                            }
+                        })
+                    }
+                );
+            }
+            //短信列表
+            function getMsgList(){
+                $.ajax({
+                    type:'POST',
+                    url: '/v1.2/Market/hisMarkets',
+                    dataType: 'json',
+                    async:false,
+                    success: function(rs){
+                        var data= rs.data;
+                        var str = '<option value="">请选择历史短信</option>';
+                        if(rs.api_code == 1){
+                            $.each(data, function (k, v) {
+                               str+='<option value="'+v.market_id+'" cid="'+v.comp_id+'">'+v.market_name+'</option>';
+                            })
+                            $('.msg_list').html(str);
+                            form.render();
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error:function(rs){
+                         layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                    }
+                })
+            }
+            //签名列表
+            function getSignList(){
+                $.ajax({
+                    type:'POST',
+                    url: '/v1.2/Market/getSign',
+                    dataType: 'json',
+                    async:false,
+                    success: function(rs){
+                        var data= rs.data;
+                        var str = '<option value="">请选择短信签名</option>';
+                        if(rs.api_code == 1){
+                            $.each(data, function (k, v) {
+                               str+='<option value="'+v.sign_id+'">'+v.sign_name+'</option>';
+                            })
+                            $('.sign_list').html(str);
+                            form.render();
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error:function(rs){
+                         layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                    }
+                })
+            }
+            //定向包列表
+            function getCrowdList(){
+                $.ajax({
+                    type:'POST',
+                    url: '/v1.2/Market/getCrowdlist',
+                    dataType: 'json',
+                    async:false,
+                    success: function(rs){
+                        var data= rs.data;
+                        var str = '<option value="">请选择人群包</option>';
+                        if(rs.api_code == 1){
+                            $.each(data, function (k, v) {
+                               str+='<option value="'+v.crowd_id+'">'+v.crowd_name+'</option>';
+                            })
+                            $('.crowd_list').html(str);
+                            form.render();
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error:function(rs){
+                         layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                    }
+                })
+            }
+            //定向包详情读取
+            function seltReaderCrowd(id){
+                $.ajax({
+                    type:'POST',
+                    url: '/v1.2/Market/getCrowdinfo',
+                    dataType: 'json',
+                    data: {crowd_id:id},
+                    success: function(rs){
+                        var data= rs.data;
+                        if(rs.api_code == 1){
+                            console.log(data[0].key_list);
+                            var dataList = data[0].key_list;
+                            var dom = $('#crowd_tab tbody'),str='';
+                            if(dataList.length==0){
+                                dom.html('');
+                                return;
+                            }
+                            $.each(dataList, function (k, v) {
+                               str+='<tr><td>'+parseInt(k*1)+1+'</td><td>'+ v +'</td></tr>';
+                            })
+                            $('#crowd_tab').attr('data_num',data[0].cover_users);
+                            userCover();
+                            dom.html(str);
+                        }else{
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error:function(rs){
+                         layui.layer.msg("查询信息失败，请重试...");    //显示提示框
+                    }
+                })
+            }
+            //创建提交
+            function postData(){
+                var crowd_name = $('input[name="crowd_name"]').val();
+                    comp = '',
+                    cycle = $('input[name="cycle"]').val(),
+                    vType = $('input[name="virtual_type"]:checked').val(),
+                    directType = $('input[name="direct_type"]').val();
+
+                var stayTime = $('input[name="stay"]').val(),
+                    visitTime = $('input[name="visit"]').val(),
+                    timeIpt = $('#timeInput').val(),
+                    fqTime = $('input[name="frequency"]').val(),
+                    logSt = $('#log_st').val(),
+                    logEd = $('#log_ed').val(),
+                    fNum = $('#frequenc_num').val();
+                if(compData){
+                    var comp = compData;
+                }else{
+                    comp = $('select[name="comp"]').val();
+                }
+                if(!crowd_name){
+                     layui.layer.msg('请输入人群定向名称');
+                    return false;
+                }
+                if(!comp){
+                     layui.layer.msg('请选择广告主名称');
+                    return false;
+                }
+                if(!cycle){
+                    layui.layer.msg('请选择统计周期！')
+                    return false;
+                }
+                if(directType==2){
+                    if(visitTime==4 && !timeIpt){
+                        layui.layer.msg('请选择到访时间！')
+                        return false;
+                    }
+                    if(stayTime == 4){
+                        if(!logSt || !logEd || (parseFloat(logSt)>parseFloat(logEd))){
+                             layui.layer.msg('请输入正确的周期时长！');
+                            return false;
+                        }
+                        if(parseFloat(logSt)<1 || parseFloat(logEd)>1440){
+                             layui.layer.msg('请在1-1440分钟区间选择起始与结束时长！');
+                            return false;
+                        }
+                        $('input[name="stay"]').val('4:'+logSt+'_'+logEd);
+                    }
+                }
+                if(fqTime == 4){
+                    if(fNum && (parseFloat(fNum)<0)){
+                         layui.layer.msg('请输入正确周期频次！');
+                        return false;
+                    }
+                    $('input[name="frequency"]').val('4:'+fNum);
+                }
+                if(!vType){
+                     layui.layer.msg('请选择生成类型！')
+                    return false;
+                }
+                /*var postData = $("form").serialize();*/
+                var dataArr = $("form").serializeArray(),
+                    dataArrPost={};
+                $.each(dataArr, function(i,field){
+                    if(field.name != 'cover_users'){
+                        if(directType==1){
+                            if(field.name !='stay' && field.name !='visit'){
+                                dataArrPost[field.name]= field.value;
+                            }
+                        }else{
+                            dataArrPost[field.name]= field.value;
+                        }
+                    }
+                });
+                getCoverNum(dataArrPost,function(id){
+                    var totalDataArr = $("form").serializeArray(),
+                        totalDataPost={};
+                    $.each(totalDataArr,function(i,field){
+                        if(directType==1){
+                            if(field.name !='stay' && field.name !='visit'){
+                                totalDataPost[field.name]= field.value;
+                            }
+                        }else{
+                            totalDataPost[field.name]= field.value;
+                        }
+                    });
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/v1.2/Ncrowd/apply",
+                        data: totalDataPost,
+                        success: function(rs){
+                            if(rs.state==1){
+                                if(backType){
+                                    location.href = backUrl;
+                                }else{
+                                    location.href = "/v1.2/ncrowd/index";
+                                }
+                                setTimeout("layer.closeAll()", 100);
+                            }else{
+                                layui.layer.msg(rs.msg);
+                            }
+                        },
+                        error: function(r){
+                            layui.layer.msg(r.msg);
+                            setTimeout("layer.closeAll()", 100);
+                        }
+                    });
+                })
+            }
+            //提示
+            $('body').on('click', '.label_tip', function () {
+                var html = '<div class="layer_tip"><span>'+this.getAttribute('title_tip')+'</span><p>'+this.getAttribute('data')+'</p></div>';
+                layer.tips(html, this, {
+                    skin: 'layui-layer-demo',
+                    tips: [3, '#eeeff3'],
+                    area: ['320px','130px'],
+                    time: 0,
+                    closeBtn:1
+                });
+            })
+        })
+
+    </script>
+    </body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>人群画像开通记录</title>
+    <link rel="stylesheet" href="../../../../..//public/css/base.css">
+    <link rel="stylesheet" href="../../../../..//public/css/common.css">
+</head>
+<style>
+    .backlist {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        background: url(../../../../../public/img/back_icon.png) no-repeat;
+        margin-right: 18px;
+        background-position: 1px 0px;
+    }
+
+    .title_box a {
+        color: #7f7f7f;
+    }
+
+    .box_title {
+        width: 100%;
+        height: 40px;
+        line-height: 46px;
+        font-size: 15px;
+        color: #333333;
+        font-weight: 900;
+    }
+
+    .info_box {
+        width: 100%;
+        overflow: hidden;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .adcount {
+        height: 44px;
+        line-height: 44px;
+        font-size: 15px;
+        color: #666666;
+    }
+
+    .adcount div {
+        margin-right: 96px;
+        padding-right: 8px;
+        float: left;
+    }
+
+    #userList {
+        width: 100%;
+        overflow: hidden;
+        padding-top:10px;
+    }
+
+    .base_table {
+        border: 1px solid #f2f4f5;
+        margin-bottom: 49px;
+    }
+
+    .base_table thead {
+        background: #ffffff;
+    }
+
+    .base_table tr th {
+        height: 40px;
+        text-align: left;
+        font-size: 15px;
+        color: #999999;
+        padding: 5px 35px;
+    }
+
+    #dmp_list td {
+        text-align: left;
+        color: #666666;
+        font-size: 14px;
+        padding: 11px 35px;
+        margin-right: 1%;
+    }
+
+    .userinfo_wrapper {
+        text-align: center;
+    }
+
+    .account_wrapper {
+        width: 100%;
+        overflow: hidden;
+        padding: 20px 20px 30px 20px;
+        box-sizing: border-box;
+        border-bottom: 1px solid #f2f4f5;
+    }
+    .account_wrapper .accounttypes{
+        width:33%;
+        float: left;
+        height: 100px;
+    }
+    .account_wrapper .accounttypes .accountname{
+        height: 30px;
+        line-height: 30px;
+        font-size: 15px;
+        color: #666666;
+        text-align: center;
+    }
+    .account_wrapper .accounttypes .accountdetails{
+        text-align: center;
+        font-size: 14px;
+        color: #999999;
+        margin-top: 10px;
+    }
+    .account_wrapper .accounttypes .accountdetails span{
+        font-size: 26px;
+        color: #409eff;
+    }
+    .account_wrapper .accounttypes:nth-of-type(2),.account_wrapper .accounttypes:nth-of-type(3){
+        position: relative;
+    }
+    .account_wrapper .accounttypes:nth-of-type(2)::before,.account_wrapper .accounttypes:nth-of-type(3)::before{
+        content: "";
+        display: block;
+        width: 0;
+        height: 60px;
+        border-left: 1px solid #f2f4f5;
+        position: absolute;
+        left: 0;
+        top: 20px;
+    }
+    #nearDate {
+        float: right;
+    }
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>
+                <a href="/v1.2/Settle/index?isreturn=1">
+                    <i class="backlist"></i>返回代理商列表</a>
+            </span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <a href="/v1.2/agent/view">基本资料</a>
+                <a href="/v1.2/agent/accountdetails">账户详情</a>
+                <a href="/v1.2/agent/consume">消耗查询</a>
+                <a href="javascript:;" class="cur">人群画像开通记录</a>
+            </div>
+            <div class="info_box">
+                <div class="box_title">人群画像开通详情</div>
+                <div class="account_wrapper">
+                    <div class="accounttypes">
+                        <div class="accountname">人群画像高级版开通</div>
+                        <div class="accountdetails"><span>7</span>次</div>
+                    </div>
+                    <div class="accounttypes">
+                            <div class="accountname">人群画像APP分析版开通</div>
+                            <div class="accountdetails"><span>7</span>次</div>
+                    </div>
+                    <div class="accounttypes">
+                            <div class="accountname">转给下级代理</div>
+                            <div class="accountdetails"><span>7</span>次</div>
+                    </div>
+                </div>
+                
+                <div class="userinfo_wrapper">
+                    <div class="tabchangebox mt20">
+                        <div class="box_title" style="width:50%;text-align:left;float:left;">人群画像开通明细</div>
+                        <select class="bm-select" id="nearDate" onchange="getData()">
+                            <option value='1'>最近6个月</option>
+                            <option value='2'>最近1个月</option>
+                        </select>
+                    </div>
+                    <div id="userList">
+                        <table id="dmp_list" class="base_table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>开通次数</th>
+                                    <th>开通对象名称</th>
+                                    <th>客户类型</th>
+                                    <th>版本名称</th>
+                                    <th>操作人员</th>
+                                    <th>流水号</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2017-12-19 15:02:25</td>
+                                    <td>1</td>
+                                    <td>大鹏服务商</td>
+                                    <td>代理商</td>
+                                    <td>人群画像高级版本</td>
+                                    <td>张三</td>
+                                    <td>WX2656653213165468</td>
+                                </tr>
+                                <tr>
+                                    <td>汇总</td>
+                                    <td>1</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </script>
+    <!--人群详情end-->
+    <script type="text/javascript" src="../../../../..//public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../..//public/js/common.js"></script>
+    <script src="../../../../..//public/js/layer/layer.js"></script>
+    <script src="../../../../..//public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="../../../../..//public/js/laytpl/laytpl.js"></script>
+    <script type="text/javascript">
+        //充值记录nav切换
+        $('.tabchangebox .nav .type').on('click', function () {
+            $(this).addClass('cur').siblings().removeClass('cur');
+            var dateType = $('#nearDate').val(); //时间长度
+            var regtype = $('.tabchangebox .nav .type.cur').attr('data-regtype');
+            if(regtype==1){
+                $('#userList.list2').show();
+                $('#userList.list1').hide();
+            }else{
+                
+                $('#userList.list1').show();
+                $('#userList.list2').hide();
+            }
+        })
+        //select筛选时间段
+        function getData() {
+            var dateType = $('#nearDate').val(); //时间长度
+            var regtype = $('.tabchangebox .nav .type.cur').attr('data-regtype');
+        }
+        //获取数据
+        var limit = 10, currNum = 1;
+        function getList(curr) {
+            var name = skeyWord ? ('/keyword/' + skeyWord) : '',
+                status = setStatu ? ('/audit_status/' + setStatu) : '',
+                crowdType = setCrowdType ? ('/crowd_type/' + setCrowdType) : '',
+                start_date = startDate ? ('/start_date/' + startDate) : '',
+                end_date = endDate ? ('/end_date/' + endDate) : '';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/ncrowd/index/page/' + (curr || 1) + '/limit/' + limit + name + status + crowdType + start_date + end_date,
+                dataType: 'json',
+                success: function (rs) {
+                    tipTopHide();       //隐藏提示框
+                    if (rs.state == 1) {         //如果查询成功
+                        var data = rs.data;     //返回数据赋值
+                        console.log(data);
+                        render_table(data, curr);     //渲染表格数据
+                        renderPage(data.pages, curr);
+                    } else {
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

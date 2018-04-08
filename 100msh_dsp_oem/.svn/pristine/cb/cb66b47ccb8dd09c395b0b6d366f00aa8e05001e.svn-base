@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>百米DMP-自定义人群</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+	<link rel="stylesheet" href="/public/css/dateRange.css">
+    <script type="text/javascript" src="/public/js/dateRange.js"></script>
+</head>
+<style>
+	.search_box.spc{position: relative; margin-left: 0;}
+	.search_box.spc p{position: absolute;bottom: 0;right: 0; color:#f80;margin: 0;}
+	.search_box.spc p b{font-weight: normal;}
+	.table-option-btn{text-decoration:none;}
+	.mod_timer{display: inline-block;}
+	.temp_box{padding: 20px;}
+</style>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<i class="info_icon icon1"></i>
+        	<span><a href="">百米DMP</a> / 自定义人群</span>
+        </div>
+        <div class="data_box mt20 delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" onClick="addFn()">新增人群</a>
+            <input type='hidden' name='if_add' id='if_add'/>
+            <div class="search_box spc">
+            	<div class="mod_timer">
+            		<span>时间筛选：</span>
+	            	<div class="date_filter">
+			            <div class="ta_date">
+			                <span class="date_title" id="date_day"></span><i class="arrow"></i>
+			            </div>
+			        </div>
+            	</div>
+            	<select id="statu_id" class="bm-select wd300">
+	                <option value="-1">全部状态</option>
+	                <option value="0">审核中</option>
+	                <option value="2">审核失败</option>
+	                <option value="1">正在运算</option>
+	                <option value="3">运算完成</option>
+	            </select>
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="关键字搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+                <p>共<b id="ct_total"></b>条数据：审核中<b id="ct_noAudit"></b>，审核失败<b id="ct_failAudit"></b>，正在运算<b id="ct_succAudit">}</b>，运算完成<b id="ct_succHandel"></b></p>
+            </div>
+            <div class="mt20">
+	            <table id="dmp_list" class="base_table">
+	                <thead>
+	                    <tr>
+	                        <th>序号</th>
+	                        <th>创建时间</th>
+	                        <th>名称</th>
+	                        <th>提交人员</th>
+							<th>当前状态</th>
+	                        <th>完成时间</th>
+	                        <th>预计覆盖用户</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+	            <p class="noMsg"></p>
+	            <!--列表分页-->
+	            <div id="list_page" class="page"></div>
+	        </div>
+        </div>
+    </div>
+    <!--人群详情start-->
+    <script id="infoTemplate" type="text/html">
+	    <div class="temp_box">
+	    	<p>人群名称：<< d.crowd_name >></p>
+	    	<p>创建时间：<< d.add_time >> </p>
+		    <table class="base_table">
+	            <thead>
+	                <tr>
+	                    <th width="44px">序列</th>
+	                    <th>用户标签</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	            	<<# for(var i in d.tag_list){ >>
+	        		<tr><td><< i*1+1 >> </td><td><< d.tag_list[i] >></td></tr>
+	        		<<# } >>
+	        	</tbody>
+	        </table>
+	    </div>
+    </script>
+    <!--人群详情end-->
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+	<script type="text/javascript">
+		laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+	   
+	    function searchFn(th){
+	        var t = $(th),
+	            inputDom = t.parent().find('input[type="text"]').val();
+	        setStatu = $('#statu_id').val();
+	        skeyWord = encodeURIComponent(inputDom);
+	        getList();
+	    }
+		//获取数据
+	    var limit = 10, currNum = 1;
+	    function getList(curr){
+	    	var name = skeyWord ? ('keyword/'+skeyWord) :'',
+	    		status = setStatu? ('/audit_status/'+setStatu) :'',
+	    		start_date = startDate ? ('/start_date/'+ startDate) :'',
+	    		end_date = endDate ? ('/end_date/'+ endDate) :'';
+	        $.ajax({
+	            type: "GET",
+	            url: '/v1.2/dcrowd/index/page/'+ (curr || 1)+'/limit/'+limit+'/'+name+status+start_date+end_date,
+	            dataType:'json',
+	            success: function(rs){
+	                tipTopHide();       //隐藏提示框
+	                if(rs.state == 1){         //如果查询成功
+	                    var data = rs.data;     //返回数据赋值
+	                    console.log(data);
+	                    render_table(data,curr);     //渲染表格数据
+	                    renderPage(data.pages, curr);
+	                }else{
+	                    tipTopShow(rs.msg);
+	               	}
+	             },
+	            error:function(rs){
+	                tipTopShow("查询信息失败，请重试...");    //显示提示框
+	            }
+	        });
+	    }
+
+	    //渲染表格数据
+	    var audit_status={'0':'审核中','1':'正在运算','2':'审核失败','3':'运算完成'};
+	    function render_table(data,curr){
+	    	$('#ct_total').html(data.stadata.count?data.stadata.count:'0');
+	        $('#ct_noAudit').html(data.stadata.count_noAudit?data.stadata.count_noAudit:'0');
+	        $('#ct_failAudit').html(data.stadata.count_failAudit?data.stadata.count_failAudit:'0');
+	        $('#ct_succAudit').html(data.stadata.count_succAudit?data.stadata.count_succAudit:'0');
+	        $('#ct_succHandel').html(data.stadata.count_succHandel?data.stadata.count_succHandel:'0');
+	        $('#if_add').val(data.if_add);
+	    	var curr = curr?curr:1;
+	        var list_e = $("#dmp_list tbody"),str="",no_msg = $(".noMsg");
+	        if(data.list.length == 0){
+	            list_e.html("");
+	            no_msg.text("暂无记录");
+	            return ;
+	        }
+	        no_msg.text("");
+	        
+	        $.each(data.list,function(k,v){
+	            str +='<tr>';
+	            str +='<td>'+ (limit*(curr-1)+k+1) +'</td>';
+	            str +='<td>'+ v.add_time +'</td>';
+	            str +='<td><a href="javascript:;" class="view_info table-option-btn" _id="'+v.crowd_id+'">'+ v.crowd_name +'</a></td>';
+	            str +='<td>'+ v.staff_name +'</td>';
+	            if(v.audit_status==2){
+	            	str +='<td>'+ audit_status[v.audit_status] +'<em class="status_tip" data="'+(v.audit_remark?v.audit_remark:"无理由")+'">？<em></td>';
+	            }else{
+	            	str +='<td>'+ audit_status[v.audit_status] +'</td>';
+	            }
+	            str +='<td>'+ v.finish_time +'</td>';
+	            str +='<td>'+ v.cover_users +'</td><td>';
+	            if(v.audit_status == 2){
+					str +='<a href="javascript:;" class="table-option-btn mr15" onclick="resubmit('+v.crowd_id+')">重新提交</a>';
+	            }
+	            if(v.audit_status == 3 || v.audit_status ==2){
+				  str +='<a href="javascript:;" class="table-option-btn mr15" onclick="delFn('+v.crowd_id+')">删除</a>';
+	            }
+	            if((v.audit_status == 3) && (v.if_download==1) && (v.download_nums<3)){
+					str +='<a href="javascript:;" class="table-option-btn" onclick="downFn('+v.crowd_id+')" >下载数据('+v.download_nums+')</a>';
+	            }else if((v.audit_status == 3) && (v.download_nums==3)){
+	            	str +='<a href="javascript:;" class="table-option-btn gray" onclick="tipFn(1)">下载数据('+v.download_nums+')</a>';
+	            }else if((v.audit_status == 3) && (v.if_download==0)){
+	            	str +='<a href="javascript:;" class="table-option-btn gray" onclick="tipFn(2)">下载数据('+v.download_nums+')</a>';
+	            }else{
+					str +='<a href="javascript:;" class="table-option-btn gray">下载数据('+v.download_nums+')</a>';
+	            }
+	            str +='</td></tr>';
+	        });
+	        list_e.html(str);
+	    }
+	    //分页
+	    function renderPage(pages,curr){
+	        //显示分页
+	        laypage({
+	            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+	            pages: pages, //通过后台拿到的总页数
+	            //skip: true, //是否开启跳页
+	            skin: '#4c94f5',
+                prev: '<em class="layui-icon"></em>',
+                next: '<em class="layui-icon"></em>',
+	            curr: curr || 1, //当前页
+	            jump: function(obj, first){ //触发分页后的回调
+	            	currNum = obj.curr;
+	                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+	                    getList(obj.curr);
+	                }
+	            }
+	        });
+	    }
+	    getList();
+
+	
+	  
+
+	 
+	</script>
+	</body>
+</html>

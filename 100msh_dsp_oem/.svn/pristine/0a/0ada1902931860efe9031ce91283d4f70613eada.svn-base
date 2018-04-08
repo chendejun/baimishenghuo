@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+</head>
+<body>
+<div class="page_box">
+    <section class="form layui-form">
+        <div class="step_box step5">
+            <div class="from-row">
+                <label>广告名称：</label>
+                <input type="text" class="bm-input layui-input" placeholder="输入广告名称" value="" autocomplete="off">
+            </div>
+            <div class="from-row">
+                <label>投放日期：</label>
+                <input type="text" class="bm-input layui-input mid_ipt" value="2018-03-28" /> <b>至</b>
+                <input type="text" value="" class="bm-input layui-input mid_ipt"/>
+                <span class="ml10">节假日安排</span>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="ad_plan" lay-verify="required">
+                        <option value="">不限</option>
+                        <option value="1">排除节假日</option>
+                        <option value="2">只节假日投放</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>投放时间：</label>
+                <div class="ad_format">
+                    <input type="radio" name="ad_time_type" value="1" title="全时段" checked lay-filter="edition">
+                    <input type="radio" name="ad_time_type" value="1" title="自定义时段" lay-filter="edition">
+                </div>
+                <span style="display: none;" id="customTimeBox">
+                    <select id="timeAear1" class="bm-select" style="width: 80px;"></select>
+                    <select id="timeAear2" class="bm-select" style="width: 80px;"></select>
+                </span>
+            </div>
+            <div class="from-row">
+                <label>出价方式：</label>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="ad_way" lay-verify="required">
+                        <option value="1">CPM</option>
+                        <option value="2">CPC</option>
+                    </select>
+                </div>
+            </div>
+            <div class="from-row">
+                <label>出价：</label>
+                <input type="text" class="bm-input layui-input" placeholder="出价在0.1~100之间" value="" autocomplete="off">
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="stepPage(4)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="postData()">确定投放</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript">
+        function preStepPage(v){
+            var v = parseInt(v)-1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<div class="addperator_form">
+    <div class="form">
+    	<div class="title">新建操作账号</div>
+        <div class="from-row">
+            <label>操作员账号：</label>
+            <input type="text" name="mobile" class="bm-input wd300" placeholder="操作员账号必须为手机号">
+        </div>
+        <div class="from-row">
+            <label>操作员密码：</label>
+            <!-- <input type="text" name="psw" class="bm-input wd300" placeholder="请输入操作员密码"> -->
+            <span class="gray">默认密码为账号后6位</span>
+        </div>
+        <div class="from-row">
+            <label>操作员名称：</label>
+            <input type="text" name="perator_name" class="bm-input wd300" placeholder="操作员名称不超过10个汉字">
+        </div>
+        <div class="from-spec check_type">
+            <span>员工身份：</span>
+            {{foreach from=$user_group  key=key item=val}}
+	            <div class="regtype_wrap">
+	                <label class="regtype_span">
+	                    <i class="regicon"></i>
+	                    <input class="regType" type="radio" name="perator_group" value="{{$key}}"/>{{$val}}
+	                </label>
+	            </div>
+			{{/foreach}}
+        </div>
+        <div class="from-spec regType_tip">
+            <p class="rgTip2">财务查询权限,包括查询广告主、账户中心、效果报告权限。</p>
+            <p class="rgTip3">仅投放权限,包括查询广告主、广告素材、WIFI广告、腾讯广告、DMP人群操作权限。</p>
+            <p class="rgTip4">拥有所有权限</p>
+        </div>
+        <div class="set_bottom mt20">
+            <a href="javascript:;" class="bm-btn cancel_btn" onclick="javascript:layer.closeAll();">取消</a>
+            <input type="button" class="bm-btn bm-btn-blue" value="确定" onclick="addPeratorPost()">
+        </div>
+    </div>
+</div>

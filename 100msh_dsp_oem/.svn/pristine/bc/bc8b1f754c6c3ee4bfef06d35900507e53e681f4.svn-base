@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>广告管理-腾讯广告</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+	<style type="text/css">
+		.ad_nav {
+			width: 245px;
+			height: 100%;
+			border-bottom: 1px solid #dfdfdf;
+			padding-left: 38px;
+			float: left;
+		}
+
+		.ad_nav .nav {
+			width: 102px;
+			float: left;
+			height: 43px;
+			line-height: 43px;
+			text-align: center;
+			background: #fff;
+		}
+
+		.nav_active {
+			border: 1px solid #dfdfdf;
+			border-bottom: 1px solid #fff;
+		}
+
+		.searchbox {
+			float: right;
+		}
+
+		.importantTip {
+			font-size: 15px;
+			color: #666666;
+		}
+
+
+		.base_table tr.inner_table>td {
+			border: none
+		}
+
+		/* .inner_table {
+			display: block;
+		} */
+
+		.inner_table.on {
+			display: table-row;
+		}
+
+		.inner_list .tab_nav li {
+			color: #999;
+			width: 80px;
+			height: 30px;
+			cursor: pointer;
+		}
+
+		.inner_list .tab_nav li {
+			color: #999;
+			width: 80px;
+			height: 30px;
+			cursor: pointer;
+		}
+
+		.inner_list .tab_tip {
+			position: relative;
+		}
+
+		.inner_list .tab_tip p {
+			background: #fff8e7;
+			line-height: 30px;
+			height: 30px;
+			color: #666;
+			border: 1px solid #efd6b6;
+			text-align: left;
+			padding-left: 26px;
+		}
+
+		.inner_list .tab_tip i {
+			width: 16px;
+			height: 16px;
+			position: absolute;
+			left: 0;
+			margin: 7px;
+			background: url(/public/img/tip_icon.png);
+			background-repeat: no-repeat;
+		}
+
+		.inner_list .edit_btn {
+			width: 22px;
+			height: 22px;
+			background: url(/public/img/edit_icon.png) center no-repeat;
+			display: inline-block;
+			cursor: pointer;
+			vertical-align: middle;
+		}
+
+		.inner_list table td {
+			position: relative;
+		}
+
+		.inner_list .close_list {
+			height: 30px;
+			line-height: 30px;
+			float: right;
+			color: #356bb7;
+			margin: 0;
+			cursor: pointer;
+		}
+
+		.layui-layer-btn0 {
+			border: 1px solid #dedede !important;
+			background-color: #f1f1f1 !important;
+			color: #333 !important;
+		}
+
+		.layui-layer-btn1 {
+			border-color: #4898d5 !important;
+			background-color: #2e8ded !important;
+			color: #fff !important;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="content_box">
+		<div class="title_box">
+			<span>数据报表 / 广告效果</span>
+		</div>
+		<div class="data_box mt20 delivery_nav">
+			<div style="height: 43px">
+				<div class="ad_nav">
+					<div class="nav nav_active" data-type="1">WIFI广告</div>
+					<div class="nav" data-type="2">腾讯广告</div>
+				</div>
+				<div class="searchbox">
+					<input type="text" value="" class="bm-input" id="s_material" placeholder="关键字搜索" />
+					<a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn()">搜索</a>
+				</div>
+			</div>
+			<div class="importantTip mt20">重要提示：当日数据仅为参考，准确数据统计请在第二日上午10点后查询。</div>
+			<div class="mt20">
+				<table id="plan_list" class="plan_list base_table">
+					<thead>
+						<tr>
+							<th>广告(计划)名称</th>
+							<th>投放平台</th>
+							<th>广告主</th>
+							<th>申请日期</th>
+							<th>广告状态</th>
+							<th>日预算</th>
+							<th>曝光次数</th>
+							<th>点击量</th>
+							<th>点击率</th>
+							<th>广告花费</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<p class="noMsg"></p>
+				<!--列表分页-->
+				<div id="list_page" class="page"></div>
+			</div>
+		</div>
+		<!--广告主详情start-->
+		<script id="infoTemplate1" type="text/html">
+			<div class="info_box">
+				<ul class="clearfix">
+					<li>广告名称：<< d.delivery_name >></li>
+					<li>广告主：<< d.comp_name >></li>
+					<li>所属服务商：<< d.comp_p_name >></li>
+					<li>投放方式：<< d.delivery_type_name>></li>
+					<li>广告出价：￥<< d.bid_money >> 元</li>	
+					<<# if(d.platform_id==1){ >>
+						<li>总预算：￥<< d.z_money >> 元</li>
+						<li>投放类型：<< d.ad_type_name >></li>
+						<li>日预算：￥<< d.day_money >> 元</li>
+						<<# if(d.crowd_info){ >>
+							<li>投放地区：<< d.crowd_info >></li>
+						<<# } >>
+					<<# } >>
+					<li>出价方式：<< d.bid_type_name >> </li>
+					<li>投放日期：<< d.delivery_date >></li>
+					<li>投放时间段：<< d.delivery_times >></li>
+				</ul>
+				<<# if(d.platform_id==1){ >>
+	                <div class="dbox"><span>投放素材：</span><div class="info"><img src="<< d.material_info[0].img_url >>"><p><< d.material_info[0].material_url >></p></div></div>
+	            <<# } >>
+	            <<# if(d.platform_id==2){ >>
+	                <div class="dbox"><span>投放素材：</span><div class="info"><p><< d.material_info.material_name >></p> <img src="<< d.material_info.pic_purl >>"><p><< d.material_info.jump_url >></p></div></div>
+	            <<# } >>
+			</div>
+    	</script>
+		<!--广告主详情end-->
+		<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="/public/js/common.js"></script>
+		<script src="/public/js/layer/layer.js"></script>
+		<script src="/public/js/laypage/laypage.js"></script>
+		<script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+
+		<script type="text/javascript">
+			//sessionStorage.clear();//清除存储数据
+			laytpl.config({ open: '<<', close: '>>' }); //laytpl与php冲突 标签修改
+			var navType = 1,
+				keywords = "";
+			//平台数据切换
+			function SetNavStyle() {
+				$('.ad_nav').find('.nav').on({
+					click: function () {
+						$(this).addClass('nav_active').siblings().removeClass('nav_active');
+						navType = $('.nav_active').attr('data-type');
+						console.log(navType)
+						getList();
+					}
+				})
+			}
+			SetNavStyle()
+			//搜索
+			function searchFn() {
+				navType = $('.nav_active').attr('data-type');
+				keywords = $.trim($('#s_material').val());
+				getList();
+			}
+			//获取数据
+			var limit = 10;
+			function getList(curr) {
+				if (keywords == "") {
+					var url = '/v1.2/Gdtdelivery/index/page/' + (curr || 1) + '/limit/' + limit + '/platform_id/' + navType
+				} else {
+					var url = '/v1.2/Gdtdelivery/index/page/' + (curr || 1) + '/limit/' + limit + '/platform_id/' + navType + '/name/' + keywords
+				}
+				$.ajax({
+					type: "GET",
+					url: url,
+					dataType: 'json',
+					success: function (rs) {
+						tipTopHide();       //隐藏提示框
+						console.log(rs)
+						if (rs.state == 1) {         //如果查询成功
+							var data = rs.data;     //返回数据赋值
+							render_table(data);     //渲染表格数据					
+							renderPage(data.total_page, curr);
+						} else {
+							tipTopShow(rs.msg);
+						}
+					},
+					error: function (rs) {
+						tipTopShow("查询信息失败，请重试...");    //显示提示框
+					}
+				});
+			}
+
+			//渲染投放计划列表（一级）
+			var delivery_status = { '0': '待审核', '1': '投放中', '2': '审核失败', '3': '投放结束', '4': '暂停' },
+				configured_status={'1':'有效','2':'暂停','3':'结束'},
+				bid_type = { '1': 'CPM', '2': 'CPC' };
+			function render_table(data) {
+				var list_e = $("#plan_list tbody"), str = "", no_msg = $(".noMsg");
+				if (data.list.length == 0) {
+					list_e.html("");
+					no_msg.text("暂无记录");
+					return;
+				}
+				no_msg.text("");
+				$.each(data.list, function (k, v) {
+					var stateText = "",   //投放状态
+						adName = "",  //广告名称
+						platform_name = "",   //平台类型
+						openList = "",   //查看列表
+						dayMoney = "";   //日预算
+					//腾讯广告  2   wifi广告   1
+					if (navType == 1) {
+						adName = '<a href="javascript:;" _id="' + v.delivery_id + '" class="table-option-btn view_info">' + v.delivery_name + '</a>'  //投放名称
+						//广告投放状态
+						stateText = delivery_status[v.delivery_status];
+						platform_name = v.platform_name;
+						openList = '<a href="javascript:;" _id="' + v.delivery_id + '" class="table-option-btn" onclick="ChartsDetails(' + v.delivery_id + ')">查看详情</a>'
+						day_money = v.day_money
+					} else if (navType == 2) {
+						adName = '<a href="javascript:;" _id="' + v.campaign_id + '" class="table-option-btn view_list" onclick="getDevertiserData(' + v.campaign_id + "," + v.configured_status + "," + k + ')">' + v.campaign_name + '</a>'  //计划名称
+						//腾讯的计划投放状态
+						stateText = configured_status[v.configured_status];
+						openList = '<a href="javascript:;" _id="' + v.campaign_id + '" class="table-option-btn" onclick="getDevertiserData(' + v.campaign_id + "," + v.configured_status + "," + k + ')">查看列表</a>'
+						day_money = v.daily_budget / 100
+					}
+					if ($('.nav_active').attr('data-type') == 1) {
+						platform_name = 'WIFI广告';
+					} else if ($('.nav_active').attr('data-type') == 2) {
+						platform_name = '腾讯广告';
+					}
+					str += '<tr class="plan' + k + '">'
+					str += '<td>'
+					str += adName
+					str += '</td>'
+					str += '<td>' + platform_name + '</td>'   //投放平台
+					str += '<td>' + v.comp_name + '</td>'   //广告主
+					str += '<td>' + v.create_time + '</td>'   //申请日期
+					str += '<td>' + stateText + '</td>'
+					str += '<td>' + day_money + '</td>'
+					str += '<td>' + v.z_cpm_num + '</td>'
+					str += '<td>' + v.z_cpc_num + '</td>'
+					str += '<td>' + v.clicking_rate + '</td>'
+					str += '<td>￥' + round(v.ad_pay, 2) + '</td>'
+					str += '<td>' + openList + '</td>'
+					str += '</tr>'
+				});
+				list_e.html(str);
+			}
+			//广告投放列表（二级）
+			function getDevertiserData(id, status, parentId) {
+				var TrNode = $(".plan" + parentId);
+				if (TrNode.hasClass('active') == false) {
+					TrNode.addClass('active');
+					TrNode.children().last().html('<a href="javascript:;" _id="' + id + '" class="table-option-btn" onclick="getDevertiserData(' + id + "," + status + "," + parentId + ')">收起列表</a>')
+					$.ajax({
+						type: "GET",
+						url: '/v1.2/Gdtdelivery/getgdtAdList/campaign_id/' + id + '/camp_status/' + status,
+						dataType: 'json',
+						success: function (rs) {
+							tipTopHide();       //隐藏提示框
+							console.log(rs)
+							if (rs.state == 1) {         //如果查询成功
+								var data = rs.data;     //返回数据赋值
+								if (data.length == 0) {
+									tipTopShow('暂无投放记录！');
+									TrNode.removeClass('active');
+									TrNode.children().last().html('<a href="javascript:;" _id="' + id + '" class="table-option-btn" onclick="getDevertiserData(' + id + "," + status + "," + parentId + ')">查看列表</a>')
+									return;
+								} else {
+									renderadList(data, TrNode);     //渲染表格数据		
+								}
+							} else {
+								tipTopShow(rs.msg);
+							}
+						},
+						error: function (rs) {
+							tipTopShow("查询信息失败，请重试...");    //显示提示框
+						}
+					});
+				} else {
+					TrNode.removeClass('active');
+					TrNode.next('.inner_table').remove();
+					TrNode.children().last().html('<a href="javascript:;" _id="' + id + '" class="table-option-btn" onclick="getDevertiserData(' + id + "," + status + "," + parentId + ')">查看列表</a>');
+				}
+
+			}
+			//渲染广告投放（二级）
+			function renderadList(data, TrNode) {
+				var str = "",
+					table1 = '<tr class="inner_table" id="1"><td colspan="11" style="padding-right:0px !important;"><div class="inner_list" id="inner_list" style="margin-left:20px"><div class="tab_tip" style="height:40px;">'
+				table1 += '<i></i><p>此推广计划共包括'+data.length+'条广告。 </p></div><table width="100%"><thead>'
+				table1 += '<tr><th>广告名称</th><th>出价</th><th>状态</th><th>曝光量</th><th>点击量</th><th>点击率</th><th>广告花费</th><th>操作</th></tr>'
+				table1 += "</thead><tbody>",
+					table2 = '</tbody></table></div></td></tr>'
+
+				$.each(data, function (k, v) {
+					str += '<tr>'
+					str += '<td><a href="javascript:;" class="table-option-btn view_info" _id="' + v.delivery_id + '">' + v.delivery_name + '</a></td>'
+					str += '<td>' + bid_type[v.bid_type] + ' ￥' + v.bid_money + '</td>'
+					str += '<td>' + (v.camp_status == 1 ? delivery_status[v.delivery_status] :configured_status[v.camp_status]) + '</td>'
+					str += '<td>' + v.cpm_num + '</td>'
+					str += '<td>' + v.cpc_num + '</td>'
+					str += '<td>' + v.clicking_rate + '</td>'
+					str += '<td>￥' + round(v.ad_pay, 2) + '</td>'
+					str += '<td><a href="javascript:;" class="table-option-btn" onclick="ChartsDetails(' + v.delivery_id + ')">详情</a></td>'
+					str += '</tr>'
+				})
+				TrNode.after(table1 + str + table2);
+			}
+
+			//跳转至图表详情页面
+			function ChartsDetails(id) {
+				location.href = '/v1.2/report/info?id=' + id;
+			}
+
+			//分页
+			function renderPage(pages, curr) {
+				//显示分页
+				laypage({
+					cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+					pages: pages, //通过后台拿到的总页数
+					//skip: true, //是否开启跳页
+					skin: '#4c94f5',
+					prev: '<em class="layui-icon"></em>',
+					next: '<em class="layui-icon"></em>',
+					curr: curr || 1, //当前页
+					jump: function (obj, first) { //触发分页后的回调
+						if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+							getList(obj.curr);
+						}
+					}
+				});
+			}
+			getList();
+			//广告列表展开
+			$('body').on('click', '.view_list', function () {
+				var id = $(this).attr('_id');
+				$('#' + id).toggleClass('on');
+			});
+
+			//广告主详情
+			$('body').on('click', '.view_info', function () {
+				var id = $(this).attr('_id');
+				console.log(id);
+				var cacheDOM = $("#infoTemplate1").html();
+				infocacheDOM = getUserInfo(id);
+				laytpl(cacheDOM).render(infocacheDOM, function (result) {         //laytpl异步渲染调用
+					//店铺详细信息弹框
+					layer.open({
+						type: 1,
+						title: "广告详情",
+						area: ['760px', '600px'],
+						shadeClose: true,
+						content: result
+					});
+				});
+			});
+			//审核失败理由
+			$('body').on('click', '.status_tip', function () {
+				layer.tips(this.getAttribute('data'), this);
+			})
+			//广告主详情数据
+			function getUserInfo(id) {
+				var data = '';
+				$.ajax({
+					type: "GET",
+					url: '/v1.2/Gdtdelivery/deliveryInfo/delivery_id/' + id,
+					dataType: 'json',
+					async: false,
+					beforeSend: function () {
+						tipTopHide("正在查询数据");    //显示提示框
+					},
+					success: function (rs) {
+						console.log(rs)
+						tipTopHide();
+						if (rs.state == 1) {         //如果查询成功
+							data = rs.data;     //返回数据赋值
+						} else {
+							tipTopShow(rs.msg);
+						}
+					},
+					error: function (rs) {
+						console.log(rs)
+						tipTopShow("查询信息失败，请重试...");    //显示提示框
+					}
+				});
+				return data;
+			}
+
+			//保留两位小数（四舍五入）
+			function round(number, fractionDigits) {
+				with (Math) {
+					return round(number * pow(10, fractionDigits)) / pow(10, fractionDigits);
+				}
+			}
+
+		</script>
+</body>
+
+</html>

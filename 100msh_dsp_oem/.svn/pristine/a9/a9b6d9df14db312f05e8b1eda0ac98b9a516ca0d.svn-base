@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>广告管理-投放计划</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+	<link rel="stylesheet" href="/public/css/common.css">
+</head>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<i class="info_icon icon1"></i>
+        	<span><a href="">广告管理</a> / 投放计划</span>
+        </div>
+        <div class="data_box mt20 delivery_nav">
+            <a class="big-btn bm-btn bm-btn-blue mr20" href="/delivery/add">新增投放</a>
+            <div class="search_box">
+            	<div class="radio_box fl">
+            		<label> <input type="radio" name="set_statu" value="4" checked="checked">所有</label>
+            		<label> <input type="radio" name="set_statu" value="0">待审核</label>
+            		<label> <input type="radio" name="set_statu" value="1">投放中</label>
+            		<label> <input type="radio" name="set_statu" value="2">审核失败</label>
+            		<label> <input type="radio" name="set_statu" value="3">投放结束</label>
+            	</div>
+                <input type="text" value="" class="bm-input" id="s_material" placeholder="关键字搜索" />
+                <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+            </div>
+            <div class="mt20">
+	            <table id="plan_list" class="base_table">
+	                <thead>
+	                    <tr>
+	                        <th>广告名称</th>
+	                        <th>广告主</th>
+	                        <th>申请日期</th>
+	                        <th>广告状态</th>
+							<th>投放类型</th>
+	                        <th>日预算</th>
+	                        <th>出价方式</th>
+	                        <th>曝光次数</th>
+	                        <th>点击数</th>
+	                        <th>点击率</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+	            <p class="noMsg"></p>
+	            <!--列表分页-->
+	            <div id="list_page" class="page"></div>
+	        </div>
+        </div>
+    </div>
+    <!--广告主详情start-->
+    <script id="infoTemplate" type="text/html">
+        <div class="info_box">
+	        <ul class="clearfix">
+	        	<li>广告名称：<< d.delivery_name >></li>
+	        	<li>广告主：<< d.comp_name >></li>
+	        	<li>所属服务商：<< d.comp_p_name >></li>
+	        	<li>投放方式：<< d.delivery_type_name >></li>
+	        	<li>广告出价：￥<< d.bid_money >> 元</li>
+	        	<li>总预算：￥<< d.z_money >> 元</li>
+				<li>投放类型：<< d.ad_type_name >></li>
+	        	<li>出价方式：<< d.bid_type_name >> </li>
+	        	<li>日预算：￥<< d.day_money >> 元</li>
+	        	<li>投放日期：<< d.delivery_date >></li>
+	        	<li>投放时间段：<< d.delivery_times >></li>
+	        </ul>
+	        <div class="dbox"><span>投放素材：</span><div class="info"><img src="<< d.material_info[0].img_url >>"><p><< d.material_info[0].material_url >></p></div></div>
+	    </div>
+    </script>
+    <!--广告主详情end-->
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/laytpl/laytpl.js"></script>
+
+	<script type="text/javascript">
+		//sessionStorage.clear();//清除存储数据
+		laytpl.config({open: '<<', close: '>>'}); //laytpl与php冲突 标签修改
+		//搜索
+	    var skeyWord ='',setStatu='';
+	    function searchFn(th){
+	        var t = $(th),
+	            inputDom = t.parent().find('input[type="text"]').val();
+	        setStatu = t.parent().find('input[type="radio"]:checked').val();
+	        skeyWord = encodeURIComponent(inputDom);
+	        getList();
+	    }
+		//获取数据
+	    var limit = 10;
+	    function getList(curr){
+	    	var name = skeyWord ? ('name/'+skeyWord) :'';
+	    		status = (setStatu !=4 )? ('/status/'+setStatu) :'';
+	        $.ajax({
+	            type: "GET",
+	            url: '/v1.2/Gdtdelivery/index/platform_id/1/page/'+ (curr || 1)+'/limit/'+limit+'/'+name+status,
+	            dataType:'json',
+	            success: function(rs){
+	                tipTopHide();       //隐藏提示框
+	                if(rs.state == 1){         //如果查询成功
+	                    var data = rs.data;     //返回数据赋值
+	                    render_table(data);     //渲染表格数据
+	                    renderPage(data.total_page, curr);
+	                }else{
+	                    tipTopShow(rs.msg);
+	                }
+	            },
+	            error:function(rs){
+	                tipTopShow("查询信息失败，请重试...");    //显示提示框
+	            }
+	        });
+	    }
+
+	    //渲染表格数据
+	    var delivery_status={'0':'待审核','1':'投放中','2':'审核失败','3':'投放结束'},
+	        bid_type={'1':'CPM', '2':'CPC'};
+	    function render_table(data){
+	        var list_e = $("#plan_list tbody"),str="",no_msg = $(".noMsg");
+	        if(data.list.length == 0){
+	            list_e.html("");
+	            no_msg.text("暂无记录");
+	            return ;
+	        }
+	        no_msg.text("");
+	        $.each(data.list,function(k,v){
+	            str +='<tr>';
+	            str +='<td><a href="javascript:;" class="view_info table-option-btn" _id="'+v.delivery_id+'">'+ v.delivery_name +'</a></td>';
+	            str +='<td>'+ v.comp_name +'</td>';
+	            str +='<td>'+ v.create_time +'</td>';
+	            if(v.delivery_status==2){
+	            	str +='<td>'+ delivery_status[v.delivery_status] +'<em class="status_tip" data="'+(v.audit_remark?v.audit_remark:"无理由")+'">？<em></td>';
+	            }else{
+	            	str +='<td>'+ delivery_status[v.delivery_status] +'</td>';
+	            }
+	            if(v.ad_type==1){
+                    str +='<td>竞价投放</td>';
+				} else{
+                    str +='<td>排期投放</td>';
+				}
+	            str +='<td>'+ v.day_money +'</td>';
+	            str +='<td>'+ bid_type[v.bid_type] +'</td>';
+	            str +='<td>'+ v.z_cpm_num +'</td>';
+	            str +='<td>'+ v.z_cpc_num +'</td>';
+	            str +='<td>'+ parseFloat(v.clicking_rate)+'%</td>';
+	            if(v.delivery_status == 2){
+					str +='<td><a href="javascript:;" class="table-option-btn mr15" onclick="editFn('+v.delivery_id+')">修改</a></td>';
+	            }else if(v.delivery_status == 3){
+					str +='<td><a href="javascript:;" class="table-option-btn" onclick="reNewFn('+v.delivery_id+')">重新投放</a></td>';
+	            }else  if(v.delivery_status == 1){
+					str +='<td><a href="javascript:;" class="table-option-btn" onclick="stopFn('+v.delivery_id+')">停止投放</a></td>';
+	            }else{
+	            	str +='<td>——</td>';
+	            }
+
+	            str +='</tr>';
+	        });
+	        list_e.html(str);
+	    }
+	    //分页
+	    function renderPage(pages,curr){
+	        //显示分页
+	        laypage({
+	            cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+	            pages: pages, //通过后台拿到的总页数
+	            skip: true, //是否开启跳页
+	            skin: '#5877a4',
+	            curr: curr || 1, //当前页
+	            jump: function(obj, first){ //触发分页后的回调
+	                if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+	                    getList(obj.curr);
+	                }
+	            }
+	        });
+	    }
+	    getList();
+
+	    //重新投放
+	    function reNewFn(id){
+	    	location.href = '/delivery/add?id='+id;
+	    }
+	    //修改
+	    function editFn(id){
+	    	location.href = '/delivery/edit?id='+id;
+	    }
+	    //停止
+	    function stopFn(id){
+	        layer.confirm("是否停止该广告投放？", {
+	                btn: ["确定","取消"] //按钮
+	             }, function(){
+	             $.ajax({
+	                type: "POST",
+	                url:'/Delivery/end/delivery_id/'+id,
+	                dataType:"json",
+	                success: function(rs){
+	                    if(rs.state == 1){
+	                        //关闭弹层
+	                        getList();
+	                    }else{
+	                        tipTopShow(rs.msg);
+	                    }
+	                    setTimeout("layer.closeAll()", 100);
+	                },
+	                error:function(data){
+	                    tipTopShow("查询失败，请重试...");
+	                    setTimeout("layer.closeAll()", 100);
+	                }
+	            });
+	        });
+	    }
+	    //广告主详情
+        $('body').on('click','.view_info',function(){
+            var id = $(this).attr('_id');
+            var cacheDOM = $("#infoTemplate").html();
+            infocacheDOM = getUserInfo(id);
+            //laytpl异步渲染调用
+            laytpl(cacheDOM).render(infocacheDOM, function(result){
+                //店铺详细信息弹框
+                layer.open({
+                    type: 1,
+                    title: "广告详情",
+                    area: ['760px', '600px'],
+                    shadeClose: true, //点击遮罩关闭
+                    content: result
+                });
+            });
+        });
+        //审核失败理由
+        $('body').on('click','.status_tip',function(){
+        	layer.tips(this.getAttribute('data'), this);
+        })
+        //广告主详情数据
+        function getUserInfo(id){
+            var data='';
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/Gdtdelivery/deliveryInfo/delivery_id/'+id,
+                dataType:'json',
+                async : false,
+                beforeSend:function(){
+                    tipTopHide("正在查询数据");    //显示提示框
+                },
+                success: function(rs){
+                    tipTopHide();
+                    if(rs.state == 1){         //如果查询成功
+                        data = rs.data;     //返回数据赋值
+                    }else{
+                        tipTopShow(rs.msg);
+                    }
+                },
+                error:function(rs){
+                    tipTopShow("查询信息失败，请重试...");    //显示提示框
+                }
+            });
+            return data;
+        }
+	</script>
+	</body>
+</html>

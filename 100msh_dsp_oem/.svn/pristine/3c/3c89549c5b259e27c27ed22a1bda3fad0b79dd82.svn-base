@@ -1,0 +1,44 @@
+<?php
+
+/**
+ *
+ */
+class Portraits extends Model
+{
+
+    protected function createPortraits($data)
+    {
+        $id = $this->db->dsp->table('dsp_individual_portraits')->data($data)->insert();
+        return $id;
+    }
+
+    protected function updatePortraits($where,$data)
+    {
+        $line = $this->db->dsp->table('dsp_individual_portraits')->where($where)->data($data)->update();
+        return $line;
+    }
+
+    protected function findPortraits($where)
+    {
+        $rel = $this->db->dsp->table('dsp_individual_portraits')->where($where)->find();
+        return $rel;
+    }
+
+    protected function createPortraitsTab($data)
+    {
+        $id = $this->db->dsp->table('dsp_individual_portrait_tabs')->data($data)->insert();
+        return $id;
+    }
+
+    protected function updatePortraitsTab($where,$data)
+    {
+        $line = $this->db->dsp->table('dsp_individual_portrait_tabs')->where($where)->data($data)->update();
+        return $line;
+    }
+
+    protected function findPortraitsTab($where)
+    {
+        $rel = $this->db->dsp->table('dsp_individual_portrait_tabs')->where($where)->find();
+        return $rel;
+    }
+}

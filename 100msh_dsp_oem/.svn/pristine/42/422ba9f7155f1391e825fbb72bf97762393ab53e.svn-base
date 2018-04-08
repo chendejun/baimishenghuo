@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/bhdelivery.css">
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form layui-form">
+        <div class="step_bar" style="display: none">
+            <ul class="clearfix">
+                <li class="cur">
+                    <span class="step_icon icon1">1</span>
+                    <p>广告计划</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon2">2</span>
+                    <p>投放人群</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon3">3</span>
+                    <p>投放媒体</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon4">4</span>
+                    <p>广告创意</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon5">5</span>
+                    <p>排期和出价</p>
+                    <i class="line"></i>
+                </li>
+            </ul>
+        </div>
+        <div class="main_box layui-form">
+            <div id="tab_box1"></div>
+            <div id="tab_box2"></div>
+            <div id="tab_box3"></div>
+            <div id="tab_box4"></div>
+            <div id="tab_box5"></div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            layer.msg('加载中.....', { icon: 16 ,shade: 0.02 ,time:500});
+        })
+        function getPageData(id){
+            $.ajax({
+                type:'GET',
+                url:'./addview'+id,
+                async:false,
+                success:function(data){
+                    $('.step_bar').show();
+                    $('#tab_box'+id).html(data).hide();
+                    $('#tab_box1').show();
+                },
+                error:function(){
+                    tipTopShow('页面响应超时...');
+                }
+
+            })
+        }
+        function pageLoad(){
+            for(var i = 1;i<6;i++){
+                getPageData(i);
+            }
+        }
+        pageLoad();
+
+        function stepPage(id){
+            var dataBox = $('#tab_box'+id),
+                stepBar = $('.step_bar');
+            if($.trim(dataBox.html())){
+                dataBox.show().siblings().hide();
+            }
+            stepBar.find('li').each(function(){
+                var th = $(this),
+                    idx = th.index();
+                    th.removeClass('cur');
+                    if(idx < id){
+                        th.addClass('cur')
+                    }
+            })
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+/*.content_box{*/
+    /*background-color: #fff;*/
+    /*min-height: 500px;*/
+    /*position: relative;*/
+/*}*/
+
+.tab_box{
+    background-color: #fff;
+    /*height: 60px;*/
+    position: relative;
+}
+
+.menu_box {
+    /*margin-left: 10px;*/
+    min-width: 900px;
+    padding: 10px;
+    /*background-color: red;*/
+}
+
+.menu_box a {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100px;
+    float: left;
+
+}
+
+.menu_box  .cur {
+    color: #01AAED;
+
+}
+.menu_box a p {
+    width: 45px;
+    height: 0;
+    display: block;
+    text-align: center;
+    margin-left: 25px;
+    position: relative;
+    top: -5px;
+    left: 0;
+}
+
+.menu_box .cur p {
+    background-color: #1E9FFF;
+    height: 5px;
+}
+
+.menu_bottom {
+    border-bottom:1px solid #f0f0f0;
+    margin-left: 15px;
+    height: 40px;
+    /*background-color: green;*/
+}
+
+.tab_box .btn_link {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+/**未开通服务提示*/
+.tip_box{
+    background-color: #fff;
+    min-height: 500px;
+
+}
+
+.tip_box .tip_title {
+    font-size: 18px;
+    text-align: center;
+    height: 55px;
+    line-height: 55px;
+    padding-top: 150px;
+}
+
+.tip_box span  {
+    color: #1E9FFF;
+}
+
+.tip_box .tip_subtitle {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+
+.tip_box .tip_btn {
+    margin-top: 20px;
+    display: block;
+    text-align: center;
+    position: relative;
+    left: 45%;
+}

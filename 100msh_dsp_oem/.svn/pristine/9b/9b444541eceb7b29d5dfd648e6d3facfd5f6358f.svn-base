@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>账户中心-账户信息</title>
+	<link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script src="/public/js/layer/layer.js"></script>
+    <script src="/public/js/common.js"></script>
+    <script type="text/javascript" src="/public/js/layui/layui.js"></script>
+    <link rel="stylesheet" href="/public/js/layui/css/layui.css"/>
+    <style>
+        .content_box{min-width: 1237px;}
+        .setred{color: #ef7269 !important;}
+    </style>
+</head>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span>账户中心 / 我的账户</span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <a href="javascript:;" class="cur">账户信息</a>
+                <a href="/v1.2/account/rechargelist">充值记录</a>
+                <a href="/v1.2/account/invoice">发票开具</a>
+                {{if $sh eq 1}}
+                <a href="/index/operatormanage">操作员管理</a>
+                {{/if}}
+            </div>
+            <div class="mod fl">
+                <h4>服务商账户余额<i class="club_icons icon1" onclick="showtips()" id="stps"></i></h4>
+                <div class="menu_box">
+                    <div class="canvas_box">
+                        <canvas id="procanvas1" class="procanvas"></canvas>
+                    </div>
+                    <ul class="clearfix">
+                        <li><i class="point clred"></i><span>现金账户</span><b id="cash_amount">{{$account.cash_amount}}</b></li>
+                        <li><i class="point clyellow"></i><span>虚拟账户</span><b id="virtual_amount">{{$account.virtual_amount}}</b></li>
+                        <li><i class="point clgray"></i><span>赠送账户</span><b id="give_amount">{{$account.give_amount}}</b></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="space_line fl"></div>
+            <div class="mod fl">
+                <h4>服务商账户支出</h4>
+                <div class="menu_box">
+                    <div class="canvas_box">
+                        <canvas id="procanvas2" class="procanvas"></canvas>
+                    </div>
+                    <ul class="clearfix">
+                        <li><i class="point clred"></i><span>今日支出</span><b id="today_expend">{{$account.today_expend}}</b></li>
+                        <li><i class="point clpurple"></i><span>昨日支出</span><b id="yes_expend">{{$account.yes_expend}}</b></li>
+                        <li><i class="point clgreen"></i><span>本周支出</span><b id="week_expend">{{$account.week_expend}}</b></li>
+                        <li><i class="point clblue"></i><span>本月支出</span><b id="month_expend">{{$account.month_expend}}</b></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="recharge_box mt20">
+            <h4><i class="club_icons icon2"></i>服务商账户充值</h4>
+            <ul class="mod_nav clearfix">
+                <li class="cur">
+                    <p>在线充值</p>
+                    <p>（小于1万建议选择）</p>
+                </li>
+                <li>
+                    <p>线下转账</p>
+                    <p>（1万以上建议选择）</p>
+                </li>
+            </ul>
+            <div class="mod_cont">
+                <div class="pay_cost mt30" id="pay_cost">
+                    <span>充值金额</span>
+                    <ul class="clearfix">
+                        <li class="cur" _data="3000">￥3000</li>
+                        <li _data="2000">￥2000</li>
+                        <li _data="1500">￥1500</li>
+                        <li _data="1000">￥1000</li>
+                        <li _data="200">￥200</li>
+                    </ul>
+                </div>
+                <div class="pay_way mt15">
+                    <span>支付方式</span>
+                    <div class="radio_box clearfix">
+                        <label><!-- <input type="radio" name="payway" class="mr10" checked="checked"> --><p class="wx">微信支付</p></label>
+                        <!-- <label><input type="radio" name="payway" class="mr10" disabled="disabled"><i></i><p class="zfb">支付宝</p></label> -->
+                    </div>
+                </div>
+                <div class="btn_box">
+                    <a href="javascript:;" class="bm-btn bm-btn-blue" id="submit_btn" onclick="submit(this)" _data="3000">立即充值</a>
+                </div>
+            </div>
+            <div class="mod_cont" style="display: none">
+                <div class="pay_account">
+                    <dl class="clearfix">
+                        <dt>账户名称</dt>
+                        <dd>深圳市百米生活股份有限公司</dd>
+                    </dl>
+                    <dl class="clearfix">
+                        <dt>开户银行</dt>
+                        <dd>招商银行深圳深纺大厦支行</dd>
+                    </dl>
+                    <dl class="clearfix">
+                        <dt>账号</dt>
+                        <dd>755 9168 1261 0601</dd>
+                    </dl>
+                    <dl class="clearfix">
+                        <dt>转账识别码</dt>
+                        <dd>{{$encry_id}}</dd>
+                        <b class="account_notice">请在转账备注栏中填写本识别码，以便尽快为您办理充值</b>
+                    </dl>
+                </div>
+                <div class="pay_desc">
+                    <h4>转账说明</h4>
+                    <p>1.充值金额1万元以下，建议您直接在线充值。</p>
+                    <p>2.转账时，请务必填写转账识别码，以便我们能尽快为您办理充值。</p>
+                    <p><span>3.转账后，到账时间受银行业务影响，一般在1~3个工作日内到账，如超过3个工作日还未充入您的账户，请立即与我们联系。</span><!-- <a class="wap_qq" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=1359863752&site=qq&menu=yes"></a> --></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //金额比例
+        function setProcanvas(){
+            var cash_amount = $('#cash_amount').text(),
+                virtual_amount = $('#virtual_amount').text(),
+                give_amount = $('#give_amount').text(),
+                today_expend = $('#today_expend').text(),
+                yes_expend = $('#yes_expend').text(),
+                week_expend = $('#week_expend').text(),
+                month_expend = $('#month_expend').text(),
+                amountP1 = parseFloat(cash_amount)+parseFloat(virtual_amount)+parseFloat(give_amount),
+                amountP2 = parseFloat(today_expend)+parseFloat(yes_expend)+parseFloat(week_expend)+parseFloat(month_expend);
+            var colorArr1 = ["#f04864","#facc14","#cccccc"];
+            var colorArr2 = ["#f04864","#8743e6","#2fc25b","#13c2c2"];
+            if(amountP1!=0){
+                $('#procanvas1').attr('value1',parseFloat(cash_amount)/amountP1*100+'%').attr('value2',parseFloat(virtual_amount)/amountP1*100+'%').attr('value3',parseFloat(give_amount)/amountP1*100+'%');
+            }
+            if(amountP2!=0){
+                $('#procanvas2').attr('value1',parseFloat(today_expend)/amountP2*100+'%').attr('value2',parseFloat(yes_expend)/amountP2*100+'%').attr('value3',parseFloat(week_expend)/amountP2*100+'%').attr('value4',parseFloat(month_expend)/amountP2*100+'%');
+            }
+            process("procanvas1",100,100,colorArr1);
+            process("procanvas2",100,100,colorArr2);
+        }
+        setProcanvas();
+        //选择充值金额
+        $('#pay_cost').on('click','li',function(){
+            $(this).addClass('cur');
+            $(this).siblings().removeClass('cur');
+            $('#submit_btn').attr('_data',$(this).attr('_data'));
+        })
+        $('.mod_nav').on('click','li',function(){
+            var th = $(this),
+                idx = th.index();
+            th.addClass('cur').siblings().removeClass('cur');
+            $('.mod_cont').eq(idx).show().siblings('.mod_cont').hide();
+
+        })
+        function submit(th){
+            var t = $(th),
+                data_num = parseInt(t.attr("_data"));
+            location.href = '/v1.2/account/wxpay/amount/'+data_num;
+        }
+        function showtips(){
+            var msg = '<span style="color:black;">现金账户：在线充值、线下转账等方式充值金额；<br>赠送账户：活动赠送，如充值赠送、活动抽奖等金额；<br>虚拟账户：系统赠送，仅可用于WIFI广告投放的金额；<br>现金和赠送账户可投放所有广告，扣费时的账户顺序：<br>WIFI广告：先从虚拟账户扣除，如余额不足依次从现金账户、赠送账户扣除。<br>其他广告：先从现金账户扣除、如余额不足从赠送账户中扣除。</span>';
+            layer.tips(msg, '#stps',{tips: [3, '#f5f5f5'], area: ['450px', 'auto'],time: 0,closeBtn:1});
+        }
+        
+    </script>
+</body>
+</html>

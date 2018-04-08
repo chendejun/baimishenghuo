@@ -1,0 +1,51 @@
+<?php
+class SettleController extends BasicController {
+	public function indexAction(){
+        $agent_level=$this->uinfo['agent_level'];
+        if($agent_level >= 3){
+            $if_opear=0;
+        }else{
+            $if_opear=1;
+        }
+        //var_dump($agent_level);
+        $this->getView()->assign('if_opear' , $if_opear);
+	}
+	//同步行业分类
+	function industryListAction(){
+        $res=json_decode(BhDspApi::industryList(),true);
+        //var_dump($res);
+        $adv=Helper::M('Advertiser');
+        $sql="INSERT INTO dsp_comp_category1 (`cate_id`,`cate_pid`,`cate_name`) VALUES ";
+        foreach ($res['datas'] as $k=>$v){
+            $sql.="({$v['id']},0,'{$v['name']}'),";
+            $data=array('Id'=>$v['id'],'v'=>mt_rand(10000000000000000,99999999999999999));
+            $list=json_decode(BhDspApi::industryCdList($data),true);
+            foreach ($list['datas'] as $k1=>$v1){
+                $sql.="({$v1['id']},{$v['id']},'{$v1['name']}'),";
+            }
+        }
+        $sql=trim($sql,',');
+        echo $sql;exit;
+        $id=$adv->insetCate($sql);
+        if($id){
+            echo "111";
+        }else{
+            echo "0";
+        }
+        exit;
+    }
+    function addAdv(){
+
+    }
+    function qualificationsAction(){
+        include(LIB_PATH . '/phpQuery/phpQuery.php');
+        $res=BhDspApi::qualifications('1697020333');
+        phpQuery::newDocumentHTML($res);
+        // $list=pq(".bh_pass_area:eq(1) .special");
+        // foreach ($list as $v){
+        //     echo pq($v)->html()."+++<br/>";
+        // }
+        echo 11;
+        exit;
+    }
+}

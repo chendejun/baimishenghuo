@@ -1,0 +1,369 @@
+<?php
+
+/**
+ *
+ */
+class PortraitsController extends BasicController
+{
+    /**
+     * [SUCCESS_STATE 请求成功状态]
+     * @var integer
+     */
+    const SUCCESS_STATE = 1;
+
+    /**
+     * [FAIL_STATE 请求失败状态]
+     * @var integer
+     */
+    const FAIL_STATE = 0;
+    const NOT_ENOUGH = -1;
+
+
+    protected $queryTags = '/tags/queryTags.do';
+
+
+
+
+
+    /**
+     * [indexAction 个体画像列表]
+     * @return [type] [description]
+     */
+    public function indexAction()
+    {
+        $page = Helper::clean($this->getRequest()->getParam('page',1));
+        $pagecount = Helper::clean($this->getRequest()->getParam('pagecount',10));
+        $key_word = Helper::clean($this->getRequest()->getParam('key_word'));
+        $start=($page-1)*$pagecount;
+        $limit = $start.','.$pagecount;
+        $where = ' comp_id = '.$this->uinfo['comp_id'];
+        if (!empty($key_word)) {
+            $where .= ' and user_mac like "%'.strtoupper($key_word).'%"';
+        }
+        $portraits = Helper::M('Portraits');
+        $data = array();
+        $data['list'] = $portraits->getPortraitsList($where,$limit);
+        $count = count($portraits->getPortraitsList($where));
+        $data['total_page'] = ceil($count/$pagecount);
+        $data['pages'] = $page;
+        Helper::outJson(array('state'=>self::SUCCESS_STATE,'data'=> $data));
+    }
+
+    /**
+     * [getPortraitsInfo 获取画像大数据详情]
+     * @return [type] [description]
+     */
+    public function getPortraitsInfoAction()
+    {
+        $individual_portraits_id = Helper::clean($this->getRequest()->getParam('individual_portraits_id'));
+        $this->checkParam('画像id',$individual_portraits_id);
+        $portraits = Helper::M('Portraits');
+        $where = ' individual_portraits_id = '.$individual_portraits_id;
+        $data = $portraits->selectPortraitsTab($where);
+        //var_dump($data);exit;
+        foreach ($data as $key => $value) {
+            $new_data[$key]['content'] = json_decode($value['tab_content'],true);
+            $new_data[$key]['tab_type'] = $value['tab_type'];
+        }
+
+        Helper::outJson(array('state'=>self::SUCCESS_STATE,'data'=> $new_data));
+
+
+
+    }
+
+
+
+
+
+    /**
+     * [sendShortMessageAction 发送短信]
+     * @return [type] [description]
+     */
+    public function sendShortMessageAction()
+    {
+        $user_mac = Helper::clean($this->getRequest()->getParam('user_mac'));
+        $this->checkParam('用户mac',$user_mac);
+        $uinfo = $_SESSION['uinfo'];
+        $code_key = $uinfo['staff_id'];
+        $code = $this->getRandomCode();
+        $mobile_phone = $this->getMobilePhone();
+        $content = '付款验证码：'.$code.'，您确定查询该用户MAC：'.$user_mac.'的个人画像，请在3分钟内填写验证码完成验证。';
+        $_SESSION['code_key'.$code_key] = $code;
+        $result = BmDspApi::request('sms/send' , array('content' => $content ,'mobile_phone'=>$mobile_phone)); //发送短信验证码
+        if(empty($result) || isset($result['error'])){
+         Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>empty($result)?'短信发送异常，请稍后再试！':$result['error']));
+        }else{
+         Helper::outJson(array('state'=>self::SUCCESS_STATE,'msg'=> $result['msg']));
+        }
+    }
+
+    /**
+     * [portraitsPaymentAction 开通人群画像]
+     * @return [type] [description]
+     */
+    public function portraitsPaymentAction()
+    {
+
+        //var_dump($this->uinfo);exit;
+        $user_mac = Helper::clean($this->getRequest()->getParam('user_mac'));
+        $code = Helper::clean($this->getRequest()->getParam('code'));
+        $portraits = Helper::M('Portraits');
+        if (!empty($_POST) && isset($_POST)) {
+            $this->checkParam('用户mac',$user_mac);
+            // 验证验证码
+            $this->checkCode($code);
+            // 余额是否足够
+            $res = $portraits->getServerSceneResource($uinfo['comp_id']);
+            $this->checkSufficientBalance(1,$res['one_num']);
+
+            // 开启事务
+            $portraits->startTrans();
+
+            // 得到大数据标签
+            $query_rel = $this->getQueryTags($user_mac);
+
+            // 判断是否存在画像
+            if ($this->checkPortraits($user_mac)) {
+                // 存在更新
+                $data = [
+                    'query_time'=>date('Y-m-d H:i:s',time())
+                ];
+                // 更新画像
+                $id = $portraits->updatePortraits('user_mac="'.$user_mac.'"',$data);
+
+                // 得到该mac的画像id
+                $rel = $portraits->findPortraits('user_mac="'.$user_mac.'"');
+                $where = 'individual_portraits_id='.$rel['individual_portraits_id'];
+                // 删除该用户画像的所有tab
+                $del_id = $portraits->delPortraitsTab($where);
+                foreach ($query_rel as $key => $value) {
+                    $tab_data = [
+                        'individual_portraits_id'=>$rel['individual_portraits_id'],
+                        'tab_type'=>$key,
+                        'tab_content'=>json_encode($value)
+                    ];
+                    // 新建标签
+                    $tab_id = $portraits->createPortraitsTab($tab_data);
+
+                    if (empty($id) || empty($tab_id) || empty($del_id)) {
+                        $portraits->rollback();
+                        Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => '插入数据库失败'));
+                    }
+                }
+            }else {
+
+                // 不存在新建
+                $data = [
+                    'query_time'=>date('Y-m-d H:i:s',time()),
+                    'comp_id'=>$this->uinfo['comp_id'],
+                    'user_mac'=>$user_mac,
+                    'create_user'=>$this->uinfo['staff_id']
+                ];
+                // 新建画像
+                $id = $portraits->createPortraits($data);
+
+                foreach ($query_rel as $key => $value) {
+                    $tab_data = [
+                        'individual_portraits_id'=>$id,
+                        'tab_type'=>$key,
+                        'tab_content'=>json_encode($value)
+                    ];
+                    // 新建标签
+                    $tab_id = $portraits->createPortraitsTab($tab_data);
+
+                    if (empty($id) || empty($tab_id)) {
+                        $portraits->rollback();
+                        Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => '插入数据库失败'));
+                    }
+                }
+            }
+
+            // 画像支付
+            $this->portraitsPay(4,1);
+            $portraits->commit();
+            Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => '开通成功'));
+
+        }else {
+            Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => '非法请求'));
+        }
+    }
+
+    /**
+     * [portraitsPay 个人画像支付]
+     * @param  [type] $portraits_type  [description]
+     * @param  [type] $transfer_number [description]
+     * @return [type]                  [description]
+     */
+    protected function portraitsPay($portraits_type,$transfer_number)
+    {
+        $portraits = Helper::M('Portraits');
+        $uinfo = $_SESSION['uinfo'];
+        $staff_id = $uinfo['staff_id'];
+        $record_no = 'CJ'.date('YmdHis',time()).'1'.rand(1000,9999);
+        $data = [
+            'record_no'=>$record_no,
+            'comp_pid'=>$uinfo['comp_id'],
+            'comp_id'=>0,
+            'poster_type'=>$portraits_type,
+            'record_type'=>2,
+            'record_status'=>1,
+            'record_num'=>$transfer_number,
+            'staff_id'=>$staff_id,
+            'add_time'=>time()
+        ];
+        $record_rel = $portraits->recordTransferCreate($data);
+        $res = $portraits->getServerSceneResource($uinfo['comp_id']);
+        $this->checkSufficientBalance(1,$res['one_num']);
+        $resource_data = [
+            'one_num'=>$res['one_num'] - $transfer_number,
+        ];
+        $res_rel = $portraits->resourceTransferUpdate($uinfo['comp_id'],$resource_data);
+
+        if (!$record_rel || !$res_rel ) {
+            $this->db->dsp->rollback();
+            Helper::outJson(array('state' => self::FAIL_STATE, 'msg' => '支付失败，请重试'));
+        }
+    }
+
+
+
+    /**
+     * [checkSufficientBalance 判断余额是否足够]
+     * @param  [type] $amount        [所需金额]
+     * @param  [type] $usable_amount [可用余额]
+     * @return [type]                [description]
+     */
+    protected function checkSufficientBalance($amount,$usable_amount)
+    {
+        if ($amount>$usable_amount) {
+            Helper::outJson(array('state'=>self::NOT_ENOUGH,'msg'=>"个人画像次数不够！"));
+        }
+    }
+
+
+
+    /**
+     * [checkPortraits 判断该用户画像是否存在]
+     * @param  [type] $user_mac [用户mac]
+     * @return [type]           [description]
+     */
+    protected function checkPortraits($user_mac)
+    {
+        $portraits = Helper::M('Portraits');
+        $where = 'user_mac="'.$user_mac.'"';
+        return !empty($portraits->findPortraits($where));
+    }
+
+    /**
+     * [checkPortraits 判断该画像标签是否存在]
+     * @param  [type] $individual_portraits_id [画像id]
+     * @return [type]                          [description]
+     */
+    protected function checkPortraitsTab($individual_portraits_id)
+    {
+        $portraits = Helper::M('Portraits');
+        $where = 'individual_portraits_id='.$individual_portraits_id;
+        return !empty($portraits->findPortraitsTab($where));
+    }
+
+
+    /**
+     * [getQueryTags 得到用户mac标签数据]
+     * @return [type] [description]
+     */
+    protected function getQueryTags($user_mac)
+    {
+        $scenes = Helper::M('Scenes');
+		$data_arr = [];
+		// 获取token
+		$token = $scenes->getToken();
+		$config = Yaf_Registry::get("config");
+		// 域名
+		$host = $config['dsp.host'];
+		$url = $host.$this->queryTags.'?token='.$token.'&mac='.$user_mac;
+		//var_dump($url);exit;
+		$data = DoNetwork::makeRequest($url,'GET');
+        $data_arr = json_decode($data,true);
+		if (is_array($data_arr) && array_key_exists('code',$data_arr) && $data_arr['code'] == 10000 ) {
+			$this->redis->set('dsp_'.$this->queryTags.'_'.$user_mac.'_'.date('YmdH',time()),$data_arr,60*60);
+			$data_arr_data = $data_arr['data'];
+		}else {
+			$redis_rel = $this->redis->get('dsp_'.$this->queryTags.'_'.$user_mac.'_'.date('YmdH',time()));
+			$data_arr_data = $redis_rel['data'];
+		}
+
+		return $data_arr_data;
+
+    }
+
+    protected function checkParam($param_column,$param_value,$param_Range = array())
+    {
+        if (empty($param_value)) {
+            Helper::outJson(array('state'=>0,'msg'=>'请输入：'.$param_column));
+        }
+        if (count($param_Range)>0) {
+            if (!in_array($param_value,$param_Range)) {
+                Helper::outJson(array('state'=>0,'msg'=>'参数'.$param_column.'不合法'));
+            }
+        }
+    }
+
+    /**
+     * [getMobileTailPhoneAction 得到手机号码尾号]
+     * @return [type] [description]
+     */
+    public function getMobileTailPhoneAction()
+    {
+
+        $phone = $this->getMobilePhone();
+        Helper::outJson(array('state'=>self::SUCCESS_STATE,'phone'=>substr($phone,-4,4)));
+
+    }
+
+    /**
+     * [getRandomCode 得到随机码]
+     * @return [type] [description]
+     */
+    protected function getRandomCode()
+    {
+         return rand(1000,9999);
+    }
+
+    /**
+     * [getMobilePhone 得到手机号码]
+     * @return [type] [description]
+     */
+    protected function getMobilePhone()
+    {
+        $uinfo = $_SESSION['uinfo'];
+        $scenes = Helper::M('Scenes');
+        $phone = $scenes->getMobilePhone($uinfo['comp_id']);
+        return $phone;
+    }
+
+
+    /**
+     * [checkCode 验证验证码输入是否正确]
+     * @param  [type] $code [输入的验证码]
+     * @return [type]       [description]
+     */
+    protected function checkCode($code)
+    {
+        $uinfo = $_SESSION['uinfo'];
+        $code_key = $uinfo['staff_id'];
+        if (empty($code)) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"请输入验证码"));
+        }
+        if (empty($_SESSION['code_key'.$code_key]) || !isset($_SESSION['code_key'.$code_key])) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"短信session失效！"));
+        }
+        if ($_SESSION['code_key'.$code_key] != $code) {
+            Helper::outJson(array('state'=>self::FAIL_STATE,'msg'=>"验证码输入错误！"));
+        }
+        $_SESSION['code_key'.$code_key] = '';
+    }
+
+
+
+}

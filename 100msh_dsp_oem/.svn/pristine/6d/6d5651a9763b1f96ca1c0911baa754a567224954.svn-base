@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 新建分析表 -->
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP / 客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=p38ZbGmkKPLWPNlLNWw42vFZ"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <style>
+        .content_box .goback {margin:20px;display:block;font-size:15px;color:#666;}
+        .data_box {padding:20px;background-color:#fff;color:#777;font-size:14px;}
+        .data_box .layui-form-label {width:100px;}
+        .data_box .tip_box {background-color:#FAEBD7;border:1px solid #FFE4C4;color:#FFA500;height:40px;line-height:40px;}
+        .data_box .tip_box i {background:url("../../../../../public/img/tip_icon.png") no-repeat top center;width:20px;height:20px;display:inline-block;vertical-align:middle;position:relative;top:12px;left:10px;}
+        .data_box .tip_box p {padding-left:15px;height:40px;line-height:40px;font-size:12px;float:left;}
+        .data_box .tip_box a {margin-right:10px;}
+        .data_box .btn {position:relative;left:35%;}
+        .data_box .btn a {margin-right:15px;font-size:14px;width:120px;}
+        .w350 {width:350px;}
+        .tip_text {float:left;display:block;padding:8px 0;margin-right:10px;line-height:20px;position:relative;font-size:13px;}
+        .mgl160 {margin-left:160px;}
+        #bmmap {width:750px;height:300px;margin-left:130px;}
+        #type_txt {font-size:10px;}
+        .layui-form-select dl dd.layui-this {background-color:#4c94f5;}
+        .layui-form-radio i:hover,.layui-form-radioed i {color:#4aa6fc;}
+        .layui-form-checkbox[lay-skin=primary]:hover i {border-color:#4aa6fc;}
+        .layui-form-checked[lay-skin=primary] i {background-color:#4aa6fc}
+        .layui-form-checked span {color:#009eff !important;}
+        #alert_bg {width:100%;height:1000px;background-color:rgba(0,0,0,0.5);position:absolute;top:0;left:0;}
+        .alert {width:250px;height:200px;border:1px solid #ccc;background-color:#fff;padding:30px;font-size:14px;position:absolute;top:80%;left:40%;}
+        .alert h3 {font-size:14px;color:#333;text-align:center;padding:10px;}
+        .alert_body #close {position:absolute;top:10px;right:10px;cursor:pointer;/*width:30px;*/            /*height:30px;*/}
+        .alert_body p {height:25px;line-height:25px;font-size:12px;}
+        .alert_body input {width:100px;height:30px;font-size:12px;text-align:center;margin:5px;margin-left:0;}
+        .alert_body .time_txt {position:relative;top:10px;left:0;}
+        .alert_btn {width:150px;height:30px;text-align:center;display:block;font-size:12px;line-height:30px;position:absolute;bottom:10px;left:20%;}
+        /*表格*/       
+        .mac_list{display: none} 
+        .mac_list,.item {padding:10px;padding-left:130px;}
+        .table_list {width:500px;border:1px solid #ccc;}
+        .table_list thead {background-color:#f1eff0;text-align:center;height:40px;line-height:40px;}
+        .table_list th {width:250px;}
+        .table_list td {height:40px;text-align:center;}
+        .scroll_box {margin:40px;margin-left:0;/*background-color:green;*/            padding-bottom:40px;}
+        .scroll_box label {margin-right:10px;float:left;}
+        /*滑块拖动*/        .lineDiv {position:relative;height:5px;background:#f1eff0;width:315px;top:10px;left:0;float:left;}
+        .lineDiv span {position:relative;top:-30px;left:0;}
+        .lineDiv .max {float:right;}
+        .lineDiv .minDiv {position:absolute;top:-10px;left:0;width:15px;height:25px;background:cornflowerblue;cursor:pointer;border-radius:8px;}
+        .lineDiv .minDiv .vals {position:absolute;top:25px;left:-10px;width:30px;height:30px;line-height:30px;text-align:center;font-size:14px;/*background:blue;*/}
+        #halfrange {margin-bottom:40px;}
+        .map-label {width:auto !important;}
+        #map-label {width:570px;}
+        #l-map-lng,#l-map-lat {width:220px;}
+        .ser_per {width:180px !important}
+        .layui-layer-content{height: auto!important;}
+        .layui-layer-content p,.layer_tip span {color:#333}
+        .edition_h5 {color:#999;font-size:12px;}
+        .layui-form-checked i,.layui-form-checked:hover i {color:#4aa6fc;}
+        .layui-form-checked,.layui-form-checked:hover {border-color:#4aa6fc;}
+        .layui-form-item .layui-input-inline{width: 220px;}
+        #mac_tips{color: red;font-size: 12px;margin-left: 130px;display: none}
+    </style>
+
+</head>
+
+<body style="overflow-x:hidden;">
+    <div class="content_box">
+        <div class="title_box">
+            <span><a href="/v1.2/Scenes/index">&lt; 返回人群画像</a></span>
+        </div>
+        <div class="data_box">
+            <div class="tip_box" id="tip_box">
+                <i class="fl"></i>
+                <p>温馨提示：提交开通后，首次开通到生成数据分析报表需1~2个工作日，不便之处敬请理解。</p>
+                <a class="fr" href="javascript:" id="closeTip">关闭</a>
+            </div>
+
+            <form action="" class="layui-form mt30">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">场景名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="title" required lay-verify="required" placeholder="请输入场景名称" autocomplete="off" class="layui-input"
+                            id="scene_name">
+                    </div>
+                </div>
+
+                <div class="layui-form-item layui-form">
+                    <label class="layui-form-label">选择广告主：</label>
+                    <div class="layui-input-inline">
+                        <select name="add_group" lay-verify="required" lay-filter="add_group" class="secens_list"></select>
+                    </div>
+                </div>
+                <p id="mac_tips">该广告主还未绑定探测设备，请先绑定设备，否则画像数据为空。</p>
+                <div class="mac_list">
+                    <table class="table_list" border="1">
+                        <thead>
+                            <tr>
+                                <th class="first">设备MAC</th>
+                                <th>放置位置</th>
+                            </tr>
+                        </thead>
+                        <tbody class="mac_body">
+                            <!--<tr>-->
+                            <!--<td>01ASD4DFAD521</td>-->
+                            <!--<td>前门</td>-->
+
+                            <!--</tr>-->
+                            <!--<tr>-->
+                            <!--<td>01ASD4DFAD521</td>-->
+                            <!--<td>后门</td>-->
+                            <!--</tr>-->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="item">
+                    <label>人群筛选条件</label>
+                    <i class="dcrowd_icon icon3 label_tip" title_tip="人群筛选条件是对探测设备基本条件:" data="探测半径：以设备为中心点,探测覆盖周边的人群。<br/>停留标注：统计停留人数的最低标准时间。"></i>
+
+                    <div class="scroll_box">
+                        <label class="fl">探测半径</label>
+                        <div id="lineDiv" class="lineDiv">
+                            <span>1米</span>
+                            <div id="minDiv" class="minDiv">
+                                <div id="val" class="vals">1</div>
+                            </div>
+                            <span class="max">30米</span>
+                        </div>
+
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="scroll_box">
+                        <label>停留标准</label>
+                        <i></i>
+                        <div id="timeDiv" class="lineDiv">
+                            <span>1分钟</span>
+                            <div id="roundDid" class="minDiv">
+                                <div id="timeValue" class="vals">1</div>
+                            </div>
+                            <span class="max">30分钟</span>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <p>
+                        <input type="checkbox" name="vehicle" value="Car" checked="checked" lay-skin="primary" id="is_auto_update" /> 设备变动时,自动更新设备信息
+                        <span>设备变动指绑定新设备、解绑设备等</span>
+                    </p>
+
+                </div>
+
+                <div class="layui-form-item layui-form">
+                    <label class="layui-form-label">所在行业：</label>
+                    <div class="layui-input-inline">
+                        <select name="type" lay-verify="required" id="industry_id">
+                            <option value="1">零售行业</option>
+                            <option value="2">餐饮行业</option>
+                            <option value="3">酒店行业</option>
+                            <option value="4">电影行业</option>
+                            <option value="5">汽车行业</option>
+                            <option value="6">母婴亲子行业</option>
+                            <option value="7">美妆护肤行业</option>
+                            <option value="8">服装鞋包行业</option>
+                        </select>
+                    </div>
+                    <div class="tip_text">温馨提示：所属行业对消费偏好分析有重要意义，请尽量选择匹配的行业。 </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">数据邮箱：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="email" required lay-verify="required" placeholder="请填写邮箱,数据/通知等将定期发送到该邮箱" autocomplete="off" class="layui-input w350"
+                            id="email">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">营业时间：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="date" id="start_date" lay-verify="date" placeholder="H点m分" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid">至</div>
+                    <div class="layui-input-inline">
+                        <input type="text" name="date" id="end_date" lay-verify="date" placeholder="H点m分" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">营业面积：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="area" lay-verify="required" placeholder="填写数字(最多2位小数)" autocomplete="off" class="layui-input" id="area">
+                    </div>
+                    <div class="layui-form-mid">平方米</div>
+                    <div class="layui-form-mid">共</div>
+                    <div class="layui-input-inline">
+                        <select name="floor" lay-filter="floor" id="floor_number">
+                            <option value="1" selected>一层</option>
+                            <option value="2">二层</option>
+                            <option value="3">三层</option>
+                            <option value="4">四层</option>
+                            <option value="5">五层</option>
+                            <option value="6">六层</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所在地址：</label>
+                    <div class="layui-input-inline" id="map-label">
+                        <div class="layui-form-mid map-label">经度：</div>
+                        <input type="text" name="title" required lay-verify="required" readonly class="layui-input fl layui-disabled" id="l-map-lng" placeholder='点击地图获取经度'>
+                        <div class="layui-form-mid map-label" style="margin-left:10px;">纬度：</div>
+                        <input type="text" name="title" required lay-verify="required" readonly class="layui-input fl layui-disabled" id="l-map-lat" placeholder='点击地图获取纬度'>
+                    </div>
+                    <div class="tip_text">地址对兴趣偏好等画像数据的准确性有重要意义,请确保正确的地址。</div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <div class="bmmap" id="bmmap"></div>
+                </div>
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">服务期限：</label>
+                    <div class="layui-input-inline">
+                        <select name="interest" lay-filter="ser_per" id="term">
+                            <option value="1" selected>1年</option>
+                            <option value="2">2年</option>
+                            <option value="3">3年</option>
+                        </select>
+                    </div>
+                    <label class="layui-form-label ser_per"></label>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">数据画像：</label>
+                    <div class="layui-input-block" id="edition">
+                        <input type="radio" name="edition" value="1" title="基础版" id="basic" checked lay-filter="edition">
+                        <input type="radio" name="edition" value="2" title="高级版" id="vip" lay-filter="edition">
+                        <i class="dcrowd_icon icon3 label_tip" title_tip="" data="基础版：包括客流基础数据分析,如近段时间的到店趋势图、停留时长分析等部分。<br/>高级版：包括基础版中的功能外,提供客户人群分析、消费偏好、商圈分析、客流来源分析、常用APP分析等多项数据分析服务。"></i>
+                        <p id="type_chose" style="display: none">当前广告主为VIP用户,本次费用¥0.00 (人群画像查询年费用 3000/年)
+                            <span></span>
+                        </p>
+                    </div>
+                    <h5 class="edition_h5">基础版本免费，本次费用 ￥0.00</h5>
+                </div>
+            </form>
+            <div class="btn">
+                <a href="javascript:;" class="btn_link bm-btn bm-btn-white" id="saveScene">保存为草稿</a>
+                <a href="javascript:;" class="btn_link bm-btn bm-btn-blue" id="pay">保存</a>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+            //日期
+            laydate.render({
+                elem: '#start_date',
+                type: 'time'
+            });
+            //日期
+            laydate.render({
+                elem: '#end_date',
+                type: 'time'
+            });
+
+
+            // 百度地图API功能
+            var map = new BMap.Map("bmmap");
+            var point = new BMap.Point();
+            map.centerAndZoom(point, 12);
+            var geolocation = new BMap.Geolocation();
+            geolocation.getCurrentPosition(function (r) {
+                if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                    var mk = new BMap.Marker(r.point); // 创建标注
+                    map.addOverlay(mk); // 将标注添加到地图中
+
+                    map.addEventListener("click", function (e) { //拖动事件
+                        document.getElementById("l-map-lng").value = e.point.lng;
+                        document.getElementById("l-map-lat").value = e.point.lat; //打印拖动结束坐标
+                        map.removeOverlay(mk); //清除地图上存在的标注
+                        var point = new BMap.Point(e.point.lng, e.point.lat);
+                        map.centerAndZoom(point);
+                        mk = new BMap.Marker(point); // 创建新的标注
+                        map.addOverlay(mk); //将标注添加到地图上
+                    });
+
+                    map.panTo(r.point);
+                    console.log('您的位置：' + r.point.lng + ',' + r.point.lat);
+                } else {
+                    alert('failed' + this.getStatus());
+                }
+            }, {
+                enableHighAccuracy: true
+            })
+            map.enableScrollWheelZoom(true); //开启缩放
+            map.enableInertialDragging(); //开启惯性拖拽
+
+
+            //提示
+            $('body').on('click', '.label_tip', function () {
+                var html = '<div class="layer_tip"><span>' + this.getAttribute('title_tip') +
+                    '</span><p>' + this.getAttribute('data') + '</p></div>';
+                layer.tips(html, this, {
+                    skin: 'layui-layer-demo',
+                    tips: [3, '#eeeff3'],
+                    area: ['320px', '130px'],
+                    time: 0,
+                    closeBtn: 1
+                });
+            })
+
+
+            //获取广告主列表
+            function getScenesList() {
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/scenes/getAgentAdvertiser',
+                    dataType: 'json',
+                    success: function (rs) {
+                        tipTopHide(); //隐藏提示框
+                        if (rs.state == 1) { //如果查询成功
+                            var data = rs.data; //返回数据赋值
+                            console.log(data);
+                            render_list(data); //渲染表格数据
+                        } else {
+                            layui.layer.msg(rs.msg);
+
+                        }
+                    },
+                    error: function (rs) {
+                        layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+                    }
+                });
+            }
+            getScenesList();
+
+
+            //广告主列表信息填充
+            function render_list(data) {
+                var str = "<option value>请选择广告主</option>";
+                for (var i = 0, len = data.length; i < len; i++) {
+                    str += "<option value='" + data[i].comp_id + "'>" + data[i].comp_name + "</option>";
+                }
+                $('.secens_list').html(str);
+                form.render();
+            }
+
+            //广告主选择
+            form.on('select(add_group)', function (data) {
+                console.log(data.value);
+                //根据广告主，获取设备列表
+                if(data.value){
+                    getMacList(data.value);
+                }else{
+                    $('.mac_list').hide();
+                }
+            });
+
+            //获取广告主设备列表
+            function getMacList(id) {
+                $.ajax({
+                    type: "GET",
+                    url: '/v1.2/scenes/getAdvertiserMac/comp_id/' + id,
+                    dataType: 'json',
+                    success: function (rs) {
+                        tipTopHide(); //隐藏提示框
+                        if (rs.state == 1) { //如果查询成功
+                            var data = rs.data; //返回数据赋值
+                            console.log('>>>>>' + data)
+                            if (data == '') {
+                                $('#mac_tips').show();
+                                $('.mac_list').hide();
+                            }else{
+                                $('#mac_tips').hide();
+                                $('.mac_list').show();          
+                            }
+                            //mac列表信息
+                            fillMacData(data);
+                            if (data.count > 0) {
+                                var comp_id = data[1].comp_id;
+                                console.log(comp_id);
+                                getMacList(comp_id);
+                            }
+                            console.log(data);
+                        } else {
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error: function (rs) {
+                        layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+                    }
+                });
+            }
+
+            //设备列表
+            function fillMacData(data) {
+                var str = "",
+                    content = "";
+                for (var i = 0, len = data.length; i < len; i++) {
+                    content = "<tr mac_id=" + data[i].mac_id + ">";
+                    content += "<td>" + data[i].mac_addr + "</td>";
+                    content += "<td>" + data[i].mac_set + "</td>";
+                    content += "</tr>";
+                    str += content;
+                }
+                console.log(str);
+                $('.mac_body').html(str);
+            }
+
+            //服务期限
+            form.on('select(ser_per)', function (data) {
+                console.log(data.value);
+                $('.ser_per').html(getDate(data.value));
+                if($('input[name="edition"]:checked').val() == 2){
+                    edition(data.value);
+                }   
+            });
+
+            //数据画像
+            form.on('radio(edition)', function (data) {
+                console.log(data.value);
+                if (data.value == 1) {
+                    $('.edition_h5').html('基础版本免费，本次费用 ￥0.00');
+                    $('#pay').html('保存');
+                } else if (data.value == 2) {
+                    edition($.trim($('#term').val()));
+                    $('#pay').html('立即支付');
+                }
+            });
+
+            function edition(n){
+                //$('.edition_h5').html('人群画像查询年费 ￥'+3*n+'000.00（有效期：'+n+'年）');
+                $('.edition_h5').html('人群画像高级版本开通后有效期为1年，如申请2年，开通时将扣2次可用次数。');
+            }
+
+            //关闭弹框
+            $('#close').on('click', function () {
+                $('#alert').remove();
+                $('#alert_bg').remove();
+            });
+
+            //确认支付
+            $('#comfirpay').on('click', function () {
+                $('#alert').remove();
+                $('#alert_bg').remove();
+            });
+
+            //关闭提示
+            $('#closeTip').on('click', function () {
+                $('#tip_box').toggle();
+            });
+
+
+            //保存为草稿
+            $('#saveScene').on('click', function () {
+                save(1).saveScenesApi();
+            })
+
+            //保存场景
+            $('#pay').on('click', function () {
+                if ($(this).html() == '保存') { //基础版保存场景
+                    save(2).saveScenesApi();
+                } else { //高级版版保存场景(立即支付)
+                    save().checkSecenData();
+                }
+            })
+
+
+            //保存草稿or保存场景
+            function save(state, code) {
+                var scene_name = $.trim($('#scene_name').val()), //场景名称
+                    comp_id = $('.secens_list').val(), //广告主id
+                    mac_id_array = [], //所选广告主设备
+                    stop_time = $('#timeValue').html(), //	停留时间
+                    detection_radius = $('#val').html(), //探测半径
+                    email = $.trim($('#email').val()), //邮箱
+                    business_start_time = $('#start_date').val(), //营业开始时间
+                    business_end_time = $('#end_date').val(), //营业结束时间
+                    area = $.trim($('#area').val()), //建筑面积
+                    floor_number = $('#floor_number').val(), //楼层
+                    longitude = $('#l-map-lng').val(), //经度
+                    latitude = $('#l-map-lat').val(), //纬度
+                    term = $('#term').val(), //服务年限
+                    scenes_type = $('input[name="edition"]:checked').val(), //场景类型 1普通版，2高级版
+                    is_auto_update = $('#is_auto_update').is(':checked') ? 2 : 1, //是否自动更新1否，2是
+                    scenes_state = state, //场景状态，1保存到草稿，2保存到场景
+                    code = code || '', //验证码，高级版必填
+                    industry_id = $('#industry_id').val(); //所属行业
+
+                $('.mac_body tr').each(function () {
+                    mac_id_array.push(parseInt($(this).attr('mac_id')));
+                })
+                // mac_id_array = JSON.stringify(mac_id_array);
+                console.log(mac_id_array);
+
+                var email_reg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
+                    area_reg = /^[0-9]+(.[0-9]{1,2})?$/;
+
+                if (!scene_name.length) {
+                    layui.layer.msg('请填写场景名称');
+                    return false;
+                }
+                if (scene_name.length > 32) {
+                    layui.layer.msg('场景名称最长不超过32个字符');
+                    return false;
+                }
+                if (!comp_id) {
+                    layui.layer.msg('请选择选择广告主');
+                    return false;
+                }
+                if (!email_reg.test(email)) {
+                    layui.layer.msg('请输入正确的邮箱');
+                    return false;
+                }
+                if (!business_start_time || !business_end_time) {
+                    layui.layer.msg('请选择营业时间');
+                    return false;
+                }
+                if (business_start_time == business_end_time) {
+                    layui.layer.msg('营业时间不能相同');
+                    return false;
+                }     
+                if (!area_reg.test(area) || area == 0) {
+                    layui.layer.msg('请输入正确的营业面积');
+                    return false;
+                }
+                if (!longitude) {
+                    layui.layer.msg('请拖动地图上红色坐标点获取经纬度');
+                    return false;
+                }
+
+                function saveScenesApi() {
+                    $.ajax({
+                        type: "POST",
+                        url: '/v1.2/scenes/saveScenesApi',
+                        // data: {"scene_name=" + scene_name + "&comp_id=" + comp_id +"&mac_id_array=" + mac_id_array +"&stop_time=" + stop_time +"&detection_radius=" + detection_radius + "&email=" + email +"&business_start_time=" + business_start_time +"&business_end_time=" + business_end_time + "&area=" + area +"&floor_number=" + floor_number +"&longitude=" + longitude +"&latitude=" + latitude +"&term=" + term +"&scenes_type=" + scenes_type + "&is_auto_update=" + is_auto_update + "&scenes_state=" + scenes_state  + "&code=" + code  + "&industry_id=" + industry_id},
+                        data: {
+                            "scene_name": scene_name,
+                            "comp_id": comp_id,
+                            "mac_id_array": mac_id_array,
+                            "stop_time": stop_time,
+                            "detection_radius": detection_radius,
+                            "email": email,
+                            "business_start_time": business_start_time,
+                            "business_end_time": business_end_time,
+                            "area": area,
+                            "floor_number": floor_number,
+                            "longitude": longitude,
+                            "latitude": latitude,
+                            "term": term,
+                            "scenes_type": scenes_type,
+                            "is_auto_update": is_auto_update,
+                            "scenes_state": scenes_state,
+                            "code": code,
+                            "industry_id": industry_id
+                        },
+                        dataType: 'json',
+                        //traditional: true,
+                        success: function (rs) {
+                            tipTopHide(); //隐藏提示框
+                            console.log(rs)
+                            if (rs.state == 1) {
+                                layui.layer.msg(rs.msg);
+                                setTimeout(function () {
+                                    window.history.back();
+                                }, 1500)
+                            } else {
+                                layui.layer.msg(rs.msg);
+                            }
+                        },
+                        error: function (rs) {
+                            layui.layer.msg("查询信息失败，请重试...");
+                        }
+                    });
+                }
+
+                //验证场景表单是否填写正确（是否弹出发送短信的模态框）
+                function checkSecenData() {
+                    $.ajax({
+                        type: "POST",
+                        url: '/v1.2/scenes/checkSceneApi',
+                        data: {
+                            "scene_name": scene_name,
+                            "comp_id": comp_id,
+                            "mac_id_array": mac_id_array,
+                            "stop_time": stop_time,
+                            "detection_radius": detection_radius,
+                            "email": email,
+                            "business_start_time": business_start_time,
+                            "business_end_time": business_end_time,
+                            "area": area,
+                            "floor_number": floor_number,
+                            "longitude": longitude,
+                            "latitude": latitude,
+                            "term": term,
+                            "scenes_type": scenes_type,
+                            "is_auto_update": is_auto_update
+                        },
+                        dataType: 'json',
+                        success: function (rs) {
+                            tipTopHide();
+                            if (rs.state == 1) {
+                                var data = rs.data;
+                                layer.open({
+                                    type: 1,
+                                    title: '支付确认',
+                                    content: '<div style="padding: 20px;color:#333;font-size:14px;">本次费用将从服务商账户中扣除支付。您的余额可支付本次付款。<p style="text-align:center;margin:20px;">请输入服务商管理员收到的确认短信验证码</p><div style="margin: 0 auto;width: 220px;"><input type="text" id="msg" style="width:90px;height:36px;text-align: center;"><input type="button" style="width:100px;height:42px;background-color:#1E9FFF;border:none;color:#fff;margin-left:20px;" id="sendMsg" value="获取验证码"></div></div>',
+                                    btn: '确定支付',
+                                    btnAlign: 'c',
+                                    shade: 0.6,
+                                    yes: function () {
+                                        var code = $.trim($('#msg').val());
+                                        if (!code) {
+                                            layui.layer.msg("请输入验证码");
+                                            return false;
+                                        }
+                                        save(2, code).saveScenesApi();
+                                        // layer.closeAll();
+                                    }
+                                });
+                            } else if(rs.state == -1){//余额不足
+                                layer.open({
+                                    type: 1,
+                                    title: '支付确认',
+                                    content: '<div style="padding: 20px 20px 0;color:#333;font-size:14px;">本次费用将从服务商账户中扣除支付。你的余额不足。<p style="text-align:center;margin:10px 20px;">您可以先保存为草稿，待充值后再支付开通。</p></div>',
+                                    btn: '保存为草稿并跳转到账户充值',
+                                    btnAlign: 'c',
+                                    shade: 0.6,
+                                    yes: function () {
+                                        save(1).saveScenesApi();
+                                        location.href='/v1.2/account/index';    
+                                    }
+                                });
+                            }else {
+                                layui.layer.msg(rs.msg);
+                            }
+                        },
+                        error: function (rs) {
+                            layui.layer.msg("查询信息失败，请重试...");
+                        }
+                    });
+                }
+
+                return {
+                    saveScenesApi: saveScenesApi,
+                    checkSecenData: checkSecenData
+                }
+            }
+
+            //确定支付
+            $('body').on('click', '#sendMsg', function () {
+                sendMsg();
+                var countdown = 90;
+                var obj = $(this);
+                settime(obj)
+
+                function settime(obj) { //发送验证码倒计时
+                    if (countdown == 0) {
+                        obj.attr('disabled', false);
+                        obj.css('background-color','#1E9FFF');
+                        obj.val("获取验证码");
+                        countdown = 90;
+                        return;
+                    } else {
+                        obj.attr('disabled', true);
+                        obj.css('background-color','#bbb');
+                        obj.val("重新发送(" + countdown + ")");
+                        countdown--;
+                    }
+                    setTimeout(function () {
+                        settime(obj)
+                    }, 1000)
+                }
+            })
+
+            //发送短信
+            function sendMsg() {
+                $.ajax({
+                    type: "POST",
+                    url: '/v1.2/scenes/sendShortMessage',
+                    dataType: 'json',
+                    success: function (rs) {
+                        tipTopHide();
+                        if (rs.state == 1) {
+                            layui.layer.msg('验证码发送成功');
+                        } else {
+                            layui.layer.msg(rs.msg);
+                        }
+                    },
+                    error: function (rs) {
+                        layui.layer.msg("查询信息失败，请重试..."); //显示提示框
+                    }
+                });
+            }
+
+
+            //获取年月日
+            function getDate(n) {
+                var date = new Date();
+                var seperator1 = "/";
+                var year = date.getFullYear();
+                var nYear = date.getFullYear() + parseInt(n);
+                var month = date.getMonth() + 1;
+                var strDate = date.getDate();
+                if (month >= 1 && month <= 9) {
+                    month = "0" + month;
+                }
+                if (strDate >= 0 && strDate <= 9) {
+                    strDate = "0" + strDate;
+                }
+                var currentdate = year + seperator1 + month + seperator1 + strDate + ' ~ ' + nYear + seperator1 +
+                    month + seperator1 + strDate
+                return currentdate;
+            }
+
+
+            //拖动条
+            window.onload = function () {
+                var lineDiv = document.getElementById('lineDiv'); //长线条
+                var minDiv = document.getElementById('minDiv'); //小方块
+                var value = document.getElementById("val");
+                var timeDiv = document.getElementById('timeDiv'); //长线条
+                var roundDid = document.getElementById('roundDid'); //小方块
+                var timeValue = document.getElementById("timeValue");
+                var ifBool = false; //判断鼠标是否按下
+                //事件
+                var start = function (e) {
+                    e.stopPropagation();
+                    ifBool = true;
+                    console.log(e.target.id)
+                    // console.log("鼠标按下")
+                }
+                var move1 = function (e) {
+                    // console.log("鼠标拖动")
+                    if (ifBool) {
+                        if (!e.touches) { //兼容移动端
+                            var x = e.clientX;
+                        } else { //兼容PC端
+                            var x = e.touches[0].pageX;
+                        }
+                        var lineDiv_left = getPosition(lineDiv).left; //长线条的横坐标
+                        var minDiv_left = x - lineDiv_left; //小方块相对于父元素（长线条）的left值
+                        if (minDiv_left >= lineDiv.offsetWidth - 15) {
+                            minDiv_left = lineDiv.offsetWidth - 15;
+                        }
+                        if (minDiv_left < 0) {
+                            minDiv_left = 0;
+                        }
+                        //设置拖动后小方块的left值
+                        minDiv.style.left = minDiv_left + "px";
+                        var minDiv_val = parseInt((minDiv_left / (lineDiv.offsetWidth - 15)) * 30);
+                        value.innerText = minDiv_val == 0 ? 1 : minDiv_val ;
+                        console.log(minDiv_left, lineDiv.offsetWidth);
+                    }
+                }
+                var move2 = function (e) {
+                    // console.log("鼠标拖动")
+                    if (ifBool) {
+                        if (!e.touches) { //兼容移动端
+                            var x = e.clientX;
+                        } else { //兼容PC端
+                            var x = e.touches[0].pageX;
+                        }
+                        var lineDiv_left = getPosition(timeDiv).left; //长线条的横坐标
+                        var minDiv_left = x - lineDiv_left; //小方块相对于父元素（长线条）的left值
+                        if (minDiv_left >= timeDiv.offsetWidth - 15) {
+                            minDiv_left = timeDiv.offsetWidth - 15;
+                        }
+                        if (minDiv_left < 0) {
+                            minDiv_left = 0;
+                        }
+                        //设置拖动后小方块的left值
+                        roundDid.style.left = minDiv_left + "px";
+                        var minDiv_val = parseInt((minDiv_left / (lineDiv.offsetWidth - 15)) * 30);
+                        timeValue.innerText = minDiv_val == 0 ? 1 : minDiv_val ;
+                        console.log(minDiv_left, timeDiv.offsetWidth);
+                    }
+                }
+                var end = function (e) {
+                    // console.log("鼠标弹起")
+                    ifBool = false;
+                }
+                //鼠标按下方块
+                minDiv.addEventListener("mousedown", start);
+                timeDiv.addEventListener("mousedown", start);
+                //拖动
+                lineDiv.addEventListener("mousemove", move1);
+                timeDiv.addEventListener("mousemove", move2);
+                //鼠标松开
+                window.addEventListener("mouseup", end);
+
+                //初始化位置（半径：17，停留：3）
+                function distance(i) {
+                    minDiv.style.left = 10 * i + 'px';
+                    value.innerHTML = i;
+                }
+
+                function radius(i) {
+                    roundDid.style.left = 10 * i + 'px';
+                    timeValue.innerHTML = i
+                }
+                distance(17);
+                radius(3);
+
+                //获取元素的绝对位置
+                function getPosition(node) {
+                    var left = node.offsetLeft; //获取元素相对于其父元素的left值var left
+                    var top = node.offsetTop;
+                    current = node.offsetParent; // 取得元素的offsetParent
+                    // 一直循环直到根元素
+
+                    while (current != null) {
+                        left += current.offsetLeft;
+                        top += current.offsetTop;
+                        current = current.offsetParent;
+                    }
+                    return {
+                        "left": left,
+                        "top": top
+                    };
+
+                }
+            }
+
+
+        });
+    </script>
+
+</body>
+
+</html>

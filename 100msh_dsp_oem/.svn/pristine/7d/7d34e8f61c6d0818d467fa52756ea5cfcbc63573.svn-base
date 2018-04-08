@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>百米DMP / 客流人群分析</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <style type="text/css">
+        .content_box,
+        .detail_box {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .content_box {
+            box-sizing: border-box;
+        }
+
+        .detail_box {
+            background-color: #fff;
+            padding: 0 20px 0 0;
+            box-sizing: border-box;
+        }
+
+        .detail_box .top_box a {
+            margin-left: 10px;
+        }
+
+        .box {
+            position: relative;
+        }
+
+        .detail_box .top_box {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .detail_box .top_box input {
+            width: 180px;
+
+        }
+
+        .detail_box .top_box .search_img {
+            background: url('../../../../../public/img/search_icon.png') no-repeat top center;
+            display: block;
+            position: absolute;
+            top: 5px;
+            right: 0px;
+            width: 30px;
+            height: 30px;
+            /*background-color: red;*/
+        }
+
+        #item_list,
+        .list_content {
+            width: 100%;
+            overflow: hidden;
+        }
+        .list_content{
+            min-height: 600px;
+            -webkit-min-height:600px;
+        }
+        #item_list{
+            text-align: center;
+            overflow: hidden;
+        }
+        .detail_box .list_content .item {
+            border: 1px solid #f4f4f4;
+            width: 30%;
+            height: 175px;
+            position: relative;
+            float: left;
+            margin-right: 29px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .detail_box .list_content .item img {
+            position: absolute;
+            left: 0;
+            top:0;
+        }
+
+        .detail_box .list_content .item .item_title {
+            font-size: 22px;
+            margin-top:64px;
+        }
+
+        .detail_box .list_content .item .sub_title {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .detail_box .list_content .item .dev_num {
+            color: #999;
+            text-align: right;
+            margin-right: 10px;
+            position: absolute;
+            bottom: 10px;
+            right: 0;
+        }
+
+        .Nocontent {
+            width: 100%;
+            color: #666666;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 27px;
+            margin-top:250px;
+        }
+
+        .createNewAnalysis {
+            background: #4c94f6;
+            border-radius: 5px;
+            width: 120px;
+            height: 40px;
+            color: #fff;
+            border: none;
+            margin: 0 auto;
+        }
+        .loadmore{
+            text-align: center;
+            line-height: 35px;
+            font-size:16px;
+            color: orange;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <div class="detail_box">
+            <div class="title_box">
+                <span>百米DMP / 客流人群分析</span>
+            </div>
+
+            <div class="detail_box" style="padding:20px 30px;">
+                <div class="top_box">
+                    <select class="bm-select isrelation" onchange="getListData()">
+                        <option value="">全部</option>
+                        <option value="3">已结束</option>
+                        <option value="2">进行中</option>
+                        <option value="1">草稿</option>
+                    </select>
+                    <a class="btn_link bm-btn bm-btn-blue fr" id="search_adbtn" href="createanalysis">新建分析表</a>
+                    <div class="box  fr">
+                        <input type="text" class="bm-input " placeholder="请输入场景或广告主名称" id="keywords" />
+                        <a class="search_img fr" id="search" herf="javascript:;"></a>
+                    </div>
+
+                </div>
+                <div class="list_content mt20">
+                    <ul id="item_list">
+                        <!-- <li class="item" onclick="itemClick();">
+                            <img src="../../../../../public/img/ongoing.png" alt="">
+                            <p class="item_title">这是一个场景</p>
+                            <p class="sub_title">2018-01-08新建</p>
+                            <p class="dev_num">大牛广告主 /
+                                <span>22</span>台设备</p>
+                        </li> -->
+                    </ul>
+                    <p class="loadmore" onclick="loadMoreData()" href="javascript:;">点击加载更多</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/cookie1.min.js"></script>
+    <script>
+        var page=1,
+            loadFlag = true;
+        function getListData(that) {
+            var keywords = $.trim($('#keywords').val());
+            var status = $('.isrelation').val()
+            getData(1, keywords, status)
+        }
+        $('#keywords').on({
+            keyup: function (e) {
+                if (e.keyCode == 13) {
+                    var keywords = $.trim($(this).val());
+                    var status = $('.isrelation').val()
+                    getData(1, keywords, status)
+                }
+
+            }
+        })
+
+        //获取场景列表数据
+        function getData(page, keywords, status) {
+            var searchKey = "",
+                Searchstatus = "";
+            if (keywords) {
+                searchKey = keywords == "" ? "" : "/key_word/" + keywords;
+            }
+            if (status) {
+                Searchstatus = status == "" ? "" : "/scenes_state/" + status;
+            }
+            $.ajax({
+                type: "GET",
+                url: '/v1.2/Scenes/sceneList/page/' +page + searchKey + Searchstatus,
+                dataType: 'json',
+                success: function (rs) {
+                    console.log(rs)
+                    if (rs.state == 1) {
+                        var data = rs.data;
+                        RenderList(data,rs.page,rs.total_page_count);
+                    } else {
+                        tipTopShow("查询信息失败，请重试...");
+                    }
+                },
+                error: function (rs) {
+                    tipTopShow("查询信息失败，请重试...");
+                }
+            });
+        }
+        getData(1)
+        //渲染场景列表
+        function RenderList(data,page,totalpage) {
+            if (data.length == 0 && page==1) {
+                $('#item_list').html('<div class="Nocontent">还没有创建任何分析表，赶紧去新建一个吧</div><button class="createNewAnalysis">新建分析表</button>')
+                $('.loadmore').hide();
+                return;
+            }
+            var ListStr = ""
+            $.each(data, function (k, v) {
+                ListStr += '<li class="item" onclick="itemClick('+v.scene_id+','+v.scenes_state+","+v.scenes_type+","+v.industry_id+');">';
+                if (v.scenes_state == 1) {   //草稿
+                    ListStr += '<img src="../../../../../public/img/dract.png" alt="">';
+                } else if (v.scenes_state == 2) {   //进行中
+                    ListStr += '<img src="../../../../../public/img/ongoing.png" alt="">';
+                } else if (v.scenes_state == 3) {  //已结束
+                    ListStr += '<img src="../../../../../public/img/ended.png" alt="">';
+                }
+                ListStr += '<p class="item_title">' + v.scene_name + '</p>';
+                ListStr += '<p class="sub_title">' + v.create_time + '新建</p>';
+                ListStr += '<p class="dev_num">' + v.comp_name + ' /';
+                ListStr += '<span>' + v.mac_num + '</span>台设备</p>';
+                ListStr += ' </li>';
+            })
+            if(page==1){
+                $('#item_list').html(ListStr);
+            }else{
+                $('#item_list').append(ListStr);
+            }
+            
+            if(page < totalpage) {
+                $('.loadmore').show();
+                loadFlag=true;
+		    } else {
+                $('.loadmore').hide();
+            }
+        }
+        //点击加载更多
+        function loadMoreData(){
+            if(loadFlag){
+                page++;
+                loadFlag=false;
+                var keywords = $.trim($('#keywords').val());
+                var status = $('.isrelation').val();
+                getData(page, keywords, status);
+            }
+        }
+
+        function itemClick(id,state,scenesType,industryid) {
+            cookie.set({
+                'scenesType':scenesType,
+                'anaylsisState':state,
+                'scenesId':id,
+                'industryid':industryid
+            });
+            if(state==1){
+                location.href = 'changeanalysis';
+            }else{
+                location.href = 'flowAnalysis';
+            } 
+        }
+    </script>
+</body>
+
+</html>

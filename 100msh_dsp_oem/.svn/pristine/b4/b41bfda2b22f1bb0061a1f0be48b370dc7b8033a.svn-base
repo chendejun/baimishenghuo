@@ -1,0 +1,537 @@
+<?php
+/**
+ * API
+ */
+class ApiController extends BasicController {
+    public function gdtCallbackAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $config = Yaf_Registry::get("config");
+        $this->cfg = $config['gdt'];
+        $adv = Helper::M('Advertiser');
+        $client_id = $this->cfg['gdt_app_id'];
+        $client_secret = $this->cfg['gdt_app_key'];
+        //echo $client_secret;exit;qq
+        if(isset($_GET['comp_id']) && $_GET['comp_id']){
+            $redirect_uri = urlencode($this->cfg['gdt_redirect_uri']."?comp_id=".intval($_GET['comp_id']));
+        }else{
+            $redirect_uri = $this->cfg['gdt_redirect_uri'];
+        }
+        $this->db    = Yaf_Registry::get('db');
+        $this->db->dsp->startTrans();
+        if( isset($_GET['authorization_code'])){ //获取access_token
+            WorkWeixin::warning("111");
+            $params['client_id'] = $client_id;
+            $params['client_secret'] = $client_secret;
+            $params['grant_type'] = 'authorization_code';
+            $params['authorization_code'] = $_GET['authorization_code'];
+            $params['redirect_uri'] = $redirect_uri;
+            WorkWeixin::warning($this->cfg['gdt_api_url'].'/oauth/token?'.http_build_query($params));
+            $result = DoNetwork::makeRequest($this->cfg['gdt_api_url'].'/oauth/token?'.http_build_query($params) , 'GET');
+            WorkWeixin::warning($result);
+            $result = json_decode($result , true);
+            if($result['code'] == 0){
+                $data = $result['data'];
+                $gdt_token=$adv->getTokenByAcc($data['authorizer_info']['account_id']);
+                $gdtCompInfo=$adv->getGdtComp($data['authorizer_info']['account_id']);
+                if(empty($gdt_token)){//第一次授权
+                    if(empty($gdtCompInfo)){
+                        //直客
+                        $zk_data=array();
+                        $zk_data['gdt_account_id']=$data['authorizer_info']['account_id'];
+                        $zk_data['system_status']=1;
+                        $zk_data['account_type']=1;
+                        $zk_data['comp_id']=$_GET['comp_id']?intval($_GET['comp_id']):0;
+                        $zk_data['qq']=$data['authorizer_info']['account_uin'];
+                        if($zk_data['comp_id']){
+                            $comp_info=$adv->getCompInfo($zk_data['comp_id']);
+                            if(empty($comp_info)){
+                                WorkWeixin::warning('关联的公司不存在！');
+                                $this->db->dsp->rollback();
+                            }
+                        }else{
+                            WorkWeixin::warning('comp_id错误！');
+                            $this->db->dsp->rollback();
+                        }
+                        $zk_data['comp_pid']=$comp_info['comp_pid'];
+                        //获取直客信息
+                        $time = time();
+                        $nonce = md5("advertiser/get". uniqid() . rand(0,1000));
+                        $gdt_c_data['account_id']=$data['authorizer_info']['account_id'];
+                        $gdt_info=DoNetwork::makeRequest($this->cfg['gdt_api_url']."/v1.0/advertiser/get?access_token={$result['data']['access_token']}&timestamp={$time}&nonce={$nonce}", 'GET',$gdt_c_data);
+                        WorkWeixin::warning($gdt_info);
+                        $gdt_info = json_decode($gdt_info , true);
+                        if(empty($gdt_info)){
+                            WorkWeixin::warning('广点通直客信息获取API接口请求失败！');
+                            $this->db->dsp->rollback();
+                            Helper::outJson(array('state' => 2, 'msg' => '广点通直客信息获取API接口请求失败'));
+                        }
+                        if($gdt_info['code'] == 0){
+                            if($gdt_info['data']['list'][0]['daily_budget']){
+                                $zk_data['daily_budget'] = $gdt_info['data']['list'][0]['daily_budget'];
+                            }
+                            if($gdt_info['data']['list'][0]['corporation_name']){
+                                $zk_data['gdt_comp_name'] = $gdt_info['data']['list'][0]['corporation_name'];
+                            }
+                        }else{
+                            $gdt_p['account_id'] = $data['authorizer_info']['account_id'];
+                            $gdt_p['message']=$gdt_info['message'];
+                            WorkWeixin::warning('广点通直客信息获取失败！' . json_encode($gdt_p));
+                            $this->db->dsp->rollback();
+                            Helper::outJson(array('state' => 2, 'msg' => '广点通直客信息获取失败'));
+                            //echo -1;
+                        }
+                        WorkWeixin::warning(json_encode($zk_data));
+                        $zk_cp=$adv->addGdtComp($zk_data);
+                        if(!$zk_cp){
+                            $this->db->dsp->rollback();
+                            WorkWeixin::warning('直客广点通信息添加失败！' . json_encode($zk_data));
+                            Helper::outJson(array('state' => 2, 'msg' => '直客广点通信息添加失败'));
+                        }
+                        //修改广点通广告开通状态
+                        $c_data['gdt_apply_status']=4;
+                        $up_cp=$adv->upComp($zk_data['comp_id'],$c_data);
+                        if(!$up_cp){
+                            $this->db->dsp->rollback();
+                            WorkWeixin::warning('修改广点通广告开通状态失败！' . json_encode($c_data));
+                            Helper::outJson(array('state' => 2, 'msg' => '修改广点通广告开通状态失败'));
+                        }
+                    }
+                    $add_data=array();
+                    $add_data['gdt_account_id']=$data['authorizer_info']['account_id'];
+                    $add_data['access_token']= $data['access_token'];
+                    $add_data['refresh_token']= $data['refresh_token'];
+                    $add_data['auth_time']= date('Y-m-d H:i:s',time());
+                    $add_data['expire_time']= date('Y-m-d H:i:s',time()+$data['refresh_token_expires_in']);
+                    $add_tk=$adv->addToken($add_data);
+                    if(!$add_tk){
+                        $this->db->dsp->rollback();
+                        WorkWeixin::warning('广点通授权信息添加失败！' . json_encode($add_data));
+                        Helper::outJson(array('state' => 2, 'msg' => '广点通授权信息添加失败'));
+                    }
+                }else{//第二次以上授权刷新refresh_token
+                    if(empty($gdtCompInfo)){
+                        $this->db->dsp->rollback();
+                        WorkWeixin::warning('授权广点通信息不存在' . json_encode($gdt_token));
+                        Helper::outJson(array('state' => 2, 'msg' => '授权广点通信息不存在'));
+                    }
+                    $up_data=array();
+                    $up_data['access_token']= $data['access_token'];
+                    $up_data['refresh_token']= $data['refresh_token'];
+                    $up_data['auth_time']= date('Y-m-d H:i:s',time());
+                    $up_data['expire_time']= date('Y-m-d H:i:s',time()+$data['refresh_token_expires_in']);
+                    $adv->upToken($data['authorizer_info']['account_id'],$up_data);
+                }
+                /*$this->redis->set('gdt_access_token' , $data['access_token']);
+                $this->redis->set('gdt_refresh_token' , $data['refresh_token']);*/
+                WorkWeixin::warning('成功');
+                $comp_id=isset($_GET['comp_id']) && $_GET['comp_id']?intval($_GET['comp_id']):1;
+                $this->redis->set('auth_success'.$comp_id , 1 , 120);
+                if($comp_id == 1){
+                   $this->redis->set('gdt_access_token' , $data['access_token']); 
+                   WorkWeixin::warning($data['access_token']);
+                   WorkWeixin::warning($this->redis->get('gdt_access_token'));
+                }
+                $this->db->dsp->commit();
+                echo 1;
+            }else{
+                $params['message']=$result['message'];
+                $this->db->dsp->rollback();
+                WorkWeixin::warning('广点通access_token获取失败！' . json_encode($params));
+                echo -1;
+            }
+        }elseif(isset($_GET['refresh_token'])){ //刷新access_token
+            $params['client_id'] = $client_id;
+            $params['client_secret'] = $client_secret;
+            $params['grant_type'] = 'refresh_token';
+            $params['refresh_token'] = $_GET['refresh_token'];
+            $result = DoNetwork::makeRequest($this->cfg['gdt_api_url'].'/oauth/token' , 'GET' , $params);
+            $result = json_decode($result , true);
+            if($result['code'] == 0){
+                $token_info=$adv->getTokenByRefresh($params['refresh_token']);
+                $up_data=array();
+                $data = $result['data'];
+                //var_dump($data);
+                $up_data['access_token']=$data['access_token'];
+                $adv->upToken($token_info['gdt_account_id'],$up_data);
+                if(isset($_GET['comp_id']) && $_GET['comp_id']){
+                    $comp_id=intval($_GET['comp_id']);
+                }else{
+                    $comp_id=1;
+                }
+                if($comp_id == 1){
+                   $this->redis->set('gdt_access_token' , $data['access_token']); 
+                    WorkWeixin::warning($data['access_token']);
+                   WorkWeixin::warning($this->redis->get('gdt_access_token'));
+                } 
+                /*$this->redis->set('gdt_access_token' , $data['access_token']);
+                $this->redis->set('gdt_refresh_token' , $data['refresh_token']);*/
+                Helper::outJson(array('state'=>1 , 'msg' =>'广点通access_token刷新成功','data'=>$data['access_token']));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>'广点通access_token刷新失败-'.$result['message']));
+            }
+        }elseif(isset($_GET['login'])){ //跳转授权登录
+            header("Location: https://developers.e.qq.com/oauth/authorize?client_id={$client_id}&redirect_uri={$redirect_uri}");
+        }else{
+            $comp_id=isset($_GET['comp_id']) && $_GET['comp_id']?intval($_GET['comp_id']):1;
+            $auth_success= $this->redis->get('auth_success'.$comp_id);
+            if(empty($auth_success)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'授权失败！'));
+            }else{
+                Helper::outJson(array('state'=>1 , 'msg' =>'授权成功！'));
+            }
+        }
+    }
+    public function gdtWxCallbackAction(){
+        if(isset($_GET['login'])){
+            $comp_id=isset($_GET['comp_id'])?intval($_GET['comp_id']):0;
+            if(!$comp_id){
+                Helper::outJson(array('state'=>0 , 'msg' =>'参数错误！'));
+            }
+            $adv = Helper::M('Advertiser');
+            $gdt_comp_info=$adv->getGdtCompInfo($comp_id);
+            if(empty($gdt_comp_info)){
+               Helper::outJson(array('state'=>0 , 'msg' =>'广告主对应的广点通信息不存在！')); 
+            }
+            if($gdt_comp_info['system_status'] != 1){
+                Helper::outJson(array('state'=>0 , 'msg' =>'广点通系统状态非有效！')); 
+            }
+            if($gdt_comp_info['account_type'] == 0){//新开
+                $dls_info=$adv->getGdtDls();//百米代理商账户
+                if(empty($dls_info)){
+                    Helper::outJson(array('state'=>0 , 'msg' =>'代理商信息不存在！')); 
+                }
+                $gdt_account_id=$dls_info['gdt_account_id'];
+            }else if($gdt_comp_info['account_type'] == 1){//直客
+                $gdt_account_id=$gdt_comp_info['gdt_account_id'];
+            }else{//服务商
+                Helper::outJson(array('state'=>0 , 'msg' =>'广点通账户类型错误！')); 
+            }
+            $token_info=$adv->getTokenByAcc($gdt_account_id);
+            if(empty($token_info)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'广点通授权信息不存在！')); 
+            }
+            if($token_info['expire_time'] <= date('Y-m-d H:i:s')){
+                Helper::outJson(array('state'=>0 , 'msg' =>'广点通授权已过期！')); 
+            }
+            $config = Yaf_Registry::get("config");
+            $this->cfg = $config['gdt'];
+            $encrypt_obj=new Encrypt();
+            $key="!abc#%*";
+            $encrypt_obj->setKey($key);
+            $encry_id=$encrypt_obj->encode("{$comp_id}");
+            //WorkWeixin::warning($encry_id);
+            $redirect_uri=$this->cfg['wx_redirect_uri']."/id/".$encry_id;
+            $access_token=$token_info['access_token'];
+            $account_id=$gdt_comp_info['gdt_account_id'];
+            header("Location: https://developers.e.qq.com/authorization/wechat_bind?access_token={$access_token}&redirect_uri=".urlencode($redirect_uri)."&account_id={$account_id}");
+        }else{
+            $encry_id=trim($this->getRequest()->getParam('id',''));
+            if(!$encry_id){
+                Helper::outJson(array('state'=>0 , 'msg' =>'参数错误！')); 
+            }
+            $encrypt_obj=new Encrypt();
+            $key="!abc#%*";
+            $encrypt_obj->setKey($key);
+            //$encry_id=$encrypt_obj->encode('206019');
+            $comp_id=$encrypt_obj->decode($encry_id);
+            //echo $encry_id."++++++++++".$comp_id;exit;
+            if(!$comp_id){
+                Helper::outJson(array('state'=>0 , 'msg' =>'参数错误！')); 
+            }
+            //WorkWeixin::warning($comp_id);
+            $adv = Helper::M('Advertiser');
+            $comp_info=$adv->getCompInfo($comp_id);
+            if(!empty($comp_info)){
+                Helper::outJson(array('state'=>0 , 'msg' =>'一个广告主只能绑定一次公众号！')); 
+            }
+            $wx_data=array();
+            $wx_data['comp_id']=$comp_id;
+            $wx_data['add_time']=date("Y-m-d H:i:s");
+            $wx_id=$adv->addGdtWxBind($wx_data);
+            if($wx_id){
+                $up_comp=array();
+                $up_comp['gdt_wx_bind']=1;
+                $adv->upComp($comp_id,$up_comp);
+                Helper::outJson(array('state'=>1 , 'msg' =>'成功！'));
+            }else{
+                Helper::outJson(array('state'=>0 , 'msg' =>'失败！'));
+            }
+        }
+        
+    }
+	//1.每天定时刷新token
+	public function refreshTaskAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $config = Yaf_Registry::get("config");
+        $this->cfg = $config['gdt'];
+        $adv = Helper::M('Advertiser');
+        $client_id = $this->cfg['gdt_app_id'];
+        $client_secret = $this->cfg['gdt_app_key'];
+        $t_list=$adv->getTokenList();
+        //var_dump($t_list);
+        foreach ($t_list as $k=>$v){
+            $params['client_id'] = $client_id;
+            $params['client_secret'] = $client_secret;
+            $params['grant_type'] = 'refresh_token';
+            $params['refresh_token'] = $v['refresh_token'];
+            $ex_h=round((strtotime($v['expire_time']) - time())/3600,2);
+            if($ex_h <= 5*24){//5天
+                WorkWeixin::warning('广点通refresh_token即将到期或已经到期！' . json_encode($params));
+            }
+            if($ex_h <=0){
+                $gdt_comp_info=$adv->getGdtComp($v['gdt_account_id']);
+                if($gdt_comp_info['account_type'] == 3){
+                    $where="gdt_apply_status=3";
+                }else if($gdt_comp_info['account_type'] == 1){
+                    $where="comp_id = {$gdt_comp_info['comp_id']}";
+                }
+                if($where){
+                    $up_gdtdata['gdt_apply_status']=5;
+                    $adv->upCompGdt($where,$up_gdtdata);
+                }
+                continue;
+            }
+            $result = DoNetwork::makeRequest($this->cfg['gdt_api_url'].'/oauth/token' , 'GET' , $params);
+            $result = json_decode($result , true);
+            //var_dump($result);
+            if($result['code'] == 0){
+                $up_data=array();
+                $data = $result['data'];
+                $up_data['access_token']=$data['access_token'];
+                $adv->upToken($v['gdt_account_id'],$up_data);
+                if($v['gdt_account_id']='3025821'){
+                    $this->redis->set('gdt_access_token' , $data['access_token']); 
+                    WorkWeixin::warning($data['access_token']);
+                    WorkWeixin::warning($this->redis->get('gdt_access_token'));
+                }
+                echo 1;
+            }else{
+                $params['message']=$result['message'];
+                WorkWeixin::warning('广点通access_token定时刷新失败！'.'_'.date('Y-m-d H:i:s').'_' . json_encode($params));
+                echo -1;
+            }
+        }
+    }
+    //2.获取直客账户余额定时任务
+    public function getZkBalanceTaskAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $result = BmDspApi::request('advertiser/refreshZkBalance');
+        //print_r($result);
+        if (!empty($result)) {
+            echo $result['data'];
+        }
+    }
+    //3.每天定时更新广点通开通待审核
+    public function upGdtCompTaskAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        $result = BmDspApi::request('advertiser/getGdtStatus');
+        //print_r($result);
+        if (!empty($result)) {
+            echo $result['data'];
+        }
+    }
+	public function getCrowdAction(){
+	    Yaf_Dispatcher::getInstance()->disableView();
+	    $tagConditions = $this->getRequest()->getPost('tagConditions');
+	    //echo $tagConditions;
+	    $token=$this->redis->get('dmp_access_token');
+	    $ts=time();
+	    $key=$this->config['dmp']['des_secret'];
+	    $des = new CryptDes($key);
+	    $s=$des->encrypt("tagConditions=".$tagConditions."&dataType=imei&token=".$token."&ts=".$ts);
+	    $result = DoNetwork::makeRequest($this->config['dmp']['api_host'].$this->config['dmp']['api_dir'].'applyTagGroupExport.do?s=' . urlencode($s), 'POST','','','',500000 );
+	    echo $result;
+	}
+    public function getNewCrowdAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        //echo "111";exit;
+        //$tagConditions = $this->getRequest()->getPost('tagConditions');
+        //获取token
+        if(!$this->redis->exists('ndmp_access_token'.date('Ymd'))){
+            $this->setNdmpToken();
+        }
+        $tag_arr['token']=$this->redis->get('ndmp_access_token');
+        $tag_arr['route_id']=$this->getRequest()->getPost('route_id');
+        $tag_arr['stat_date_interval']=$this->getRequest()->getPost('stat_date_interval');
+        $tag_arr['virtual_type']=$this->getRequest()->getPost('virtual_type');
+        if($this->getRequest()->getPost('is_new')){
+            $tag_arr['is_new']=$this->getRequest()->getPost('is_new');
+        }
+        if($this->getRequest()->getPost('first_in_interval')){
+            $tag_arr['first_in_interval']=$this->getRequest()->getPost('first_in_interval');
+        }
+        if($this->getRequest()->getPost('stay_length_interval')){
+            $tag_arr['stay_length_interval']=$this->getRequest()->getPost('stay_length_interval');
+        }
+        if($this->getRequest()->getPost('stay_day_interval')){
+            $tag_arr['stay_day_interval']=$this->getRequest()->getPost('stay_day_interval');
+        }
+        $tag_arr['call_back_url']=$this->config['ndmp']['n_call_back_url'];
+        $tagConditions=http_build_query($tag_arr);
+
+        //echo "123";exit;
+        $result = DoNetwork::makeRequest($this->config['ndmp']['api_host'].'/api/getQueryList.do?' .$tagConditions, 'GET','','','',500000 );
+        echo $result;
+    }
+    public function nCrowdCbkAction(){
+        $task_id=trim($_GET['task_id']);
+        if(!empty($task_id)){
+
+        }
+    }
+	public function crowdTaskAction(){
+	    Yaf_Dispatcher::getInstance()->disableView();
+	    set_time_limit(0); 
+	    $crowdModel = Helper::M("Dcrowd");
+	    $key=$this->config['dmp']['des_secret'];
+	    $des = new CryptDes($key);
+	    $token=$this->redis->get('dmp_access_token');
+	    $ts=time();
+	    $limit=1000;
+	    $c_count=$crowdModel->getCrowdDwListCount();
+	    if($c_count == 0){
+	        echo "已完成";exit;
+	    }
+	    for($i=1;$i<=$c_count;$i++){
+	        if($i%$limit==0 || $i==$c_count){
+	            $start = (ceil($i/$limit)-1)*$limit ;
+	            $c_list=$crowdModel->getCrowdDwList($start,$limit);
+	           // var_dump($c_list);
+	            if(!empty($c_list)){
+	                foreach ($c_list as $v){
+	                    $s=$des->encrypt("taskId=".$v['crowd_taskid']."&token=".$token."&ts=".$ts);
+	                    $res=DoNetwork::makeRequest($this->config['dmp']['api_host'].$this->config['dmp']['api_dir'].'getTagGroupExportStatus.do?s=' . urlencode($s), 'POST','','','',500000 );
+// 	                    echo "++++++++++";
+// 	                    echo "<br/>";
+// 	                    var_dump($res);
+// 	                    echo "@@@@@@@@@@@@@@@@@@@@@@@".$v['crowd_taskid'];
+// 	                    echo "<br/>";
+// 	                    echo "++++++++++";
+	                    $res=json_decode($res , true);
+	                    $edit_data=$audit_data=array();
+	                    if($res['errcode'] == 0 && $res['data'] == 4){//192  118  datamart.100msh.com
+	                        $down_r=Helper::download("http://datamart.100msh.com".$this->config['dmp']['down_dir'].$v['crowd_taskid'].".zip",$this->config['config']['ACCESSORY_FOLDER']."dmp/".$v['crowd_taskid'].".zip");
+	                        //$down_r1=Helper::download("http://192.168.83.192".$this->config['dmp']['down_dir'].$v['crowd_taskid'].".zip",$this->config['config']['ACCESSORY_FOLDER']."dmp/".$v['crowd_taskid'].".zip");
+	                        if(!$down_r){
+	                            $edit_data['audit_status']=3;
+	                            $edit_data['finish_time']=time();
+	                            $edit_data['if_saved']=1;
+	                            $audit_data['crowd_id']=$v['crowd_id'];
+	                            $audit_data['audit_status']=3;
+	                            $audit_data['audit_staff_id']=0;
+	                            $audit_data['audit_time']=time();
+	                            $audit_data['audit_remark']='dmp定时请求人群包导出状态';
+	                        }   
+	                    }
+	                    if(!empty($edit_data) && !empty($audit_data)){
+	                        $result=$crowdModel->edit($v['crowd_id'],$edit_data);
+	                        if($result){
+	                            $crowdModel->addAudit($audit_data);
+	                            echo "-------------------".$v['crowd_taskid']."(".$edit_data['audit_status'].")------------<br/>";
+	                        }
+	                    }
+	                }
+	            }
+	        }  
+	    }
+	}
+    public function newCrowdTaskAction(){
+        Yaf_Dispatcher::getInstance()->disableView();
+        set_time_limit(0);
+        $crowdModel = Helper::M("Dcrowd");
+        //获取token
+        if(!$this->redis->exists('ndmp_access_token'.date('Ymd'))){
+            $this->setDmpToken();
+        }
+        $token=$this->redis->get('ndmp_access_token');
+        $limit=1000;
+        $c_count=$crowdModel->getCrowdDwListCount("1,2");
+        if($c_count == 0){
+            echo "已完成";exit;
+        }
+        for($i=1;$i<=$c_count;$i++){
+            if($i%$limit==0 || $i==$c_count){
+                $start = (ceil($i/$limit)-1)*$limit ;
+                $c_list=$crowdModel->getCrowdDwList($start,$limit,"1,2");
+                // var_dump($c_list);
+                if(!empty($c_list)){
+                    foreach ($c_list as $v){
+                        $s="token=".$token."&task_id=".$v['crowd_taskid'];
+                        $res=DoNetwork::makeRequest($this->config['ndmp']['api_host'].'/api/taskStatus.do?' . $s, 'GET','','','',500000 );
+ 	                    echo "++++++++++";
+ 	                    echo "<br/>";
+ 	                    var_dump($res);
+ 	                    echo "@@@@@@@@@@@@@@@@@@@@@@@".$v['crowd_taskid'];
+ 	                    echo "<br/>";
+ 	                    echo "++++++++++";
+                        $res=json_decode($res , true);
+                        $edit_data=$audit_data=array();
+                        //var_dump($res);
+                        if($res['code'] == 10000 && $res['list'][0]['task_status'] == 1){//192  118  datamart.100msh.com
+                            //echo "111";
+                            $down_r=Helper::download($this->config['ndmp']['api_host']."/download/".$v['crowd_taskid'].".zip",$this->config['config']['ACCESSORY_FOLDER']."dmp/".$v['crowd_taskid'].".zip");
+                            //var_dump($down_r);
+                            //$down_r1=Helper::download("http://192.168.83.192".$this->config['dmp']['down_dir'].$v['crowd_taskid'].".zip",$this->config['config']['ACCESSORY_FOLDER']."dmp/".$v['crowd_taskid'].".zip");
+                            if(!$down_r){
+                                $edit_data['audit_status']=3;
+                                $edit_data['finish_time']=time();
+                                $edit_data['if_saved']=1;
+                                $audit_data['crowd_id']=$v['crowd_id'];
+                                $audit_data['audit_status']=3;
+                                $audit_data['audit_staff_id']=0;
+                                $audit_data['audit_time']=time();
+                                $audit_data['audit_remark']='ndmp定时请求人群包导出状态';
+                            }
+                        }
+                        if(!empty($edit_data) && !empty($audit_data)){
+                            $result=$crowdModel->edit($v['crowd_id'],$edit_data);
+                            if($result){
+                                $crowdModel->addAudit($audit_data);
+                                echo "-------------------".$v['crowd_taskid']."(".$edit_data['audit_status'].")------------<br/>";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+	public function crowdTestAction(){
+	    $key=$this->config['dmp']['des_secret'];
+        $des = new CryptDes($key);
+        $token=$this->redis->get('dmp_access_token');
+        $s=$des->encrypt('tagConditions={"and":[]}&dataType=imei&token='.$token.'&ts=1503479088');
+	    $result = DoNetwork::makeRequest($this->config['dmp']['api_host'].$this->config['dmp']['api_dir'].'applyTagGroupExport.do?s=' . urlencode($s), 'POST','','','',500000 );
+        var_dump($result);exit;
+//        / $users_result = json_decode($users_result , true);
+	}
+	public function aaaAction(){
+	    $data=array(
+	        'partnerId'  => 22,
+	        'partnerName' => 'mariegs123test',
+	        'state' => 1,
+	        'userRealname' => 'marie',
+	        'userPhone' =>18888888888,
+	        'agentId' =>0,
+	        //'comp_type' =>1,
+	        'catePid' => 1,
+	        'cateId' => 11,
+	        'scPro' => 44,
+	        'scPid' => 4403,
+	        'scId' => 440303,
+	        'pAddr' =>'testhahah',
+	        'businessImg' => 'www.baidu.com',//www.baidu.com
+	        'frontCard' =>'',
+	        'backCard' =>'www.baidu.com',
+	    );
+	    //var_dump(http_build_query($data));
+	   $result=DoNetwork::makeRequest('https://dev-dspservice.100msh.com/Api/sync?'.http_build_query($data));
+	   var_dump($result);exit;
+	}
+    public function fundAction(){
+		Yaf_Dispatcher::getInstance()->disableView();
+		$type = $this->getRequest()->getParam('type' , '');
+		if(empty($type)) return;
+		$result = BmDspApi::request('fund/crontab' , array('type' => $type));
+		var_dump($result);
+	}
+}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 账户中心-账户信息 -->
+<head>
+	<meta charset="UTF-8">
+	<title>账户中心-账户信息</title>
+	<link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script src="../../../../../public/js/layer/layer.js"></script>
+    <script src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui/layui.js"></script>
+    <link rel="stylesheet" href="../../../../../public/js/layui/css/layui.css"/>
+    <style>
+        .flex .flex_item {height: auto;}
+        .content_box{min-width: 1237px;}
+        .setred{color: #ef7269 !important;}
+        .recharge_box .mod_cont li.li_ipt{width: 150px;}
+        .recharge_box .mod_cont li.li_ipt input{width: 130px; border: 0; line-height: 44px;padding: 0 8px;}
+        .percent_box .mod{width: 28%}
+        .percent_box .mod:last-child{width: 38%}
+        .percent_box .mod:last-child li{width: 25%}
+        .percent_box .mod h4{color: #333333;font-weight: bold}
+        .percent_box ul{position: static;padding: 0;width: auto}
+        .percent_box ul p{color: #333333;font-size: 22px;white-space: normal;text-overflow: ellipsis;overflow: hidden;}
+        .pay_tips{color: #999;font-size: 14px;}
+    </style>
+</head>
+<body>
+	<div class="content_box">
+        <div class="title_box">
+        	<span>账户中心 / 我的账户</span>
+        </div>
+        <div class="percent_box clearfix">
+            <div class="nav_box">
+                <a href="javascript:;" class="cur">账户信息</a>
+                <a href="/v1.2/account/rechargelist">充值流水</a>
+                <!-- <a href="/v1.2/account/invoice">发票开具</a> -->
+                {{if $sh eq 1}}
+                <a href="/index/operatormanage">操作员管理</a>
+                {{/if}}
+            </div>
+            <div class="mod fl">
+                <h4>服务商账户余额<i class="club_icons icon1" onclick="showtips(1)" id="ye_stps"></i></h4>
+                <ul class="flex">
+                    <li class="flex_item">
+                        I 类账户
+                        <p>{{$account.give_amount}}</p>
+                    </li>
+                    <li class="flex_item">
+                        II 类账户
+                        <p>{{$account.cash_amount}}</p>       
+                    </li>
+                </ul>
+            </div>
+            <div class="space_line fl"></div>
+            <div class="mod fl">
+                <h4>人群画像剩余次数<i class="club_icons icon1" onclick="showtips(2)" id="hx_stps"></i></h4>
+                <ul class="flex">
+                    <li class="flex_item">
+                        高级版
+                        <p>{{$portrait.top}}</p>
+                    </li>
+                    <li class="flex_item">
+                        APP分析版
+                        <p>{{$portrait.app}}</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="space_line fl"></div>
+            <div class="mod fl">
+                <h4>服务商账户支出<a href="/v1.2/account/transfer" style="float:right;font-weight:100;">支出明细></a></h4>
+                <ul class="flex">
+                    <li class="flex_item">
+                        今日支出
+                        <p>{{$account.today_expend}}</p>
+                    </li>
+                    <li class="flex_item">
+                        昨日支出
+                        <p>{{$account.yes_expend}}</p>
+                    </li>
+                    <li class="flex_item">
+                        本周支出
+                        <p>{{$account.week_expend}}</p>
+                    </li>
+                    <li class="flex_item">
+                        本月支出
+                        <p>{{$account.month_expend}}</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="recharge_box mt20">
+            <h4><i class="club_icons icon2"></i>II 类账户在线充值</h4>
+            <!-- <ul class="mod_nav clearfix">
+                <li class="cur">
+                    <p>在线充值</p>
+                    <p>（小于1万建议选择）</p>
+                </li>
+                <li>
+                    <p>线下转账</p>
+                    <p>（1万以上建议选择）</p>
+                </li>
+            </ul> -->
+            <div class="mod_cont">
+                <p class="pay_tips mt20">请注意：在线充值的金额是充入II类账户（支持投放全网所有广告）</p>
+                <div class="pay_cost mt20" id="pay_cost">
+                    <span>充值金额</span>
+                    <ul class="clearfix">
+                        <li class="cur" _data="3000" type="1">￥3000</li>
+                        <li _data="2000" type="2">￥2000</li>
+                        <li _data="1500" type="3">￥1500</li>
+                        <li _data="1000" type="4">￥1000</li>
+                        <!-- <li _data="200" type="5">￥200</li> -->
+                        <li _data="" type="6" class="li_ipt"><input type="text" id="pay_input" value="" placeholder="输入其他金额" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"></li>
+                    </ul>
+                    <input type="hidden" name="payNum" value="3000">
+                </div>
+                <div class="pay_way mt15">
+                    <span>支付方式</span>
+                    <div class="radio_box clearfix">
+                        <label><!-- <input type="radio" name="payway" class="mr10" checked="checked"> --><p class="wx">微信支付</p></label>
+                        <!-- <label><input type="radio" name="payway" class="mr10" disabled="disabled"><i></i><p class="zfb">支付宝</p></label> -->
+                    </div>
+                </div>
+                <div class="btn_box">
+                    <a href="javascript:;" class="bm-btn bm-btn-blue" id="submit_btn" type="1" onclick="submit(this)">立即充值</a>
+                </div>
+            </div>
+            <div class="mod_cont" style="display: none">
+                <div class="pay_account">
+                    <dl class="clearfix">
+                        <dt>账户名称</dt>
+                        <dd>深圳市百米生活股份有限公司</dd>
+                    </dl>
+                    <dl class="clearfix">
+                        <dt>开户银行</dt>
+                        <dd>招商银行深圳分行泰然支行</dd>
+                    </dl>
+                    <dl class="clearfix">
+                        <dt>账号</dt>
+                        <dd>755 9168 1261 0203</dd>
+                    </dl>
+                    <dl class="clearfix">
+                        <dt>转账识别码</dt>
+                        <dd>{{$encry_id}}</dd>
+                        <b class="account_notice">请在转账备注栏中填写本识别码，以便尽快为您办理充值</b>
+                    </dl>
+                </div>
+                <div class="pay_desc">
+                    <h4>转账说明</h4>
+                    <p>1.充值金额1万元以下，建议您直接在线充值。</p>
+                    <p>2.转账时，请务必填写转账识别码，以便我们能尽快为您办理充值。</p>
+                    <p><span>3.转账后，到账时间受银行业务影响，一般在1~3个工作日内到账，如超过3个工作日还未充入您的账户，请立即与我们联系。</span><!-- <a class="wap_qq" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=1359863752&site=qq&menu=yes"></a> --></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //选择充值金额
+        $('#pay_cost').on('click','li',function(){
+            var data = $(this).attr('_data'),
+                type = $(this).attr('type');
+            $(this).addClass('cur');
+            $(this).siblings().removeClass('cur');
+            $('input[name="payNum"]').val(data);
+            $('#submit_btn').attr('type',type);
+        })
+        function submit(th){
+            var th = $(th),
+                type = th.attr('type'),
+                dataNum = $('input[name="payNum"]').val(),
+                pay_ipt = $('#pay_input').val();
+            if(type==6){
+                if(!pay_ipt){
+                    tipTopShow('请输入充值金额！');
+                    return;
+                }
+                if(parseFloat(pay_ipt)>3000){
+                    tipTopShow('请输入小于3000元的充值金额！');
+                    return;
+                }
+                dataNum = pay_ipt;
+            }
+            location.href = '/v1.2/account/wxpay/amount/'+dataNum;
+        }
+        function showtips(i){
+            var msg,el;
+            if(i==1){
+                msg='<span style="color:black;">I类账户：账户金额可用来投放主流网络广告,包括今日头条 、爱奇艺、优酷、微博、WIFI广告等。不支持腾讯广告（含朋友圈）、短信投放；<br>II 类账户：账户金额可投放全网广告；</span>';
+                el='#ye_stps';
+            }else{
+                msg = '<span style="color:black;">人群画像高级版：剩余次数可用来开通DMP中人群画像的高级版的开通（开通后使用期限为1年）；<br>人群画像APP分析版：在高级版开通后，可再次选择APP分析版本的剩余次数。（开通后使用期限为1年）；</span>';
+                el='#hx_stps';
+            }
+            layer.tips(msg,el,{tips: [3, '#f5f5f5'], area: ['450px', 'auto'],time: 0,closeBtn:1});
+        }
+    </script>
+</body>
+</html>

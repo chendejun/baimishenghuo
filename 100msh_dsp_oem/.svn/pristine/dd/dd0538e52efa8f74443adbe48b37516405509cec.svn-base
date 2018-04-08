@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>新增投放</title>
+    <link rel="stylesheet" href="../../../../../public/css/base.css">
+    <link rel="stylesheet" href="../../../../../public/css/common.css">
+    <link rel="stylesheet" href="../../../../../public/js/layui2.2.5/css/layui.css" />
+    <link rel="stylesheet" href="../../../../../public/css/bhdelivery.css">
+</head>
+<body>
+<div class="content_box">
+    <div class="title_box">
+        <span><a href="/v1.2/gdtdelivery/index">< 返回腾讯广告</a></span>
+    </div>
+    <section class="form layui-form">
+        <div class="step_bar">
+            <ul class="clearfix">
+                <li class="cur">
+                    <span class="step_icon icon1">1</span>
+                    <p>广告计划</p>
+                    <i class="line"></i>
+                </li>
+                <li class="cur">
+                    <span class="step_icon icon2">2</span>
+                    <p>投放人群</p>
+                    <i class="line"></i>
+                </li>
+                <li class="cur">
+                    <span class="step_icon icon3">3</span>
+                    <p>投放媒体</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon4">4</span>
+                    <p>广告创意</p>
+                    <i class="line"></i>
+                </li>
+                <li>
+                    <span class="step_icon icon5">5</span>
+                    <p>排期和出价</p>
+                    <i class="line"></i>
+                </li>
+            </ul>
+        </div>
+        <div class="step_box step3">
+            <div class="from-row">
+                <label>广告行为：</label>
+                <input type="radio" name="ad_active" value="0" title="跳转网页" checked lay-filter="edition">
+                <input type="radio" name="ad_active" value="1" title="下载应用" lay-filter="edition">
+            </div>
+            <div class="from-row">
+                <label>创意形式：</label>
+                <input type="radio" name="ad_style" value="0" title="横幅" checked lay-filter="edition">
+                <input type="radio" name="ad_style" value="1" title="视频贴片" lay-filter="edition">
+                <input type="radio" name="ad_style" value="2" title="原生信息流" lay-filter="edition">
+                <input type="radio" name="ad_style" value="3" title="开屏" lay-filter="edition">
+            </div>
+            <div class="from-row">
+                <label>媒体选择：</label>
+                <input type="radio" name="user_media" value="0" title="指定应用" checked lay-filter="edition">
+                <input type="radio" name="user_media" value="1" title="全网自动选择" lay-filter="edition">
+            </div>
+            <div class="from-row">
+                <div class="media_box m1" style="display: none">
+                    <ul class="clearfix">
+                        <li class="item on">
+                            <img src="../../../../../public/img/behe/adx_baidu.png" alt="">
+                            <span class="item_check"></span>
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_aiqiyi.png" alt="">
+                            <span class="item_check"></span>
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                            <span class="item_check"></span>
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                    </ul>
+                </div>
+                <div class="media_box m2">
+                    <ul class="clearfix">
+                        <li class="item on">
+                            <img src="../../../../../public/img/behe/adx_baidu.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_aiqiyi.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                        <li class="item">
+                            <img src="../../../../../public/img/behe/adx_adview.png" alt="">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="commit-box">
+                <button type="button" class="bm-btn bm-btn-white btn_pre" onclick="preStepPage(3)">上一步</button>
+                <button type="button" class="bm-btn bm-btn-blue btn_next" onclick="nextStepPage(3)">下一步</button>
+            </div>
+        </div>
+    </section>
+    </div>
+    <script type="text/javascript" src="../../../../../public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/common.js"></script>
+    <script type="text/javascript" src="../../../../../public/js/layui2.2.5/layui.js"></script>
+    <script type="text/javascript">
+        function preStepPage(v){
+            var v = parseInt(v)-1
+            location.href ='./create'+v+'.html';
+        }
+        function nextStepPage(v){
+            var v = parseInt(v)+1
+            location.href ='./create'+v+'.html';
+        }
+        layui.use(['form', 'layer', 'element', 'layedit', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                laydate = layui.laydate;
+        })
+    </script>
+</body>
+</html>

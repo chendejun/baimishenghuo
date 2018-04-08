@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>账户中心-支出记录</title>
+    <link rel="stylesheet" href="/public/css/base.css">
+    <link rel="stylesheet" href="/public/css/common.css">
+    <link rel="stylesheet" href="/public/css/dateRange.css">
+    <script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/public/js/common.js"></script>
+    <script src="/public/js/laypage/laypage.js"></script>
+    <script type="text/javascript" src="/public/js/dateRange.js"></script>
+</head>
+<style>
+    .ta_date input {width:90%;border:none;outline:none;height:38px;line-height:38px;}
+    .date-picker-wrapper .drp_top-bar .clear-btn {display:block;position:absolute;right:40px;top:6px;padding:3px 5px;margin:0;font-size:12px;border-radius:4px;cursor:pointer;border:1px solid #0076a3;background:#0095cd;background:-webkit-gradient(linear,left top,left bottom,from(#00adee),to(#0078a5));background:-moz-linear-gradient(top,#00adee,#0078a5);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee',endColorstr='#0078a5');color:#fff;line-height:initial;}
+    .tabchangebox {width:100%;margin-top:23px;height:40px;margin-bottom:10px;}
+    .tabchangebox .nav {height:38px;border:1px solid #cccccc;border-radius:5px;overflow:hidden;width:300px;float:left;cursor: pointer;}
+    .tabchangebox .nav .type {height:38px;background:#fff;width:50%;color:#666666;font-size:14px;text-align:center;line-height:38px;float:left;}
+    .tabchangebox .nav .type.cur {background:#4c94f5;color:#fff;}
+    .select_box {float:right;}
+    .select_box #statu_id,.select_box .date_filter,.select_box .mod_timer,.tabchangebox input {float:left;margin:0 5px;}
+    #date_id{height: 38px;}
+    .noMsg1 {width:100%;text-align:center;padding-top:25px;color:#f08519;}
+    th,td {text-align: left!important;}
+</style>
+
+<body>
+    <div class="content_box">
+        <div class="title_box">
+            <span>账户中心 / 支出记录</span>
+        </div>
+        <div class="data_box">
+            <div class="tabchangebox">
+                <div class="nav">
+                    <div class="type cur">账户转账支出记录</div>
+                    <div class="type" status='1'>人群画像充值记录</div>
+                </div>
+
+                <div class="select_box">
+                    <select id="statu_id" class="bm-select">
+                        <option value="">客户类型</option>
+                        <option value="1">代理商</option>
+                        <option value="2">广告主</option>
+                    </select>
+                    <input type="text" id="date_id" class="Wdate bm-input" readonly="readonly" placeholder="选择月份"/>
+                    <input type="text" value="" class="bm-input" id="s_material" placeholder="代理商名称搜索" />
+                    <a class="bm-btn bm-btn-blue" href="javascript:;" onclick="searchFn(this)">搜索</a>
+                </div>
+            </div>
+
+            <!-- 账户充值记录 -->
+            <div class="box_table table_style list1" id="userList">
+                <table id="transfer_list" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>转账金额/元</th>
+                            <th>支出对象名称</th>
+                            <th>客户类型</th>
+                            <th>转入账户</th>
+                            <th>操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg"></p>
+                <!--列表分页-->
+                <div id="list_page" class="page"></div>
+            </div>
+
+            <!-- 人群画像充值记录 -->
+            <div class="box_table table_style list2" id="userList1" style="display: none;">
+                <table id="transfer_list1" class="base_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>支出次数</th>
+                            <th>支出对象名称</th>
+                            <th>客户类型</th>
+                            <th>版本名称</th>
+                            <th>操作人员</th>
+                            <th>流水号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p class="noMsg1"></p>
+                <!--列表分页-->
+                <div id="list_page1" class="page"></div>
+            </div>
+        </div>
+        <script type="text/javascript" src="/public/js/My97DatePicker/WdatePicker.js"></script>
+        <script type="text/javascript">
+            var dateTimer = '',
+                customer_type = '',
+                server_name = '',
+                thisMonth = get_date(0).substr(0, 7);
+            $('#date_id').bind('focus', function () {
+                WdatePicker({
+                    dateFmt: 'yyyy-MM',
+                    minDate: '2017-07',
+                    maxDate: thisMonth
+                })
+            });
+
+            $('.tabchangebox .nav').on('click','.type',function(){
+                var status = $(this).attr('status') ? 1 : '';
+                $(this).addClass('cur').siblings().removeClass('cur');
+                $('.noMsg,.noMsg1').html('');
+                if(status){
+                    $('#userList1').show();
+                    $('#userList').hide();
+                }else{
+                    $('#userList').show();
+                    $('#userList1').hide();         
+                }
+                getTransferList(1,status);
+                console.log(status);
+            })
+
+            // //客户类型
+            // $('#statu_id').on('change',function () {
+            //     var s = $('.tabchangebox .nav').find('.cur').attr('status') ? 1 : '';
+            //     customer_type = $('this').val();
+            //     getTransferList(1,s);
+            // })    
+
+            //搜索
+            function searchFn(){
+                var s = $('.tabchangebox .nav').find('.cur').attr('status') ? 1 : '';
+                dateTimer= $('#date_id').val();
+                customer_type = $('#statu_id').val();
+                server_name = $('#s_material').val();
+                getTransferList(1,s);
+            }
+
+            //获取数据
+            function getTransferList(curr,s) {
+                var s = s || '',urls,
+                date = dateTimer ? ('/date/'+dateTimer) :'',
+                customer = customer_type ? ('/customer_type/'+customer_type) :'',
+                name = server_name ? ('/server_name/'+server_name) :'';
+
+                if(s){//人群画像充值记录
+                    urls = '/v1.2/SceneExtension/getTransferResourceRecord/transfer_type/1/page/' + (curr || 1) + date + customer + name;
+                }else{//账户转账支出记录
+                    urls = '/v1.2/account/transfer/page/' + (curr || 1) + date + customer + name;
+                }
+
+                $.ajax({
+                    type: "GET",
+                    url: urls,
+                    dataType: 'json',
+                    success: function (rs) {
+                        tipTopHide(); //隐藏提示框
+                        if (rs.state == 1) { //如果查询成功
+                            var data = rs.data; //返回数据赋值
+                            render_table(data,s); //渲染表格数据
+                            if(s){
+                            renderPage1(data.pages,curr);
+                            }else{
+                                renderPage(data.pages,curr);
+                            }
+                        } else {
+                            tipTopShow(rs.msg);
+                        }
+                    },
+                    error: function (rs) {
+                        tipTopShow("查询信息失败，请重试..."); //显示提示框
+                    }
+                });
+            }
+
+            //渲染表格数据
+            function render_table(data,s) {
+                var s = s || '',list_e = $("#transfer_list"+s+" tbody"),str="",no_msg = $(".noMsg"+s);
+                if(data.length == 0 || data.list.length == 0){
+                    list_e.html("");
+                    no_msg.text("暂无记录");
+                    return ;
+                }
+                no_msg.text("");
+                $.each(data.list, function (k, v) {
+                    var poster = {'2':'人群画像高级版本','3':'人群画像APP分析版本'}
+                    if(s){
+                        str += '<tr>',
+                        str += '<td>' + v.add_time + '</td>';
+                        str += '<td>' + v.record_num + '</td>';
+                        str += '<td>' + v.to_comp_name + '</td>';
+                        if (v.record_type == 1) {
+                            str += '<td>代理商</td>';
+                        } else if (v.record_type == 2) {
+                            str += '<td>广告主</td>';
+                        } else {
+                            str += '<td>-</td>';
+                        }
+                        str += '<td>' + poster[v.poster_type] + '</td>';
+                        str += '<td>' + v.staff_name + '</td>';
+                        str += '<td>' + v.record_no + '</td>';
+                        str += '</tr>';
+
+                    }else{
+                        str += '<tr>',
+                        str += '<td>' + v.transfer_time + '</td>';
+                        str += '<td>' + v.amount + '</td>';
+                        str += '<td>' + v.comp_name + '</td>';
+                        if (v.comp_type == 1) {
+                            str += '<td>广告主</td>';
+                        } else if (v.comp_type == 2) {
+                            str += '<td>服务商</td>';
+                        } else {
+                            str += '<td>-</td>';
+                        }
+                        str += '<td>' + v.acc_type + '</td>';
+                        str += '<td>' + v.staff_name + '</td>';
+                        str += '<td>' + v.trade_no + '</td>';
+                        str += '</tr>';
+                    }
+                });
+                list_e.html(str);
+                var total = '<tr><td>汇总</td><td>'+data.total+'</td></tr>';
+                list_e.append(total);
+            }
+ 
+            //分页
+            function renderPage(pages,curr){
+                laypage({
+                    cont: $('#list_page'), //容器。值支持id名、原生dom对象，jquery对象。
+                    pages: pages, //通过后台拿到的总页数
+                    //skip: true, //是否开启跳页
+                    skin: '#4c94f5',
+                    prev: '<em class="layui-icon"></em>',
+                    next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function(obj, first){ //触发分页后的回调
+                        if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getTransferList(obj.curr);
+                        }
+                    }
+                });
+            }
+            function renderPage1(pages,curr){
+                laypage({
+                    cont: $('#list_page1'), //容器。值支持id名、原生dom对象，jquery对象。
+                    pages: pages, //通过后台拿到的总页数
+                    //skip: true, //是否开启跳页
+                    skin: '#4c94f5',
+                    prev: '<em class="layui-icon"></em>',
+                    next: '<em class="layui-icon"></em>',
+                    curr: curr || 1, //当前页
+                    jump: function(obj, first){ //触发分页后的回调
+                        if(!first){ //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getTransferList(obj.curr,1);
+                        }
+                    }
+                });
+            }
+
+
+
+
+
+            getTransferList();
+            $(function () {
+                if ($("#daterange").val() != "") {
+                    $('.clear-btn').css("display", "block");
+                }
+            });
+        </script>
+</body>
+
+</html>

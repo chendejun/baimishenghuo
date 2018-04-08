@@ -1,0 +1,19 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Administrator
+ * Date: 2017/6/27
+ * Time: 18:46
+ */
+Class Bhcreate extends  Model{
+
+	/**
+	 * @author	skylon
+	 * @desc	添加广告投放状态修改记录
+	 * @param array() $data
+	 */
+    public function add($data){
+       return $this->db->bh->table( "bh_adxs" )->data( $data )->insert(  );
+    }
+
+}

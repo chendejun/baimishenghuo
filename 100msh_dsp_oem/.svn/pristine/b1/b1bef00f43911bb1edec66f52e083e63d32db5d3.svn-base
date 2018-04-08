@@ -1,0 +1,49 @@
+<?php
+
+/**
+ *
+ */
+class TestController extends BasicController
+{
+
+    public function indexAction()
+    {
+$account_id = 1697020333;
+$data = [
+    'randomNumber'=> '87bed061433798092162bafd6185a714',
+    'creativeType'=>'1',
+    'adxType'=>["9","11","15","27","29","32","35","38","44","45","48","50","55","58","63","66"],
+    'domainIn'=> '',
+    'adPlaceIn'=> '',
+    'appCategory'=> '',
+    'whitelistIn'=> '',
+    'eType'=> '',
+    'v'=> '07844430075019806'
+    ];
+
+
+        $rel = BhDspApi::getEstimateFlow($account_id,$data);
+
+Helper::outJson(json_decode($rel,true));
+    }
+
+
+    public function getBhTimeStatisticsAction()
+    {
+        $account_id = 1697020333;
+        $data = [
+            'cityId'=> 110000
+        ];
+      //   $data['dealType'] = 1;
+      // $data['creativeType'] = 1;//创意类型
+      // $data['mediaType'] = 1;//媒体类型
+      // $data['osType'] = 2;//系统类型
+      // $data['trafficType'] = 1;
+      // $data['behaviorType'] = 1;
+      // $data['platformType'] = 2;
+      // $data['v'] = '';
+
+        $rel = BhDspApi::getEstimateFlow($account_id,$data);
+        Helper::outJson(json_decode($rel,true));
+    }
+}

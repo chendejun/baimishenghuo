@@ -1,0 +1,39 @@
+<?php
+/**
+ * 所有在Bootstrap类中, 以_init开头的方法, 都会被Yaf调用,
+ * 这些方法, 都接受一个参数:Yaf_Dispatcher $dispatcher
+ * 调用的次序, 和申明的次序相同
+ */
+class Bootstrap extends Yaf_Bootstrap_Abstract{
+        /**
+         * [_initCore description]
+         * @return [type] [description]
+         */
+        public function _initCore() {
+             $config = Yaf_Application::app()->getConfig(); 
+
+             Yaf_Loader::import(APP_PATH.'/conf/const.inc.php');
+
+             Yaf_Loader::import(CORE_PATH.'/Model.php');
+             Yaf_Loader::import(CORE_PATH.'/Basic.php');
+             Yaf_Loader::import(CORE_PATH.'/Db.php'); 
+             Yaf_Loader::import(CORE_PATH.'/Helper.php');      
+
+             Yaf_Registry::set('db',new Db($config['db'] ) );
+             Yaf_Registry::set("config", $config);
+             Yaf_Registry::set('redis', RedisCache::Instance($config['redis_host'],$config['redis_port'] , $config['redis_prefix'] , $config['redis_auth']) ); 
+        }
+        public function _initSmarty(Yaf_Dispatcher $dispatcher){  
+            $smarty = new Smarty_Adapter(null , Yaf_Application::app()->getConfig()->smarty);  
+            Yaf_Dispatcher::getInstance()->setView($smarty);  
+        }  
+        /**
+         * [_initRoute description]
+         * @param  Yaf_Dispatcher $dispatcher [description]
+         * @return [type]                     [description]
+         */
+        // public function _initRoute(Yaf_Dispatcher $dispatcher) {
+        //     $router = $dispatcher->getInstance()->getRouter();    
+        //     $router->addRoute('route', new Router());
+        // }
+}
